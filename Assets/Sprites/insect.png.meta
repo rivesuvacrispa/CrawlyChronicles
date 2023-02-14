@@ -43,7 +43,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 0
   alignment: 0
@@ -116,18 +116,84 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: insect_body
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 13
+        width: 78
+        height: 102
+      alignment: 9
+      pivot: {x: 0.50000006, y: 0.48069862}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d6b35ead57daa1545a9cd08c9063c132
+      internalID: -376527012
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: insect_nipper_left
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 104
+        width: 12
+        height: 24
+      alignment: 8
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ee77c8f8a32c67e4783ed62f802fb65f
+      internalID: -1308859145
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: insect_nipper_right
+      rect:
+        serializedVersion: 2
+        x: 12
+        y: 104
+        width: 12
+        height: 24
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1b3e28211e964c945ac825dad88bfaf1
+      internalID: 1928495800
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
     spriteID: 5e97eb03825dee720800000000000000
-    internalID: 0
+    internalID: 1537655665
     vertices: []
     indices: 
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      insect_nipper_left: -1308859145
+      insect_body: -376527012
+      insect_nipper_right: 1928495800
   spritePackingTag: 
   pSDRemoveMatte: 0
   userData: 

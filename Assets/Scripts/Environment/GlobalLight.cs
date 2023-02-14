@@ -1,29 +1,44 @@
 ﻿using System.Collections;
+using Timeline;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
-using UnityEngine.Serialization;
 
 namespace Environment
 {
     [RequireComponent(typeof(Light2D))]
     public class GlobalLight : MonoBehaviour
     {
-        [SerializeField] private Vector2 intensity;
         [SerializeField] private Gradient color;
         [SerializeField] private int transitionTimeSeconds;
         
         private new Light2D light;
 
 
-        private void Awake() => light = GetComponent<Light2D>();
-        
-        public void SetDay()
+        private void Awake()
         {
-            StopAllCoroutines();
-            StartCoroutine(TransitionRoutine(false));
+            light = GetComponent<Light2D>();
+            TimeManager.OnDayStart += SetDay;
+            TimeManager.OnNightStart += SetNight;
+        }
+
+        private void OnDestroy()
+        {
+            TimeManager.OnDayStart -= SetDay;
+            TimeManager.OnNightStart -= SetNight;
+        }
+
+        private void SetDay(int dayCounter)
+        {
+            if (dayCounter == 1)
+                SetInstantly(false);
+            else
+            {
+                StopAllCoroutines();
+                StartCoroutine(TransitionRoutine(false));
+            }
         }
         
-        public void SetNight()
+        private void SetNight(int dayCounter)
         {
             StopAllCoroutines();
             StartCoroutine(TransitionRoutine(true));
@@ -35,7 +50,6 @@ namespace Environment
             light ??= GetComponent<Light2D>();
             int isNight = intoNight ? 0 : 1;
             light.color = color.Evaluate(isNight);
-            light.intensity = Mathf.Lerp(intensity.x, intensity.y, isNight);
         }
 
         private IEnumerator TransitionRoutine(bool intoNight)
@@ -47,7 +61,6 @@ namespace Environment
                 float value = t / transitionTimeSeconds;
                 if (intoNight) value = 1 - value;
                 light.color = color.Evaluate(value);
-                light.intensity = Mathf.Lerp(intensity.x, intensity.y, value);
                 t += Time.deltaTime;
                 yield return null;
             }
