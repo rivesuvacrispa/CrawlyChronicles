@@ -1,13 +1,14 @@
 using System;
 using System.Collections;
 using Camera;
+using Gameplay.AI.Locators;
 using Unity.Mathematics;
 using UnityEngine;
 
 namespace Player
 {
     [RequireComponent(typeof(Rigidbody2D))]
-    public class Movement : MonoBehaviour
+    public class Movement : MonoBehaviour, ILocatorTarget
     {
         [SerializeField] private float moveSpeed;
         [SerializeField] private float rotationSpeed;
@@ -17,6 +18,7 @@ namespace Player
         private Coroutine dashRoutine;
 
         public static Vector2 Position => rb.position;
+        public static Transform Transform => rb.transform;
         
         private void Awake() => rb = GetComponent<Rigidbody2D>();
 
@@ -130,5 +132,7 @@ namespace Player
             rb.rotation = RotateTowardsPosition(MainCamera.WorldMousePos, 360);
             onEnd();
         }
+
+        public string LocatorTargetName => "Player";
     }
 }

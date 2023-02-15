@@ -1,4 +1,5 @@
-﻿using Gameplay.Enemies;
+﻿using Definitions;
+using Gameplay.Enemies;
 using UnityEngine;
 
 namespace UI
@@ -6,14 +7,14 @@ namespace UI
     public class HealthbarPool : MonoBehaviour
     {
         public static HealthbarPool Instance { get; private set; }
-        
+
         [SerializeField] private HealthBar healthBarPrefab;
 
         private void Awake() => Instance = this;
 
         public HealthBar Create(Enemy enemy)
         {
-            HealthBar hb = Instantiate(healthBarPrefab, transform);
+            HealthBar hb = Instantiate(healthBarPrefab, GlobalDefinitions.WorldCanvasTransform);
             hb.SetTarget(enemy);
             return hb;
         }

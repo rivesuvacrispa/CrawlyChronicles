@@ -1,33 +1,41 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Definitions;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Gameplay.Enemies
 {
     public class EnemySpawner : MonoBehaviour
     {
         [SerializeField] private Transform playerTransform;
-        [SerializeField] private Enemy enemyPrefab;
+        [FormerlySerializedAs("enemyAIPrefab")] [SerializeField] private Enemy enemyPrefab;
         [SerializeField] private int enemyPerMinute;
         [SerializeField] private Transform enemySpawnPointsTransform;
 
-        private readonly List<Vector3> enemySpawnPoints = new();
+        private readonly List<EnemySpawnLocation> enemySpawnPoints = new();
+        
+        public static int SpawnLocationsCount { get; private set; }
         
         private void Awake()
         {
             foreach (Transform child in enemySpawnPointsTransform)
-                enemySpawnPoints.Add(child.localPosition);
+                enemySpawnPoints.Add(child.GetComponent<EnemySpawnLocation>());
+            SpawnLocationsCount = enemySpawnPoints.Count;
         }
         
-        private void SpawnEnemy(Vector3 vector3)
+        private void SpawnEnemy(EnemySpawnLocation location)
         {
-            Enemy enemy = Instantiate(enemyPrefab);
-            enemy.SetTarget(playerTransform);
-            enemy.transform.position = vector3;
+            Enemy enemy = Instantiate(enemyPrefab, GlobalDefinitions.GameObjectsTransform);
+            enemy.SpawnLocation = location;
+            enemy.transform.position = location.SpawnPosition;
         }
         
         private IEnumerator SpawnRoutine()
         {
+            yield return new WaitUntil(() => 
+                EnemySpawnLocation.InitializedLocationsAmount == SpawnLocationsCount);
+            
             while (enemyPerMinute > 0)
             {
                 yield return new WaitForSeconds(60f / enemyPerMinute);
@@ -39,6 +47,6 @@ namespace Gameplay.Enemies
 
         private void OnEnable() => StartCoroutine(SpawnRoutine());
 
-        private Vector3 GetRandomSpawnPoint() => enemySpawnPoints[Random.Range(0, enemySpawnPoints.Count)];
+        private EnemySpawnLocation GetRandomSpawnPoint() => enemySpawnPoints[Random.Range(0, enemySpawnPoints.Count)];
     }
 }

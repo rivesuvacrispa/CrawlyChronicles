@@ -1,17 +1,23 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Scriptable
 {
     [CreateAssetMenu(menuName = "Scriptable/Enemy")]
     public class Enemy : ScriptableObject
     {
+        [Header("Utility fields")]
         [SerializeField] private string animatorName;
+        [SerializeField] private float healthbarOffsetY;
+        [SerializeField] private float healthbarWidth;
+        [Header("Stats fields")]
         [SerializeField] private float immunityDuration;
         [SerializeField] private int maxHealth;
         [SerializeField] private int healthRegen;
-        [SerializeField] private float healthbarOffsetY;
-        [SerializeField] private float healthbarWidth;
-        [SerializeField] private Color color;
+        [SerializeField] private int wanderingRadius;
+        [SerializeField] private float movementSpeed;
+        [SerializeField] private float locatorRadius;
+        [SerializeField] private Color bodyColor;
 
         private Gradient immunityGradient;
 
@@ -19,9 +25,12 @@ namespace Scriptable
         public float ImmunityDuration => immunityDuration;
         public int MaxHealth => maxHealth;
         public int HealthRegen => healthRegen;
-        public Color Color => color;
+        public Color BodyColor => bodyColor;
         public float HealthbarOffsetY => healthbarOffsetY;
         public float HealthbarWidth => healthbarWidth;
+        public int WanderingRadius => wanderingRadius;
+        public float MovementSpeed => movementSpeed;
+        public float LocatorRadius => locatorRadius;
 
 
         public Color GetImmunityFrameColor(float time) => immunityGradient.Evaluate(time / immunityDuration);
@@ -33,7 +42,7 @@ namespace Scriptable
                 new[]
                 {
                     new GradientColorKey(Color.white, 0),
-                    new GradientColorKey(color, 1)
+                    new GradientColorKey(bodyColor, 1)
                 }, new[]
                 {
                     new GradientAlphaKey(1, 0),

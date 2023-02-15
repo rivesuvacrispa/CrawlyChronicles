@@ -1,24 +1,28 @@
 ﻿using System.Collections;
 using Definitions;
-using Pathfinding;
+using Gameplay.AI;
+using Gameplay.Food;
 using UI;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Util;
 
 namespace Gameplay.Enemies
 {
-    public class Enemy : MonoBehaviour
+    [RequireComponent(typeof(SpriteRenderer)),
+     RequireComponent(typeof(Animator)),
+     RequireComponent(typeof(Rigidbody2D)),
+     RequireComponent(typeof(AIStateController))]
+    public abstract class Enemy : MonoBehaviour
     {
         [SerializeField] private Scriptable.Enemy scriptable;
-        [SerializeField] private EnemyBody body;
-
-
+        [FormerlySerializedAs("body")] [SerializeField] private EnemyHitbox hitbox;
+        
         private SpriteRenderer spriteRenderer;
         private Animator animator;
         private Rigidbody2D rb;
-        private AIPath path;
-        private AIDestinationSetter destinationSetter;
-
+        protected AIStateController stateController;
+        
         private int walkHash;
         private int idleHash;
         private int deadhash;
@@ -26,56 +30,72 @@ namespace Gameplay.Enemies
         private HealthBar healthBar;
         private int health;
 
+        public EnemySpawnLocation SpawnLocation { get; set; }
         public Scriptable.Enemy Scriptable => scriptable;
+        public Vector2 Position => rb.position;
 
         
+        
+        public abstract void OnMapEntered();
+        public abstract void OnPlayerLocated();
 
-        public void SetTarget(Transform t) => destinationSetter.target = t;
+        public abstract void OnEggsLocated(EggBed eggBed);
 
+        public abstract void OnFoodLocated(FoodBed foodBed);
+
+        public abstract void OnDamageTaken();
+        
+        
+        
         private void Awake()
         {
             spriteRenderer = GetComponent<SpriteRenderer>();
             animator = GetComponent<Animator>();
             rb = GetComponent<Rigidbody2D>();
-            path = GetComponent<AIPath>();
-            destinationSetter = GetComponent<AIDestinationSetter>();
+            stateController = GetComponent<AIStateController>();
+
             walkHash = Animator.StringToHash(scriptable.AnimatorName + "Walk");
             idleHash = Animator.StringToHash(scriptable.AnimatorName + "Idle");
             deadhash = Animator.StringToHash(scriptable.AnimatorName + "Dead");
-            health = scriptable.MaxHealth;
-            spriteRenderer.color = scriptable.Color;
-        }
 
-        private void Start()
+        }
+        
+        protected virtual void Start()
         {
+            health = scriptable.MaxHealth;
+            spriteRenderer.color = scriptable.BodyColor;
             healthBar = HealthbarPool.Instance.Create(this);
         }
-
-
+        
         public void Damage(Vector2 fromPos, int damage, float knockbackPower)
         {
             health -= damage;
             ApplyKnockback(fromPos, knockbackPower);
             healthBar.SetValue(health, Mathf.Clamp01((float) health / scriptable.MaxHealth));
             if (health <= 0) Die();
-            else StartCoroutine(ImmunityRoutine());
+            else
+            {
+                OnDamageTaken();
+                StartCoroutine(ImmunityRoutine());
+            }
         }
 
         private void Die()
         {
-            body.gameObject.SetActive(false);
-            path.enabled = false;
-            destinationSetter.target = null;
+            StopAllCoroutines();
+            hitbox.gameObject.SetActive(false);
+            stateController.SetState(AIState.None);
             rb.rotation = 0;
             rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+            animator.Play(deadhash);
             StartCoroutine(DeathRoutine());
         }
-
+        
+        
+        
+        // Routines & utils
         private IEnumerator DeathRoutine()
         {
-            yield return new WaitForEndOfFrame();
-            
-            animator.Play(deadhash);
             float t = 0;
             while (t < 1f)
             {
@@ -104,8 +124,8 @@ namespace Gameplay.Enemies
         private IEnumerator ImmunityRoutine()
         {
             animator.Play(idleHash);
-            path.enabled = false;
-            body.enabled = false;
+            stateController.SetState(AIState.None);
+            hitbox.enabled = false;
 
             float t = 0;
             while (t < scriptable.ImmunityDuration)
@@ -115,12 +135,12 @@ namespace Gameplay.Enemies
                 yield return null;
             }
 
-            spriteRenderer.color = scriptable.Color;
-            path.enabled = true;
-            body.enabled = true;
+            spriteRenderer.color = scriptable.BodyColor;
+            stateController.SetState(AIState.Follow);
+            hitbox.enabled = true;
             animator.Play(walkHash);
         }
 
-        private void ApplyKnockback(Vector2 from, float knockbackPower) => rb.velocity = (rb.position - from).normalized * knockbackPower;
+        protected virtual void ApplyKnockback(Vector2 from, float knockbackPower) => rb.velocity = (rb.position - from).normalized * knockbackPower;
     }
 }

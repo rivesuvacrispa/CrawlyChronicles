@@ -2,10 +2,9 @@
 
 namespace Gameplay.Enemies
 {
-    public class EnemyBody : MonoBehaviour
+    public class EnemyHitbox : MonoBehaviour
     {
         [SerializeField] private Enemy enemy;
-        
         
         private void OnCollisionEnter2D(Collision2D _)
         {
