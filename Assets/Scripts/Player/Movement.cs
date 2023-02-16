@@ -2,8 +2,8 @@ using System;
 using System.Collections;
 using Camera;
 using Gameplay.AI.Locators;
-using Unity.Mathematics;
 using UnityEngine;
+using Util;
 
 namespace Player
 {
@@ -25,7 +25,7 @@ namespace Player
         private void Update()
         {
             Vector2 mousePos = MainCamera.WorldMousePos;
-            rb.rotation = RotateTowardsPosition(mousePos, rotationSpeed);
+            rb.rotation = PhysicsUtility.RotateTowardsPosition(rb.position, rb.rotation, mousePos, rotationSpeed);
 
             if (Input.GetMouseButton(0))
             {
@@ -33,30 +33,24 @@ namespace Player
             }
         }
 
-        private float RotateTowardsPosition(Vector2 pos, float delta)
-        {
-            Vector2 rotateDirection = pos - rb.position;
-            float angle = Mathf.Atan2(rotateDirection.y, rotateDirection.x) - Mathf.PI * 0.5f;
-            return RotateTowardsAngle(angle, delta);
-        }
 
-        private float RotateTowardsAngle(float angle, float delta)
+
+        public void Knockback(Vector2 attacker, float duration, float speed)
         {
-            return Quaternion.RotateTowards(
-                Quaternion.Euler(0, 0, rb.rotation), 
-                quaternion.Euler(0, 0, angle),
-                delta).eulerAngles.z;
+            StartCoroutine(KnockbackRoutine(attacker, duration, speed));
         }
         
         public bool Dash(Vector2 position, float duration, float speed, Action onEnd)
         {
             if (dashRoutine is null)
             {
-                float direction = RotateTowardsPosition(position, 360);
+                float direction = PhysicsUtility.RotateTowardsPosition(rb.position, rb.rotation,position, 360);
                 if(Mathf.Abs(rb.rotation - direction) < 30f) 
                     dashRoutine = StartCoroutine(StraightDashRoutine(position, duration, speed * 0.75f, onEnd));
                 else
                     dashRoutine = StartCoroutine(SideDashRoutine(position, direction, duration, speed, onEnd));
+                
+                StopCoroutine(nameof(KnockbackRoutine));
                 return true;
             }
 
@@ -73,6 +67,7 @@ namespace Player
 
             return false;
         }
+        
 
         
         private IEnumerator SideDashRoutine(Vector2 position, float direction, float duration, float speed, Action onEnd)
@@ -83,7 +78,7 @@ namespace Player
 
             while (t < duration && Mathf.Abs(rb.rotation - direction) > 10f)
             {
-                rb.rotation = RotateTowardsPosition(position, dashRotationSpeed);
+                rb.rotation = PhysicsUtility.RotateTowardsPosition(rb.position, rb.rotation,position, dashRotationSpeed);
                 t += Time.deltaTime;
                 yield return null;
             }
@@ -129,10 +124,16 @@ namespace Player
             enabled = true;
             dashRoutine = null;
             rb.angularVelocity = 0;
-            rb.rotation = RotateTowardsPosition(MainCamera.WorldMousePos, 360);
+            rb.rotation = PhysicsUtility.RotateTowardsPosition(rb.position, rb.rotation,MainCamera.WorldMousePos, 360);
             onEnd();
         }
 
-        public string LocatorTargetName => "Player";
+        private IEnumerator KnockbackRoutine(Vector2 attacker, float duration, float speed)
+        {
+            enabled = false;
+            rb.velocity = PhysicsUtility.GetKnockbackVelocity(rb.position, attacker, speed);
+            yield return new WaitForSeconds(duration);
+            enabled = true;
+        }
     }
 }

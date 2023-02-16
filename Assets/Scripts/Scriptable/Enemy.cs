@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using UnityEngine.Serialization;
+﻿using Gameplay.Genetics;
+using UnityEngine;
 
 namespace Scriptable
 {
@@ -10,10 +10,12 @@ namespace Scriptable
         [SerializeField] private string animatorName;
         [SerializeField] private float healthbarOffsetY;
         [SerializeField] private float healthbarWidth;
-        [Header("Stats fields")]
+
+        [Header("Stats fields")] 
+        [SerializeField] private GeneType geneDropType;
+        [SerializeField, Range(0, 1)] private float geneDropRate;
         [SerializeField] private float immunityDuration;
         [SerializeField] private int maxHealth;
-        [SerializeField] private int healthRegen;
         [SerializeField] private int wanderingRadius;
         [SerializeField] private float movementSpeed;
         [SerializeField] private float locatorRadius;
@@ -24,7 +26,6 @@ namespace Scriptable
         public string AnimatorName => animatorName;
         public float ImmunityDuration => immunityDuration;
         public int MaxHealth => maxHealth;
-        public int HealthRegen => healthRegen;
         public Color BodyColor => bodyColor;
         public float HealthbarOffsetY => healthbarOffsetY;
         public float HealthbarWidth => healthbarWidth;
@@ -34,6 +35,12 @@ namespace Scriptable
 
 
         public Color GetImmunityFrameColor(float time) => immunityGradient.Evaluate(time / immunityDuration);
+
+        public bool GetGeneDrop(out GeneType geneType)
+        {
+            geneType = geneDropType;
+            return Random.value <= geneDropRate;
+        }
         
         private void Awake()
         {

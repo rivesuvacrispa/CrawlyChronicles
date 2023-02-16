@@ -6,6 +6,7 @@ namespace Player
 {
     public class AttackController : MonoBehaviour
     {
+        [SerializeField] private PlayerHitbox hitbox;
         [SerializeField] private Movement movementComponent;
         [SerializeField] private Animator animator;
         [SerializeField] private float dashDuration;
@@ -13,22 +14,13 @@ namespace Player
         [SerializeField] private float comboRotationSpeed;
         [SerializeField] private GameObject attackGO;
         [SerializeField] private float comboExpirationTime;
-        [SerializeField] private float knockbackPower;
-        [SerializeField] private int attackDamage;
 
         private readonly int claw0Hash = Animator.StringToHash("Claw0");
         private readonly int claw1Hash = Animator.StringToHash("Claw1");
         private int comboCounter;
         private Coroutine comboExpirationRoutine;
 
-        public static float KnockbackPower { get; private set; }
-        public static int AttackDamage { get; private set; }
-
-        private void Start()
-        {
-            KnockbackPower = knockbackPower;
-            AttackDamage = attackDamage;
-        }
+        public bool IsAttacking => attackGO.activeInHierarchy;
 
         private void Update()
         {
@@ -47,30 +39,35 @@ namespace Player
                 () => {
                     attackGO.SetActive(false);
                     StartComboExpiration();
+                    hitbox.Enable();
                 }))
             {
+                if(comboExpirationRoutine is not null) 
+                    StopCoroutine(comboExpirationRoutine);
                 comboCounter++;
                 attackGO.SetActive(true);
                 animator.Play(claw1Hash);
+                hitbox.Disable();
             }
         }
 
         private void ComboAttack()
         {
-            if (movementComponent.ComboDash(dashDuration * 2, comboRotationSpeed, () =>
-                {
+            if (movementComponent.ComboDash(dashDuration * 2, comboRotationSpeed, 
+                () => {
                     attackGO.SetActive(false);
+                    ExpireCombo();
+                    hitbox.Enable();
                 }))
             {
                 StopCoroutine(comboExpirationRoutine);
-                ExpireCombo();
                 attackGO.SetActive(true);
+                hitbox.Disable();
             }
         }
 
         private void StartComboExpiration()
         {
-            if(comboExpirationRoutine is not null) StopCoroutine(comboExpirationRoutine);
             comboExpirationRoutine = StartCoroutine(ComboExpirationRoutine());
         }
 

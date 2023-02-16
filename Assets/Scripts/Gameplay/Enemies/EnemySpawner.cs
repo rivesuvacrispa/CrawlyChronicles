@@ -1,15 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Definitions;
+using Timeline;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Gameplay.Enemies
 {
     public class EnemySpawner : MonoBehaviour
     {
-        [SerializeField] private Transform playerTransform;
-        [FormerlySerializedAs("enemyAIPrefab")] [SerializeField] private Enemy enemyPrefab;
+        [SerializeField] private List<Enemy> enemyPrefabs;
         [SerializeField] private int enemyPerMinute;
         [SerializeField] private Transform enemySpawnPointsTransform;
 
@@ -26,7 +25,7 @@ namespace Gameplay.Enemies
         
         private void SpawnEnemy(EnemySpawnLocation location)
         {
-            Enemy enemy = Instantiate(enemyPrefab, GlobalDefinitions.GameObjectsTransform);
+            Enemy enemy = Instantiate(enemyPrefabs[Random.Range(0, enemyPrefabs.Count)], GlobalDefinitions.GameObjectsTransform);
             enemy.SpawnLocation = location;
             enemy.transform.position = location.SpawnPosition;
         }
@@ -36,6 +35,7 @@ namespace Gameplay.Enemies
             yield return new WaitUntil(() => 
                 EnemySpawnLocation.InitializedLocationsAmount == SpawnLocationsCount);
             
+            SpawnEnemy(GetRandomSpawnPoint());
             while (enemyPerMinute > 0)
             {
                 yield return new WaitForSeconds(60f / enemyPerMinute);

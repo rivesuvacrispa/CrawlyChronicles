@@ -1,5 +1,7 @@
-﻿using Gameplay.AI;
+﻿using Definitions;
+using Gameplay.AI;
 using Gameplay.Food;
+using Gameplay.Genetics;
 using UnityEngine;
 
 namespace Gameplay.Enemies
@@ -9,6 +11,7 @@ namespace Gameplay.Enemies
         [SerializeField] private SpriteRenderer eggSpriteRenderer;
 
         private bool isHoldingEgg;
+        private TrioGene holdingGene;
 
         protected override void Start()
         {
@@ -30,15 +33,13 @@ namespace Gameplay.Enemies
         {
             stateController.SetState(AIState.Follow, eggBed.gameObject, (go) =>
             {
-                if(go is null)
+                if(eggBed.RemoveOne(out holdingGene))
                 {
-                    stateController.SetState(AIState.Wander);
-                    return;
+                    isHoldingEgg = true;
+                    eggSpriteRenderer.enabled = true;
+                    stateController.SetState(AIState.Flee);
                 }
-                eggBed.RemoveOne();
-                isHoldingEgg = true;
-                eggSpriteRenderer.enabled = true;
-                stateController.SetState(AIState.Flee);
+                else stateController.SetState(AIState.Wander);
             });
         }
 
@@ -46,7 +47,7 @@ namespace Gameplay.Enemies
         {
         }
 
-        public override void OnDamageTaken()
+        protected override void OnDamageTaken()
         {
             if(isHoldingEgg) DropEgg();
         }
@@ -55,6 +56,9 @@ namespace Gameplay.Enemies
         {
             eggSpriteRenderer.enabled = false;
             isHoldingEgg = false;
+            var egg = GlobalDefinitions.CreateEgg(holdingGene).transform;
+            egg.position = (Vector3) rb.position + transform.up * 0.35f;
+            egg.rotation = Quaternion.Euler(0, 0, rb.rotation);
         }
     }
 }

@@ -21,8 +21,9 @@ namespace Gameplay.AI
         private Enemy enemy;
         private CallbackableAIPath aiPath;
         private AIDestinationSetter destinationSetter;
+        private float defaultReachDistance;
 
-        private AIState CurrentState { get; set; }
+        public AIState CurrentState { get; private set; }
         private Transform currentFollowTarget;
         
 
@@ -36,6 +37,7 @@ namespace Gameplay.AI
             locator.OnTargetLocated += OnLocatorTriggered;
             aiPath.enabled = false;
             destinationSetter.enabled = false;
+            defaultReachDistance = aiPath.endReachedDistance;
         }
 
         private IEnumerator Start()
@@ -43,12 +45,15 @@ namespace Gameplay.AI
             yield return new WaitUntil(() => EnemySpawnLocation.InitializedLocationsAmount == EnemySpawner.SpawnLocationsCount);
             SetState(debug_AIState);
             SetMovementSpeed(enemy.Scriptable.MovementSpeed);
+            locator.SetRadius(enemy.Scriptable.LocatorRadius);
         }
 
         public void SetState(
             AIState newState, 
             GameObject followTarget = null, 
-            Action<GameObject> onTargetReach = null)
+            Action<GameObject> onTargetReach = null,
+            bool repeatOnTargetReach = false,
+            float reachDistance = float.NaN)
         {
             if(newState == CurrentState) return;
             
@@ -66,7 +71,7 @@ namespace Gameplay.AI
                     SetWander();
                     break;
                 case AIState.Follow:
-                    SetFollow(followTarget, onTargetReach);
+                    SetFollow(followTarget, onTargetReach, repeatOnTargetReach, reachDistance);
                     break;
                 case AIState.None:
                     SetNone();
@@ -83,6 +88,7 @@ namespace Gameplay.AI
 
         private void SetEnter()
         {
+            SetDefaultReachDistance();
             DisableLocator();
             DoNotRepath();
             destinationSetter.enabled = false;
@@ -97,6 +103,7 @@ namespace Gameplay.AI
 
         private void SetExit()
         {
+            SetDefaultReachDistance();
             DisableLocator();
             DoNotRepath();
             destinationSetter.enabled = false;
@@ -110,9 +117,12 @@ namespace Gameplay.AI
             };
         }
 
-        private void SetFollow(GameObject targetGO, Action<GameObject> onTargetReach)
+        private void SetFollow(GameObject targetGO, Action<GameObject> onTargetReach, bool repeat, float reachDistance)
         {
+            if (reachDistance.Equals(float.NaN)) SetDefaultReachDistance();
+            else aiPath.endReachedDistance = reachDistance;
             Transform target = targetGO is null ? Player.Movement.Transform : targetGO.transform;
+            
             DisableLocator();
             AutoRepath();
             destinationSetter.enabled = true;
@@ -122,7 +132,7 @@ namespace Gameplay.AI
                 aiPath.Callback = () =>
                 {
                     onTargetReach(targetGO);
-                    aiPath.Callback = null;
+                    if(!repeat) aiPath.Callback = null;
                 };
         }
 
@@ -136,6 +146,7 @@ namespace Gameplay.AI
         
         private void SetWander()
         {
+            SetDefaultReachDistance();
             EnableLocator();
             AutoRepath();
             destinationSetter.enabled = false;
@@ -149,6 +160,16 @@ namespace Gameplay.AI
         {
             SetMovementSpeed(enemy.Scriptable.MovementSpeed * GlobalDefinitions.FleeingSpeedMultiplier);
             SetExit();
+        }
+
+        public void TakeMoveControl()
+        {
+            aiPath.canMove = false;
+        }
+
+        public void ReturnMoveControl()
+        {
+            aiPath.canMove = true;
         }
 
 
@@ -191,7 +212,8 @@ namespace Gameplay.AI
                     break;
             }
         }
-        
+
+        private void SetDefaultReachDistance() => aiPath.endReachedDistance = defaultReachDistance;
         private void DisableLocator() => locator.gameObject.SetActive(false);
 
         private void EnableLocator() => locator.gameObject.SetActive(true);

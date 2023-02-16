@@ -1,6 +1,6 @@
 ﻿using Definitions;
-using Gameplay.Enemies;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace UI
 {
@@ -8,14 +8,15 @@ namespace UI
     {
         public static HealthbarPool Instance { get; private set; }
 
-        [SerializeField] private HealthBar healthBarPrefab;
+        [FormerlySerializedAs("healthBarPrefab")] 
+        [SerializeField] private Healthbar healthbarPrefab;
 
         private void Awake() => Instance = this;
 
-        public HealthBar Create(Enemy enemy)
+        public Healthbar Create(IDamageable damageable)
         {
-            HealthBar hb = Instantiate(healthBarPrefab, GlobalDefinitions.WorldCanvasTransform);
-            hb.SetTarget(enemy);
+            Healthbar hb = Instantiate(healthbarPrefab, GlobalDefinitions.WorldCanvasTransform);
+            hb.SetTarget(damageable);
             return hb;
         }
     }

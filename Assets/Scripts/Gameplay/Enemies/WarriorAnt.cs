@@ -7,11 +7,18 @@ namespace Gameplay.Enemies
     {
         public override void OnMapEntered()
         {
-            stateController.SetState(AIState.Follow);
+            stateController.SetState(AIState.Follow, 
+                onTargetReach: o => BasicAttack(), 
+                repeatOnTargetReach: true,
+                reachDistance: 1.25f);
         }
 
         public override void OnPlayerLocated()
         {
+            stateController.SetState(AIState.Follow, 
+                onTargetReach: o => BasicAttack(), 
+                repeatOnTargetReach: true,
+                reachDistance: 1.25f);
         }
 
         public override void OnEggsLocated(EggBed eggBed)
@@ -22,7 +29,7 @@ namespace Gameplay.Enemies
         {
         }
 
-        public override void OnDamageTaken()
+        protected override void OnDamageTaken()
         {
         }
     }

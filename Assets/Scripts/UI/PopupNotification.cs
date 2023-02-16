@@ -11,7 +11,6 @@ namespace UI
         [SerializeField] private Text popupText;
 
         private INotificationProvider provider;
-        private float distanceToPlayer;
         private Vector2 providerStaticPosition;
         private bool isActive;
 
@@ -27,6 +26,7 @@ namespace UI
             provider.OnProviderDestroy += OnProviderDestroy;
             providerStaticPosition = provider.Position;
             transform.localPosition = providerStaticPosition;
+            animator.gameObject.SetActive(false);
             UpdateText();
         }
 
@@ -50,7 +50,7 @@ namespace UI
 
         private void Update()
         {
-            distanceToPlayer = (providerStaticPosition - Player.Movement.Position).sqrMagnitude;
+            float distanceToPlayer = (providerStaticPosition - Player.Movement.Position).sqrMagnitude;
             SetActive(distanceToPlayer <= GlobalDefinitions.InteractionDistance);
         }
 

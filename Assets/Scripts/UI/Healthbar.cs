@@ -1,29 +1,26 @@
 ﻿using System.Collections;
-using Gameplay.Enemies;
 using UnityEngine;
 using UnityEngine.UI;
 using Util;
 
 namespace UI
 {
-    public class HealthBar : MonoBehaviour
+    public class Healthbar : MonoBehaviour
     {
+        [SerializeField] private float height = 14;
         [SerializeField] private Image bgImage;
         [SerializeField] private Image mainImage;
         [SerializeField] private Image catchImage;
         [SerializeField] private float catchSpeed;
 
-        private Transform target;
-        private float offset;
-        private Coroutine currentRoutine;
+        private IDamageable target;
+        protected Coroutine currentRoutine;
 
 
-
-        public void SetTarget(Enemy enemy)
+        public void SetTarget(IDamageable damageable)
         {
-            target = enemy.transform;
-            offset = enemy.Scriptable.HealthbarOffsetY;
-            SetWidth(enemy.Scriptable.HealthbarWidth);
+            target = damageable;
+            UpdateWidth();
         }
         
         public void SetValue(int health, float value)
@@ -41,11 +38,11 @@ namespace UI
             SetAlpha(0);
         }
         
-        private void Update()
+        protected virtual void Update()
         {
-            Vector3 pos = target.position;
+            Vector3 pos = target.Transform.position;
             pos.z = 0;
-            pos.y += offset;
+            pos.y += target.HealthbarOffsetY;
             transform.localPosition = pos;
         }
         
@@ -60,6 +57,11 @@ namespace UI
 
             catchImage.fillAmount = finalValue;
 
+            OnValueCatched(health);
+        }
+
+        protected virtual void OnValueCatched(int health)
+        {
             currentRoutine = StartCoroutine(health <= 0 ? DeathRoutine() : FadeRoutine());
         }
 
@@ -76,7 +78,7 @@ namespace UI
             Destroy(gameObject);
         }
 
-        private IEnumerator FadeRoutine()
+        protected IEnumerator FadeRoutine()
         {
             float t = 0;
             yield return new WaitForSeconds(2f);
@@ -96,7 +98,8 @@ namespace UI
             catchImage.color = catchImage.color.WithAlpha(alpha);
         }
         
-        private void SetWidth(float width) => ((RectTransform) transform).sizeDelta = new Vector2(width, 14);
+        protected void UpdateWidth() => 
+            ((RectTransform) transform).sizeDelta = new Vector2(target.HealthbarWidth, height);
 
     }
 }
