@@ -74,8 +74,16 @@ namespace Player
         
         private void Die()
         {
-            AddHealth(100);
-            BreedingManager.Instance.Abort();
+            if (BreedingManager.Instance.CanRespawn)
+            {
+                //Respawn
+                AddHealth(100);
+                BreedingManager.Instance.Abort();
+            }
+            else
+            {
+                Debug.Log("LOL U DIED LOL LOL U DIED");
+            }
         }
 
         private void OnDestroy() => OnDamageableDestroy?.Invoke();

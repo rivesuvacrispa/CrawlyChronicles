@@ -15,7 +15,9 @@ namespace Definitions
         [SerializeField] private Sprite puddleSprite;
         [SerializeField] private Transform gameObjectsTransform;
         [SerializeField] private Transform worldCanvasTransform;
-        [Header("Stats")]
+        [Header("Stats")] 
+        [SerializeField] private int eggGeneEntropy;
+        [SerializeField] private int breedingPartnersGeneEntropy;
         [SerializeField] private float despawnTime;
         [SerializeField] private float wanderingSpeedMultiplier;
         [SerializeField] private float fleeingSpeedMultiplier;
@@ -45,7 +47,9 @@ namespace Definitions
         public static Sprite PuddleSprite => instance.puddleSprite;
         public static Color EggPuddleColor => instance.eggPuddleColor;
         public static float GenePickupDistance => instance.genePickupDistance;
-
+        public static int BreedingPartnersGeneEntropy => instance.breedingPartnersGeneEntropy;
+        public static int EggGeneEntropy => instance.eggGeneEntropy;
+        
         
         
         public static Sprite GetEggsBedSprite(int eggsAmount) => instance.eggSprites[Mathf.Clamp(eggsAmount - 1, 0, 5)];

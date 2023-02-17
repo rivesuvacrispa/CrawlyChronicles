@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Definitions;
+using Gameplay.Enemies;
 using Gameplay.Genetics;
 using UI;
 using UnityEngine;
@@ -13,6 +14,8 @@ namespace Gameplay
     {
         public static BreedingManager Instance { get; private set; }
 
+        [SerializeField] private BreedingMenu breedingMenu;
+        [SerializeField] private GeneDisplay geneDisplay;
         [SerializeField] private int pregnancyDuration = 5;
         [SerializeField] private Animator animator;
         [SerializeField] private ParticleSystem breedingParticles;
@@ -23,28 +26,24 @@ namespace Gameplay
         [Header("Food")]
         [SerializeField] private Text foodText;
         [SerializeField] private int breedingFoodRequirement;
-        [Header("Genes")] 
-        [SerializeField] private Text aggressiveGenesAmountText;
-        [SerializeField] private Text defensiveGenesAmountText;
-        [SerializeField] private Text universalGenesAmountText;
 
         private int totalEggsAmount;
         private int currentFoodAmount;
-        private TrioGene trioGene = TrioGene.Zero;
-        private readonly Text[] geneTexts = new Text[3];
         private PopupNotification popupNotification;
-        
+        private static int eggLayingTimer;
+        private Coroutine eggLayRoutine;
+
         private readonly int breedAnimHash = Animator.StringToHash("PlayerBodyBreeding");
         private readonly int idleAnimHash = Animator.StringToHash("PlayerBodyIdle");
 
-        private static int eggLayingTimer;
+        [field:SerializeField] public TrioGene TrioGene { get; set; } = TrioGene.Zero;
         public bool CanBreed => currentFoodAmount >= breedingFoodRequirement && eggLayingTimer == 0;
+        public bool CanRespawn => totalEggsAmount > 0;
+        
+        
         
         private void Awake()
         {
-            geneTexts[0] = aggressiveGenesAmountText;
-            geneTexts[1] = defensiveGenesAmountText;
-            geneTexts[2] = universalGenesAmountText;
             Instance = this;
             totalEggsAmount = 0;
             currentFoodAmount = 0;
@@ -55,18 +54,18 @@ namespace Gameplay
         public void AddGene(GeneType geneType)
         {
             geneConsumer.ConsumeGene(geneType);
-            trioGene.AddGene(geneType);
-            UpdateGeneText(geneType);
+            TrioGene.AddGene(geneType);
+            geneDisplay.UpdateGeneText(TrioGene, geneType);
         }
         
-        private void LayEggs(Vector2 position)
+        private void LayEggs(Vector2 position, TrioGene genes)
         {
             var bed = Instantiate(eggBedPrefab, GlobalDefinitions.GameObjectsTransform);
             int amount = Random.Range(1, 7);
             var eggs = new List<TrioGene>();
             while (amount > 0)
             {
-                eggs.Add(TrioGene.One);
+                eggs.Add(genes.Randomize(GlobalDefinitions.EggGeneEntropy));
                 amount--;
             }
             
@@ -87,7 +86,6 @@ namespace Gameplay
             foodText.color = currentFoodAmount >= breedingFoodRequirement ? Color.green : Color.white;
         }
 
-        private void UpdateGeneText(GeneType geneType) => geneTexts[(int) geneType].text = trioGene.GetGene(geneType).ToString();
         
         public void AddTotalEggsAmount(int amount)
         {
@@ -113,14 +111,15 @@ namespace Gameplay
             breedingParticles.Stop();
         }
 
-        public void BecomePregnant()
+        public void BecomePregnant(TrioGene genes)
         {
+            breedingParticles.Play();
             currentFoodAmount -= breedingFoodRequirement;
             eggLayingTimer = pregnancyDuration;
-            StartCoroutine(EggLayRoutine());
+            eggLayRoutine = StartCoroutine(EggLayRoutine(genes));
         }
 
-        private IEnumerator EggLayRoutine()
+        private IEnumerator EggLayRoutine(TrioGene genes)
         {
             popupNotification = GlobalDefinitions.CreateNotification(this, false);
             
@@ -131,18 +130,29 @@ namespace Gameplay
                 eggLayingTimer--;
             }
             
-            LayEggs(Player.Movement.Position);
+            breedingParticles.Stop();
+            LayEggs(Player.Movement.Position, genes);
             Destroy(popupNotification.gameObject);
             popupNotification = null;
+            eggLayRoutine = null;
         }
 
         public void Abort()
         {
-            StopCoroutine(EggLayRoutine());
+            if(eggLayRoutine is null) return;
+
+            StopCoroutine(eggLayRoutine);
+            breedingParticles.Stop();
+            eggLayRoutine = null;
+            popupNotification = null;
             eggLayingTimer = 0;
             if(popupNotification is not null) 
                 Destroy(popupNotification.gameObject);
-            popupNotification = null;
+        }
+
+        public void OpenBreedingMenu(NeutralAnt partner)
+        {
+            breedingMenu.Open(partner);
         }
 
         private void OnDestroy() => OnProviderDestroy?.Invoke();

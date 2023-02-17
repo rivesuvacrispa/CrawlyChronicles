@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Definitions;
+using GameCycle;
 using Gameplay.AI.Locators;
 using Gameplay.Genetics;
 using Gameplay.Interaction;
@@ -15,11 +16,16 @@ namespace Gameplay
         
         private SpriteRenderer spriteRenderer;
 
-        private int EggsAmount => eggs.Count;
+        public int EggsAmount => eggs.Count;
+        public TrioGene GetEgg(int index) => eggs[index];
         
         
         
-        private void Awake() => spriteRenderer = GetComponent<SpriteRenderer>();
+        private void Awake()
+        {
+            spriteRenderer = GetComponent<SpriteRenderer>();
+            RespawnManager.OnEggCollectionRequested += OnEggBedsCollectionRequested;
+        }
 
         private void Start()
         {
@@ -31,6 +37,7 @@ namespace Gameplay
         private void OnDestroy()
         {
             BreedingManager.Instance.AddTotalEggsAmount(-EggsAmount);
+            RespawnManager.OnEggCollectionRequested -= OnEggBedsCollectionRequested;
             OnProviderDestroy?.Invoke();
         }
 
@@ -72,25 +79,28 @@ namespace Gameplay
             spriteRenderer.sprite = GlobalDefinitions.GetEggsBedSprite(EggsAmount);
             OnDataUpdate?.Invoke();
         }
-        
-        
+
+        private void OnEggBedsCollectionRequested(List<EggBed> eggBeds) => eggBeds.Add(this);
+
+
         
         // INotificationProvider 
         public event INotificationProvider.NotificationProviderEvent OnDataUpdate;
         public event INotificationProvider.NotificationProviderEvent OnProviderDestroy;
         public Transform Transform => transform;
         public string NotificationText => EggsAmount.ToString();
-        
-        
-        
+
+
         // IInteractable
+
+
         public void Interact()
         {
             AddEgg(Player.Manager.Instance.HoldingEgg);
             Player.Manager.Instance.RemoveEgg();
         }
 
-        public bool CanInteract() => Player.Manager.Instance.IsHoldingEgg;
+        public bool CanInteract() => Player.Manager.Instance.IsHoldingEgg && EggsAmount < 12;
         public float PopupDistance => 0.75f;
         public string ActionTitle => "Return egg";
         Vector3 IInteractable.Position => transform.position;

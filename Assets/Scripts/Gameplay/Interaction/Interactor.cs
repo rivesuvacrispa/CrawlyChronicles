@@ -8,7 +8,6 @@ namespace Gameplay.Interaction
     public class Interactor : MonoBehaviour
     {
         [SerializeField] private InteractionPopup popup;
-        [SerializeField] private float popupDistance;
         
         private IInteractable interactable;
         private bool canInteract;

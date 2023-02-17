@@ -1,9 +1,10 @@
 ﻿using System.Collections;
+using Definitions;
 using Gameplay.AI;
 using Gameplay.Food;
+using Gameplay.Genetics;
 using Gameplay.Interaction;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Util;
 
 namespace Gameplay.Enemies
@@ -16,8 +17,20 @@ namespace Gameplay.Enemies
         private readonly int breedAnimHash = Animator.StringToHash("NeutralAntBodyBreeding");
         private readonly int idleAnimHash = Animator.StringToHash("NeutralAntBodyIdle");
 
-        private bool canBreed = true;
+        private Coroutine interestRoutine;
         
+        public bool CanBreed { get; set; } = true;
+
+        [field:SerializeField] public TrioGene TrioGene { get; private set; } = TrioGene.Zero;
+
+        protected override void Start()
+        {
+            int entropy = GlobalDefinitions.BreedingPartnersGeneEntropy;
+            TrioGene = BreedingManager.Instance.TrioGene.Randomize(entropy);
+            TrioGene.AddGene((GeneType) Random.Range(0,3), Random.Range(2 * entropy, 4 * entropy));
+            base.Start();
+        }
+
         public override void OnMapEntered()
         {
             stateController.SetState(AIState.Wander);
@@ -26,7 +39,7 @@ namespace Gameplay.Enemies
         public override void OnPlayerLocated()
         {
             StopInterest();
-            StartCoroutine(InterestRoutine());
+            interestRoutine = StartCoroutine(InterestRoutine());
         }
 
         public override void OnEggsLocated(EggBed eggBed)
@@ -40,26 +53,24 @@ namespace Gameplay.Enemies
         protected override void OnDamageTaken()
         {
             StopInterest();
-            canBreed = false;
+            CanBreed = false;
             stateController.SetState(AIState.Flee);
         }
 
-        public void Interact()
-        {
-            canBreed = false;
-            BreedingManager.Instance.BecomePregnant();
-        }
+        public void Interact() => BreedingManager.Instance.OpenBreedingMenu(this);
 
-        public bool CanInteract() => canBreed && BreedingManager.Instance.CanBreed;
+        public bool CanInteract() => CanBreed && BreedingManager.Instance.CanBreed;
 
         
 
         // IContinuouslyInteractable
         public void OnInteractionStart()
         {
-            StopInterest();
-            breedAnimator.Play(breedAnimHash);
             stateController.SetState(AIState.None);
+            StopInterest();
+            rb.rotation = PhysicsUtility
+                .RotateTowardsPosition(rb.position, rb.rotation, Player.Movement.Position, 360);
+            breedAnimator.Play(breedAnimHash);
             breedingParticles.Play();
             BreedingManager.Instance.PlayBreedingAnimation();
         }
@@ -70,7 +81,7 @@ namespace Gameplay.Enemies
             stateController.SetState(AIState.Wander);
             breedingParticles.Stop();
             BreedingManager.Instance.PlayIdleAnimation();
-            if(!canBreed) stateController.SetState(AIState.Flee);
+            if(!CanBreed) stateController.SetState(AIState.Flee);
         }
 
         private IEnumerator InterestRoutine()
@@ -87,12 +98,13 @@ namespace Gameplay.Enemies
             }
             
             stateController.ReturnMoveControl();
+            interestRoutine = null;
             stateController.SetState(AIState.Wander);
         }
 
         private void StopInterest()
         {
-            StopCoroutine(InterestRoutine());
+            if(interestRoutine is not null) StopCoroutine(interestRoutine);
             stateController.ReturnMoveControl();
         }
 

@@ -1,22 +1,47 @@
-﻿using UnityEngine;
+﻿using Player;
+using UnityEngine;
 
 namespace Camera
 {
     [RequireComponent(typeof(UnityEngine.Camera))]
     public class MainCamera : MonoBehaviour
     {
+        [SerializeField] private FollowMovement followMovement;
+        [SerializeField] private FreeMovement freeMovement;
+
         private UnityEngine.Camera cam;
+        private static MainCamera instance;
         
         public static Vector3 WorldMousePos { get; private set; }
-        public static Transform Transform { get; private set; }
-        
+
+
+        public static void ToggleFreeMode()
+        {
+            instance.followMovement.enabled = false;
+            instance.freeMovement.enabled = true;
+
+        }
+
+        public static void ToggleFollowMode()
+        {
+            instance.followMovement.enabled = true;
+            instance.freeMovement.enabled = false;
+        }
         
         private void Awake()
         {
+            freeMovement.enabled = false;
+            instance = this;
             cam = GetComponent<UnityEngine.Camera>();
-            Transform = transform;
         }
 
-        private void Update() => WorldMousePos = cam.ScreenToWorldPoint(Input.mousePosition);
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.PageDown))
+                ToggleFollowMode();
+            else if(Input.GetKeyDown(KeyCode.PageUp))
+                ToggleFreeMode();
+            WorldMousePos = cam.ScreenToWorldPoint(Input.mousePosition);
+        }
     }
 }
