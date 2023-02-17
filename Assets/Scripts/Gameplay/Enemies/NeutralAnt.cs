@@ -2,7 +2,7 @@
 using Definitions;
 using Gameplay.AI;
 using Gameplay.Food;
-using Gameplay.Genetics;
+using Genes;
 using Gameplay.Interaction;
 using UnityEngine;
 using Util;

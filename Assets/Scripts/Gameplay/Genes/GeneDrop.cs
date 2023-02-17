@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using Definitions;
+using Gameplay;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
-namespace Gameplay.Genetics
+namespace Genes
 {
     public class GeneDrop : MonoBehaviour
     {

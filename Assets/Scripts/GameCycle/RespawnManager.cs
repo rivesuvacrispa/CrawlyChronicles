@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Camera;
 using Gameplay;
-using Gameplay.Genetics;
+using Genes;
 using UI;
 using UnityEngine;
 using UnityEngine.UI;

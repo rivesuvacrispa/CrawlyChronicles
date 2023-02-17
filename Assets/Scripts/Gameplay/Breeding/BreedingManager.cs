@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Definitions;
 using Gameplay.Enemies;
-using Gameplay.Genetics;
+using Genes;
 using UI;
 using UnityEngine;
 using UnityEngine.UI;

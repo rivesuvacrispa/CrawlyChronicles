@@ -1,6 +1,6 @@
 ﻿using System;
 using Gameplay;
-using Gameplay.Genetics;
+using Genes;
 using UI;
 using UnityEngine;
 using Util;

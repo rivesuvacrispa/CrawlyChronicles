@@ -1,5 +1,5 @@
 ﻿using Gameplay;
-using Gameplay.Genetics;
+using Genes;
 using UI;
 using UnityEngine;
 
@@ -20,6 +20,8 @@ namespace Player
         public TrioGene HoldingEgg { get; private set; }
         public bool AllowInteract => !attackController.IsAttacking;
         public static PlayerStats PlayerStats => Instance.playerStats;
+        public static Transform AggroTransform => true ? Movement.Transform : Movement.Transform;
+        
         
         private int health;
         private int foodAmount;

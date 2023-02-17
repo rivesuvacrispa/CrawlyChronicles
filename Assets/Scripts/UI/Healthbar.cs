@@ -76,7 +76,6 @@ namespace UI
                 yield return null;
             }
             SetAlpha(0);
-            Destroy(gameObject);
         }
 
         protected IEnumerator FadeRoutine()

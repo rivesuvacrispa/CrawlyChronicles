@@ -2,7 +2,7 @@
 using Definitions;
 using GameCycle;
 using Gameplay.AI.Locators;
-using Gameplay.Genetics;
+using Genes;
 using Gameplay.Interaction;
 using UnityEngine;
 using Util;

@@ -1,4 +1,4 @@
-﻿using Gameplay.Genetics;
+﻿using Genes;
 using UnityEngine;
 
 namespace Scriptable

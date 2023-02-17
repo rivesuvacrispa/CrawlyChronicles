@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using Definitions;
-using Gameplay.Genetics;
+using Genes;
 using Gameplay.Interaction;
 using UnityEngine;
 using Util;

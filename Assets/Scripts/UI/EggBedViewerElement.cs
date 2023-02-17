@@ -1,5 +1,5 @@
 ﻿using GameCycle;
-using Gameplay.Genetics;
+using Genes;
 using UnityEngine;
 
 namespace UI

@@ -1,6 +1,6 @@
 ﻿using Gameplay;
 using Gameplay.Enemies;
-using Gameplay.Genetics;
+using Genes;
 using UnityEngine;
 
 namespace UI

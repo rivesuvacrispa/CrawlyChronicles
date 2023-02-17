@@ -1,7 +1,7 @@
 ﻿using Definitions;
 using Gameplay.AI;
 using Gameplay.Food;
-using Gameplay.Genetics;
+using Genes;
 using UnityEngine;
 
 namespace Gameplay.Enemies

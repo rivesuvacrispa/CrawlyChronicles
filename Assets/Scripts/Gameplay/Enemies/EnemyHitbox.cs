@@ -16,6 +16,11 @@ namespace Gameplay.Enemies
             enemy.Damage(Player.Movement.Position, Player.Manager.PlayerStats.AttackDamage, Player.Manager.PlayerStats.AttackKnockback);
         }
 
+        /*private void OnParticleCollision(GameObject other)
+        {
+            // enemy.Damage(other.transform.position, 0, 3);
+        }*/
+
         public void Enable() => collider.enabled = true;
         public void Disable() => collider.enabled = false;
     }

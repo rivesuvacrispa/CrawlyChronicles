@@ -4,7 +4,7 @@ using Player;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
-namespace Gameplay.Genetics
+namespace Genes
 {
     [RequireComponent(typeof(Light2D))]
     public class GeneConsumer : MonoBehaviour

@@ -9,7 +9,6 @@ namespace Player
     {
         [SerializeField] private PlayerHitbox hitbox;
         [SerializeField] private Movement movementComponent;
-        [SerializeField] private Animator animator;
         [SerializeField] private float dashDuration;
         [SerializeField] private float dashSpeed;
         [SerializeField] private float comboRotationSpeed;

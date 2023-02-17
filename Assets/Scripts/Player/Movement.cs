@@ -16,6 +16,7 @@ namespace Player
         
         private static Rigidbody2D rb;
         private Coroutine dashRoutine;
+        public static float MoveSpeedAmplifier { get; set; } = 1;
 
         public static Vector2 Position => rb.position;
         public static Transform Transform => rb.transform;
@@ -29,7 +30,7 @@ namespace Player
 
             if (Input.GetMouseButton(0))
             {
-                rb.velocity = transform.up * moveSpeed;
+                rb.velocity = transform.up * moveSpeed * MoveSpeedAmplifier;
             }
         }
 
@@ -72,7 +73,7 @@ namespace Player
         
         private IEnumerator SideDashRoutine(Vector2 position, float direction, float duration, float speed, Action onEnd)
         {
-            rb.velocity = (position - rb.position).normalized * speed;
+            rb.velocity = (position - rb.position).normalized * speed * MoveSpeedAmplifier;
             float t = 0f;
             enabled = false;
 
@@ -91,7 +92,7 @@ namespace Player
         
         private IEnumerator StraightDashRoutine(Vector2 position, float duration, float speed, Action onEnd)
         {
-            rb.velocity = (position - rb.position).normalized * speed;
+            rb.velocity = (position - rb.position).normalized * speed * MoveSpeedAmplifier;
             float t = 0f;
             enabled = false;
 
@@ -116,7 +117,7 @@ namespace Player
             while (t < duration)
             {
                 rb.rotation += speed;
-                rb.velocity = ((Vector2) MainCamera.WorldMousePos - rb.position).normalized * moveSpeed * 1.5f;
+                rb.velocity = ((Vector2) MainCamera.WorldMousePos - rb.position).normalized * moveSpeed * 1.5f * MoveSpeedAmplifier;
                 t += Time.deltaTime;
                 yield return null;
             }
