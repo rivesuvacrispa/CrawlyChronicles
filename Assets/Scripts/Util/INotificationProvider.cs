@@ -7,7 +7,7 @@ namespace Util
         public delegate void NotificationProviderEvent();
         public event NotificationProviderEvent OnDataUpdate;
         public event NotificationProviderEvent OnProviderDestroy;
-        public Vector2 Position { get; }
+        public Transform Transform { get; }
         public string NotificationText { get; }
     }
 }

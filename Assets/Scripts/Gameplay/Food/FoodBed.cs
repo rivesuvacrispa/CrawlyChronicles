@@ -4,20 +4,22 @@ using UnityEngine;
 
 namespace Gameplay.Food
 {
-    public abstract class FoodBed : MonoBehaviour, ILocatorTarget, IFoodBed, IInteractable
+    public abstract class FoodBed : MonoBehaviour, ILocatorTarget, IFoodBed, IContinuouslyInteractable
     {
         public abstract void Eat();
         
         
         
-        // IInteractable
+        // IContinuouslyInteractable
         public void Interact()
         {
             Eat();
             Player.Manager.Instance.AddHealth(1);
             BreedingManager.Instance.AddFood();
         }
-
+        
+        public abstract void OnInteractionStart();
+        public abstract void OnInteractionStop();
         public abstract bool CanInteract();
         public float InteractionTime => 2f;
         public float PopupDistance => 1.25f;

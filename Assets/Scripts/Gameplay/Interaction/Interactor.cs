@@ -13,8 +13,11 @@ namespace Gameplay.Interaction
         private IInteractable interactable;
         private bool canInteract;
         
+        public static bool Interacting { get; private set; }
+        
         private void OnTriggerEnter2D(Collider2D col)
         {
+            if(Interacting) return;
             if(col.TryGetComponent(out InteractionCollider iCol)) interactable = iCol.Interactable;
         }
 
@@ -42,21 +45,24 @@ namespace Gameplay.Interaction
 
             if(Input.GetKeyDown(KeyCode.E) && canInteract)
             {
-                if (interactable.InteractionTime == 0)
+                if (interactable is IContinuouslyInteractable continuouslyInteractable)
+                    StartCoroutine(InteractionRoutine(continuouslyInteractable));
+                else
                 {
                     interactable.Interact();
                     popup.Disable();
                 }
-                else StartCoroutine(InteractionRoutine());
             }
         }
 
-        private IEnumerator InteractionRoutine()
+        private IEnumerator InteractionRoutine(IContinuouslyInteractable continuouslyInteractable)
         {
             if (interactable is null) yield break;
-            
+
+            Interacting = true;
+            continuouslyInteractable.OnInteractionStart();
             popup.SetFilling(0);
-            float duration = interactable.InteractionTime;
+            float duration = continuouslyInteractable.InteractionTime;
             bool interrupted = false;
             float interactionTime = 0;
             while (interactionTime < duration)
@@ -66,7 +72,7 @@ namespace Gameplay.Interaction
                     interrupted = true;
                     break;
                 }
-                popup.SetFilling(Mathf.Clamp01(interactionTime / interactable.InteractionTime));
+                popup.SetFilling(Mathf.Clamp01(interactionTime / duration));
                 interactionTime += Time.deltaTime;
                 yield return null;
             }
@@ -75,8 +81,13 @@ namespace Gameplay.Interaction
             {
                 interactable.Interact();
                 popup.Disable();
-                StartCoroutine(InteractionRoutine());
-            } else popup.SetFilling(0);
+                StartCoroutine(InteractionRoutine(continuouslyInteractable));
+            } else
+            {
+                popup.SetFilling(0);
+                continuouslyInteractable.OnInteractionStop();
+                Interacting = false;
+            }
         }
 
         private void UpdatePopup()

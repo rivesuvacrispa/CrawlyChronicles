@@ -58,9 +58,9 @@ namespace Definitions
             Instantiate(instance.eggPrefab, instance.gameObjectsTransform)
                 .SetGenes(genes);
 
-        public static void CreateNotification(INotificationProvider provider) =>
+        public static PopupNotification CreateNotification(INotificationProvider provider, bool isStatic = true) =>
             Instantiate(instance.popupNotificationPrefab, instance.worldCanvasTransform)
-                .SetDataProvider(provider);
+                .SetDataProvider(provider, isStatic);
 
         public static void CreateGeneDrop(Vector3 position, GeneType geneType) =>
             Instantiate(instance.geneDropPrefab, instance.gameObjectsTransform).SetGeneType(geneType)

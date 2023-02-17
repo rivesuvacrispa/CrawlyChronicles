@@ -72,7 +72,6 @@ namespace Gameplay
         }
 
         public bool CanInteract() => !Player.Manager.Instance.IsHoldingEgg && !crashed;
-        public float InteractionTime => 0f;
         public float PopupDistance => 0.5f;
         public string ActionTitle => "Pickup egg";
         public Vector3 Position => transform.position;

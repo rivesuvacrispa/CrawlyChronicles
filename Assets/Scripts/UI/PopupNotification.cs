@@ -13,21 +13,26 @@ namespace UI
         private INotificationProvider provider;
         private Vector2 providerStaticPosition;
         private bool isActive;
+        private bool isStatic;
+        private Transform cachedTransfrom;
 
         private static readonly int PopoutHash = Animator.StringToHash("PopupNotificationPopout");
         private static readonly int PopupHash = Animator.StringToHash("PopupNotificationPopup");
         
         
         
-        public void SetDataProvider(INotificationProvider target)
+        public PopupNotification SetDataProvider(INotificationProvider target, bool staticProvider)
         {
             provider = target;
             provider.OnDataUpdate += UpdateText;
             provider.OnProviderDestroy += OnProviderDestroy;
-            providerStaticPosition = provider.Position;
+            cachedTransfrom = target.Transform;
+            isStatic = staticProvider;
+            providerStaticPosition = cachedTransfrom.position;
             transform.localPosition = providerStaticPosition;
             animator.gameObject.SetActive(false);
             UpdateText();
+            return this;
         }
 
         private void UpdateText() => popupText.text = provider.NotificationText;
@@ -50,8 +55,11 @@ namespace UI
 
         private void Update()
         {
-            float distanceToPlayer = (providerStaticPosition - Player.Movement.Position).sqrMagnitude;
+            Vector2 positionToUse = isStatic ? providerStaticPosition : cachedTransfrom.position;
+            float distanceToPlayer = (positionToUse - Player.Movement.Position).sqrMagnitude;
             SetActive(distanceToPlayer <= GlobalDefinitions.InteractionDistance);
+
+            if (!isStatic) transform.localPosition = cachedTransfrom.position;
         }
 
         private void SetActive(bool activeState)

@@ -20,6 +20,7 @@ namespace UI
         public void SetTarget(IDamageable damageable)
         {
             target = damageable;
+            damageable.OnDamageableDestroy += OnDamageableDestroy;
             UpdateWidth();
         }
         
@@ -96,6 +97,12 @@ namespace UI
             bgImage.color = bgImage.color.WithAlpha(alpha * 0.8f);
             mainImage.color = mainImage.color.WithAlpha(alpha);
             catchImage.color = catchImage.color.WithAlpha(alpha);
+        }
+
+        private void OnDamageableDestroy()
+        {
+            target.OnDamageableDestroy -= OnDamageableDestroy;
+            Destroy(gameObject);
         }
         
         protected void UpdateWidth() => 

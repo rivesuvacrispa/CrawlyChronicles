@@ -1,4 +1,5 @@
-﻿using Definitions;
+﻿using System.Collections;
+using Definitions;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
@@ -13,6 +14,8 @@ namespace Gameplay.Genetics
         private void Start()
         {
             SetGeneType(geneType);
+            enabled = false;
+            StartCoroutine(SpawnRoutine());
         }
         
         public GeneDrop SetGeneType(GeneType newType)
@@ -31,13 +34,29 @@ namespace Gameplay.Genetics
             float pickUpDistance = GlobalDefinitions.GenePickupDistance;
             if (distanceFromPlayer <= pickUpDistance)
             {
-                transform.Translate(direction.normalized * Time.deltaTime * (pickUpDistance / distanceFromPlayer));
-                if (distanceFromPlayer <= 0.15f)
-                {
-                    BreedingManager.Instance.AddGene(geneType);
-                    Destroy(gameObject);
-                }
+                enabled = false;
+                StartCoroutine(ConsumingRoutine(pickUpDistance, distanceFromPlayer));
             }
+        }
+
+        private IEnumerator ConsumingRoutine(float pickUpDistance, float distanceFromPlayer)
+        {
+            while (distanceFromPlayer >= 0.15f)
+            {
+                Vector2 direction = Player.Movement.Position - (Vector2) transform.position;
+                distanceFromPlayer = direction.sqrMagnitude;
+                transform.Translate(direction.normalized * Time.deltaTime * (pickUpDistance / distanceFromPlayer));
+                yield return null;
+            }
+            
+            BreedingManager.Instance.AddGene(geneType);
+            Destroy(gameObject);
+        }
+
+        private IEnumerator SpawnRoutine()
+        {
+            yield return new WaitForSeconds(0.75f);
+            enabled = true;
         }
     }
 }

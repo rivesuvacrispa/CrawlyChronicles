@@ -9,17 +9,16 @@ using Util;
 
 namespace Gameplay.Enemies
 {
-    [RequireComponent(typeof(SpriteRenderer)),
-     RequireComponent(typeof(Animator)),
+    [RequireComponent(typeof(Animator)),
      RequireComponent(typeof(Rigidbody2D)),
      RequireComponent(typeof(AIStateController))]
     public abstract class Enemy : MonoBehaviour, IDamageable
     {
+        [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private Scriptable.Enemy scriptable;
         [SerializeField] private EnemyHitbox hitbox;
         [SerializeField] private GameObject attackGO;
         
-        private SpriteRenderer spriteRenderer;
         private Animator animator;
         protected Rigidbody2D rb;
         protected AIStateController stateController;
@@ -32,7 +31,7 @@ namespace Gameplay.Enemies
         private int health;
         private Coroutine attackRoutine;
 
-        public EnemySpawnLocation SpawnLocation { get; set; }
+        [field:SerializeField] public EnemySpawnLocation SpawnLocation { get; set; }
         public Scriptable.Enemy Scriptable => scriptable;
         public Vector2 Position => rb.position;
 
@@ -51,7 +50,6 @@ namespace Gameplay.Enemies
         
         private void Awake()
         {
-            spriteRenderer = GetComponent<SpriteRenderer>();
             animator = GetComponent<Animator>();
             rb = GetComponent<Rigidbody2D>();
             stateController = GetComponent<AIStateController>();
@@ -172,10 +170,12 @@ namespace Gameplay.Enemies
             hitbox.Enable();
             animator.Play(walkHash);
         }
-        
-        
-        
+
+        private void OnDestroy() => OnDamageableDestroy?.Invoke();
+
+
         // IDamageable
+        public event IDamageable.DamageableEvent OnDamageableDestroy;
         public Transform Transform => transform;
         public float HealthbarOffsetY => scriptable.HealthbarOffsetY;
         public float HealthbarWidth => scriptable.HealthbarWidth;

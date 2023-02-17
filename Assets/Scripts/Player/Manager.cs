@@ -1,4 +1,5 @@
-﻿using Gameplay.Genetics;
+﻿using Gameplay;
+using Gameplay.Genetics;
 using UI;
 using UnityEngine;
 
@@ -74,11 +75,15 @@ namespace Player
         private void Die()
         {
             AddHealth(100);
+            BreedingManager.Instance.Abort();
         }
 
+        private void OnDestroy() => OnDamageableDestroy?.Invoke();
         
         
+
         // IDamageable
+        public event IDamageable.DamageableEvent OnDamageableDestroy;
         public Transform Transform => transform;
         public float HealthbarOffsetY => healthbarOffsetY;
         public float HealthbarWidth => healthbarWidth;

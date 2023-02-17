@@ -78,7 +78,7 @@ namespace Gameplay
         // INotificationProvider 
         public event INotificationProvider.NotificationProviderEvent OnDataUpdate;
         public event INotificationProvider.NotificationProviderEvent OnProviderDestroy;
-        public Vector2 Position => transform.position;
+        public Transform Transform => transform;
         public string NotificationText => EggsAmount.ToString();
         
         
@@ -91,7 +91,6 @@ namespace Gameplay
         }
 
         public bool CanInteract() => Player.Manager.Instance.IsHoldingEgg;
-        public float InteractionTime => 0f;
         public float PopupDistance => 0.75f;
         public string ActionTitle => "Return egg";
         Vector3 IInteractable.Position => transform.position;

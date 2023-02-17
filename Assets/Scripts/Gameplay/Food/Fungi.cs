@@ -20,6 +20,14 @@ namespace Gameplay.Food
             else OnDataUpdate?.Invoke();
         }
 
+        public override void OnInteractionStart()
+        {
+        }
+
+        public override void OnInteractionStop()
+        {
+        }
+
         public override bool CanInteract()
         {
             return true;
@@ -32,7 +40,7 @@ namespace Gameplay.Food
         // INotificationProvider
         public event INotificationProvider.NotificationProviderEvent OnDataUpdate;
         public event INotificationProvider.NotificationProviderEvent OnProviderDestroy;
-        Vector2 INotificationProvider.Position => transform.position;
+        public Transform Transform => transform;
         public string NotificationText => amount.ToString();
     }
 }

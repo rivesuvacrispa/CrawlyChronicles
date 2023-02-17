@@ -1,15 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using Definitions;
 using Gameplay.Genetics;
+using UI;
 using UnityEngine;
 using UnityEngine.UI;
+using Util;
 
 namespace Gameplay
 {
-    public class BreedingManager : MonoBehaviour
+    public class BreedingManager : MonoBehaviour, INotificationProvider
     {
         public static BreedingManager Instance { get; private set; }
 
+        [SerializeField] private int pregnancyDuration = 5;
+        [SerializeField] private Animator animator;
+        [SerializeField] private ParticleSystem breedingParticles;
         [SerializeField] private GeneConsumer geneConsumer;
         [Header("Eggs")]
         [SerializeField] private Text totalEggsText;
@@ -26,8 +32,13 @@ namespace Gameplay
         private int currentFoodAmount;
         private TrioGene trioGene = TrioGene.Zero;
         private readonly Text[] geneTexts = new Text[3];
+        private PopupNotification popupNotification;
         
-        
+        private readonly int breedAnimHash = Animator.StringToHash("PlayerBodyBreeding");
+        private readonly int idleAnimHash = Animator.StringToHash("PlayerBodyIdle");
+
+        private static int eggLayingTimer;
+        public bool CanBreed => currentFoodAmount >= breedingFoodRequirement && eggLayingTimer == 0;
         
         private void Awake()
         {
@@ -40,12 +51,7 @@ namespace Gameplay
             UpdateTotalEggsText();
             UpdateFoodText();
         }
-
-        private void Update()
-        {
-            if(Input.GetKeyDown(KeyCode.R) && currentFoodAmount >= breedingFoodRequirement) LayEggs(Player.Movement.Position);
-        }
-
+        
         public void AddGene(GeneType geneType)
         {
             geneConsumer.ConsumeGene(geneType);
@@ -66,7 +72,6 @@ namespace Gameplay
             
             bed.AddEggs(eggs);
             bed.transform.position = position;
-            currentFoodAmount -= breedingFoodRequirement;
             UpdateFoodText();
         }
 
@@ -95,5 +100,59 @@ namespace Gameplay
             currentFoodAmount++;
             UpdateFoodText();
         }
+
+        public void PlayBreedingAnimation()
+        {
+            animator.Play(breedAnimHash);
+            breedingParticles.Play();
+        }
+
+        public void PlayIdleAnimation()
+        {
+            animator.Play(idleAnimHash);
+            breedingParticles.Stop();
+        }
+
+        public void BecomePregnant()
+        {
+            currentFoodAmount -= breedingFoodRequirement;
+            eggLayingTimer = pregnancyDuration;
+            StartCoroutine(EggLayRoutine());
+        }
+
+        private IEnumerator EggLayRoutine()
+        {
+            popupNotification = GlobalDefinitions.CreateNotification(this, false);
+            
+            while (eggLayingTimer > 0)
+            {
+                OnDataUpdate?.Invoke();
+                yield return new WaitForSeconds(1f);
+                eggLayingTimer--;
+            }
+            
+            LayEggs(Player.Movement.Position);
+            Destroy(popupNotification.gameObject);
+            popupNotification = null;
+        }
+
+        public void Abort()
+        {
+            StopCoroutine(EggLayRoutine());
+            eggLayingTimer = 0;
+            if(popupNotification is not null) 
+                Destroy(popupNotification.gameObject);
+            popupNotification = null;
+        }
+
+        private void OnDestroy() => OnProviderDestroy?.Invoke();
+
+
+        
+        // INotificationProvider
+        public event INotificationProvider.NotificationProviderEvent OnDataUpdate;
+        public event INotificationProvider.NotificationProviderEvent OnProviderDestroy;
+        public Transform Transform => Player.Movement.Transform;
+        public string NotificationText => eggLayingTimer.ToString();
     }
 }

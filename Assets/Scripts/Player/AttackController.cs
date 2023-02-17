@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using Camera;
+using Gameplay.Interaction;
 using UnityEngine;
 
 namespace Player
@@ -15,8 +16,6 @@ namespace Player
         [SerializeField] private GameObject attackGO;
         [SerializeField] private float comboExpirationTime;
 
-        private readonly int claw0Hash = Animator.StringToHash("Claw0");
-        private readonly int claw1Hash = Animator.StringToHash("Claw1");
         private int comboCounter;
         private Coroutine comboExpirationRoutine;
 
@@ -24,6 +23,7 @@ namespace Player
 
         private void Update()
         {
+            if(Interactor.Interacting) return;
             if (Input.GetKeyDown(KeyCode.Q))
             {
                 if (comboCounter == 3)
@@ -46,7 +46,7 @@ namespace Player
                     StopCoroutine(comboExpirationRoutine);
                 comboCounter++;
                 attackGO.SetActive(true);
-                animator.Play(claw1Hash);
+                // animator.Play(claw1Hash);
                 hitbox.Disable();
             }
         }
@@ -75,7 +75,7 @@ namespace Player
         {
             comboCounter = 0;
             comboExpirationRoutine = null;
-            animator.Play(claw0Hash);
+            // animator.Play(claw0Hash);
         }
 
         private IEnumerator ComboExpirationRoutine()
