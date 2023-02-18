@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Definitions;
+using Gameplay.Abilities;
 using Gameplay.Enemies;
 using Genes;
 using UI;
@@ -57,15 +58,23 @@ namespace Gameplay
             TrioGene.AddGene(geneType);
             geneDisplay.UpdateGeneText(TrioGene, geneType);
         }
+
+        public void UpdateGeneText()
+        {
+            geneDisplay.UpdateTrioText(TrioGene);
+        }
         
-        private void LayEggs(Vector2 position, TrioGene genes)
+        private void LayEggs(Vector2 position, TrioGene genes, MutationData mutationData)
         {
             var bed = Instantiate(eggBedPrefab, GlobalDefinitions.GameObjectsTransform);
             int amount = Random.Range(1, 7);
-            var eggs = new List<TrioGene>();
+            var eggs = new List<Egg>();
             while (amount > 0)
             {
-                eggs.Add(genes.Randomize(GlobalDefinitions.EggGeneEntropy));
+                Egg egg = new Egg(
+                    genes.Randomize(GlobalDefinitions.EggGeneEntropy), 
+                    mutationData.Randomize());
+                eggs.Add(egg);
                 amount--;
             }
             
@@ -111,15 +120,15 @@ namespace Gameplay
             breedingParticles.Stop();
         }
 
-        public void BecomePregnant(TrioGene genes)
+        public void BecomePregnant(TrioGene genes, MutationData mutationData)
         {
             breedingParticles.Play();
             currentFoodAmount -= breedingFoodRequirement;
             eggLayingTimer = pregnancyDuration;
-            eggLayRoutine = StartCoroutine(EggLayRoutine(genes));
+            eggLayRoutine = StartCoroutine(EggLayRoutine(genes, mutationData));
         }
 
-        private IEnumerator EggLayRoutine(TrioGene genes)
+        private IEnumerator EggLayRoutine(TrioGene genes, MutationData mutationData)
         {
             popupNotification = GlobalDefinitions.CreateNotification(this, false);
             
@@ -131,7 +140,7 @@ namespace Gameplay
             }
             
             breedingParticles.Stop();
-            LayEggs(Player.Movement.Position, genes);
+            LayEggs(Player.Movement.Position, genes, mutationData);
             Destroy(popupNotification.gameObject);
             popupNotification = null;
             eggLayRoutine = null;

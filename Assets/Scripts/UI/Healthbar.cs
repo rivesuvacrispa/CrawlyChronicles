@@ -24,12 +24,12 @@ namespace UI
             UpdateWidth();
         }
         
-        public void SetValue(int health, float value)
+        public void SetValue(float value)
         {
             mainImage.fillAmount = value;
             SetAlpha(1f);
             if(currentRoutine is not null) StopCoroutine(currentRoutine);
-            currentRoutine = StartCoroutine(CatchRoutine(health, value));
+            currentRoutine = StartCoroutine(CatchRoutine(value));
         }
         
         private void Start()
@@ -47,7 +47,7 @@ namespace UI
             transform.localPosition = pos;
         }
         
-        private IEnumerator CatchRoutine(int health, float finalValue)
+        private IEnumerator CatchRoutine(float finalValue)
         {
             while (catchImage.fillAmount - mainImage.fillAmount > 0.01f)
             {
@@ -58,12 +58,12 @@ namespace UI
 
             catchImage.fillAmount = finalValue;
 
-            OnValueCatched(health);
+            OnValueCatched(finalValue);
         }
 
-        protected virtual void OnValueCatched(int health)
+        protected virtual void OnValueCatched(float value)
         {
-            currentRoutine = StartCoroutine(health <= 0 ? DeathRoutine() : FadeRoutine());
+            currentRoutine = StartCoroutine(value <= float.Epsilon ? DeathRoutine() : FadeRoutine());
         }
 
         private IEnumerator DeathRoutine()

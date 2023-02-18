@@ -6,6 +6,8 @@ namespace Timeline
 {
     public class TimeManager : MonoBehaviour
     {
+        private static TimeManager instance;
+        
         [SerializeField] private Text dayText;
         [SerializeField] private int dayDurationInSeconds = 60;
         [SerializeField] private int nightDurationInSeconds = 240;
@@ -17,7 +19,10 @@ namespace Timeline
         public delegate void DayCycleEvent(int dayCounter);
         public static event DayCycleEvent OnDayStart;
         public static event DayCycleEvent OnNightStart;
+
+        public static bool IsDay => instance.time < instance.dayDurationInSeconds;
         
+        private TimeManager() => instance = this;
 
         private void Start()
         {

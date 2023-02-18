@@ -8,12 +8,12 @@
             UpdateWidth();
         }
 
-        protected override void OnValueCatched(int health)
+        protected override void OnValueCatched(float health)
         {
             if (health == 0)
             {
                 //TODO: IDK BRO
-            } else if (health == Player.Manager.PlayerStats.MaxHealth)
+            } else if (health >= 1 - float.Epsilon)
             {
                 currentRoutine = StartCoroutine(FadeRoutine());
             }

@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-namespace Gameplay.Abilities
+namespace Gameplay.Abilities.Active
 {
-    public class PheromoneBurst : Ability
+    public class PheromoneBurst : ActiveAbility
     {
         [SerializeField] private TrailRenderer trailRenderer;
         [Header("Duration")] 
@@ -19,6 +19,7 @@ namespace Gameplay.Abilities
         
         public override void OnLevelChanged(int lvl)
         {
+            base.OnLevelChanged(lvl);
             duration = LerpLevel(durationLvl1, durationLvl10, lvl);
             speed = LerpLevel(speedLvl1, speedLvl10, lvl);
         }

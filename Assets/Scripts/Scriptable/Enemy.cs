@@ -12,10 +12,9 @@ namespace Scriptable
         [SerializeField] private float healthbarWidth;
 
         [Header("Stats fields")] 
-        [SerializeField] private GeneType geneDropType;
         [SerializeField, Range(0, 1)] private float geneDropRate;
         [SerializeField] private float immunityDuration;
-        [SerializeField] private int maxHealth;
+        [SerializeField] private float maxHealth;
         [SerializeField] private int wanderingRadius;
         [SerializeField] private float movementSpeed;
         [SerializeField] private float locatorRadius;
@@ -25,22 +24,20 @@ namespace Scriptable
 
         public string AnimatorName => animatorName;
         public float ImmunityDuration => immunityDuration;
-        public int MaxHealth => maxHealth;
+        public float MaxHealth => maxHealth;
         public Color BodyColor => bodyColor;
         public float HealthbarOffsetY => healthbarOffsetY;
         public float HealthbarWidth => healthbarWidth;
         public int WanderingRadius => wanderingRadius;
         public float MovementSpeed => movementSpeed;
         public float LocatorRadius => locatorRadius;
+        public float GeneDropRate => geneDropRate;
 
 
+        
         public Color GetImmunityFrameColor(float time) => immunityGradient.Evaluate(time / immunityDuration);
-
-        public bool GetGeneDrop(out GeneType geneType)
-        {
-            geneType = geneDropType;
-            return Random.value <= geneDropRate;
-        }
+        
+        
         
         private void Awake()
         {

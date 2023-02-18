@@ -33,8 +33,8 @@ namespace UI
                     float slice = sliceSize * i;
                     Vector2 pos = new Vector2(Mathf.Sin(slice), Mathf.Cos(slice)) * radius;
                     display.transform.localPosition = pos;
-                    TrioGene egg = eggBed.GetEgg(i);
-                    display.SetGenes(egg);
+                    Egg egg = eggBed.GetEgg(i);
+                    display.SetEgg(egg);
                     display.gameObject.SetActive(true);
                 }
                 else

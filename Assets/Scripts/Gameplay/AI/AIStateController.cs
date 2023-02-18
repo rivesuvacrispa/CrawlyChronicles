@@ -15,6 +15,8 @@ namespace Gameplay.AI
     public class AIStateController : MonoBehaviour
     {
         [SerializeField] private Locator locator;
+        [SerializeField] private EnemyHitbox hitbox;
+        [SerializeField] private Collider2D physicsCollider;
 
         public AIState debug_AIState;
         
@@ -52,7 +54,6 @@ namespace Gameplay.AI
             AIState newState, 
             GameObject followTarget = null, 
             Action<GameObject> onTargetReach = null,
-            bool repeatOnTargetReach = false,
             float reachDistance = float.NaN)
         {
             if(newState == CurrentState) return;
@@ -71,7 +72,7 @@ namespace Gameplay.AI
                     SetWander();
                     break;
                 case AIState.Follow:
-                    SetFollow(followTarget, onTargetReach, repeatOnTargetReach, reachDistance);
+                    SetFollow(followTarget, onTargetReach, reachDistance);
                     break;
                 case AIState.None:
                     SetNone();
@@ -84,10 +85,12 @@ namespace Gameplay.AI
             }
             
             CurrentState = newState;
+            debug_AIState = newState;
         }
 
         private void SetEnter()
         {
+            SetEtherial(true);
             SetDefaultReachDistance();
             DisableLocator();
             DoNotRepath();
@@ -96,28 +99,28 @@ namespace Gameplay.AI
             aiPath.SetPath(enemy.SpawnLocation.EnteringPath);
             aiPath.Callback = () =>
             {
-                aiPath.Callback = null;
+                CancelCallback();
+                SetEtherial(false);
                 enemy.OnMapEntered();
             };
         }
 
         private void SetExit()
         {
-            SetDefaultReachDistance();
             DisableLocator();
-            DoNotRepath();
+            AutoRepath();
             destinationSetter.enabled = false;
             aiPath.enabled = true;
             aiPath.destination = enemy.SpawnLocation.SpawnPosition;
             aiPath.SearchPath();
+            aiPath.endReachedDistance = 1f;
             aiPath.Callback = () =>
             {
                 Destroy(gameObject);
-                aiPath.Callback = null;
             };
         }
 
-        private void SetFollow(GameObject targetGO, Action<GameObject> onTargetReach, bool repeat, float reachDistance)
+        private void SetFollow(GameObject targetGO, Action<GameObject> onTargetReach, float reachDistance)
         {
             if (reachDistance.Equals(float.NaN)) SetDefaultReachDistance();
             else aiPath.endReachedDistance = reachDistance;
@@ -129,11 +132,7 @@ namespace Gameplay.AI
             aiPath.enabled = true;
             destinationSetter.target = target;
             if (onTargetReach is not null)
-                aiPath.Callback = () =>
-                {
-                    onTargetReach(targetGO);
-                    if(!repeat) aiPath.Callback = null;
-                };
+                aiPath.Callback = () => onTargetReach(targetGO);
         }
 
         private void SetNone()
@@ -159,19 +158,19 @@ namespace Gameplay.AI
         private void SetFlee()
         {
             SetMovementSpeed(enemy.Scriptable.MovementSpeed * GlobalDefinitions.FleeingSpeedMultiplier);
-            SetExit();
+            SetState(AIState.Exit);
         }
 
-        public void TakeMoveControl()
+        public void SetEtherial(bool isEtherial)
         {
-            aiPath.canMove = false;
+            physicsCollider.enabled = !isEtherial;
+            if(isEtherial) hitbox.Disable();
+            else hitbox.Enable();
         }
+        
+        public void TakeMoveControl() => aiPath.canMove = false;
 
-        public void ReturnMoveControl()
-        {
-            aiPath.canMove = true;
-        }
-
+        public void ReturnMoveControl() => aiPath.canMove = true;
 
         
 
@@ -190,10 +189,12 @@ namespace Gameplay.AI
         private void DoNotRepath() => aiPath.autoRepath.mode = AutoRepathPolicy.Mode.Never;
         private void AutoRepath() => aiPath.autoRepath.mode = AutoRepathPolicy.Mode.Dynamic;
         private void SetMovementSpeed(float speed) => aiPath.maxSpeed = speed;
+
+        public void CancelCallback() => aiPath.Callback = null;
         
         private void CancelPath()
         {
-            aiPath.Callback = null;
+            CancelCallback();
             aiPath.SetPath(null);
         }
 

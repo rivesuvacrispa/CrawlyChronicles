@@ -12,12 +12,12 @@ namespace Gameplay
     [RequireComponent(typeof(SpriteRenderer))]
     public class EggBed : MonoBehaviour, INotificationProvider, ILocatorTarget, IInteractable
     {
-        [SerializeField] private List<TrioGene> eggs = new();
+        [SerializeField] private List<Egg> storedEggs = new();
         
         private SpriteRenderer spriteRenderer;
 
-        public int EggsAmount => eggs.Count;
-        public TrioGene GetEgg(int index) => eggs[index];
+        public int EggsAmount => storedEggs.Count;
+        public Egg GetEgg(int index) => storedEggs[index];
         
         
         
@@ -41,27 +41,27 @@ namespace Gameplay
             OnProviderDestroy?.Invoke();
         }
 
-        public void AddEggs(List<TrioGene> trioGenes)
+        public void AddEggs(List<Egg> eggs)
         {
-            eggs.AddRange(trioGenes);
-            BreedingManager.Instance.AddTotalEggsAmount(trioGenes.Count);
+            storedEggs.AddRange(eggs);
+            BreedingManager.Instance.AddTotalEggsAmount(eggs.Count);
             UpdateAmount();
         }
 
-        private void AddEgg(TrioGene trioGene)
+        private void AddEgg(Egg egg)
         {
-            eggs.Add(trioGene);
+            storedEggs.Add(egg);
             BreedingManager.Instance.AddTotalEggsAmount(1);
             UpdateAmount();
         }
 
-        public bool RemoveOne(out TrioGene gene)
+        public bool RemoveOne(out Egg egg)
         {
-            gene = default;
+            egg = null;
             if (EggsAmount <= 0) return false;
             
-            gene = eggs[Random.Range(0, EggsAmount)];
-            eggs.Remove(gene);
+            egg = storedEggs[Random.Range(0, EggsAmount)];
+            storedEggs.Remove(egg);
 
             if (EggsAmount <= 0)
                 Destroy(gameObject);

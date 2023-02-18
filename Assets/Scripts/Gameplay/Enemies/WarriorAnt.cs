@@ -8,16 +8,14 @@ namespace Gameplay.Enemies
         public override void OnMapEntered()
         {
             stateController.SetState(AIState.Follow, 
-                onTargetReach: o => BasicAttack(), 
-                repeatOnTargetReach: true,
+                onTargetReach: o => BasicAttack(),
                 reachDistance: 1.25f);
         }
 
         public override void OnPlayerLocated()
         {
             stateController.SetState(AIState.Follow, 
-                onTargetReach: o => BasicAttack(), 
-                repeatOnTargetReach: true,
+                onTargetReach: o => BasicAttack(),
                 reachDistance: 1.25f);
         }
 

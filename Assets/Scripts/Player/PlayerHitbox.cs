@@ -10,11 +10,16 @@ namespace Player
         [SerializeField] private Movement movement;
         [SerializeField] private SpriteRenderer bodySprite;
         [SerializeField] private Gradient immunityGradient;
-
+        
         private new Collider2D collider;
         
         public bool BlockColor { get; set; }
 
+        public delegate void PlayerHitboxEvent(int damage);
+        public static event PlayerHitboxEvent OnDamageTaken;
+        
+        
+        
         private void Awake() => collider = GetComponent<Collider2D>();
 
         private void OnCollisionEnter2D(Collision2D col)
@@ -24,12 +29,12 @@ namespace Player
         
         private void Damage(Vector3 pos)
         {
-            if (!Manager.PlayerStats.Godmode)
-            {
-                //TODO: add knockback and damage stat for each enemy
-                movement.Knockback(pos, 0.35f, knockback);
-                Manager.Instance.Damage(1);
-            }
+            if (Manager.Instance.GodMode) return;
+            //TODO: add knockback and damage stat for each enemy
+            movement.Knockback(pos, 0.35f, knockback);
+            int damage = 1;
+            Manager.Instance.Damage(damage);
+            OnDamageTaken?.Invoke(damage);
             StartCoroutine(ImmunityRoutine());
         }
         

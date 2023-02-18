@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor (typeof (Ability), true), CanEditMultipleObjects]
+[CustomEditor (typeof (BasicAbility), true), CanEditMultipleObjects]
 public class AbilityEditor : Editor
 {
     private SerializedProperty levelProperty;
@@ -14,7 +14,7 @@ public class AbilityEditor : Editor
     }
 
     public override void OnInspectorGUI() {
-        Ability manager = target as Ability;
+        BasicAbility manager = target as BasicAbility;
         if (manager == null) return;
         
         int current = levelProperty.intValue;
@@ -26,9 +26,10 @@ public class AbilityEditor : Editor
 
         DrawDefaultInspector();
 
-        if (GUILayout.Button("Activate"))
+        if (manager is ActiveAbility activeAbility &&
+            GUILayout.Button("Activate"))
         {
-            manager.Activate();
+            activeAbility.Activate();
         }
     }
 }

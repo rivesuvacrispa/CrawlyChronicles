@@ -10,7 +10,6 @@ namespace Player
         [SerializeField] private PlayerHitbox hitbox;
         [SerializeField] private Movement movementComponent;
         [SerializeField] private float dashDuration;
-        [SerializeField] private float dashSpeed;
         [SerializeField] private float comboRotationSpeed;
         [SerializeField] private GameObject attackGO;
         [SerializeField] private float comboExpirationTime;
@@ -34,7 +33,7 @@ namespace Player
 
         private void Attack()
         {
-            if (movementComponent.Dash(MainCamera.WorldMousePos, dashDuration, dashSpeed, 
+            if (movementComponent.Dash(MainCamera.WorldMousePos, dashDuration, 
                 () => {
                     attackGO.SetActive(false);
                     StartComboExpiration();

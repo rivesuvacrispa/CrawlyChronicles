@@ -4,6 +4,7 @@ using System.Linq;
 using Camera;
 using Gameplay;
 using Genes;
+using Player;
 using UI;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,12 +16,14 @@ namespace GameCycle
         public delegate void EggBedCollectionEvent(List<EggBed> eggBeds);
         public static EggBedCollectionEvent OnEggCollectionRequested;
 
+        [SerializeField] private AbilityController abilityController;
         [SerializeField] private FollowMovement followMovement;
         [SerializeField] private EggBedViewer viewer;
         [SerializeField] private GameObject respawnMenuGO;
         [SerializeField] private Text eggBedSelectionText;
         [SerializeField] private GameObject leftArrow;
         [SerializeField] private GameObject rightArrow;
+        [SerializeField] private MutationMenu mutationMenu;
 
         private int currentEggBedIndex;
         private List<EggBed> eggBeds = new();
@@ -36,6 +39,7 @@ namespace GameCycle
             CollectAllEggBeds();
             eggBeds = eggBeds.OrderBy(bed => bed.transform.position.x).ToList();
             SelectEggBed(0);
+            AbilityController.SetUIActive(false);
             respawnMenuGO.SetActive(true);
             StartCoroutine(RespawnRoutine());
         }
@@ -78,10 +82,21 @@ namespace GameCycle
 
         public void GoRight() => SelectEggBed(currentEggBedIndex + 1);
 
-        public void SelectEggToRespawn(TrioGene trioGene)
+        public void SelectEggToRespawn(Egg egg)
         {
             viewer.Disable();
             respawnMenuGO.SetActive(false);
+            mutationMenu.SetEgg(egg);
+            mutationMenu.gameObject.SetActive(true);
+        }
+
+        public void Respawn(Egg egg)
+        {
+            BreedingManager.Instance.TrioGene = egg.Genes;
+            BreedingManager.Instance.UpdateGeneText();
+            abilityController.UpdateAbilities(egg);
+            followMovement.Target = Movement.Transform;
+            AbilityController.SetUIActive(true);
             Time.timeScale = 1;
         }
     }

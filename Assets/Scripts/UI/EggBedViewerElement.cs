@@ -1,4 +1,5 @@
 ﻿using GameCycle;
+using Gameplay;
 using Genes;
 using UnityEngine;
 
@@ -9,17 +10,17 @@ namespace UI
         [SerializeField] private GeneDisplay display;
         [SerializeField] private RespawnManager respawnManager;
 
-        public TrioGene TrioGene { get; private set; }
+        private Egg storedEgg;
 
         public void Click()
         {
-            respawnManager.SelectEggToRespawn(TrioGene);
+            respawnManager.SelectEggToRespawn(storedEgg);
         }
 
-        public void SetGenes(TrioGene trioGene)
+        public void SetEgg(Egg egg)
         {
-            TrioGene = trioGene;
-            display.UpdateTrioText(trioGene);
+            storedEgg = egg;
+            display.UpdateTrioText(egg.Genes);
         }
     }
 }

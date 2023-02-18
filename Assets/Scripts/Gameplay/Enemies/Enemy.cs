@@ -28,8 +28,9 @@ namespace Gameplay.Enemies
         private int deadhash;
 
         private Healthbar healthbar;
-        private int health;
+        private float health;
         private Coroutine attackRoutine;
+        private bool stunned;
 
         [field:SerializeField] public EnemySpawnLocation SpawnLocation { get; set; }
         public Scriptable.Enemy Scriptable => scriptable;
@@ -67,17 +68,26 @@ namespace Gameplay.Enemies
             healthbar = HealthbarPool.Instance.Create(this);
         }
         
-        public void Damage(Vector2 attacker, int damage, float knockbackPower)
+        public void Damage(float damage, float knockback, float stunDuration) => 
+            Damage(Player.Movement.Position, damage, knockback, stunDuration);
+
+        public void Damage(Vector2 attacker, float damage, float knockbackPower, float stunDuration)
         {
             health -= damage;
             StopAttack();
-            rb.velocity = PhysicsUtility.GetKnockbackVelocity(rb.position, attacker, knockbackPower);
-            healthbar.SetValue(health, Mathf.Clamp01((float) health / scriptable.MaxHealth));
-            if (health <= 0) Die();
+            healthbar.SetValue(Mathf.Clamp01(health / scriptable.MaxHealth));
+            if (health <= float.Epsilon) Die();
             else
             {
                 OnDamageTaken();
                 StartCoroutine(ImmunityRoutine());
+                if (stunDuration > float.Epsilon) 
+                    StartCoroutine(StunRoutine(stunDuration));
+                if (knockbackPower > 0)
+                {
+                    var velocity = PhysicsUtility.GetKnockbackVelocity(rb.position, attacker, knockbackPower);
+                    StartCoroutine(KnockbackRoutine(velocity));
+                }
             }
         }
 
@@ -90,20 +100,22 @@ namespace Gameplay.Enemies
             rb.rotation = 0;
             rb.constraints = RigidbodyConstraints2D.FreezeRotation;
             animator.Play(deadhash);
-            if(scriptable.GetGeneDrop(out GeneType geneType)) 
-                GlobalDefinitions.CreateGeneDrop(Position, geneType);
+            if(Random.value <= scriptable.GeneDropRate) 
+                GlobalDefinitions.CreateRandomGeneDrop(Position);
             StartCoroutine(DeathRoutine());
         }
 
         private void StopAttack()
         {
-            if(attackRoutine is not null) StopCoroutine(attackRoutine);
+            if(attackRoutine is not null) 
+                StopCoroutine(attackRoutine);
             attackRoutine = null;
+            attackGO.SetActive(false);
         }
         
         protected void BasicAttack()
         {
-            if(attackRoutine is not null) return;
+            if(attackRoutine is not null || stunned) return;
             attackRoutine = StartCoroutine(AttackRoutine());
         }
         
@@ -114,13 +126,15 @@ namespace Gameplay.Enemies
         {
             attackGO.SetActive(true);
             stateController.TakeMoveControl();
-            rb.velocity = PhysicsUtility.GetKnockbackVelocity(rb.position, Player.Movement.Position, -15);
+            var playerPos = Player.Movement.Position;
+            rb.rotation = PhysicsUtility.RotateTowardsPosition(rb.position, rb.rotation, playerPos, 45);
+            rb.velocity = PhysicsUtility.GetKnockbackVelocity(rb.position, playerPos, -15);
             
             yield return new WaitForSeconds(0.33f);
 
             attackGO.SetActive(false);
             stateController.ReturnMoveControl();
-            yield return new WaitForSeconds(0.66f);
+            yield return new WaitForSeconds(1.25f);
             attackRoutine = null;
         }
         
@@ -150,11 +164,41 @@ namespace Gameplay.Enemies
             
             Destroy(gameObject);
         }
+
+        private IEnumerator StunRoutine(float duration)
+        {
+            animator.Play(idleHash);
+
+            float t = duration;
+            while (t > 0)
+            {
+                stateController.TakeMoveControl();
+                stunned = true;
+                t -= Time.deltaTime;
+                yield return null;
+            }
+            
+            stateController.ReturnMoveControl();
+            animator.Play(walkHash);
+            stunned = false;
+        }
+        
+        private IEnumerator KnockbackRoutine(Vector2 velocity)
+        {
+            float t = 0.25f;
+            while (t > 0)
+            {
+                stateController.TakeMoveControl();
+                rb.velocity = velocity;
+                t -= Time.deltaTime;
+                yield return null;
+            }
+            
+            stateController.ReturnMoveControl();
+        }
         
         private IEnumerator ImmunityRoutine()
         {
-            animator.Play(idleHash);
-            stateController.TakeMoveControl();
             hitbox.Disable();
 
             float t = 0;
@@ -166,12 +210,12 @@ namespace Gameplay.Enemies
             }
 
             spriteRenderer.color = scriptable.BodyColor;
-            stateController.ReturnMoveControl();
             hitbox.Enable();
-            animator.Play(walkHash);
         }
+        
+        //TODO: Colorroutine
 
-        private void OnDestroy() => OnDamageableDestroy?.Invoke();
+        protected virtual void OnDestroy() => OnDamageableDestroy?.Invoke();
 
 
         // IDamageable

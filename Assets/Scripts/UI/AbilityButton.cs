@@ -8,40 +8,37 @@ using Util;
 
 namespace UI
 {
-    public class AbilityButton : MonoBehaviour
+    public class AbilityButton : BasicAbilityButton
     {
-        [SerializeField] private Image icon;
         [SerializeField] private Text hotkeyText;
         [SerializeField] private Image cooldownImage;
 
         private bool onCooldown;
-        private ActiveMutation scriptable;
-        private Ability ability;
 
-        public void SetAbility(Ability newAbility)
+        public override void SetAbility(BasicAbility newAbility)
         {
-            ability = newAbility;
-            scriptable = ability.Scriptable;
+            base.SetAbility(newAbility);
+            var activeAbility = (ActiveAbility) newAbility;
             cooldownImage.color = GlobalDefinitions
-                .GetGeneColor(ability.Scriptable.GeneType)
+                .GetGeneColor(activeAbility.Scriptable.GeneType)
                 .WithAlpha(0.35f);
             cooldownImage.fillAmount = 0;
-            hotkeyText.text = scriptable.KeyCode.ToString();
-            icon.color = scriptable.SpriteColor;
-            icon.sprite = scriptable.Sprite;
+            hotkeyText.text = activeAbility.Scriptable.KeyCode.ToString();
         }
 
         private void Update()
         {
-            if(Input.GetKeyDown(scriptable.KeyCode)) Activate();
+            if(Input.GetKeyDown(((ActiveMutation)Scriptable).KeyCode)) 
+                Activate();
         }
 
         public void Activate()
         {
             if(onCooldown) return;
-            
-            ability.Activate();
-            StartCoroutine(CooldownRoutine(ability.Cooldown));
+
+            ActiveAbility activeAbility = (ActiveAbility) ability;
+            activeAbility.Activate();
+            StartCoroutine(CooldownRoutine(activeAbility.Cooldown));
         }
 
         private IEnumerator CooldownRoutine(float duration)
@@ -58,7 +55,16 @@ namespace UI
             }
 
             cooldownImage.fillAmount = 0;
-            hotkeyText.text = scriptable.KeyCode.ToString();
+            hotkeyText.text = ((ActiveMutation)Scriptable).KeyCode.ToString();
+            enabled = true;
+            onCooldown = false;
+        }
+
+        private void OnEnable()
+        {
+            if(Scriptable is null) return;
+            cooldownImage.fillAmount = 0;
+            hotkeyText.text = ((ActiveMutation)Scriptable).KeyCode.ToString();
             enabled = true;
             onCooldown = false;
         }

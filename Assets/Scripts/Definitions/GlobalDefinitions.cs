@@ -1,5 +1,4 @@
-﻿using System;
-using Gameplay;
+﻿using Gameplay;
 using Genes;
 using UI;
 using UnityEngine;
@@ -10,7 +9,9 @@ namespace Definitions
     public class GlobalDefinitions : MonoBehaviour
     {
         private static GlobalDefinitions instance;
-        [Header("Miscs")]
+        [Header("Miscs")] 
+        [SerializeField] private int mutationCostPerLevel;
+        [SerializeField] private string[] romanDigits = new string[10];
         [SerializeField] private Sprite[] eggSprites = new Sprite[6];
         [SerializeField] private Sprite puddleSprite;
         [SerializeField] private Transform gameObjectsTransform;
@@ -24,18 +25,16 @@ namespace Definitions
         [SerializeField] private float interactionDistance;
         [SerializeField] private float genePickupDistance;
         [Header("Prefabs")]
-        [SerializeField] private Egg eggPrefab;
+        [SerializeField] private EggDrop eggDropPrefab;
         [SerializeField] private PopupNotification popupNotificationPrefab;
         [SerializeField] private GeneDrop geneDropPrefab;
         [Header("Colors")]
         [SerializeField] private Color deadColor;
         [SerializeField] private Color eggPuddleColor;
-        [SerializeField] private Color aggressiveGeneColor;
-        [SerializeField] private Color defensiveGeneColor;
-        [SerializeField] private Color universalGeneColor;
+        [SerializeField] private Color[] geneColors = new Color[3];
         
         private static Gradient deathGradient;
-        private static readonly Color[] geneColors = new Color[3];
+        
         
         public static Transform GameObjectsTransform => instance.gameObjectsTransform;
         public static Transform WorldCanvasTransform => instance.worldCanvasTransform;
@@ -49,34 +48,41 @@ namespace Definitions
         public static float GenePickupDistance => instance.genePickupDistance;
         public static int BreedingPartnersGeneEntropy => instance.breedingPartnersGeneEntropy;
         public static int EggGeneEntropy => instance.eggGeneEntropy;
-        
-        
-        
+
+
+
+        public static string GetRomanDigit(int digit) => instance.romanDigits[digit];
         public static Sprite GetEggsBedSprite(int eggsAmount) => instance.eggSprites[Mathf.Clamp(eggsAmount - 1, 0, 5)];
         public static Color GetDeadColor(float t) => deathGradient.Evaluate(t);
-        public static Color GetGeneColor(GeneType geneType) => geneColors[(int) geneType];
+        public static Color GetGeneColor(GeneType geneType) => instance.geneColors[(int) geneType];
+        public static int GetMutationCost(int lvl) => (lvl + 1) * instance.mutationCostPerLevel;
         
+
         
-        
-        public static Egg CreateEgg(TrioGene genes) =>
-            Instantiate(instance.eggPrefab, instance.gameObjectsTransform)
-                .SetGenes(genes);
+
+        public static EggDrop CreateEggDrop(Egg egg)=>
+            Instantiate(instance.eggDropPrefab, instance.gameObjectsTransform)
+                .SetEgg(egg);
 
         public static PopupNotification CreateNotification(INotificationProvider provider, bool isStatic = true) =>
             Instantiate(instance.popupNotificationPrefab, instance.worldCanvasTransform)
                 .SetDataProvider(provider, isStatic);
 
         public static void CreateGeneDrop(Vector3 position, GeneType geneType) =>
-            Instantiate(instance.geneDropPrefab, instance.gameObjectsTransform).SetGeneType(geneType)
-                .transform.localPosition = position;
+            Instantiate(instance.geneDropPrefab, instance.gameObjectsTransform)
+                .SetGeneType(geneType)
+                    .transform.localPosition = position;
 
-        
+        public static void CreateRandomGeneDrop(Vector3 position) =>
+            CreateGeneDrop(position, (GeneType) Random.Range(0, 3));
+
+        private GlobalDefinitions()
+        {
+            instance = this;
+        }
 
         private void Awake()
         {
-            geneColors[0] = aggressiveGeneColor;
-            geneColors[1] = defensiveGeneColor;
-            geneColors[2] = universalGeneColor;
             EnemyPhysicsLayerMask = LayerMask.NameToLayer("EnemyPhysics");
             instance = this;
             deathGradient = new Gradient();

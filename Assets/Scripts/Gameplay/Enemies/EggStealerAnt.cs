@@ -10,8 +10,7 @@ namespace Gameplay.Enemies
     {
         [SerializeField] private SpriteRenderer eggSpriteRenderer;
 
-        private bool isHoldingEgg;
-        private TrioGene holdingGene;
+        private Egg holdingEgg;
 
         protected override void Start()
         {
@@ -33,9 +32,8 @@ namespace Gameplay.Enemies
         {
             stateController.SetState(AIState.Follow, eggBed.gameObject, (go) =>
             {
-                if(eggBed.RemoveOne(out holdingGene))
+                if(eggBed.RemoveOne(out holdingEgg))
                 {
-                    isHoldingEgg = true;
                     eggSpriteRenderer.enabled = true;
                     stateController.SetState(AIState.Flee);
                 }
@@ -49,14 +47,14 @@ namespace Gameplay.Enemies
 
         protected override void OnDamageTaken()
         {
-            if(isHoldingEgg) DropEgg();
+            if(holdingEgg is not null) DropEgg();
         }
 
         private void DropEgg()
         {
             eggSpriteRenderer.enabled = false;
-            isHoldingEgg = false;
-            var egg = GlobalDefinitions.CreateEgg(holdingGene).transform;
+            holdingEgg = null;
+            var egg = GlobalDefinitions.CreateEggDrop(holdingEgg).transform;
             egg.position = (Vector3) rb.position + transform.up * 0.35f;
             egg.rotation = Quaternion.Euler(0, 0, rb.rotation);
         }

@@ -1,6 +1,7 @@
 ﻿using Gameplay;
 using Gameplay.Enemies;
 using Genes;
+using Player;
 using UnityEngine;
 
 namespace UI
@@ -34,18 +35,20 @@ namespace UI
 
         private void OnEnable()
         {
+            AbilityController.SetUIActive(false);
             Time.timeScale = 0;
         }
 
         private void OnDisable()
         {
+            AbilityController.SetUIActive(true);
             Time.timeScale = 1;
         }
 
         public void Accept()
         {
             openedPartner.CanBreed = false;
-            BreedingManager.Instance.BecomePregnant(median);
+            BreedingManager.Instance.BecomePregnant(median, AbilityController.GetMutationData());
             Close();
         }
     }
