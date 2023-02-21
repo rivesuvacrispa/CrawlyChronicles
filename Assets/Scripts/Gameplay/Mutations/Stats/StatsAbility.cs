@@ -32,5 +32,9 @@ namespace Gameplay.Abilities.Base
             playerManager.AddStats(current.Negated());
             base.OnDisable();
         }
+
+        public override string GetLevelDescription(int lvl) 
+            => PlayerStats.LerpLevel(statsLvl1, statsLvl10, lvl)
+                .Print(false);
     }
 }

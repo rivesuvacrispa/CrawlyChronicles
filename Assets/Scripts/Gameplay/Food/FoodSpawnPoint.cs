@@ -1,22 +1,25 @@
-﻿using UnityEngine;
+﻿using UI;
+using UnityEngine;
 
 namespace Gameplay.Food
 {
     public class FoodSpawnPoint : MonoBehaviour
     {
-        public bool IsEmpty => instantiatedGO is null;
+        public bool IsEmpty => foodBed is null;
 
-        private GameObject instantiatedGO;
+        private FoodBed foodBed;
 
-        public void Spawn(GameObject toSpawn)
+        public void Spawn(FoodBed toSpawn)
         {
-            instantiatedGO = Instantiate(toSpawn, transform);
+            foodBed = Instantiate(toSpawn, transform);
+            foodBed.FoodSpawnPoint = this;
         }
 
         public void Remove()
         {
-            Destroy(instantiatedGO);
-            instantiatedGO = null;
+            if(foodBed is not null)
+                Destroy(foodBed.gameObject);
+            foodBed = null;
         }
     }
 }

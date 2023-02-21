@@ -23,7 +23,7 @@ namespace Player
         {
             if (Interactor.Interacting)
                 return;
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && Time.timeScale != 0)
             {
                 if (comboCounter == 3)
                     ComboAttack();

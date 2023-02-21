@@ -8,7 +8,7 @@ namespace Gameplay.Food
 {
     public class FoodSpawner : MonoBehaviour
     {
-        [SerializeField] private List<GameObject> foodPrefabs;
+        [SerializeField] private List<FoodBed> foodPrefabs;
         [SerializeField] private Transform foodSpawnPointsTransform;
         [SerializeField] private float foodPerMinute;
 
@@ -34,19 +34,17 @@ namespace Gameplay.Food
         private void OnResetRequested()
         {
             for (int i = 0; i < Random.Range(1, 4); i++)
-            {
                 SpawnFood();
-            }
         }
 
         private void SpawnFood()
         {
-            FoodSpawnPoint spawn = foodSpawnPoints
+            FoodSpawnPoint foodToSpawn = foodSpawnPoints
                 .OrderBy(_ => Random.value)
                 .FirstOrDefault(spawnPoint => spawnPoint.IsEmpty);
-            if (spawn is not null)
+            if (foodToSpawn is not null)
             {
-                spawn.Spawn(GetRandomFood());
+                foodToSpawn.Spawn(GetRandomFood());
             };
         }
 
@@ -62,6 +60,6 @@ namespace Gameplay.Food
             }
         }
 
-        private GameObject GetRandomFood() => foodPrefabs[Random.Range(0, foodPrefabs.Count)];
+        private FoodBed GetRandomFood() => foodPrefabs[Random.Range(0, foodPrefabs.Count)];
     }
 }

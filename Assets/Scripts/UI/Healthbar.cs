@@ -26,8 +26,10 @@ namespace UI
         
         public void SetValue(float value)
         {
+            if(Mathf.Abs(mainImage.fillAmount - value) < 0.01f) return;
             mainImage.fillAmount = value;
             SetAlpha(1f);
+            enabled = true;
             if(currentRoutine is not null) StopCoroutine(currentRoutine);
             currentRoutine = StartCoroutine(CatchRoutine(value));
         }
@@ -37,8 +39,18 @@ namespace UI
             mainImage.fillAmount = 1f;
             catchImage.fillAmount = 1f;
             SetAlpha(0);
+            enabled = false;
         }
-        
+
+        private void OnEnable()
+        {
+            if(target is null) return;
+            Vector3 pos = target.Transform.position;
+            pos.z = 0;
+            pos.y += target.HealthbarOffsetY;
+            transform.localPosition = pos;
+        }
+
         protected virtual void Update()
         {
             Vector3 pos = target.Transform.position;
@@ -76,6 +88,7 @@ namespace UI
                 yield return null;
             }
             SetAlpha(0);
+            enabled = false;
         }
 
         protected IEnumerator FadeRoutine()
@@ -89,6 +102,7 @@ namespace UI
                 yield return null;
             }
             SetAlpha(0f);
+            enabled = false;
         }
 
         private void SetAlpha(float alpha)

@@ -55,7 +55,12 @@ namespace Player
 
         private void Update()
         {
-            if(IsHoldingEgg && Input.GetKeyDown(KeyCode.Escape)) DropEgg();
+            if(Input.GetKeyDown(KeyCode.R) && IsHoldingEgg) 
+                DropEgg();
+            else if(Input.GetKeyDown(KeyCode.K)) 
+                Die();
+            else if(Input.GetKeyDown(KeyCode.Escape) && Time.timeScale != 0) 
+                mainMenu.Pause();
         }
 
         public void AddStats(PlayerStats stats)
@@ -148,8 +153,8 @@ namespace Player
 
         private void OnDayStart(int day)
         {
-            health = currentStats.MaxHealth;
-            UpdateHealthbar();
+            /*health = currentStats.MaxHealth;
+            UpdateHealthbar();*/
         }
 
         private void OnResetRequested()

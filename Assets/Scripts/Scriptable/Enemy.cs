@@ -12,7 +12,6 @@ namespace Scriptable
         [SerializeField] private float healthbarWidth;
 
         [Header("Stats fields")] 
-        [SerializeField, Range(0, 1)] private float geneDropRate;
         [SerializeField] private float immunityDuration;
         [SerializeField] private float maxHealth;
         [SerializeField] private int wanderingRadius;
@@ -33,10 +32,7 @@ namespace Scriptable
         public int WanderingRadius => wanderingRadius;
         public float MovementSpeed => movementSpeed;
         public float LocatorRadius => locatorRadius;
-        public float GeneDropRate => geneDropRate;
-
         public float Damage => damage;
-
         public float Knockback => knockback;
 
 

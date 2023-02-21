@@ -49,7 +49,6 @@ namespace UI
         public void Accept()
         {
             openedPartner.CanBreed = false;
-            StatRecorder.timesBreed++;
             BreedingManager.Instance.BecomePregnant(median, AbilityController.GetMutationData());
             Close();
         }

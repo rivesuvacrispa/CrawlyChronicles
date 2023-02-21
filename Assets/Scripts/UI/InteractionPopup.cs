@@ -19,9 +19,9 @@ namespace UI
         
         public void Enable(string action, KeyCode key)
         {
-            if(isActive) return;
             buttonText.text = key.ToString();
             actionText.text = action;
+            if(isActive) return;
             gameObject.SetActive(true);
             animator.Play(PopupHash);
             isActive = true;

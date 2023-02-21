@@ -104,12 +104,12 @@ namespace Gameplay.Enemies
             rb.rotation = 0;
             rb.constraints = RigidbodyConstraints2D.FreezeRotation;
             animator.Play(deadhash);
-            if(Random.value <= scriptable.GeneDropRate) 
+            if(Random.value <= Gamemode.GeneDropRate) 
                 GlobalDefinitions.CreateRandomGeneDrop(Position);
             StartCoroutine(DeathRoutine());
             UnsubEvents();
         }
-
+        
         private void StopAttack()
         {
             if(attackRoutine is not null) 

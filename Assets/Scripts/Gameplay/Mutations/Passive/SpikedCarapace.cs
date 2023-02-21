@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using Gameplay.Enemies;
 using Player;
 using UnityEngine;
@@ -60,6 +61,19 @@ namespace Gameplay.Abilities.Passive
         {
             base.OnEnable();
             PlayerHitbox.OnDamageTaken += OnDamageTaken;
+        }
+        
+        public override string GetLevelDescription(int lvl)
+        {
+            float prob = LerpLevel(probabilityLvl1, probabilityLvl10, lvl);
+            float amount = LerpLevel(amountLvl1, amountLvl10, lvl);
+            StringBuilder sb = new StringBuilder();
+            sb.Append("<color=orange>").Append("Trigger chance").Append(": ").Append("</color>").Append(prob.ToString("n2")).Append("\n");
+            sb.Append("<color=orange>").Append("Damage cap").Append(": ").Append("</color>").Append(damageCap.ToString("n2")).Append("\n");
+            sb.Append("<color=orange>").Append("Bullets amount").Append(": ").Append("</color>").Append(amount.ToString("n2")).Append("\n");
+            sb.Append("<color=orange>").Append("Stun duration").Append(": ").Append("</color>").Append(stunDuration.ToString("n2")).Append("\n");
+            sb.Append("<color=orange>").Append("Knockback").Append(": ").Append("</color>").Append(knockbackPower.ToString("n2")).Append("\n");
+            return sb.ToString();
         }
     }
 }

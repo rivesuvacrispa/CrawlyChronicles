@@ -55,6 +55,7 @@ namespace UI
 
         private void Update()
         {
+            // TODO: This def can be rewritten
             Vector2 positionToUse = isStatic ? providerStaticPosition : cachedTransfrom.position;
             float distanceToPlayer = (positionToUse - Player.Movement.Position).sqrMagnitude;
             SetActive(distanceToPlayer <= GlobalDefinitions.InteractionDistance);

@@ -3,6 +3,7 @@ using System.Linq;
 using Gameplay;
 using Gameplay.Abilities;
 using Genes;
+using Scriptable;
 using UI;
 using UnityEngine;
 
@@ -20,23 +21,29 @@ namespace Player
         [SerializeField] private List<BasicAbility> allAbilities = new();
 
         private AbilityController() => instance = this;
+        private static readonly Dictionary<BasicMutation, BasicAbility> abilitiesDict = new();
 
         private void Awake()
         {
             MainMenu.OnResetRequested += OnResetRequested;
         }
 
+        public static string GetAbilityLevelDescription(BasicMutation mutation, int lvl) 
+            => abilitiesDict[mutation].GetLevelDescription(lvl);
+
         public void CreateUIElement(BasicAbility ability)
         {
+            abilitiesDict[ability.Scriptable] = ability;
             if (ability is ActiveAbility activeAbility)
                 Instantiate(abilityButtonPrefab, activeButtonsTransform)
                     .SetAbility(activeAbility);
-            else
-                Instantiate(basicAbilityPrefab, basicButtonsTransform)
+            else Instantiate(basicAbilityPrefab, basicButtonsTransform)
                     .SetAbility(ability);
         }
 
-        public void UpdateAbilities(Egg egg)
+        public static void UpdateAbilities(Egg egg) => instance.UpdateAbilitiesNonStatic(egg);
+        
+        private void UpdateAbilitiesNonStatic(Egg egg)
         {
             var eggAbilities = egg.MutationData.GetAll();
             foreach (BasicAbility ability in allAbilities)
@@ -61,7 +68,7 @@ namespace Player
 
         private void OnResetRequested()
         {
-            UpdateAbilities(new Egg(TrioGene.Zero, new MutationData()));
+            UpdateAbilitiesNonStatic(new Egg(TrioGene.Zero, new MutationData()));
         }
 
         private void OnDestroy()

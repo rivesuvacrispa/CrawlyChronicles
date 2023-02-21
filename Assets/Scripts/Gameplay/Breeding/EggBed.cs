@@ -38,16 +38,15 @@ namespace Gameplay
 
         private void OnDestroy()
         {
-            BreedingManager.Instance.AddTotalEggsAmount(-EggsAmount);
             RespawnManager.OnEggCollectionRequested -= OnEggBedsCollectionRequested;
             OnProviderDestroy?.Invoke();
             MainMenu.OnResetRequested -= OnResetRequested;
         }
 
-        public void AddEggs(List<Egg> eggs)
+        // Should be called only when instantiating because it does not update total eggs amount
+        public void SetEggs(IEnumerable<Egg> eggs)
         {
             storedEggs.AddRange(eggs);
-            BreedingManager.Instance.AddTotalEggsAmount(eggs.Count);
             UpdateAmount();
         }
 
@@ -104,9 +103,8 @@ namespace Gameplay
         public string NotificationText => EggsAmount.ToString();
 
 
+        
         // IInteractable
-
-
         public void Interact()
         {
             AddEgg(Player.Manager.Instance.HoldingEgg);

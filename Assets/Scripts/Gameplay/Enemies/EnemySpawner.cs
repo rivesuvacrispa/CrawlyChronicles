@@ -40,7 +40,7 @@ namespace Gameplay.Enemies
         {
             yield return new WaitUntil(() => 
                 EnemySpawnLocation.InitializedLocationsAmount == SpawnLocationsCount);
-            
+
             while (enabled)
             {
                 if (TimeManager.IsDay)
@@ -50,10 +50,10 @@ namespace Gameplay.Enemies
                 }
                 else
                 {
-                    SpawnEnemy(enemyList.GetRandomEnemyForDay(TimeManager.Instance.DayCounter), GetRandomSpawnPoint());
-                    yield return new WaitForSeconds(60f / (enemyPerMinute + enemyPerDayModifier));
+                    var day = TimeManager.Instance.DayCounter - 1;
+                    SpawnEnemy(enemyList.GetRandomEnemyForDay(day), GetRandomSpawnPoint());
+                    yield return new WaitForSeconds(60f / (enemyPerMinute + enemyPerDayModifier * day));
                 }
-                
             }
         }
 

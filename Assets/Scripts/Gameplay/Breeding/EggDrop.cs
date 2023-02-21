@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using Definitions;
-using GameCycle;
 using Gameplay.Abilities;
 using Genes;
 using Gameplay.Interaction;
@@ -47,6 +46,7 @@ namespace Gameplay
                 spriteRenderer.sortingOrder = -1;
                 GetComponent<Collider2D>().enabled = false;
                 GetComponent<Rigidbody2D>().simulated = false;
+                transform.rotation = Quaternion.identity;
                 crashed = true;
                 StartCoroutine(FadeRoutine(spriteRenderer));
             }

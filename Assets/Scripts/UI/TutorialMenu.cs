@@ -9,10 +9,10 @@ namespace UI
         [SerializeField] private GameObject rootGO;
         [SerializeField] private Transform stepsTransform;
         [SerializeField] private Text stepText;
-        [SerializeField] private GameObject leftArrow;
-        [SerializeField] private GameObject rightArrow;
+        [SerializeField] private Image leftArrow;
+        [SerializeField] private Image rightArrow;
  
-        private List<GameObject> steps = new();
+        private readonly List<GameObject> steps = new();
         private int currentStep;
         private int stepsAmount;
 
@@ -51,10 +51,11 @@ namespace UI
             step = Mathf.Clamp(step, 0, stepsAmount - 1);
             steps[currentStep].SetActive(false);
             currentStep = step;
-            steps[currentStep].SetActive(true);
-            leftArrow.SetActive(currentStep > 0);
-            rightArrow.SetActive(currentStep < stepsAmount - 1);
-            stepText.text = $"{currentStep + 1}/{stepsAmount}";
+            var stepGO = steps[currentStep];
+            stepGO.SetActive(true);
+            stepText.text = stepGO.name;
+            leftArrow.enabled = currentStep > 0;
+            rightArrow.enabled = currentStep < stepsAmount - 1;
         }
 
         public void SelectRight() => SelectTutorialStep(currentStep + 1);

@@ -14,7 +14,10 @@ namespace Gameplay.Enemies
     {
         [SerializeField] private ParticleSystem breedingParticles;
         [SerializeField] private Animator breedAnimator;
-        
+
+        private delegate void NeutralAntEvent();
+        private static event NeutralAntEvent OnNeutralDamaged;
+
         private readonly int breedAnimHash = Animator.StringToHash("NeutralAntBodyBreeding");
         private readonly int idleAnimHash = Animator.StringToHash("NeutralAntBodyIdle");
 
@@ -42,7 +45,7 @@ namespace Gameplay.Enemies
         public override void OnPlayerLocated()
         {
             StopInterest();
-            if(TimeManager.IsDay) interestRoutine = StartCoroutine(InterestRoutine());
+            if(TimeManager.IsDay && CanBreed) interestRoutine = StartCoroutine(InterestRoutine());
         }
 
         public override void OnEggsLocated(EggBed eggBed)
@@ -68,9 +71,7 @@ namespace Gameplay.Enemies
 
         protected override void OnDamageTaken()
         {
-            StopInterest();
-            CanBreed = false;
-            stateController.SetState(AIState.Flee);
+            OnNeutralDamaged?.Invoke();
         }
 
         public void Interact()
@@ -112,14 +113,33 @@ namespace Gameplay.Enemies
         private void OnNightStart(int day)
         {
             StopInterest();
+            stateController.SetEtherial(true);
             CanBreed = false;
             stateController.SetState(AIState.Flee);
         }
 
+        private void OnNeutralDamage()
+        {
+            StopInterest();
+            CanBreed = false;
+            stateController.SetState(AIState.Follow, 
+                onTargetReach: o => BasicAttack(),
+                reachDistance: 1.25f);
+        }
+
         protected override void OnDayStart(int day) { }
 
-        private void SubEvents() => TimeManager.OnNightStart += OnNightStart;
-        private void UnsubEvents() => TimeManager.OnNightStart -= OnNightStart;
+        private void SubEvents()
+        {
+            OnNeutralDamaged += OnNeutralDamage;
+            TimeManager.OnNightStart += OnNightStart;
+        }
+
+        private void UnsubEvents()
+        {
+            OnNeutralDamaged -= OnNeutralDamage;
+            TimeManager.OnNightStart -= OnNightStart;
+        }
 
         protected override void OnDestroy()
         {

@@ -10,7 +10,7 @@ namespace Gameplay.Enemies
 
         public Enemy GetRandomEnemyForDay(int day)
         {
-            day = Mathf.Clamp(day - 1, 0, enemies.Count - 1);
+            day = Mathf.Clamp(day, 0, enemies.Count - 1);
             return enemies[day].GetRandom();
         }
     }

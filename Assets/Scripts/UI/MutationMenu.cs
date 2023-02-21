@@ -5,6 +5,7 @@ using GameCycle;
 using Gameplay;
 using Gameplay.Abilities;
 using Genes;
+using Player;
 using Scriptable;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -14,6 +15,8 @@ namespace UI
 {
     public class MutationMenu : MonoBehaviour
     {
+        private static MutationMenu instance;
+        
         [SerializeField] private RespawnManager respawnManager;
         [SerializeField] private AbilityTooltip tooltip;
         [SerializeField] private Transform currentMutationsTransform;
@@ -24,7 +27,8 @@ namespace UI
         [SerializeField] private List<BasicMutation> allMutations = new();
 
         [SerializeField] private Egg hatchingEgg = new(TrioGene.Zero, new MutationData());
-        
+
+        private MutationTarget mutationTarget;
         private TrioGene genesLeft;
         private readonly Dictionary<BasicMutation, BasicAbilityButton> basicAbilityButtons = new();
         private Dictionary<BasicMutation, int> current = new();
@@ -36,9 +40,15 @@ namespace UI
         public Egg HatchingEgg => hatchingEgg;
 
 
+
+        private MutationMenu() => instance = this;
+
+        public static void Show(MutationTarget target, Egg egg) => instance.ShowNonStatic(target, egg);
         
-        public void SetEgg(Egg egg)
+        private void ShowNonStatic(MutationTarget target, Egg egg)
         {
+            Time.timeScale = 0;
+            mutationTarget = target;
             tooltip.Clear();
             hatchingEgg = egg;
             genesLeft = egg.Genes;
@@ -46,6 +56,7 @@ namespace UI
             current = egg.MutationData.GetAll();
             ShowCurrentMutations();
             CreateMutations();
+            gameObject.SetActive(true);
         }
 
         private void CreateMutations()
@@ -57,7 +68,7 @@ namespace UI
             var available = LinqUtility.ToHashSet(allMutations);
             available.ExceptWith(maxed);
 
-            int amount = Random.Range(2, 6);
+            int amount = Random.Range(3, 7);
             if (amount > available.Count) amount = available.Count;
             while (amount > 0)
             {
@@ -105,10 +116,10 @@ namespace UI
                 CreateBasicAbilityButton(mutation, level);
                 current.Add(mutation, level);
             }
-            
-            RefreshAffrodable();
+
             genesLeft.SetGene(mutation.GeneType, genesLeft.GetGene(mutation.GeneType) - cost);
             geneDisplay.UpdateTrioText(genesLeft);
+            RefreshAffrodable();
             StatRecorder.timesMutated++;
         }
 
@@ -141,7 +152,15 @@ namespace UI
                     pair => pair.Value)));
             gameObject.SetActive(false);
             ClearAll();
-            respawnManager.Respawn(hatchingEgg, mutated);
+            if(mutationTarget is MutationTarget.Egg) 
+                respawnManager.Respawn(hatchingEgg, mutated);
+            else if (mutationTarget is MutationTarget.Player)
+            {
+                BreedingManager.Instance.SetTrioGene(mutated.Genes);
+                AbilityController.UpdateAbilities(mutated);
+                Time.timeScale = 1;
+
+            }
         }
         
         
@@ -164,12 +183,18 @@ namespace UI
         public void Refresh()
         {
             ClearAll();
-            SetEgg(hatchingEgg);
+            ShowNonStatic(MutationTarget.Egg, hatchingEgg);
         }
 
         public void Save()
         {
             hatchingEgg = new Egg(genesLeft, new MutationData(current));
         }
+    }
+
+    public enum MutationTarget
+    {
+        Egg,
+        Player
     }
 }

@@ -1,36 +1,68 @@
-﻿using Gameplay.AI.Locators;
+﻿using Definitions;
+using Gameplay.AI.Locators;
 using Gameplay.Interaction;
 using UI;
 using UnityEngine;
+using Util;
 
 namespace Gameplay.Food
 {
-    public abstract class FoodBed : MonoBehaviour, ILocatorTarget, IFoodBed, IContinuouslyInteractable
+    public abstract class FoodBed : MonoBehaviour, ILocatorTarget, IFoodBed, IContinuouslyInteractable, INotificationProvider
     {
-        public abstract void Eat();
+        [SerializeField] protected Scriptable.FoodBed scriptable;
         
-        
-        private void Start() => MainMenu.OnResetRequested += OnResetRequested;
+        private int amount;
 
-        private void OnDestroy() => MainMenu.OnResetRequested -= OnResetRequested;
+        public FoodSpawnPoint FoodSpawnPoint { get; set; }
 
-        private void OnResetRequested() => Destroy(gameObject);
+        private void Start()
+        {
+            MainMenu.OnResetRequested += OnResetRequested;
+            amount = scriptable.GetRandomAmount();
+            GlobalDefinitions.CreateNotification(this);
+        }
+
+        private void OnDestroy()
+        {
+            MainMenu.OnResetRequested -= OnResetRequested;
+            OnProviderDestroy?.Invoke();
+        }
         
-        
+        public void Eat()
+        {
+            amount--;
+            if (amount <= 0) FoodSpawnPoint.Remove();
+            else OnDataUpdate?.Invoke();
+        }
+
+        protected abstract void OnEatenByPlayer();
+
+        private void OnResetRequested() => FoodSpawnPoint.Remove();
+
+
+
         // IContinuouslyInteractable
         public void Interact()
         {
             Eat();
-            Player.Manager.Instance.AddHealth(1);
             BreedingManager.Instance.AddFood();
+            OnEatenByPlayer();
         }
         
-        public abstract void OnInteractionStart();
-        public abstract void OnInteractionStop();
-        public abstract bool CanInteract();
+        public void OnInteractionStart() { }
+        public void OnInteractionStop() { }
+        public bool CanInteract() => true;
         public float InteractionTime => 1.5f;
         public float PopupDistance => 1.25f;
         public string ActionTitle => "Eat";
         public Vector3 Position => transform.position;
+        
+        
+        
+        // INotificationProvider
+        public event INotificationProvider.NotificationProviderEvent OnDataUpdate;
+        public event INotificationProvider.NotificationProviderEvent OnProviderDestroy;
+        public Transform Transform => transform;
+        public string NotificationText => amount.ToString();
     }
 }

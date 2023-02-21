@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Camera;
 using Gameplay;
-using Genes;
 using Player;
 using Timeline;
 using UI;
@@ -19,14 +18,12 @@ namespace GameCycle
         public delegate void EggBedCollectionEvent(List<EggBed> eggBeds);
         public static EggBedCollectionEvent OnEggCollectionRequested;
 
-        [SerializeField] private AbilityController abilityController;
         [SerializeField] private FollowMovement followMovement;
         [SerializeField] private EggBedViewer viewer;
         [SerializeField] private GameObject respawnMenuGO;
         [SerializeField] private Text eggBedSelectionText;
         [SerializeField] private GameObject leftArrow;
         [SerializeField] private GameObject rightArrow;
-        [SerializeField] private MutationMenu mutationMenu;
         [SerializeField] private GameObject navigatorGO;
 
         private int currentEggBedIndex;
@@ -35,11 +32,6 @@ namespace GameCycle
 
         private RespawnManager() => instance = this;
         
-        /*private void Update()
-        {
-            if(Input.GetKeyDown(KeyCode.K)) StartRespawn();
-        }*/
-
         public static void Respawn() => instance.StartRespawn();
 
         
@@ -82,8 +74,7 @@ namespace GameCycle
         private void SelectEggBed(int index)
         {
             int count = eggBeds.Count;
-            if (count == 1) currentEggBedIndex = 0;
-            else currentEggBedIndex = Mathf.Clamp(index, 0, count - 1);
+            currentEggBedIndex = count == 1 ? 0 : Mathf.Clamp(index, 0, count - 1);
             eggBedSelectionText.text = $"{currentEggBedIndex + 1}/{count}";
             leftArrow.SetActive(currentEggBedIndex > 0);
             rightArrow.SetActive(currentEggBedIndex < count - 1);
@@ -98,20 +89,19 @@ namespace GameCycle
 
         public void SelectEggToRespawn(Egg egg)
         {
+            StopAllCoroutines();
             viewer.Disable();
             respawnMenuGO.SetActive(false);
-            mutationMenu.SetEgg(egg);
-            mutationMenu.gameObject.SetActive(true);
+            MutationMenu.Show(MutationTarget.Egg, egg);
         }
 
         public void Respawn(Egg origin, Egg mutated)
         {
             Movement.Teleport(selectedEggbed.Transform.position);
-            BreedingManager.Instance.TrioGene = mutated.Genes;
-            BreedingManager.Instance.UpdateGeneText();
-            BreedingManager.Instance.AddTotalEggsAmount(-1);
+            BreedingManager.Instance.SetTrioGene(mutated.Genes);
+            BreedingManager.Instance.SetCurrentFoodAmount(0);
             selectedEggbed.RemoveParticular(origin);
-            abilityController.UpdateAbilities(mutated);
+            AbilityController.UpdateAbilities(mutated);
             followMovement.Target = Movement.Transform;
             AbilityController.SetUIActive(true);
             TimeManager.Instance.ResetLifespan();

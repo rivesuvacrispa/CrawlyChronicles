@@ -1,4 +1,5 @@
 ﻿using Definitions;
+using Player;
 using Scriptable;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,7 +20,8 @@ namespace UI
         {
             button.SetMutation(mutation, lvl);
             nameText.text = mutation.Name;
-            descriptionText.text = mutation.Description;
+            descriptionText.text = mutation.Description + "\n\n" + AbilityController
+                .GetAbilityLevelDescription(mutation, lvl);
             costText.text = GlobalDefinitions.GetMutationCost(lvl).ToString();
             geneTypeImage.color = GlobalDefinitions.GetGeneColor(mutation.GeneType);
             rootGO.SetActive(true);

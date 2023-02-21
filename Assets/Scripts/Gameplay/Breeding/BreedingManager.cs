@@ -37,7 +37,7 @@ namespace Gameplay
         private readonly int breedAnimHash = Animator.StringToHash("PlayerBodyBreeding");
         private readonly int idleAnimHash = Animator.StringToHash("PlayerBodyIdle");
 
-        [field:SerializeField] public TrioGene TrioGene { get; set; } = TrioGene.Zero;
+        [field:SerializeField] public TrioGene TrioGene { get; private set; } = TrioGene.Zero;
         public bool CanBreed => currentFoodAmount >= breedingFoodRequirement && eggLayingTimer == 0;
         
         
@@ -45,22 +45,30 @@ namespace Gameplay
         private void Awake()
         {
             Instance = this;
-            totalEggsAmount = 0;
-            currentFoodAmount = 0;
-            UpdateTotalEggsText();
-            UpdateFoodText();
+            SetCurrentFoodAmount(0);
+            SetTotalEggsAmount(0);
+            MainMenu.OnResetRequested += OnResetRequested;
         }
 
-        public void OnResetRequested()
+        private void OnResetRequested()
         {
             StopAllCoroutines();
-            totalEggsAmount = 0;
-            currentFoodAmount = 0;
-            TrioGene = TrioGene.Zero;
             eggLayingTimer = 0;
+            SetCurrentFoodAmount(0);
+            SetTotalEggsAmount(0);
+            SetTrioGene(TrioGene.Zero);
+        }
+
+        public void SetCurrentFoodAmount(int newAmount)
+        {
+            currentFoodAmount = newAmount;
+            UpdateFoodText();
+        }
+        
+        private void SetTotalEggsAmount(int newAmount)
+        {
+            totalEggsAmount = newAmount;
             UpdateTotalEggsText();
-            UpdateFoodText(); 
-            geneDisplay.UpdateTrioText(TrioGene);
         }
         
         public void AddGene(GeneType geneType)
@@ -70,15 +78,17 @@ namespace Gameplay
             geneDisplay.UpdateGeneText(TrioGene, geneType);
         }
 
-        public void UpdateGeneText()
+        public void SetTrioGene(TrioGene trioGene)
         {
-            geneDisplay.UpdateTrioText(TrioGene);
+            TrioGene = trioGene;
+            geneDisplay.UpdateTrioText(trioGene);
         }
         
         private void LayEggs(Vector2 position, TrioGene genes, MutationData mutationData)
         {
             var bed = Instantiate(GlobalDefinitions.EggBedPrefab, GlobalDefinitions.GameObjectsTransform);
             int amount = Random.Range(1, 7);
+            StatRecorder.eggsLayed += amount;
             var eggs = new List<Egg>();
             while (amount > 0)
             {
@@ -89,10 +99,8 @@ namespace Gameplay
                 amount--;
             }
 
-            StatRecorder.eggsLayed += amount;
-            bed.AddEggs(eggs);
+            bed.SetEggs(eggs);
             bed.transform.position = position;
-            UpdateFoodText();
         }
 
         private void UpdateTotalEggsText()
@@ -124,6 +132,7 @@ namespace Gameplay
         {
             animator.Play(breedAnimHash);
             breedingParticles.Play();
+            Debug.Log($"paused: {breedingParticles.isPaused}, playing: {breedingParticles.isPlaying}");
         }
 
         public void PlayIdleAnimation()
@@ -134,10 +143,12 @@ namespace Gameplay
 
         public void BecomePregnant(TrioGene genes, MutationData mutationData)
         {
+            StatRecorder.timesBreed++;
             breedingParticles.Play();
             currentFoodAmount -= breedingFoodRequirement;
             eggLayingTimer = pregnancyDuration;
             eggLayRoutine = StartCoroutine(EggLayRoutine(genes, mutationData));
+            UpdateFoodText();
         }
 
         private IEnumerator EggLayRoutine(TrioGene genes, MutationData mutationData)
@@ -165,10 +176,10 @@ namespace Gameplay
             StopCoroutine(eggLayRoutine);
             breedingParticles.Stop();
             eggLayRoutine = null;
-            popupNotification = null;
             eggLayingTimer = 0;
             if(popupNotification is not null) 
                 Destroy(popupNotification.gameObject);
+            popupNotification = null;
         }
 
         public void OpenBreedingMenu(NeutralAnt partner)
@@ -179,6 +190,7 @@ namespace Gameplay
         private void OnDestroy()
         {
             OnProviderDestroy?.Invoke();
+            MainMenu.OnResetRequested -= OnResetRequested;
         }
 
 

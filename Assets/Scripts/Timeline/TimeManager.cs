@@ -12,7 +12,6 @@ namespace Timeline
         public static TimeManager Instance { get; private set; }
 
         [SerializeField] private Text dayText;
-        [FormerlySerializedAs("timespanText")] 
         [SerializeField] private Text lifespanText;
         [SerializeField] private int dayDurationInSeconds = 30;
         [SerializeField] private int nightDurationInSeconds = 120;
@@ -21,7 +20,7 @@ namespace Timeline
         private int dayCounter;
         private int time;
         private int cycleDuration;
-        private Coroutine timespanRoutine;
+        private Coroutine lifespanRoutine;
 
         public delegate void DayCycleEvent(int dayCounter);
         public static event DayCycleEvent OnDayStart;
@@ -72,20 +71,20 @@ namespace Timeline
             float timeLeft = playerLifespanInSeconds;
             while (timeLeft > 0)
             {
-                timeLeft -= Time.deltaTime;
                 lifespanText.text = $"{(int) timeLeft / 60:0}:{timeLeft % 60:00}";
-                if(timeLeft <= 5) DeathCounter.StartCounter(timeLeft);
+                if(timeLeft <= 10) DeathCounter.StartCounter(timeLeft);
+                timeLeft -= Time.deltaTime;
                 yield return null;
             }
 
             lifespanText.text = "0:00";
             Player.Manager.Instance.Die();
         }
-
+        
         public void ResetLifespan()
         {
-            if(timespanRoutine is not null) StopCoroutine(timespanRoutine);
-            StartCoroutine(LifespanRoutine());
+            if(lifespanRoutine is not null) StopCoroutine(lifespanRoutine);
+            lifespanRoutine = StartCoroutine(LifespanRoutine());
             DeathCounter.StopCounter();
         }
 
@@ -97,7 +96,10 @@ namespace Timeline
             OnDayStart?.Invoke(dayCounter);
         }
 
-        private void StartNight() => OnNightStart?.Invoke(dayCounter);
+        private void StartNight()
+        {
+            OnNightStart?.Invoke(dayCounter);
+        }
 
         private void UpdateUI()
         {

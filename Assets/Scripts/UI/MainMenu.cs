@@ -5,18 +5,21 @@ using Gameplay;
 using Gameplay.Abilities;
 using Genes;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace UI
 {
     public class MainMenu : MonoBehaviour
     {
+        [SerializeField] private bool showOnStartup;
         [SerializeField] private GameObject rootGO;
         [SerializeField] private GameObject gameUICanvas;
-        [SerializeField] private TutorialMenu tutorialMenu;
-        [SerializeField] private bool showOnStartup;
         [SerializeField] private GameObject gameOverGO;
-        [SerializeField] private Text statsText;
+        [SerializeField] private TutorialMenu tutorialMenu;
+        [SerializeField] private PauseMenu pauseMenu;
+        [FormerlySerializedAs("statsText")] 
+        [SerializeField] private Text gameOverStatsText;
         
         public delegate void MainMenuEvent();
         public static event MainMenuEvent OnResetRequested;
@@ -25,12 +28,15 @@ namespace UI
         {
             Application.targetFrameRate = 60;
         
-            if(showOnStartup)
-            {
-                Time.timeScale = 0;
-                rootGO.SetActive(true);
-                gameUICanvas.SetActive(false);
-            }
+            if(showOnStartup) ShowMainMenu();
+        }
+
+        public void ShowMainMenu()
+        {
+            pauseMenu.gameObject.SetActive(false);
+            Time.timeScale = 0;
+            rootGO.SetActive(true);
+            gameUICanvas.SetActive(false);
         }
 
         public void ShowTutorial()
@@ -43,13 +49,14 @@ namespace UI
         public void CloseTutorial()
         {
             tutorialMenu.Close();
+            gameUICanvas.SetActive(false);
             rootGO.SetActive(true);
         }
 
         public void ShowGameOver()
         {
             Time.timeScale = 0;
-            statsText.text = StatRecorder.Print();
+            gameOverStatsText.text = StatRecorder.Print();
             gameOverGO.SetActive(true);
             gameUICanvas.SetActive(false);
         }
@@ -62,13 +69,24 @@ namespace UI
         
         public void Play()
         {
-            OnResetRequested?.Invoke();
-            BreedingManager.Instance.TrioGene = TrioGene.Zero;
-            BreedingManager.Instance.OnResetRequested();
+            ResetGame();
             rootGO.SetActive(false);
             gameUICanvas.SetActive(true);
-            CreateFirstEggBed();
             Time.timeScale = 1;
+        }
+
+        public void Pause() => pauseMenu.gameObject.SetActive(true);
+
+        public void Restart()
+        {
+            ResetGame();
+            pauseMenu.gameObject.SetActive(false);
+        }
+        
+        private void ResetGame()
+        {
+            OnResetRequested?.Invoke();
+            CreateFirstEggBed();
         }
 
         private void CreateFirstEggBed()
@@ -84,7 +102,7 @@ namespace UI
             }
 
             StatRecorder.eggsLayed += amount;
-            bed.AddEggs(eggs);
+            bed.SetEggs(eggs);
             bed.transform.position = new Vector3(15, 15, 0);
         }
 

@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Text;
 using UnityEngine;
 
 namespace Gameplay.Abilities.Active
@@ -39,6 +40,15 @@ namespace Gameplay.Abilities.Active
             trailRenderer.emitting = false;
         }
         
-
+        public override string GetLevelDescription(int lvl)
+        {
+            float dur = LerpLevel(durationLvl1, durationLvl10, lvl);
+            float spd = LerpLevel(speedLvl1, speedLvl10, lvl);
+            StringBuilder sb = new StringBuilder();
+            sb.Append("<color=orange>").Append("Cooldown").Append(": ").Append("</color>").Append(Scriptable.GetCooldown(lvl).ToString("n2")).Append("\n");
+            sb.Append("<color=orange>").Append("Duration").Append(": ").Append("</color>").Append(dur.ToString("n2")).Append("\n");
+            sb.Append("<color=orange>").Append("Speed multiplier").Append(": ").Append("</color>").Append(spd.ToString("n2")).Append("\n");
+            return sb.ToString();
+        }
     }
 }

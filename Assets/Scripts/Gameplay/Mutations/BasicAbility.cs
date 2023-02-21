@@ -48,5 +48,7 @@ namespace Gameplay.Abilities
             Learned = true;
             Button.SetActive(true);
         }
+
+        public virtual string GetLevelDescription(int lvl) => string.Empty;
     }
 }

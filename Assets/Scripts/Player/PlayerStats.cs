@@ -78,12 +78,18 @@ namespace Player
         public string Print(bool includeZeros)
         {
             StringBuilder sb = new StringBuilder();
-            if(includeZeros || MovementSpeed > 0) sb.Append("Movespeed: ").Append(MovementSpeed.ToString("n2")).Append("\n");
-            if(includeZeros || RotationSpeed > 0) sb.Append("Rotation speed: ").Append(RotationSpeed.ToString("n2")).Append("\n");
-            if(includeZeros || MaxHealth > 0) sb.Append("Max health: ").Append(MaxHealth.ToString("n2")).Append("\n");
-            if(includeZeros || AttackKnockback > 0) sb.Append("ATK knockback: ").Append(AttackKnockback.ToString("n2")).Append("\n");
-            if(includeZeros || AttackDamage > 0) sb.Append("ATK damage: ").Append(AttackDamage.ToString("n2")).Append("\n");
-            if(includeZeros || ImmunityDuration > 0) sb.Append("Immunity frame: ").Append(ImmunityDuration.ToString("n2"));
+            if(includeZeros || MovementSpeed > 0) 
+                sb.Append("<color=orange>").Append("Movespeed: ").Append("</color>").Append(MovementSpeed.ToString("n2")).Append("\n");
+            if(includeZeros || RotationSpeed > 0) 
+                sb.Append("<color=orange>").Append("Rotation speed: ").Append("</color>").Append(RotationSpeed.ToString("n2")).Append("\n");
+            if(includeZeros || MaxHealth > 0) 
+                sb.Append("<color=orange>").Append("Max health: ").Append("</color>").Append(MaxHealth.ToString("n2")).Append("\n");
+            if(includeZeros || AttackKnockback > 0) 
+                sb.Append("<color=orange>").Append("ATK knockback: ").Append("</color>").Append(AttackKnockback.ToString("n2")).Append("\n");
+            if(includeZeros || AttackDamage > 0) 
+                sb.Append("<color=orange>").Append("ATK damage: ").Append("</color>").Append(AttackDamage.ToString("n2")).Append("\n");
+            if(includeZeros || ImmunityDuration > 0) 
+                sb.Append("<color=orange>").Append("Immunity frame: ").Append("</color>").Append(ImmunityDuration.ToString("n2"));
             return sb.ToString();
         } 
     }
