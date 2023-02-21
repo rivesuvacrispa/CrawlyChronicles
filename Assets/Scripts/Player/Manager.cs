@@ -1,14 +1,23 @@
 ﻿using Definitions;
+using GameCycle;
 using Gameplay;
+using Gameplay.Interaction;
+using Timeline;
 using UI;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Player
 {
     public class Manager : MonoBehaviour, IDamageable
     {
         public static Manager Instance { get; private set; }
-        
+
+        [SerializeField] private Animator spriteAnimator;
+        [SerializeField] private Movement movement;
+        [SerializeField] private MainMenu mainMenu;
+        [SerializeField] private Text healthText;
+        [SerializeField] private Text statsText;
         [SerializeField] private Healthbar healthbar;
         [SerializeField] private float healthbarOffsetY;
         [SerializeField] private float healthbarWidth;
@@ -17,27 +26,31 @@ namespace Player
         [SerializeField] private PlayerStats baseStats = new();
         [SerializeField] private PlayerStats currentStats;
         
+        private readonly int deadHash = Animator.StringToHash("PlayerSpriteDead");
+
         [field:SerializeField] public bool GodMode { get; private set; }
-        public bool IsHoldingEgg => HoldingEgg is not null;
+        public bool IsHoldingEgg { get; private set; }
         public Egg HoldingEgg { get; private set; }
         public bool AllowInteract => !attackController.IsAttacking;
         public static PlayerStats PlayerStats => Instance.currentStats;
         
         private float health;
-        private int foodAmount;
-        
-        
-        
+
+
         private void Awake()
         {
             Instance = this;
             currentStats = baseStats;
+            MainMenu.OnResetRequested += OnResetRequested;
         }
         
         private void Start()
         {
             healthbar.SetTarget(this);
             health = currentStats.MaxHealth;
+            statsText.text = currentStats.Print(true);
+            healthText.text = Mathf.CeilToInt(health).ToString();
+            TimeManager.OnDayStart += OnDayStart;
         }
 
         private void Update()
@@ -48,17 +61,21 @@ namespace Player
         public void AddStats(PlayerStats stats)
         {
             currentStats.AddStats(baseStats, stats);
+            statsText.text = currentStats.Print(true);
         }
         
-        public void PickEgg(Egg gene)
+        public void PickEgg(Egg egg)
         {
-            HoldingEgg = gene;
+            IsHoldingEgg = true;
+            HoldingEgg = egg;
             eggSpriteRenderer.enabled = true;
             attackController.enabled = false;
         }
 
         public void RemoveEgg()
         {
+            IsHoldingEgg = false;
+            HoldingEgg = null;
             eggSpriteRenderer.enabled = false;
             attackController.enabled = true;
         }
@@ -91,27 +108,61 @@ namespace Player
         private void UpdateHealthbar()
         {
             healthbar.SetValue(health / currentStats.MaxHealth);
+            healthText.text = Mathf.CeilToInt(health).ToString();
         }
         
-        private void Die()
+        public void Die()
         {
+            movement.enabled = false;
+            spriteAnimator.Play(deadHash);
+            DeathCounter.StopCounter();
+            TimeManager.OnDayStart -= OnDayStart;
+            Interactor.Abort();
             BreedingManager.Instance.Abort();
+            attackController.ExpireCombo();
+            attackController.enabled = false;
             if(IsHoldingEgg) DropEgg();
-            if (BreedingManager.Instance.CanRespawn)
-            {
-                //Respawn
-                AddHealth(100);
-            }
-            else
-            {
-                Debug.Log("LOL U DIED LOL LOL U DIED");
-            }
+            if (RespawnManager.CollectEggBeds() > 0)
+                RespawnManager.Respawn();
+            else 
+                mainMenu.ShowGameOver();
+        }
+
+        public void OnRespawn()
+        {
+            movement.enabled = true;
+            attackController.enabled = true;
+            StatRecorder.respawns++;
+            health = currentStats.MaxHealth;
+            UpdateHealthbar();
+            TimeManager.OnDayStart += OnDayStart;
         }
 
 
-        private void OnDestroy() => OnDamageableDestroy?.Invoke();
-        
-        
+        private void OnDestroy()
+        {
+            OnDamageableDestroy?.Invoke();
+            TimeManager.OnDayStart -= OnDayStart;
+            MainMenu.OnResetRequested -= OnResetRequested;
+        }
+
+        private void OnDayStart(int day)
+        {
+            health = currentStats.MaxHealth;
+            UpdateHealthbar();
+        }
+
+        private void OnResetRequested()
+        {
+            RemoveEgg();
+            Movement.Teleport(new Vector2(15f, 15f));
+            currentStats = baseStats;
+            health = currentStats.MaxHealth;
+            statsText.text = currentStats.Print(true);
+            healthText.text = Mathf.CeilToInt(health).ToString();
+            UpdateHealthbar();
+        }
+
 
         // IDamageable
         public event IDamageable.DamageableEvent OnDamageableDestroy;

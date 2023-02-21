@@ -5,6 +5,7 @@ using Camera;
 using Gameplay;
 using Genes;
 using Player;
+using Timeline;
 using UI;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,6 +14,8 @@ namespace GameCycle
 {
     public class RespawnManager : MonoBehaviour
     {
+        private static RespawnManager instance;
+        
         public delegate void EggBedCollectionEvent(List<EggBed> eggBeds);
         public static EggBedCollectionEvent OnEggCollectionRequested;
 
@@ -24,31 +27,42 @@ namespace GameCycle
         [SerializeField] private GameObject leftArrow;
         [SerializeField] private GameObject rightArrow;
         [SerializeField] private MutationMenu mutationMenu;
+        [SerializeField] private GameObject navigatorGO;
 
         private int currentEggBedIndex;
         private List<EggBed> eggBeds = new();
+        private EggBed selectedEggbed;
 
-        private void Update()
+        private RespawnManager() => instance = this;
+        
+        /*private void Update()
         {
             if(Input.GetKeyDown(KeyCode.K)) StartRespawn();
-        }
+        }*/
 
-        public void StartRespawn()
+        public static void Respawn() => instance.StartRespawn();
+
+        
+        private void StartRespawn()
         {
+            selectedEggbed = null;
             Time.timeScale = 0;
-            CollectAllEggBeds();
+            navigatorGO.SetActive(eggBeds.Count > 0);
             eggBeds = eggBeds.OrderBy(bed => bed.transform.position.x).ToList();
             SelectEggBed(0);
             AbilityController.SetUIActive(false);
             respawnMenuGO.SetActive(true);
             StartCoroutine(RespawnRoutine());
         }
+
+        public static int CollectEggBeds() => instance.CollectEggBedsNonStatic();
         
-        private void CollectAllEggBeds()
+        private int CollectEggBedsNonStatic()
         {
             eggBeds.Clear();
             eggBeds = new List<EggBed>();
             OnEggCollectionRequested?.Invoke(eggBeds);
+            return eggBeds.Count;
         }
 
         private IEnumerator RespawnRoutine()
@@ -68,14 +82,14 @@ namespace GameCycle
         private void SelectEggBed(int index)
         {
             int count = eggBeds.Count;
-            currentEggBedIndex = Mathf.Clamp(index, 0, count - 1);
+            if (count == 1) currentEggBedIndex = 0;
+            else currentEggBedIndex = Mathf.Clamp(index, 0, count - 1);
             eggBedSelectionText.text = $"{currentEggBedIndex + 1}/{count}";
             leftArrow.SetActive(currentEggBedIndex > 0);
             rightArrow.SetActive(currentEggBedIndex < count - 1);
-            currentEggBedIndex = index;
-            EggBed eggBed = eggBeds[currentEggBedIndex];
-            followMovement.Target = eggBed.Transform;
-            viewer.ShowEggs(eggBed);
+            selectedEggbed = eggBeds[currentEggBedIndex];
+            followMovement.Target = selectedEggbed.Transform;
+            viewer.ShowEggs(selectedEggbed);
         }
 
         public void GoLeft() => SelectEggBed(currentEggBedIndex - 1);
@@ -90,13 +104,18 @@ namespace GameCycle
             mutationMenu.gameObject.SetActive(true);
         }
 
-        public void Respawn(Egg egg)
+        public void Respawn(Egg origin, Egg mutated)
         {
-            BreedingManager.Instance.TrioGene = egg.Genes;
+            Movement.Teleport(selectedEggbed.Transform.position);
+            BreedingManager.Instance.TrioGene = mutated.Genes;
             BreedingManager.Instance.UpdateGeneText();
-            abilityController.UpdateAbilities(egg);
+            BreedingManager.Instance.AddTotalEggsAmount(-1);
+            selectedEggbed.RemoveParticular(origin);
+            abilityController.UpdateAbilities(mutated);
             followMovement.Target = Movement.Transform;
             AbilityController.SetUIActive(true);
+            TimeManager.Instance.ResetLifespan();
+            Manager.Instance.OnRespawn();
             Time.timeScale = 1;
         }
     }

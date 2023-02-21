@@ -35,5 +35,6 @@ namespace Gameplay.Abilities.Active
         }
 
         public override void Activate() => particleSystem.Play();
+   
     }
 }

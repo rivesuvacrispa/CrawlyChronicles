@@ -2,6 +2,7 @@
 using System.Linq;
 using Gameplay;
 using Gameplay.Abilities;
+using Genes;
 using UI;
 using UnityEngine;
 
@@ -19,6 +20,11 @@ namespace Player
         [SerializeField] private List<BasicAbility> allAbilities = new();
 
         private AbilityController() => instance = this;
+
+        private void Awake()
+        {
+            MainMenu.OnResetRequested += OnResetRequested;
+        }
 
         public void CreateUIElement(BasicAbility ability)
         {
@@ -51,6 +57,16 @@ namespace Player
             foreach (var basicAbility in instance.allAbilities.Where(basicAbility => basicAbility.Learned))
                 data.Add(basicAbility.Scriptable, basicAbility.Level);
             return data;
+        }
+
+        private void OnResetRequested()
+        {
+            UpdateAbilities(new Egg(TrioGene.Zero, new MutationData()));
+        }
+
+        private void OnDestroy()
+        {
+            MainMenu.OnResetRequested -= OnResetRequested;
         }
 
         public static void SetUIActive(bool isActive) => instance.uiGO.SetActive(isActive);

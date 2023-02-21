@@ -4,6 +4,7 @@ using GameCycle;
 using Gameplay.AI.Locators;
 using Genes;
 using Gameplay.Interaction;
+using UI;
 using UnityEngine;
 using Util;
 
@@ -23,6 +24,7 @@ namespace Gameplay
         
         private void Awake()
         {
+            MainMenu.OnResetRequested += OnResetRequested;
             spriteRenderer = GetComponent<SpriteRenderer>();
             RespawnManager.OnEggCollectionRequested += OnEggBedsCollectionRequested;
         }
@@ -39,6 +41,7 @@ namespace Gameplay
             BreedingManager.Instance.AddTotalEggsAmount(-EggsAmount);
             RespawnManager.OnEggCollectionRequested -= OnEggBedsCollectionRequested;
             OnProviderDestroy?.Invoke();
+            MainMenu.OnResetRequested -= OnResetRequested;
         }
 
         public void AddEggs(List<Egg> eggs)
@@ -55,6 +58,16 @@ namespace Gameplay
             UpdateAmount();
         }
 
+        public void RemoveParticular(Egg egg)
+        {
+            storedEggs.Remove(egg);
+            BreedingManager.Instance.AddTotalEggsAmount(-1);
+            if (EggsAmount <= 0)
+                Destroy(gameObject);
+            else
+                UpdateAmount();
+        }
+        
         public bool RemoveOne(out Egg egg)
         {
             egg = null;
@@ -62,14 +75,12 @@ namespace Gameplay
             
             egg = storedEggs[Random.Range(0, EggsAmount)];
             storedEggs.Remove(egg);
-
+            BreedingManager.Instance.AddTotalEggsAmount(-1);
+            
             if (EggsAmount <= 0)
                 Destroy(gameObject);
             else
-            {
                 UpdateAmount();
-                BreedingManager.Instance.AddTotalEggsAmount(-1);
-            }
 
             return true;
         }
@@ -81,7 +92,9 @@ namespace Gameplay
         }
 
         private void OnEggBedsCollectionRequested(List<EggBed> eggBeds) => eggBeds.Add(this);
+        private void OnResetRequested() => Destroy(gameObject);
 
+        
 
         
         // INotificationProvider 
@@ -97,6 +110,7 @@ namespace Gameplay
         public void Interact()
         {
             AddEgg(Player.Manager.Instance.HoldingEgg);
+            StatRecorder.eggsLost--;
             Player.Manager.Instance.RemoveEgg();
         }
 

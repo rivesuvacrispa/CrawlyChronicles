@@ -28,6 +28,7 @@ namespace UI
 
         private void Update()
         {
+            if(onCooldown) return;
             if(Input.GetKeyDown(((ActiveMutation)Scriptable).KeyCode)) 
                 Activate();
         }
@@ -43,7 +44,6 @@ namespace UI
 
         private IEnumerator CooldownRoutine(float duration)
         {
-            enabled = false;
             onCooldown = true;
             float t = duration;
             while (t > 0)
@@ -54,18 +54,16 @@ namespace UI
                 yield return null;
             }
 
-            cooldownImage.fillAmount = 0;
             hotkeyText.text = ((ActiveMutation)Scriptable).KeyCode.ToString();
-            enabled = true;
+            cooldownImage.fillAmount = 0;
             onCooldown = false;
         }
 
-        private void OnEnable()
+        private void OnDisable()
         {
             if(Scriptable is null) return;
-            cooldownImage.fillAmount = 0;
             hotkeyText.text = ((ActiveMutation)Scriptable).KeyCode.ToString();
-            enabled = true;
+            cooldownImage.fillAmount = 0;
             onCooldown = false;
         }
     }

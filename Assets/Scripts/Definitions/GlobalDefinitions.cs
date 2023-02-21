@@ -24,7 +24,8 @@ namespace Definitions
         [SerializeField] private float fleeingSpeedMultiplier;
         [SerializeField] private float interactionDistance;
         [SerializeField] private float genePickupDistance;
-        [Header("Prefabs")]
+        [Header("Prefabs")] 
+        [SerializeField] private EggBed eggBedPrefab;
         [SerializeField] private EggDrop eggDropPrefab;
         [SerializeField] private PopupNotification popupNotificationPrefab;
         [SerializeField] private GeneDrop geneDropPrefab;
@@ -49,6 +50,7 @@ namespace Definitions
         public static int BreedingPartnersGeneEntropy => instance.breedingPartnersGeneEntropy;
         public static int EggGeneEntropy => instance.eggGeneEntropy;
 
+        public static EggBed EggBedPrefab => instance.eggBedPrefab;
 
 
         public static string GetRomanDigit(int digit) => instance.romanDigits[digit];

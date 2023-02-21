@@ -1,4 +1,5 @@
-﻿using Gameplay;
+﻿using GameCycle;
+using Gameplay;
 using Gameplay.Enemies;
 using Genes;
 using Player;
@@ -48,6 +49,7 @@ namespace UI
         public void Accept()
         {
             openedPartner.CanBreed = false;
+            StatRecorder.timesBreed++;
             BreedingManager.Instance.BecomePregnant(median, AbilityController.GetMutationData());
             Close();
         }

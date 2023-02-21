@@ -25,6 +25,7 @@ namespace Gameplay.Abilities.Passive
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
+            if(particleSystem.isPlaying) particleSystem.Stop();
             probability = LerpLevel(probabilityLvl1, probabilityLvl10, lvl);
             var emission = particleSystem.emission;
             emission.SetBurst(0, new ParticleSystem.Burst(0, 
@@ -36,7 +37,7 @@ namespace Gameplay.Abilities.Passive
             particleSystem.Play();
         }
         
-        private void OnDamageTaken(int damage)
+        private void OnDamageTaken(float damage)
         {
             if(damage >= damageCap || Random.value <= probability) Activate();
         }

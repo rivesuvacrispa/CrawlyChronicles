@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Gameplay.Enemies;
 using UnityEngine;
 
 namespace Player
@@ -15,7 +16,7 @@ namespace Player
         
         public bool BlockColor { get; set; }
 
-        public delegate void PlayerHitboxEvent(int damage);
+        public delegate void PlayerHitboxEvent(float damage);
         public static event PlayerHitboxEvent OnDamageTaken;
         
         
@@ -24,15 +25,14 @@ namespace Player
 
         private void OnCollisionEnter2D(Collision2D col)
         {
-            Damage(col.transform.position);
+            if(col.gameObject.TryGetComponent(out Enemy enemy))
+                Damage(col.transform.position, enemy.Scriptable.Damage, enemy.Scriptable.Knockback);
         }
         
-        private void Damage(Vector3 pos)
+        private void Damage(Vector3 pos, float damage, float kb)
         {
             if (Manager.Instance.GodMode) return;
-            //TODO: add knockback and damage stat for each enemy
-            movement.Knockback(pos, 0.35f, knockback);
-            int damage = 1;
+            movement.Knockback(pos, 0.35f, kb);
             Manager.Instance.Damage(damage);
             OnDamageTaken?.Invoke(damage);
             StartCoroutine(ImmunityRoutine());

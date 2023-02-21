@@ -10,6 +10,11 @@ namespace Player
     [RequireComponent(typeof(Rigidbody2D))]
     public class Movement : MonoBehaviour, ILocatorTarget
     {
+        [SerializeField] private Animator spriteAnimator;
+
+        private readonly int idleHash = Animator.StringToHash("PlayerSpriteIdle");
+        private readonly int walkHash = Animator.StringToHash("PlayerSpriteWalk");
+        
         private static Rigidbody2D rb;
         private Coroutine dashRoutine;
         public static float MoveSpeedAmplifier { get; set; } = 1;
@@ -17,18 +22,21 @@ namespace Player
         public static Vector2 Position => rb.position;
         public static float Rotation => rb.rotation;
         public static Transform Transform => rb.transform;
+        public static void Teleport(Vector2 pos) => rb.position = pos;
         
         private void Awake() => rb = GetComponent<Rigidbody2D>();
 
-        private void Update()
+        private void FixedUpdate()
         {
             Vector2 mousePos = MainCamera.WorldMousePos;
             rb.rotation = PhysicsUtility.RotateTowardsPosition(rb.position, rb.rotation, mousePos, Manager.PlayerStats.RotationSpeed);
 
-            if (Input.GetMouseButton(0))
+            if (Input.GetMouseButton(1))
             {
+                spriteAnimator.Play(walkHash);
                 rb.velocity = transform.up * Manager.PlayerStats.MovementSpeed * MoveSpeedAmplifier;
             }
+            else spriteAnimator.Play(idleHash);
         }
 
 
@@ -71,15 +79,15 @@ namespace Player
         private IEnumerator SideDashRoutine(Vector2 position, float direction, float duration, Action onEnd)
         {
             rb.velocity = (position - rb.position).normalized * 
-                          Mathf.Clamp(Manager.PlayerStats.MovementSpeed * 3 * MoveSpeedAmplifier, 0, 20);
+                          Mathf.Clamp(Manager.PlayerStats.MovementSpeed * 4 * MoveSpeedAmplifier, 0, 20);
             float t = 0f;
             enabled = false;
 
             while (t < duration && Mathf.Abs(rb.rotation - direction) > 10f)
             {
-                rb.rotation = PhysicsUtility.RotateTowardsPosition(rb.position, rb.rotation, position, 8);
-                t += Time.deltaTime;
-                yield return null;
+                rb.rotation = PhysicsUtility.RotateTowardsPosition(rb.position, rb.rotation, position, 10);
+                t += Time.fixedDeltaTime;
+                yield return new WaitForFixedUpdate();
             }
 
             yield return new WaitForEndOfFrame();
@@ -91,14 +99,14 @@ namespace Player
         private IEnumerator StraightDashRoutine(Vector2 position, float duration, Action onEnd)
         {
             rb.velocity = (position - rb.position).normalized * 
-                          Mathf.Clamp(Manager.PlayerStats.MovementSpeed * 3 * MoveSpeedAmplifier, 0, 20);
+                          Mathf.Clamp(Manager.PlayerStats.MovementSpeed * 4 * MoveSpeedAmplifier, 0, 20);
             float t = 0f;
             enabled = false;
 
             while (t < duration)
             {
-                t += Time.deltaTime;
-                yield return null;
+                t += Time.fixedDeltaTime;
+                yield return new WaitForFixedUpdate();
             }
 
             yield return new WaitForEndOfFrame();
@@ -118,8 +126,8 @@ namespace Player
                 rb.rotation += speed;
                 rb.velocity = ((Vector2) MainCamera.WorldMousePos - rb.position).normalized * 
                               Mathf.Clamp(Manager.PlayerStats.MovementSpeed * MoveSpeedAmplifier, 0, 20);
-                t += Time.deltaTime;
-                yield return null;
+                t += Time.fixedDeltaTime;
+                yield return new WaitForFixedUpdate();
             }
             
             enabled = true;

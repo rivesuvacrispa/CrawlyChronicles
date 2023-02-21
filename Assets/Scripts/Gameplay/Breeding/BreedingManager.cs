@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Definitions;
+using GameCycle;
 using Gameplay.Abilities;
 using Gameplay.Enemies;
 using Genes;
@@ -23,7 +24,6 @@ namespace Gameplay
         [SerializeField] private GeneConsumer geneConsumer;
         [Header("Eggs")]
         [SerializeField] private Text totalEggsText;
-        [SerializeField] private EggBed eggBedPrefab;
         [Header("Food")]
         [SerializeField] private Text foodText;
         [SerializeField] private int breedingFoodRequirement;
@@ -39,7 +39,6 @@ namespace Gameplay
 
         [field:SerializeField] public TrioGene TrioGene { get; set; } = TrioGene.Zero;
         public bool CanBreed => currentFoodAmount >= breedingFoodRequirement && eggLayingTimer == 0;
-        public bool CanRespawn => totalEggsAmount > 0;
         
         
         
@@ -50,6 +49,18 @@ namespace Gameplay
             currentFoodAmount = 0;
             UpdateTotalEggsText();
             UpdateFoodText();
+        }
+
+        public void OnResetRequested()
+        {
+            StopAllCoroutines();
+            totalEggsAmount = 0;
+            currentFoodAmount = 0;
+            TrioGene = TrioGene.Zero;
+            eggLayingTimer = 0;
+            UpdateTotalEggsText();
+            UpdateFoodText(); 
+            geneDisplay.UpdateTrioText(TrioGene);
         }
         
         public void AddGene(GeneType geneType)
@@ -66,7 +77,7 @@ namespace Gameplay
         
         private void LayEggs(Vector2 position, TrioGene genes, MutationData mutationData)
         {
-            var bed = Instantiate(eggBedPrefab, GlobalDefinitions.GameObjectsTransform);
+            var bed = Instantiate(GlobalDefinitions.EggBedPrefab, GlobalDefinitions.GameObjectsTransform);
             int amount = Random.Range(1, 7);
             var eggs = new List<Egg>();
             while (amount > 0)
@@ -77,7 +88,8 @@ namespace Gameplay
                 eggs.Add(egg);
                 amount--;
             }
-            
+
+            StatRecorder.eggsLayed += amount;
             bed.AddEggs(eggs);
             bed.transform.position = position;
             UpdateFoodText();
@@ -164,10 +176,12 @@ namespace Gameplay
             breedingMenu.Open(partner);
         }
 
-        private void OnDestroy() => OnProviderDestroy?.Invoke();
+        private void OnDestroy()
+        {
+            OnProviderDestroy?.Invoke();
+        }
 
 
-        
         // INotificationProvider
         public event INotificationProvider.NotificationProviderEvent OnDataUpdate;
         public event INotificationProvider.NotificationProviderEvent OnProviderDestroy;

@@ -1,7 +1,10 @@
 ﻿using System.Collections;
 using Definitions;
+using GameCycle;
+using Gameplay.Abilities;
 using Genes;
 using Gameplay.Interaction;
+using UI;
 using UnityEngine;
 using Util;
 
@@ -10,12 +13,21 @@ namespace Gameplay
     [RequireComponent(typeof(SpriteRenderer))]
     public class EggDrop : MonoBehaviour, IInteractable
     {
-        private Egg egg;
+        [SerializeReference] private Egg egg;
         private bool crashed;
         private bool immune = true;
 
 
-        private void Start() => StartCoroutine(ImmunityRoutine());
+        private void Start()
+        {
+            egg ??= new Egg(TrioGene.Zero, new MutationData());
+            MainMenu.OnResetRequested += OnResetRequested;
+            StartCoroutine(ImmunityRoutine());
+        }
+
+        private void OnDestroy() => MainMenu.OnResetRequested -= OnResetRequested;
+
+        private void OnResetRequested() => Destroy(gameObject);
         
         public EggDrop SetEgg(Egg eg)
         {

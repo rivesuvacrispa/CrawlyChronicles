@@ -116,6 +116,8 @@ namespace Gameplay.Enemies
             stateController.SetState(AIState.Flee);
         }
 
+        protected override void OnDayStart(int day) { }
+
         private void SubEvents() => TimeManager.OnNightStart += OnNightStart;
         private void UnsubEvents() => TimeManager.OnNightStart -= OnNightStart;
 

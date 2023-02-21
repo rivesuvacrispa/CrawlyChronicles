@@ -1,4 +1,5 @@
 ﻿using Definitions;
+using GameCycle;
 using Gameplay.AI;
 using Gameplay.Food;
 using Genes;
@@ -25,7 +26,9 @@ namespace Gameplay.Enemies
 
         public override void OnPlayerLocated()
         {
-            stateController.SetState(AIState.Follow);
+            stateController.SetState(AIState.Follow, 
+                onTargetReach: o => BasicAttack(),
+                reachDistance: 0.75f);
         }
 
         public override void OnEggsLocated(EggBed eggBed)
@@ -34,6 +37,7 @@ namespace Gameplay.Enemies
             {
                 if(eggBed.RemoveOne(out holdingEgg))
                 {
+                    StatRecorder.eggsLost++;
                     eggSpriteRenderer.enabled = true;
                     stateController.SetState(AIState.Flee);
                 }
@@ -53,10 +57,10 @@ namespace Gameplay.Enemies
         private void DropEgg()
         {
             eggSpriteRenderer.enabled = false;
-            holdingEgg = null;
             var egg = GlobalDefinitions.CreateEggDrop(holdingEgg).transform;
             egg.position = (Vector3) rb.position + transform.up * 0.35f;
             egg.rotation = Quaternion.Euler(0, 0, rb.rotation);
+            holdingEgg = null;
         }
     }
 }

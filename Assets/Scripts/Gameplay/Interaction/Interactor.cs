@@ -7,13 +7,22 @@ namespace Gameplay.Interaction
     [RequireComponent(typeof(Collider2D))]
     public class Interactor : MonoBehaviour
     {
+        
         [SerializeField] private InteractionPopup popup;
         
-        private IInteractable interactable;
-        private bool canInteract;
+        private static IInteractable interactable;
         
+        public static bool CanInteract { get; private set; }
         public static bool Interacting { get; private set; }
+
+
         
+        public static void Abort()
+        {
+            interactable = null;
+            Interacting = false;
+        }
+
         private void OnTriggerEnter2D(Collider2D col)
         {
             if(Interacting) return;
@@ -36,13 +45,13 @@ namespace Gameplay.Interaction
                 return;
             }
 
-            canInteract = interactable.CanInteract() &&
-                               Player.Manager.Instance.AllowInteract;
+            CanInteract = interactable.CanInteract() &&
+                          Player.Manager.Instance.AllowInteract;
             
-            if(canInteract) UpdatePopup();
+            if(CanInteract) UpdatePopup();
             else popup.Disable();
 
-            if(Input.GetKeyDown(KeyCode.E) && canInteract)
+            if(Input.GetKeyDown(KeyCode.E) && CanInteract)
             {
                 if (interactable is IContinuouslyInteractable continuouslyInteractable)
                     StartCoroutine(InteractionRoutine(continuouslyInteractable));
@@ -66,7 +75,7 @@ namespace Gameplay.Interaction
             float interactionTime = 0;
             while (interactionTime < duration)
             {
-                if (Input.GetKeyUp(KeyCode.E) || !canInteract || interactable is null)
+                if (Input.GetKeyUp(KeyCode.E) || !CanInteract || interactable is null)
                 {
                     interrupted = true;
                     break;
@@ -85,8 +94,8 @@ namespace Gameplay.Interaction
             {
                 popup.SetFilling(0);
                 continuouslyInteractable.OnInteractionStop();
-                Interacting = false;
             }
+            Interacting = false;
         }
 
         private void UpdatePopup()

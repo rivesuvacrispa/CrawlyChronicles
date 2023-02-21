@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using Definitions;
+using GameCycle;
 using Gameplay.AI;
 using Gameplay.Food;
-using Genes;
+using Timeline;
 using UI;
 using UnityEngine;
 using Util;
@@ -66,6 +67,7 @@ namespace Gameplay.Enemies
             health = scriptable.MaxHealth;
             spriteRenderer.color = scriptable.BodyColor;
             healthbar = HealthbarPool.Instance.Create(this);
+            SubEvents();
         }
         
         public void Damage(float damage, float knockback, float stunDuration) => 
@@ -73,6 +75,7 @@ namespace Gameplay.Enemies
 
         public void Damage(Vector2 attacker, float damage, float knockbackPower, float stunDuration)
         {
+            StatRecorder.damageDealt += damage;
             health -= damage;
             StopAttack();
             healthbar.SetValue(Mathf.Clamp01(health / scriptable.MaxHealth));
@@ -93,6 +96,7 @@ namespace Gameplay.Enemies
 
         private void Die()
         {
+            StatRecorder.enemyKills++;
             StopAllCoroutines();
             attackGO.SetActive(false);
             hitbox.Disable();
@@ -103,6 +107,7 @@ namespace Gameplay.Enemies
             if(Random.value <= scriptable.GeneDropRate) 
                 GlobalDefinitions.CreateRandomGeneDrop(Position);
             StartCoroutine(DeathRoutine());
+            UnsubEvents();
         }
 
         private void StopAttack()
@@ -181,6 +186,7 @@ namespace Gameplay.Enemies
             stateController.ReturnMoveControl();
             animator.Play(walkHash);
             stunned = false;
+            if(TimeManager.IsDay) OnDayStart(0);
         }
         
         private IEnumerator KnockbackRoutine(Vector2 velocity)
@@ -213,9 +219,28 @@ namespace Gameplay.Enemies
             hitbox.Enable();
         }
         
-        //TODO: Colorroutine
+        protected virtual void OnDestroy()
+        {
+            OnDamageableDestroy?.Invoke();
+            MainMenu.OnResetRequested -= OnResetRequested;
+            UnsubEvents();
+        }
 
-        protected virtual void OnDestroy() => OnDamageableDestroy?.Invoke();
+        protected virtual void OnDayStart(int day)
+        {
+            stateController.SetEtherial(true);
+            stateController.SetState(AIState.Flee);
+        }
+        
+        private void SubEvents()
+        {
+            MainMenu.OnResetRequested += OnResetRequested;
+            TimeManager.OnDayStart += OnDayStart;
+        }
+
+        private void UnsubEvents() => TimeManager.OnDayStart -= OnDayStart;
+
+        private void OnResetRequested() => Destroy(gameObject);
 
 
         // IDamageable

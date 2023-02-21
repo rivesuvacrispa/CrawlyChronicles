@@ -21,8 +21,9 @@ namespace Player
 
         private void Update()
         {
-            if(Interactor.Interacting) return;
-            if (Input.GetKeyDown(KeyCode.Q))
+            if (Interactor.Interacting)
+                return;
+            if (Input.GetMouseButtonDown(0))
             {
                 if (comboCounter == 3)
                     ComboAttack();
@@ -69,7 +70,7 @@ namespace Player
             comboExpirationRoutine = StartCoroutine(ComboExpirationRoutine());
         }
 
-        private void ExpireCombo()
+        public void ExpireCombo()
         {
             comboCounter = 0;
             comboExpirationRoutine = null;

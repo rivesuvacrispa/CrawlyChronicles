@@ -38,5 +38,7 @@ namespace Gameplay.Abilities.Active
             Player.Movement.MoveSpeedAmplifier = 1;
             trailRenderer.emitting = false;
         }
+        
+
     }
 }

@@ -19,6 +19,8 @@ namespace Scriptable
         [SerializeField] private float movementSpeed;
         [SerializeField] private float locatorRadius;
         [SerializeField] private Color bodyColor;
+        [SerializeField] private float damage;
+        [SerializeField] private float knockback;
 
         private Gradient immunityGradient;
 
@@ -33,8 +35,11 @@ namespace Scriptable
         public float LocatorRadius => locatorRadius;
         public float GeneDropRate => geneDropRate;
 
+        public float Damage => damage;
 
-        
+        public float Knockback => knockback;
+
+
         public Color GetImmunityFrameColor(float time) => immunityGradient.Evaluate(time / immunityDuration);
         
         

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Text;
+using UnityEngine;
 
 namespace Player
 {
@@ -73,5 +74,17 @@ namespace Player
         }
 
         public static PlayerStats Zero => new();
+
+        public string Print(bool includeZeros)
+        {
+            StringBuilder sb = new StringBuilder();
+            if(includeZeros || MovementSpeed > 0) sb.Append("Movespeed: ").Append(MovementSpeed.ToString("n2")).Append("\n");
+            if(includeZeros || RotationSpeed > 0) sb.Append("Rotation speed: ").Append(RotationSpeed.ToString("n2")).Append("\n");
+            if(includeZeros || MaxHealth > 0) sb.Append("Max health: ").Append(MaxHealth.ToString("n2")).Append("\n");
+            if(includeZeros || AttackKnockback > 0) sb.Append("ATK knockback: ").Append(AttackKnockback.ToString("n2")).Append("\n");
+            if(includeZeros || AttackDamage > 0) sb.Append("ATK damage: ").Append(AttackDamage.ToString("n2")).Append("\n");
+            if(includeZeros || ImmunityDuration > 0) sb.Append("Immunity frame: ").Append(ImmunityDuration.ToString("n2"));
+            return sb.ToString();
+        } 
     }
 }

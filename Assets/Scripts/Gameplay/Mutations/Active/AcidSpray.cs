@@ -21,6 +21,7 @@ namespace Gameplay.Abilities.Active
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
+            if(particleSystem.isPlaying) particleSystem.Stop();
             var emission = particleSystem.emission;
             var shape = particleSystem.shape;
             shape.angle = LerpLevel(amountLvl1, amountLvl10, lvl);

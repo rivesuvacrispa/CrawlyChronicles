@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UI;
 using UnityEngine;
 
 namespace Gameplay.Food
@@ -17,11 +18,25 @@ namespace Gameplay.Food
         {
             foreach (Transform child in foodSpawnPointsTransform)
                 foodSpawnPoints.Add(child.gameObject.GetComponent<FoodSpawnPoint>());
+            MainMenu.OnResetRequested += OnResetRequested;
+        }
+
+        private void OnDestroy()
+        {
+            MainMenu.OnResetRequested -= OnResetRequested;
         }
 
         private void Start()
         {
             StartCoroutine(FoodSpawningRoutine());
+        }
+
+        private void OnResetRequested()
+        {
+            for (int i = 0; i < Random.Range(1, 4); i++)
+            {
+                SpawnFood();
+            }
         }
 
         private void SpawnFood()

@@ -109,6 +109,7 @@ namespace UI
             RefreshAffrodable();
             genesLeft.SetGene(mutation.GeneType, genesLeft.GetGene(mutation.GeneType) - cost);
             geneDisplay.UpdateTrioText(genesLeft);
+            StatRecorder.timesMutated++;
         }
 
         private void CreateBasicAbilityButton(BasicMutation mutation, int level)
@@ -134,13 +135,13 @@ namespace UI
 
         public void Hatch()
         {
-            hatchingEgg = new Egg(genesLeft, new MutationData(
+            Egg mutated = new Egg(genesLeft, new MutationData(
                 current.ToDictionary(
                     pair => pair.Key, 
                     pair => pair.Value)));
             gameObject.SetActive(false);
             ClearAll();
-            respawnManager.Respawn(hatchingEgg);
+            respawnManager.Respawn(hatchingEgg, mutated);
         }
         
         

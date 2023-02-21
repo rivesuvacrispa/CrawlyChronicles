@@ -118,64 +118,85 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: insect_body
-      rect:
-        serializedVersion: 2
-        x: 24
-        y: 13
-        width: 78
-        height: 102
-      alignment: 9
-      pivot: {x: 0.50000006, y: 0.48069862}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: d6b35ead57daa1545a9cd08c9063c132
-      internalID: -376527012
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: insect_nipper_left
+      name: insect_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 104
-        width: 12
-        height: 24
-      alignment: 8
-      pivot: {x: 1, y: 0}
+        y: 0
+        width: 128
+        height: 128
+      alignment: 9
+      pivot: {x: 0.4884978, y: 0.5690131}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ee77c8f8a32c67e4783ed62f802fb65f
-      internalID: -1308859145
+      spriteID: e1fc656f332a8a24d8e9b4db3faaa776
+      internalID: -1545957121
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: insect_nipper_right
+      name: insect_1
       rect:
         serializedVersion: 2
-        x: 12
-        y: 104
-        width: 12
-        height: 24
-      alignment: 6
-      pivot: {x: 0, y: 0}
+        x: 128
+        y: 0
+        width: 128
+        height: 128
+      alignment: 9
+      pivot: {x: 0.4884978, y: 0.5690131}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1b3e28211e964c945ac825dad88bfaf1
-      internalID: 1928495800
+      spriteID: 47e3613c0652fb448b7af0cc2e995e4d
+      internalID: 233135230
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: insect_2
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 0
+        width: 128
+        height: 128
+      alignment: 9
+      pivot: {x: 0.4884978, y: 0.5690131}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: adec4f30e4aa8f249837d466eda9fe96
+      internalID: 1838539455
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: insect_3
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 0
+        width: 128
+        height: 128
+      alignment: 9
+      pivot: {x: 0.4501574, y: 0.40798244}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 349eedf820c2be0448beca05db1131da
+      internalID: -1573755300
       vertices: []
       indices: 
       edges: []
@@ -191,9 +212,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      insect_nipper_left: -1308859145
-      insect_body: -376527012
-      insect_nipper_right: 1928495800
+      insect_2: 1838539455
+      insect_1: 233135230
+      insect_0: -1545957121
+      insect_3: -1573755300
   spritePackingTag: 
   pSDRemoveMatte: 0
   userData: 
