@@ -1,8 +1,8 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using Gameplay.Enemies;
 using Player;
 using UnityEngine;
+using Util;
 using Random = UnityEngine.Random;
 
 namespace Gameplay.Abilities.Passive
@@ -20,14 +20,19 @@ namespace Gameplay.Abilities.Passive
         [Header("Stun and knockback")] 
         [SerializeField, Range(0, 1)] private float stunDuration = 0.5f;
         [SerializeField, Range(0, 10)] private float knockbackPower = 0.5f;
+        [Header("Damage")]
+        [SerializeField] private float damageLvl1;
+        [SerializeField] private float damageLvl10;
 
         private float probability;
+        private float damage;
         
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
             if(particleSystem.isPlaying) particleSystem.Stop();
             probability = LerpLevel(probabilityLvl1, probabilityLvl10, lvl);
+            damage = LerpLevel(damageLvl1, damageLvl10, lvl);
             var emission = particleSystem.emission;
             emission.SetBurst(0, new ParticleSystem.Burst(0, 
                 LerpLevel(amountLvl1, amountLvl10, lvl)));
@@ -38,17 +43,15 @@ namespace Gameplay.Abilities.Passive
             particleSystem.Play();
         }
         
-        private void OnDamageTaken(float damage)
+        private void OnDamageTaken(float dmg)
         {
-            if(damage >= damageCap || Random.value <= probability) Activate();
+            if(dmg >= damageCap || Random.value <= probability) Activate();
         }
         
         private void OnParticleCollision(GameObject other)
         {
-            if (other.TryGetComponent(out Enemy enemy))
-            {
-                enemy.Damage(1, knockbackPower, stunDuration);
-            }
+            if (other.TryGetComponent(out Enemy enemy)) 
+                enemy.Damage(damage, knockbackPower, stunDuration);
         }
         
         protected override void OnDisable()
@@ -65,14 +68,29 @@ namespace Gameplay.Abilities.Passive
         
         public override string GetLevelDescription(int lvl)
         {
-            float prob = LerpLevel(probabilityLvl1, probabilityLvl10, lvl);
-            float amount = LerpLevel(amountLvl1, amountLvl10, lvl);
             StringBuilder sb = new StringBuilder();
-            sb.Append("<color=orange>").Append("Trigger chance").Append(": ").Append("</color>").Append(prob.ToString("n2")).Append("\n");
-            sb.Append("<color=orange>").Append("Damage cap").Append(": ").Append("</color>").Append(damageCap.ToString("n2")).Append("\n");
-            sb.Append("<color=orange>").Append("Bullets amount").Append(": ").Append("</color>").Append(amount.ToString("n2")).Append("\n");
-            sb.Append("<color=orange>").Append("Stun duration").Append(": ").Append("</color>").Append(stunDuration.ToString("n2")).Append("\n");
-            sb.Append("<color=orange>").Append("Knockback").Append(": ").Append("</color>").Append(knockbackPower.ToString("n2")).Append("\n");
+            
+            float prob = LerpLevel(probabilityLvl1, probabilityLvl10, lvl);
+            float prevProb = 0;
+            float amount = LerpLevel(amountLvl1, amountLvl10, lvl);
+            float prevAmount = 0;
+            float dmg = LerpLevel(damageLvl1, damageLvl10, lvl);
+            float prevDmg = 0;
+
+            if (lvl > 0)
+            {
+                var prevLvl = lvl - 1;
+                prevProb = LerpLevel(probabilityLvl1, probabilityLvl10, prevLvl);
+                prevAmount = LerpLevel(amountLvl1, amountLvl10, prevLvl);
+                prevDmg = LerpLevel(damageLvl1, damageLvl10, prevLvl);
+            }
+
+            sb.AddAbilityLine("Trigger chance", prob, prevProb);
+            sb.AddAbilityLine("Spikes amount", amount, prevAmount);
+            sb.AddAbilityLine("Spikes damage", dmg, prevDmg);
+            sb.AddAbilityLine("Damage cap", damageCap, 0);
+            sb.AddAbilityLine("Stun duration", stunDuration, 0);
+            sb.AddAbilityLine("Knockback", knockbackPower, 0);
             return sb.ToString();
         }
     }

@@ -15,18 +15,21 @@ namespace Gameplay.Enemies
         [SerializeField] private ParticleSystem breedingParticles;
         [SerializeField] private Animator breedAnimator;
 
-        private delegate void NeutralAntEvent();
+        private delegate void NeutralAntEvent(Vector2 position);
         private static event NeutralAntEvent OnNeutralDamaged;
 
-        private readonly int breedAnimHash = Animator.StringToHash("NeutralAntBodyBreeding");
-        private readonly int idleAnimHash = Animator.StringToHash("NeutralAntBodyIdle");
+        private static readonly int BreedAnimHash = Animator.StringToHash("NeutralAntBodyBreeding");
+        private static readonly int IdleAnimHash = Animator.StringToHash("NeutralAntBodyIdle");
 
         private Coroutine interestRoutine;
         private bool hungry = true;
+        private bool aggressive;
         public bool CanBreed { get; set; } = true;
 
         [field:SerializeField] public TrioGene TrioGene { get; private set; } = TrioGene.Zero;
 
+        
+        
         protected override void Start()
         {
             SubEvents();
@@ -44,8 +47,15 @@ namespace Gameplay.Enemies
 
         public override void OnPlayerLocated()
         {
-            StopInterest();
-            if(TimeManager.IsDay && CanBreed) interestRoutine = StartCoroutine(InterestRoutine());
+            if (aggressive)
+            {
+                stateController.SetState(AIState.Follow, 
+                    onTargetReach: o => BasicAttack(),
+                    reachDistance: 1.25f);
+            } else {
+                StopInterest();
+                if(TimeManager.IsDay && CanBreed) interestRoutine = StartCoroutine(InterestRoutine());
+            }
         }
 
         public override void OnEggsLocated(EggBed eggBed)
@@ -71,7 +81,9 @@ namespace Gameplay.Enemies
 
         protected override void OnDamageTaken()
         {
-            OnNeutralDamaged?.Invoke();
+            OnNeutralDamaged -= OnNeutralDamage;
+            OnNeutralDamaged?.Invoke(rb.position);
+            aggressive = true;
         }
 
         public void Interact()
@@ -118,13 +130,12 @@ namespace Gameplay.Enemies
             stateController.SetState(AIState.Flee);
         }
 
-        private void OnNeutralDamage()
+        private void OnNeutralDamage(Vector2 pos)
         {
+            if(Vector2.Distance(rb.position, pos) > 7.5f) return;
             StopInterest();
-            CanBreed = false;
-            stateController.SetState(AIState.Follow, 
-                onTargetReach: o => BasicAttack(),
-                reachDistance: 1.25f);
+            aggressive = true;
+            OnNeutralDamaged -= OnNeutralDamage;
         }
 
         protected override void OnDayStart(int day) { }
@@ -158,14 +169,14 @@ namespace Gameplay.Enemies
             StopInterest();
             rb.rotation = PhysicsUtility
                 .RotateTowardsPosition(rb.position, rb.rotation, Player.Movement.Position, 360);
-            breedAnimator.Play(breedAnimHash);
+            breedAnimator.Play(BreedAnimHash);
             breedingParticles.Play();
             BreedingManager.Instance.PlayBreedingAnimation();
         }
 
         public void OnInteractionStop()
         {
-            breedAnimator.Play(idleAnimHash);
+            breedAnimator.Play(IdleAnimHash);
             stateController.SetState(AIState.Wander);
             breedingParticles.Stop();
             BreedingManager.Instance.PlayIdleAnimation();

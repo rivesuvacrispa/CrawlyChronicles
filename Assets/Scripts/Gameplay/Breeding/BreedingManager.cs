@@ -84,25 +84,6 @@ namespace Gameplay
             geneDisplay.UpdateTrioText(trioGene);
         }
         
-        private void LayEggs(Vector2 position, TrioGene genes, MutationData mutationData)
-        {
-            var bed = Instantiate(GlobalDefinitions.EggBedPrefab, GlobalDefinitions.GameObjectsTransform);
-            int amount = Random.Range(1, 7);
-            StatRecorder.eggsLayed += amount;
-            var eggs = new List<Egg>();
-            while (amount > 0)
-            {
-                Egg egg = new Egg(
-                    genes.Randomize(GlobalDefinitions.EggGeneEntropy), 
-                    mutationData.Randomize());
-                eggs.Add(egg);
-                amount--;
-            }
-
-            bed.SetEggs(eggs);
-            bed.transform.position = position;
-        }
-
         private void UpdateTotalEggsText()
         {
             totalEggsText.text = totalEggsAmount.ToString();
@@ -167,6 +148,25 @@ namespace Gameplay
             Destroy(popupNotification.gameObject);
             popupNotification = null;
             eggLayRoutine = null;
+        }
+        
+        private void LayEggs(Vector2 position, TrioGene genes, MutationData mutationData)
+        {
+            var bed = Instantiate(GlobalDefinitions.EggBedPrefab, GlobalDefinitions.GameObjectsTransform);
+            int amount = Random.Range(3, 7);
+            StatRecorder.eggsLayed += amount;
+            var eggs = new List<Egg>();
+            while (amount > 0)
+            {
+                Egg egg = new Egg(
+                    genes.Randomize(GlobalDefinitions.EggGeneEntropy), 
+                    mutationData.Randomize());
+                eggs.Add(egg);
+                amount--;
+            }
+
+            bed.SetEggs(eggs);
+            bed.transform.position = position;
         }
 
         public void Abort()

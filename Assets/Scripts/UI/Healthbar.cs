@@ -26,9 +26,9 @@ namespace UI
         
         public void SetValue(float value)
         {
-            if(Mathf.Abs(mainImage.fillAmount - value) < 0.01f) return;
             mainImage.fillAmount = value;
             SetAlpha(1f);
+            UpdatePosition();
             enabled = true;
             if(currentRoutine is not null) StopCoroutine(currentRoutine);
             currentRoutine = StartCoroutine(CatchRoutine(value));
@@ -42,16 +42,9 @@ namespace UI
             enabled = false;
         }
 
-        private void OnEnable()
-        {
-            if(target is null) return;
-            Vector3 pos = target.Transform.position;
-            pos.z = 0;
-            pos.y += target.HealthbarOffsetY;
-            transform.localPosition = pos;
-        }
+        protected virtual void Update() => UpdatePosition();
 
-        protected virtual void Update()
+        private void UpdatePosition()
         {
             Vector3 pos = target.Transform.position;
             pos.z = 0;
@@ -61,7 +54,7 @@ namespace UI
         
         private IEnumerator CatchRoutine(float finalValue)
         {
-            while (catchImage.fillAmount - mainImage.fillAmount > 0.01f)
+            while (Mathf.Abs(catchImage.fillAmount - mainImage.fillAmount) > 0.01f)
             {
                 catchImage.fillAmount = Mathf.MoveTowards(catchImage.fillAmount, mainImage.fillAmount,
                     catchSpeed * Time.deltaTime);

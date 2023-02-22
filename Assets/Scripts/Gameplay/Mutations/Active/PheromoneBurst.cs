@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Text;
 using UnityEngine;
+using Util;
 
 namespace Gameplay.Abilities.Active
 {
@@ -17,7 +18,7 @@ namespace Gameplay.Abilities.Active
 
         private float duration;
         private float speed;
-        
+
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
@@ -42,12 +43,26 @@ namespace Gameplay.Abilities.Active
         
         public override string GetLevelDescription(int lvl)
         {
-            float dur = LerpLevel(durationLvl1, durationLvl10, lvl);
-            float spd = LerpLevel(speedLvl1, speedLvl10, lvl);
             StringBuilder sb = new StringBuilder();
-            sb.Append("<color=orange>").Append("Cooldown").Append(": ").Append("</color>").Append(Scriptable.GetCooldown(lvl).ToString("n2")).Append("\n");
-            sb.Append("<color=orange>").Append("Duration").Append(": ").Append("</color>").Append(dur.ToString("n2")).Append("\n");
-            sb.Append("<color=orange>").Append("Speed multiplier").Append(": ").Append("</color>").Append(spd.ToString("n2")).Append("\n");
+
+            float prevCd = 0;
+            float dur = LerpLevel(durationLvl1, durationLvl10, lvl);
+            float prevDur = 0;
+            float spd = LerpLevel(speedLvl1, speedLvl10, lvl);
+            float prevSpd = 0;
+
+            if (lvl > 0)
+            {
+                int prevLvl = lvl - 1;
+                prevCd = Scriptable.GetCooldown(prevLvl);
+                prevDur = LerpLevel(durationLvl1, durationLvl10, prevLvl);
+                prevSpd = LerpLevel(speedLvl1, speedLvl10, prevLvl);
+            }
+
+            sb.AddAbilityLine("Cooldown", Scriptable.GetCooldown(lvl), prevCd, false);
+            sb.AddAbilityLine("Duration", dur, prevDur);
+            sb.AddAbilityLine("Speed multiplier", spd, prevSpd);
+            
             return sb.ToString();
         }
     }

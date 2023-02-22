@@ -20,5 +20,6 @@ namespace Gameplay.Enemies
 
         public void Enable() => collider.enabled = true;
         public void Disable() => collider.enabled = false;
+        public bool Enabled => collider.enabled;
     }
 }

@@ -15,18 +15,19 @@ namespace Gameplay.Enemies
      RequireComponent(typeof(AIStateController))]
     public abstract class Enemy : MonoBehaviour, IDamageable
     {
+        public bool debug_Fearless;
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private Scriptable.Enemy scriptable;
-        [SerializeField] private EnemyHitbox hitbox;
+        [SerializeField] protected EnemyHitbox hitbox;
         [SerializeField] private GameObject attackGO;
         
-        private Animator animator;
+        protected Animator animator;
         protected Rigidbody2D rb;
         protected AIStateController stateController;
         
-        private int walkHash;
-        private int idleHash;
-        private int deadhash;
+        protected int walkHash;
+        protected int idleHash;
+        protected int deadhash;
 
         private Healthbar healthbar;
         private float health;
@@ -75,6 +76,7 @@ namespace Gameplay.Enemies
 
         public void Damage(Vector2 attacker, float damage, float knockbackPower, float stunDuration)
         {
+            damage = PhysicsUtility.CalculateDamage(damage, Scriptable.Armor);
             StatRecorder.damageDealt += damage;
             health -= damage;
             StopAttack();
@@ -132,7 +134,7 @@ namespace Gameplay.Enemies
             attackGO.SetActive(true);
             stateController.TakeMoveControl();
             var playerPos = Player.Movement.Position;
-            rb.rotation = PhysicsUtility.RotateTowardsPosition(rb.position, rb.rotation, playerPos, 45);
+            rb.rotation = PhysicsUtility.RotateTowardsPosition(rb.position, rb.rotation, playerPos, 90);
             rb.velocity = PhysicsUtility.GetKnockbackVelocity(rb.position, playerPos, -15);
             
             yield return new WaitForSeconds(0.33f);
@@ -228,6 +230,7 @@ namespace Gameplay.Enemies
 
         protected virtual void OnDayStart(int day)
         {
+            if(debug_Fearless) return;
             stateController.SetEtherial(true);
             stateController.SetState(AIState.Flee);
         }

@@ -31,7 +31,11 @@ namespace Gameplay.Food
         public void Eat()
         {
             amount--;
-            if (amount <= 0) FoodSpawnPoint.Remove();
+            if (amount <= 0)
+            {
+                if(FoodSpawnPoint is null) Destroy(gameObject);
+                else FoodSpawnPoint.Remove();
+            }
             else OnDataUpdate?.Invoke();
         }
 

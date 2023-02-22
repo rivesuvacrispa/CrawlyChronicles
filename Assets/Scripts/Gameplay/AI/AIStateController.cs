@@ -163,6 +163,7 @@ namespace Gameplay.AI
 
         public void SetEtherial(bool isEtherial)
         {
+            Debug.Log($"Set etherial: {isEtherial}");
             physicsCollider.enabled = !isEtherial;
             if(isEtherial) hitbox.Disable();
             else hitbox.Enable();

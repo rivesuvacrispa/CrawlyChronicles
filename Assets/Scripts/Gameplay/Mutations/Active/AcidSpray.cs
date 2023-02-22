@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using Gameplay.Enemies;
 using UnityEngine;
+using Util;
 
 namespace Gameplay.Abilities.Active
 {
@@ -16,13 +17,18 @@ namespace Gameplay.Abilities.Active
         [Header("Stun and knockback")] 
         [SerializeField, Range(0, 1)] private float stunDuration = 0.5f;
         [SerializeField, Range(0, 10)]  private float knockbackPower = 0.5f;
-        
+        [Header("Damage")]
+        [SerializeField] private float damageLvl1;
+        [SerializeField] private float damageLvl10;
 
         
+        private float damage;
+
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
             if(particleSystem.isPlaying) particleSystem.Stop();
+            damage = LerpLevel(damageLvl1, damageLvl10, lvl);
             var emission = particleSystem.emission;
             var shape = particleSystem.shape;
             shape.angle = LerpLevel(amountLvl1, amountLvl10, lvl);
@@ -33,22 +39,38 @@ namespace Gameplay.Abilities.Active
 
         private void OnParticleCollision(GameObject other)
         {
-            if (other.TryGetComponent(out Enemy enemy))
-            {
-                enemy.Damage(1, knockbackPower, stunDuration);
-            }
+            if (other.TryGetComponent(out Enemy enemy)) 
+                enemy.Damage(damage, knockbackPower, stunDuration);
         }
 
         public override string GetLevelDescription(int lvl)
         {
-            float width = LerpLevel(angleLvl1, angleLvl10, lvl) * 2;
-            float amount = LerpLevel(amountLvl1, amountLvl10, lvl);
             StringBuilder sb = new StringBuilder();
-            sb.Append("<color=orange>").Append("Cooldown").Append(": ").Append("</color>").Append(Scriptable.GetCooldown(lvl).ToString("n2")).Append("\n");
-            sb.Append("<color=orange>").Append("Spray width").Append(": ").Append("</color>").Append(width.ToString("n2")).Append("\n");
-            sb.Append("<color=orange>").Append("Bullets amount").Append(": ").Append("</color>").Append(amount.ToString("n2")).Append("\n");
-            sb.Append("<color=orange>").Append("Stun duration").Append(": ").Append("</color>").Append(stunDuration.ToString("n2")).Append("\n");
-            sb.Append("<color=orange>").Append("Knockback").Append(": ").Append("</color>").Append(knockbackPower.ToString("n2")).Append("\n");
+
+            float prevCd = 0;
+            float width = LerpLevel(angleLvl1, angleLvl10, lvl) * 2;
+            float prevWidth = 0;
+            float amount = LerpLevel(amountLvl1, amountLvl10, lvl);
+            float prevAmount = 0;
+            float dmg = LerpLevel(damageLvl1, damageLvl10, lvl);
+            float prevDmg = 0;
+
+            if (lvl > 0)
+            {
+                var prevLvl = lvl - 1;
+                prevCd = Scriptable.GetCooldown(prevLvl);
+                prevWidth = LerpLevel(angleLvl1, angleLvl10, prevLvl) * 2;
+                prevAmount = LerpLevel(amountLvl1, amountLvl10, prevLvl);
+                prevDmg = LerpLevel(damageLvl1, damageLvl10, prevLvl);
+            }
+            
+            sb.AddAbilityLine("Cooldown", Scriptable.GetCooldown(lvl), prevCd, false);
+            sb.AddAbilityLine("Spray width", width, prevWidth);
+            sb.AddAbilityLine("Spray amount", amount, prevAmount);
+            sb.AddAbilityLine("Spray damage", dmg, prevDmg);
+            sb.AddAbilityLine("Stun duration", stunDuration, 0);
+            sb.AddAbilityLine("Knockback", knockbackPower, 0);
+            
             return sb.ToString();
         }
     }

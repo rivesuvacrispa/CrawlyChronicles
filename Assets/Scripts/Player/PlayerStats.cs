@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using UnityEngine;
+using Util;
 
 namespace Player
 {
@@ -19,15 +20,12 @@ namespace Player
         public float AttackDamage => attackDamage;
         public float Armor => armor;
         public float ImmunityDuration => immunityDuration;
-
         public float MovementSpeed => movementSpeed;
-
         public float RotationSpeed => rotationSpeed;
 
 
-        public PlayerStats(float movementSpeed = 0, float rotationSpeed = 0, float maxHealth = 0, float attackKnockback = 0, 
-            float attackDamage = 0, 
-            float armor = 0, float immunityDuration = 0)
+        public PlayerStats(float movementSpeed = 0, float rotationSpeed = 0, float maxHealth = 0, 
+            float attackKnockback = 0, float attackDamage = 0, float armor = 0, float immunityDuration = 0)
         {
             this.movementSpeed = movementSpeed;
             this.rotationSpeed = rotationSpeed;
@@ -79,18 +77,35 @@ namespace Player
         {
             StringBuilder sb = new StringBuilder();
             if(includeZeros || MovementSpeed > 0) 
-                sb.Append("<color=orange>").Append("Movespeed: ").Append("</color>").Append(MovementSpeed.ToString("n2")).Append("\n");
+                sb.Append("<color=orange>").Append("Movespeed: ").Append("</color>").Append(MovementSpeed.ToString("n1")).Append("\n");
             if(includeZeros || RotationSpeed > 0) 
-                sb.Append("<color=orange>").Append("Rotation speed: ").Append("</color>").Append(RotationSpeed.ToString("n2")).Append("\n");
+                sb.Append("<color=orange>").Append("Rotation speed: ").Append("</color>").Append(RotationSpeed.ToString("n1")).Append("\n");
             if(includeZeros || MaxHealth > 0) 
-                sb.Append("<color=orange>").Append("Max health: ").Append("</color>").Append(MaxHealth.ToString("n2")).Append("\n");
+                sb.Append("<color=orange>").Append("Max health: ").Append("</color>").Append(MaxHealth.ToString("n1")).Append("\n");
             if(includeZeros || AttackKnockback > 0) 
-                sb.Append("<color=orange>").Append("ATK knockback: ").Append("</color>").Append(AttackKnockback.ToString("n2")).Append("\n");
+                sb.Append("<color=orange>").Append("Melee knockback: ").Append("</color>").Append(AttackKnockback.ToString("n1")).Append("\n");
             if(includeZeros || AttackDamage > 0) 
-                sb.Append("<color=orange>").Append("ATK damage: ").Append("</color>").Append(AttackDamage.ToString("n2")).Append("\n");
+                sb.Append("<color=orange>").Append("Melee damage: ").Append("</color>").Append(AttackDamage.ToString("n1")).Append("\n");
+            if(includeZeros || Armor > 0) 
+                sb.Append("<color=orange>").Append("Armor: ").Append("</color>").Append(Armor.ToString("n1")).Append("\n");
             if(includeZeros || ImmunityDuration > 0) 
-                sb.Append("<color=orange>").Append("Immunity frame: ").Append("</color>").Append(ImmunityDuration.ToString("n2"));
+                sb.Append("<color=orange>").Append("Immunity frame: ").Append("</color>").Append(ImmunityDuration.ToString("n1"));
             return sb.ToString();
-        } 
+        }
+
+        public string PrintCompared(PlayerStats with)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            if (MovementSpeed > 0) sb.AddAbilityLine("Movespeed", MovementSpeed, with.movementSpeed);
+            if (RotationSpeed > 0) sb.AddAbilityLine("Rotation speed", RotationSpeed, with.rotationSpeed);
+            if (MaxHealth > 0) sb.AddAbilityLine("Max health", MaxHealth, with.maxHealth);
+            if (AttackKnockback > 0) sb.AddAbilityLine("Melee knockback", AttackKnockback, with.attackKnockback);
+            if (AttackDamage > 0) sb.AddAbilityLine("Melee damage", AttackDamage, with.attackDamage);
+            if (Armor > 0) sb.AddAbilityLine("Armor", Armor, with.armor);
+            if (ImmunityDuration > 0) sb.AddAbilityLine("Immunity frame", ImmunityDuration, with.immunityDuration);
+
+            return sb.ToString();
+        }
     }
 }

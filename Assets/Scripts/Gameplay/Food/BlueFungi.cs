@@ -6,7 +6,7 @@ namespace Gameplay.Food
     {
         protected override void OnEatenByPlayer()
         {
-            Player.Manager.Instance.AddHealth(1.5f);
+            Player.Manager.Instance.AddHealthPercent(0.1f);
             GlobalDefinitions.CreateRandomGeneDrop(Position);
         }
     }

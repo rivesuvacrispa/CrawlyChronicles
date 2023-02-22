@@ -23,5 +23,7 @@ namespace Util
                 delta).eulerAngles.z;
         }
 
+        public static float CalculateDamage(float incomingDamage, float armor)
+            => incomingDamage * incomingDamage / (incomingDamage + armor);
     }
 }

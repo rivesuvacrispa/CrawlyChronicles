@@ -6,6 +6,7 @@ using Timeline;
 using UI;
 using UnityEngine;
 using UnityEngine.UI;
+using Util;
 
 namespace Player
 {
@@ -34,7 +35,7 @@ namespace Player
         public bool AllowInteract => !attackController.IsAttacking;
         public static PlayerStats PlayerStats => Instance.currentStats;
         
-        private float health;
+        [SerializeField] private float health;
 
 
         private void Awake()
@@ -93,27 +94,26 @@ namespace Player
             egg.rotation = Quaternion.Euler(0, 0, Movement.Rotation);
         }
 
+        public void AddHealthPercent(float percent) => AddHealth(currentStats.MaxHealth * percent);
+        
         public void AddHealth(float amount)
         {
+            if(health < 0 || health >= currentStats.MaxHealth) return;
             health = Mathf.Clamp(health + amount, health, currentStats.MaxHealth);
             UpdateHealthbar();
         }
         
         public void Damage(float damage)
         {
-            health -= damage;
+            health -= PhysicsUtility.CalculateDamage(damage, currentStats.Armor);
             UpdateHealthbar();
-            if (health <= float.Epsilon)
-            {
-                health = 0;
-                Die();
-            }
+            if (health <= float.Epsilon) Die();
         }
 
         private void UpdateHealthbar()
         {
             healthbar.SetValue(health / currentStats.MaxHealth);
-            healthText.text = Mathf.CeilToInt(health).ToString();
+            healthText.text = health.ToString("n2");
         }
         
         public void Die()

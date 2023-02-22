@@ -10147,7 +10147,8 @@ MonoBehaviour:
     attackDamage: 0
     armor: 0
     immunityDuration: 0
-  <GodMode>k__BackingField: 0
+  <GodMode>k__BackingField: 1
+  health: 0
 --- !u!114 &318896215
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11924,7 +11925,7 @@ MonoBehaviour:
     rotationSpeed: 0
     maxHealth: 0
     attackKnockback: 3
-    attackDamage: 5
+    attackDamage: 6
     armor: 0
     immunityDuration: 0
   current:
@@ -11932,7 +11933,7 @@ MonoBehaviour:
     rotationSpeed: 0
     maxHealth: 0
     attackKnockback: 0.35
-    attackDamage: 0.75
+    attackDamage: 0.25
     armor: 0
     immunityDuration: 0
 --- !u!1 &452903097
@@ -12357,7 +12358,7 @@ GameObject:
   - component: {fileID: 470728981}
   - component: {fileID: 470728980}
   m_Layer: 0
-  m_Name: PoisonSpray
+  m_Name: AcidSpray
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13008,7 +13009,7 @@ ParticleSystem:
     serializedVersion: 6
     enabled: 1
     type: 4
-    angle: 15
+    angle: 25
     length: 5
     boxThickness: {x: 0, y: 0, z: 0}
     radiusThickness: 1
@@ -13323,7 +13324,7 @@ ParticleSystem:
       countCurve:
         serializedVersion: 2
         minMaxState: 0
-        scalar: 10
+        scalar: 15
         minScalar: 30
         maxCurve:
           serializedVersion: 2
@@ -17243,12 +17244,14 @@ MonoBehaviour:
   scriptable: {fileID: 11400000, guid: 0415620eb7a66d24f9ee49376e8d36fc, type: 2}
   level: 0
   particleSystem: {fileID: 470728980}
-  amountLvl1: 15
-  amountLvl10: 60
-  angleLvl1: 10
+  amountLvl1: 25
+  amountLvl10: 70
+  angleLvl1: 15
   angleLvl10: 60
-  stunDuration: 0.5
-  knockbackPower: 0.5
+  stunDuration: 0.2
+  knockbackPower: 5
+  damageLvl1: 2
+  damageLvl10: 8
 --- !u!1001 &471632606
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19292,7 +19295,7 @@ ParticleSystem:
       countCurve:
         serializedVersion: 2
         minMaxState: 0
-        scalar: 7
+        scalar: 15
         minScalar: 30
         maxCurve:
           serializedVersion: 2
@@ -23212,12 +23215,14 @@ MonoBehaviour:
   level: 0
   particleSystem: {fileID: 553534248}
   damageCap: 5
-  probabilityLvl1: 0.15
+  probabilityLvl1: 0.25
   probabilityLvl10: 0.75
-  amountLvl1: 7
-  amountLvl10: 32
-  stunDuration: 0.5
-  knockbackPower: 0.5
+  amountLvl1: 15
+  amountLvl10: 50
+  stunDuration: 0.6
+  knockbackPower: 2
+  damageLvl1: 1
+  damageLvl10: 4
 --- !u!1001 &553836779
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -24217,7 +24222,7 @@ MonoBehaviour:
   m_LightType: 4
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.5
-  m_Color: {r: 0.3882353, g: 0.3137255, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 0.52156866, a: 1}
   m_Intensity: 2
   m_LightVolumeIntensity: 1
   m_LightVolumeIntensityEnabled: 0
@@ -28874,7 +28879,7 @@ MonoBehaviour:
     maxHealth: 3
     attackKnockback: 0
     attackDamage: 0
-    armor: 1
+    armor: 0.25
     immunityDuration: 0.05
   statsLvl10:
     movementSpeed: 0
@@ -28882,7 +28887,7 @@ MonoBehaviour:
     maxHealth: 25
     attackKnockback: 0
     attackDamage: 0
-    armor: 10
+    armor: 5
     immunityDuration: 0.35
   current:
     movementSpeed: 0
@@ -28890,7 +28895,7 @@ MonoBehaviour:
     maxHealth: 3
     attackKnockback: 0
     attackDamage: 0
-    armor: 1
+    armor: 0.25
     immunityDuration: 0.05
 --- !u!1 &1006640939
 GameObject:
@@ -29679,7 +29684,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67b8a9ad8d444efc87a6901d6885b21a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showOnStartup: 1
+  showOnStartup: 0
   rootGO: {fileID: 637381732}
   gameUICanvas: {fileID: 1248225194}
   gameOverGO: {fileID: 132975589}
@@ -31924,8 +31929,8 @@ MonoBehaviour:
       - {fileID: 6295599008569207250, guid: 0cf4113352599924d91b09aa3359ec57, type: 3}
       - {fileID: 6295599008569207250, guid: ee2d46190e4482a4585abf49b1ae075f, type: 3}
   neutralsPerMinute: 6
-  enemyPerMinute: 8
-  enemyPerDayModifier: 8
+  enemyPerMinute: 10
+  enemyPerDayModifier: 5
   enemySpawnPointsTransform: {fileID: 632638884}
 --- !u!114 &1311998317
 MonoBehaviour:
@@ -34795,7 +34800,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 20
+      scalar: 30
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -38766,12 +38771,14 @@ MonoBehaviour:
   scriptable: {fileID: 11400000, guid: f728bd99fbd124f4b9745f3fc2cd5011, type: 2}
   level: 0
   particleSystem: {fileID: 1425429165}
-  amountLvl1: 20
-  amountLvl10: 75
+  amountLvl1: 30
+  amountLvl10: 80
   durationLvl1: 1.2
-  durationLvl10: 5
+  durationLvl10: 3
   stunDuration: 0.5
-  knockbackPower: 0.5
+  knockbackPower: 1
+  damageLvl1: 1
+  damageLvl10: 4
 --- !u!1001 &1432508568
 PrefabInstance:
   m_ObjectHideFlags: 0

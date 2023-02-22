@@ -124,8 +124,10 @@ namespace Player
             while (t < duration)
             {
                 rb.rotation += speed;
-                rb.velocity = ((Vector2) MainCamera.WorldMousePos - rb.position).normalized * 
-                              Mathf.Clamp(Manager.PlayerStats.MovementSpeed * MoveSpeedAmplifier, 0, 20);
+                var diff = ((Vector2) MainCamera.WorldMousePos - rb.position).normalized;
+                var spd = Mathf.Clamp(Manager.PlayerStats.MovementSpeed * MoveSpeedAmplifier, 0, 20);
+                // Debug.Log($"t: {t}/{duration} ({t/duration}); direction: {diff}, speed: {spd}");
+                rb.velocity = diff * spd;
                 t += Time.fixedDeltaTime;
                 yield return new WaitForFixedUpdate();
             }
