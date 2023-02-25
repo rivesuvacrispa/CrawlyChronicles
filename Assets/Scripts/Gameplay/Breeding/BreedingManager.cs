@@ -5,6 +5,7 @@ using GameCycle;
 using Gameplay.Abilities;
 using Gameplay.Enemies;
 using Genes;
+using Player;
 using UI;
 using UnityEngine;
 using UnityEngine.UI;
@@ -196,8 +197,8 @@ namespace Gameplay
 
         // INotificationProvider
         public event INotificationProvider.NotificationProviderEvent OnDataUpdate;
-        public event INotificationProvider.NotificationProviderEvent OnProviderDestroy;
-        public Transform Transform => Player.Movement.Transform;
+        public event INotificationProvider.DestructionProviderEvent OnProviderDestroy;
+        public Transform Transform => Manager.Instance.Transform;
         public string NotificationText => eggLayingTimer.ToString();
     }
 }

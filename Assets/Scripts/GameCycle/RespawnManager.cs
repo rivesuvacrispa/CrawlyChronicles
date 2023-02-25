@@ -4,6 +4,7 @@ using System.Linq;
 using Camera;
 using Gameplay;
 using Player;
+using Scripts.SoundEffects;
 using Timeline;
 using UI;
 using UnityEngine;
@@ -74,7 +75,9 @@ namespace GameCycle
         private void SelectEggBed(int index)
         {
             int count = eggBeds.Count;
-            currentEggBedIndex = count == 1 ? 0 : Mathf.Clamp(index, 0, count - 1);
+            int step = count == 1 ? 0 : Mathf.Clamp(index, 0, count - 1);
+            UIAudioController.Instance.PlaySelect();
+            currentEggBedIndex = step;
             eggBedSelectionText.text = $"{currentEggBedIndex + 1}/{count}";
             leftArrow.SetActive(currentEggBedIndex > 0);
             rightArrow.SetActive(currentEggBedIndex < count - 1);
@@ -102,7 +105,7 @@ namespace GameCycle
             BreedingManager.Instance.SetCurrentFoodAmount(0);
             selectedEggbed.RemoveParticular(origin);
             AbilityController.UpdateAbilities(mutated);
-            followMovement.Target = Movement.Transform;
+            followMovement.Target = Manager.Instance.Transform;
             AbilityController.SetUIActive(true);
             TimeManager.Instance.ResetLifespan();
             Manager.Instance.OnRespawn();

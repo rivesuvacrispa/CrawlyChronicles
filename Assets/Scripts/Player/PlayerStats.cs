@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Util;
 
 namespace Player
@@ -10,13 +11,13 @@ namespace Player
         [SerializeField] private float movementSpeed;
         [SerializeField] private float rotationSpeed;
         [SerializeField] private float maxHealth;
-        [SerializeField] private float attackKnockback;
+        [SerializeField] private float attackPower;
         [SerializeField] private float attackDamage;
         [SerializeField] private float armor;
         [SerializeField] private float immunityDuration;
 
         public float MaxHealth => maxHealth;
-        public float AttackKnockback => attackKnockback;
+        public float AttackPower => attackPower;
         public float AttackDamage => attackDamage;
         public float Armor => armor;
         public float ImmunityDuration => immunityDuration;
@@ -25,12 +26,12 @@ namespace Player
 
 
         public PlayerStats(float movementSpeed = 0, float rotationSpeed = 0, float maxHealth = 0, 
-            float attackKnockback = 0, float attackDamage = 0, float armor = 0, float immunityDuration = 0)
+            float attackPower = 0, float attackDamage = 0, float armor = 0, float immunityDuration = 0)
         {
             this.movementSpeed = movementSpeed;
             this.rotationSpeed = rotationSpeed;
             this.maxHealth = maxHealth;
-            this.attackKnockback = attackKnockback;
+            this.attackPower = attackPower;
             this.attackDamage = attackDamage;
             this.armor = armor;
             this.immunityDuration = immunityDuration;
@@ -41,7 +42,7 @@ namespace Player
             movementSpeed = Mathf.Clamp(MovementSpeed + stats.MovementSpeed, baseStats.MovementSpeed, float.MaxValue);
             rotationSpeed = Mathf.Clamp(RotationSpeed + stats.RotationSpeed, baseStats.RotationSpeed, float.MaxValue);
             maxHealth = Mathf.Clamp(MaxHealth + stats.MaxHealth, baseStats.MaxHealth, float.MaxValue);
-            attackKnockback = Mathf.Clamp(AttackKnockback + stats.AttackKnockback, baseStats.AttackKnockback, float.MaxValue);
+            attackPower = Mathf.Clamp(AttackPower + stats.AttackPower, baseStats.AttackPower, float.MaxValue);
             attackDamage = Mathf.Clamp(AttackDamage + stats.AttackDamage, baseStats.AttackDamage, float.MaxValue);
             armor = Mathf.Clamp(Armor + stats.Armor, baseStats.Armor, float.MaxValue);
             immunityDuration = Mathf.Clamp(ImmunityDuration + stats.ImmunityDuration, baseStats.ImmunityDuration, float.MaxValue);
@@ -53,7 +54,7 @@ namespace Player
                 movementSpeed: Mathf.Lerp(lvl1.MovementSpeed,lvl10.MovementSpeed,level / 9f),
                 rotationSpeed: Mathf.Lerp(lvl1.RotationSpeed,lvl10.RotationSpeed,level / 9f),
                 maxHealth: Mathf.Lerp(lvl1.MaxHealth,lvl10.MaxHealth,level / 9f),
-                attackKnockback: Mathf.Lerp(lvl1.AttackKnockback,lvl10.AttackKnockback,level / 9f),
+                attackPower: Mathf.Lerp(lvl1.AttackPower,lvl10.AttackPower,level / 9f),
                 attackDamage: Mathf.Lerp(lvl1.AttackDamage,lvl10.AttackDamage,level / 9f),
                 armor: Mathf.Lerp(lvl1.Armor,lvl10.Armor,level / 9f),
                 immunityDuration: Mathf.Lerp(lvl1.ImmunityDuration,lvl10.ImmunityDuration,level / 9f));
@@ -65,7 +66,7 @@ namespace Player
                 movementSpeed: -MovementSpeed,
                 rotationSpeed: -RotationSpeed,
                 maxHealth: -MaxHealth,
-                attackKnockback: -AttackKnockback,
+                attackPower: -AttackPower,
                 attackDamage: -AttackDamage,
                 armor: -Armor,
                 immunityDuration: -ImmunityDuration);
@@ -82,10 +83,10 @@ namespace Player
                 sb.Append("<color=orange>").Append("Rotation speed: ").Append("</color>").Append(RotationSpeed.ToString("n1")).Append("\n");
             if(includeZeros || MaxHealth > 0) 
                 sb.Append("<color=orange>").Append("Max health: ").Append("</color>").Append(MaxHealth.ToString("n1")).Append("\n");
-            if(includeZeros || AttackKnockback > 0) 
-                sb.Append("<color=orange>").Append("Melee knockback: ").Append("</color>").Append(AttackKnockback.ToString("n1")).Append("\n");
+            if(includeZeros || AttackPower > 0) 
+                sb.Append("<color=orange>").Append("Attack power: ").Append("</color>").Append(AttackPower.ToString("n1")).Append("\n");
             if(includeZeros || AttackDamage > 0) 
-                sb.Append("<color=orange>").Append("Melee damage: ").Append("</color>").Append(AttackDamage.ToString("n1")).Append("\n");
+                sb.Append("<color=orange>").Append("Attack damage: ").Append("</color>").Append(AttackDamage.ToString("n1")).Append("\n");
             if(includeZeros || Armor > 0) 
                 sb.Append("<color=orange>").Append("Armor: ").Append("</color>").Append(Armor.ToString("n1")).Append("\n");
             if(includeZeros || ImmunityDuration > 0) 
@@ -100,8 +101,8 @@ namespace Player
             if (MovementSpeed > 0) sb.AddAbilityLine("Movespeed", MovementSpeed, with.movementSpeed);
             if (RotationSpeed > 0) sb.AddAbilityLine("Rotation speed", RotationSpeed, with.rotationSpeed);
             if (MaxHealth > 0) sb.AddAbilityLine("Max health", MaxHealth, with.maxHealth);
-            if (AttackKnockback > 0) sb.AddAbilityLine("Melee knockback", AttackKnockback, with.attackKnockback);
-            if (AttackDamage > 0) sb.AddAbilityLine("Melee damage", AttackDamage, with.attackDamage);
+            if (AttackPower > 0) sb.AddAbilityLine("Attack power", AttackPower, with.attackPower);
+            if (AttackDamage > 0) sb.AddAbilityLine("Attack damage", AttackDamage, with.attackDamage);
             if (Armor > 0) sb.AddAbilityLine("Armor", Armor, with.armor);
             if (ImmunityDuration > 0) sb.AddAbilityLine("Immunity frame", ImmunityDuration, with.immunityDuration);
 

@@ -1,12 +1,15 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using Definitions;
 using GameCycle;
 using Gameplay.AI;
 using Gameplay.Food;
+using Scripts.SoundEffects;
 using Timeline;
 using UI;
 using UnityEngine;
 using Util;
+using Random = UnityEngine.Random;
 
 namespace Gameplay.Enemies
 {
@@ -17,22 +20,21 @@ namespace Gameplay.Enemies
     {
         public bool debug_Fearless;
         [SerializeField] private SpriteRenderer spriteRenderer;
-        [SerializeField] private Scriptable.Enemy scriptable;
-        [SerializeField] protected EnemyHitbox hitbox;
         [SerializeField] private GameObject attackGO;
-        
+        [SerializeField] protected EnemyHitbox hitbox;
+        [SerializeField] protected Scriptable.Enemy scriptable;
+        [SerializeField] private AudioController audioController;
+
         protected Animator animator;
         protected Rigidbody2D rb;
         protected AIStateController stateController;
         
-        protected int walkHash;
-        protected int idleHash;
-        protected int deadhash;
-
         private Healthbar healthbar;
         private float health;
         private Coroutine attackRoutine;
         private bool stunned;
+        private float attackDelay = 0.75f;
+        private bool reckoned;
 
         [field:SerializeField] public EnemySpawnLocation SpawnLocation { get; set; }
         public Scriptable.Enemy Scriptable => scriptable;
@@ -49,51 +51,75 @@ namespace Gameplay.Enemies
 
         protected abstract void OnDamageTaken();
         
-        
-        
         private void Awake()
         {
             animator = GetComponent<Animator>();
             rb = GetComponent<Rigidbody2D>();
             stateController = GetComponent<AIStateController>();
-
-            walkHash = Animator.StringToHash(scriptable.AnimatorName + "Walk");
-            idleHash = Animator.StringToHash(scriptable.AnimatorName + "Idle");
-            deadhash = Animator.StringToHash(scriptable.AnimatorName + "Dead");
-
         }
         
         protected virtual void Start()
         {
+            rb.mass = scriptable.Mass;
             health = scriptable.MaxHealth;
             spriteRenderer.color = scriptable.BodyColor;
             healthbar = HealthbarPool.Instance.Create(this);
+            PlayCrawl();
             SubEvents();
         }
         
         public void Damage(float damage, float knockback, float stunDuration) => 
             Damage(Player.Movement.Position, damage, knockback, stunDuration);
 
-        public void Damage(Vector2 attacker, float damage, float knockbackPower, float stunDuration)
+        private void Damage(Vector2 attacker, float damage, float knockbackPower, float stunDuration)
         {
+            if (reckoned)
+            {
+                reckoned = false;
+                attackDelay = 0.5f;
+                return;
+            }
+        
             damage = PhysicsUtility.CalculateDamage(damage, Scriptable.Armor);
             StatRecorder.damageDealt += damage;
             health -= damage;
+            attackDelay = 1f;
             StopAttack();
             healthbar.SetValue(Mathf.Clamp01(health / scriptable.MaxHealth));
+            OnDamageTaken();
+
             if (health <= float.Epsilon) Die();
             else
             {
-                OnDamageTaken();
+                audioController.PlayAction(scriptable.HitAudio, pitch: SoundUtility.GetRandomPitchTwoSided(0.15f));
                 StartCoroutine(ImmunityRoutine());
-                if (stunDuration > float.Epsilon) 
+                if (stunDuration > 0) 
                     StartCoroutine(StunRoutine(stunDuration));
-                if (knockbackPower > 0)
-                {
-                    var velocity = PhysicsUtility.GetKnockbackVelocity(rb.position, attacker, knockbackPower);
-                    StartCoroutine(KnockbackRoutine(velocity));
-                }
+                if (knockbackPower > 0) 
+                    Knockback(attacker, knockbackPower);
             }
+        }
+
+        private void Knockback(Vector2 attacker, float force)
+        {
+            float kbResistance = PhysicsUtility.GetKnockbackResistance(scriptable.Mass);
+            rb.AddClampedForceBackwards(attacker, force * (1 - kbResistance), ForceMode2D.Impulse);
+            StartCoroutine(KnockbackRoutine());
+        }
+
+        public void Reckon(Vector2 attacker, float force)
+        {
+            StopAttack();
+            attackDelay = 0.5f;
+            Knockback(attacker, force);
+            reckoned = true;
+            StartCoroutine(CancelReckon());
+        }
+
+        private IEnumerator CancelReckon()
+        {
+            yield return new WaitForSeconds(0.5f);
+            reckoned = false;
         }
 
         private void Die()
@@ -105,7 +131,9 @@ namespace Gameplay.Enemies
             stateController.SetState(AIState.None);
             rb.rotation = 0;
             rb.constraints = RigidbodyConstraints2D.FreezeRotation;
-            animator.Play(deadhash);
+            audioController.PlayAction(scriptable.DeathAudio, pitch: SoundUtility.GetRandomPitchTwoSided(0.15f));
+            audioController.StopState();
+            animator.Play(scriptable.DeadAnimHash);
             if(Random.value <= Gamemode.GeneDropRate) 
                 GlobalDefinitions.CreateRandomGeneDrop(Position);
             StartCoroutine(DeathRoutine());
@@ -116,6 +144,7 @@ namespace Gameplay.Enemies
         {
             if(attackRoutine is not null) 
                 StopCoroutine(attackRoutine);
+            stateController.ReturnMoveControl();
             attackRoutine = null;
             attackGO.SetActive(false);
         }
@@ -131,17 +160,19 @@ namespace Gameplay.Enemies
         // Routines & utils
         private IEnumerator AttackRoutine()
         {
+            yield return new WaitForSeconds(attackDelay);
+            audioController.PlayAction(scriptable.AttackAudio);
             attackGO.SetActive(true);
             stateController.TakeMoveControl();
             var playerPos = Player.Movement.Position;
-            rb.rotation = PhysicsUtility.RotateTowardsPosition(rb.position, rb.rotation, playerPos, 90);
-            rb.velocity = PhysicsUtility.GetKnockbackVelocity(rb.position, playerPos, -15);
+            rb.RotateTowardsPosition(playerPos, 90);
+            rb.AddClampedForceTowards(playerPos, scriptable.AttackPower, ForceMode2D.Impulse);
             
-            yield return new WaitForSeconds(0.33f);
+            yield return new WaitForSeconds(0.4f);
 
             attackGO.SetActive(false);
             stateController.ReturnMoveControl();
-            yield return new WaitForSeconds(1.25f);
+            attackDelay = 0.75f;
             attackRoutine = null;
         }
         
@@ -174,7 +205,7 @@ namespace Gameplay.Enemies
 
         private IEnumerator StunRoutine(float duration)
         {
-            animator.Play(idleHash);
+            PlayIdle();
 
             float t = duration;
             while (t > 0)
@@ -186,18 +217,34 @@ namespace Gameplay.Enemies
             }
             
             stateController.ReturnMoveControl();
-            animator.Play(walkHash);
+            PlayCrawl();
             stunned = false;
+            OnStunEnd();
+        }
+
+        protected virtual void OnStunEnd()
+        {
             if(TimeManager.IsDay) OnDayStart(0);
         }
+
+        private void PlayIdle()
+        {
+            animator.Play(scriptable.IdleAnimHash);
+            audioController.StopState();
+        }
+
+        private void PlayCrawl()
+        {
+            animator.Play(scriptable.WalkAnimHash);
+            audioController.PlayState(scriptable.CrawlAudio, true, scriptable.CrawlPitch);
+        }
         
-        private IEnumerator KnockbackRoutine(Vector2 velocity)
+        private IEnumerator KnockbackRoutine()
         {
             float t = 0.25f;
             while (t > 0)
             {
                 stateController.TakeMoveControl();
-                rb.velocity = velocity;
                 t -= Time.deltaTime;
                 yield return null;
             }
@@ -210,7 +257,7 @@ namespace Gameplay.Enemies
             hitbox.Disable();
 
             float t = 0;
-            while (t < scriptable.ImmunityDuration)
+            while (t < GlobalDefinitions.EnemyImmunityDuration)
             {
                 spriteRenderer.color = scriptable.GetImmunityFrameColor(t);
                 t += Time.deltaTime;
@@ -223,7 +270,7 @@ namespace Gameplay.Enemies
         
         protected virtual void OnDestroy()
         {
-            OnDamageableDestroy?.Invoke();
+            OnProviderDestroy?.Invoke();
             MainMenu.OnResetRequested -= OnResetRequested;
             UnsubEvents();
         }
@@ -243,11 +290,15 @@ namespace Gameplay.Enemies
 
         private void UnsubEvents() => TimeManager.OnDayStart -= OnDayStart;
 
-        private void OnResetRequested() => Destroy(gameObject);
+        private void OnResetRequested()
+        {
+            if(debug_Fearless) return;
+            Destroy(gameObject);
+        }
 
 
         // IDamageable
-        public event IDamageable.DamageableEvent OnDamageableDestroy;
+        public event IDamageable.DestructionProviderEvent OnProviderDestroy;
         public Transform Transform => transform;
         public float HealthbarOffsetY => scriptable.HealthbarOffsetY;
         public float HealthbarWidth => scriptable.HealthbarWidth;

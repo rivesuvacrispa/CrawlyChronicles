@@ -2,7 +2,10 @@ using System;
 using System.Collections;
 using Camera;
 using Gameplay.AI.Locators;
+using Scripts.SoundEffects;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using Util;
 
 namespace Player
@@ -10,52 +13,77 @@ namespace Player
     [RequireComponent(typeof(Rigidbody2D))]
     public class Movement : MonoBehaviour, ILocatorTarget
     {
+        [SerializeField] private float knockbackResistance = 0.5f;
         [SerializeField] private Animator spriteAnimator;
+        [SerializeField] private float comboDashSpeedAmplifier;
+        [SerializeField] private Volume volume;
 
         private readonly int idleHash = Animator.StringToHash("PlayerSpriteIdle");
         private readonly int walkHash = Animator.StringToHash("PlayerSpriteWalk");
+
+        private Coroutine dashRoutine;
+        private float previousRotation;
         
         private static Rigidbody2D rb;
-        private Coroutine dashRoutine;
         public static float MoveSpeedAmplifier { get; set; } = 1;
-
         public static Vector2 Position => rb.position;
         public static float Rotation => rb.rotation;
-        public static Transform Transform => rb.transform;
-        public static void Teleport(Vector2 pos) => rb.position = pos;
+
+
         
-        private void Awake() => rb = GetComponent<Rigidbody2D>();
+        private void Awake()
+        {
+            rb = GetComponent<Rigidbody2D>();
+            // Debug.Log(volume.profile.TryGet(out motionBlur));
+        }
 
         private void FixedUpdate()
         {
             Vector2 mousePos = MainCamera.WorldMousePos;
-            rb.rotation = PhysicsUtility.RotateTowardsPosition(rb.position, rb.rotation, mousePos, Manager.PlayerStats.RotationSpeed);
+            float currentRotation = rb.rotation;
+            rb.RotateTowardsPosition(mousePos, Manager.PlayerStats.RotationSpeed);
 
             if (Input.GetMouseButton(1))
             {
-                spriteAnimator.Play(walkHash);
-                rb.velocity = transform.up * Manager.PlayerStats.MovementSpeed * MoveSpeedAmplifier;
+                PlayCrawl();
+                rb.AddForce(transform.up * Manager.PlayerStats.MovementSpeed * MoveSpeedAmplifier);
             }
-            else spriteAnimator.Play(idleHash);
+            else if (Mathf.Abs(previousRotation - currentRotation) > 1f)
+                PlayCrawl();
+            else
+                PlayIdle();
+            
+            previousRotation = currentRotation;
         }
 
-
-
-        public void Knockback(Vector2 attacker, float duration, float speed)
+        private void PlayCrawl()
         {
-            StartCoroutine(KnockbackRoutine(attacker, duration, speed));
+            PlayerAudioController.Instance.PlayCrawl();
+            spriteAnimator.Play(walkHash);
+        }
+
+        private void PlayIdle()
+        {
+            PlayerAudioController.Instance.StopState();
+            spriteAnimator.Play(idleHash);
         }
         
-        public bool Dash(Vector2 position, float duration, Action onEnd)
+        public void Knockback(Vector2 attacker, float force)
+        {
+            rb.AddClampedForceBackwards(attacker, force * (1 - knockbackResistance), ForceMode2D.Impulse);
+            StartCoroutine(KnockbackRoutine());
+        }
+
+        public bool Dash(float duration, Action onEnd)
         {
             if (dashRoutine is null)
             {
-                float direction = PhysicsUtility.RotateTowardsPosition(rb.position, rb.rotation,position, 360);
-                if(Mathf.Abs(rb.rotation - direction) < 30f) 
-                    dashRoutine = StartCoroutine(StraightDashRoutine(position, duration, onEnd));
-                else
-                    dashRoutine = StartCoroutine(SideDashRoutine(position, direction, duration, onEnd));
-                
+                Vector2 position = MainCamera.WorldMousePos;
+                float direction = PhysicsUtility.RotationTowards(rb.position, rb.rotation, position, 360);
+                dashRoutine = StartCoroutine(Mathf.Abs(rb.rotation - direction) < 30f ?
+                    StraightDashRoutine(position, duration, onEnd) : 
+                    SideDashRoutine(position, direction, duration, onEnd));
+
                 StopCoroutine(nameof(KnockbackRoutine));
                 return true;
             }
@@ -73,19 +101,18 @@ namespace Player
 
             return false;
         }
-        
 
-        
+
         private IEnumerator SideDashRoutine(Vector2 position, float direction, float duration, Action onEnd)
         {
-            rb.velocity = (position - rb.position).normalized * 
-                          Mathf.Clamp(Manager.PlayerStats.MovementSpeed * 4 * MoveSpeedAmplifier, 0, 20);
-            float t = 0f;
             enabled = false;
+            spriteAnimator.Play(idleHash);
+            rb.AddClampedForceTowards(position, Manager.PlayerStats.AttackPower * MoveSpeedAmplifier, ForceMode2D.Impulse);
 
+            float t = 0f;
             while (t < duration && Mathf.Abs(rb.rotation - direction) > 10f)
             {
-                rb.rotation = PhysicsUtility.RotateTowardsPosition(rb.position, rb.rotation, position, 10);
+                rb.RotateTowardsPosition(position, 10);
                 t += Time.fixedDeltaTime;
                 yield return new WaitForFixedUpdate();
             }
@@ -95,20 +122,14 @@ namespace Player
             dashRoutine = null;
             onEnd();
         }
-        
+
         private IEnumerator StraightDashRoutine(Vector2 position, float duration, Action onEnd)
         {
-            rb.velocity = (position - rb.position).normalized * 
-                          Mathf.Clamp(Manager.PlayerStats.MovementSpeed * 4 * MoveSpeedAmplifier, 0, 20);
-            float t = 0f;
             enabled = false;
+            spriteAnimator.Play(idleHash);
+            rb.AddClampedForceTowards(position, Manager.PlayerStats.AttackPower * MoveSpeedAmplifier, ForceMode2D.Impulse);
 
-            while (t < duration)
-            {
-                t += Time.fixedDeltaTime;
-                yield return new WaitForFixedUpdate();
-            }
-
+            yield return new WaitForSeconds(duration);
             yield return new WaitForEndOfFrame();
             enabled = true;
             dashRoutine = null;
@@ -124,10 +145,12 @@ namespace Player
             while (t < duration)
             {
                 rb.rotation += speed;
-                var diff = ((Vector2) MainCamera.WorldMousePos - rb.position).normalized;
-                var spd = Mathf.Clamp(Manager.PlayerStats.MovementSpeed * MoveSpeedAmplifier, 0, 20);
-                // Debug.Log($"t: {t}/{duration} ({t/duration}); direction: {diff}, speed: {spd}");
-                rb.velocity = diff * spd;
+                rb.AddClampedForceTowards(
+                    MainCamera.WorldMousePos,
+                    Manager.PlayerStats.AttackPower * MoveSpeedAmplifier * comboDashSpeedAmplifier,
+                    ForceMode2D.Force,
+                    maxAmplifier: comboDashSpeedAmplifier);
+
                 t += Time.fixedDeltaTime;
                 yield return new WaitForFixedUpdate();
             }
@@ -135,16 +158,18 @@ namespace Player
             enabled = true;
             dashRoutine = null;
             rb.angularVelocity = 0;
-            rb.rotation = PhysicsUtility.RotateTowardsPosition(rb.position, rb.rotation,MainCamera.WorldMousePos, 360);
+            rb.RotateTowardsPosition(MainCamera.WorldMousePos, 360);
             onEnd();
         }
 
-        private IEnumerator KnockbackRoutine(Vector2 attacker, float duration, float speed)
+        private IEnumerator KnockbackRoutine()
         {
             enabled = false;
-            rb.velocity = PhysicsUtility.GetKnockbackVelocity(rb.position, attacker, speed);
-            yield return new WaitForSeconds(duration);
+            yield return new WaitForSeconds(0.25f);
             enabled = true;
         }
+
+        public static void AddForce(Vector2 force) => rb.AddForce(force);
+        public static void Teleport(Vector2 pos) => rb.position = pos;
     }
 }

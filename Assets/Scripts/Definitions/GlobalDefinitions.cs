@@ -1,4 +1,5 @@
 ﻿using Gameplay;
+using Gameplay.Enemies;
 using Genes;
 using UI;
 using UnityEngine;
@@ -25,6 +26,7 @@ namespace Definitions
         [SerializeField] private float interactionDistance;
         [SerializeField] private float genePickupDistance;
         [Header("Prefabs")] 
+        [SerializeField] private SandFunnel sandFunnel;
         [SerializeField] private EggBed eggBedPrefab;
         [SerializeField] private EggDrop eggDropPrefab;
         [SerializeField] private PopupNotification popupNotificationPrefab;
@@ -33,6 +35,11 @@ namespace Definitions
         [SerializeField] private Color deadColor;
         [SerializeField] private Color eggPuddleColor;
         [SerializeField] private Color[] geneColors = new Color[3];
+        [Header("Physics")]
+        [SerializeField] private float playerMass = 0.175f;
+        [SerializeField] private float maxAppliedForce = 5;
+        [SerializeField] private float enemyImmunityDuration = 0.5f;
+        
         
         private static Gradient deathGradient;
         
@@ -44,13 +51,17 @@ namespace Definitions
         public static float FleeingSpeedMultiplier => instance.fleeingSpeedMultiplier;
         public static float InteractionDistance => instance.interactionDistance;
         public static int EnemyPhysicsLayerMask { get; private set; }
+        public static int EnemyAttackLayerMask { get; private set; }
         public static Sprite PuddleSprite => instance.puddleSprite;
         public static Color EggPuddleColor => instance.eggPuddleColor;
         public static float GenePickupDistance => instance.genePickupDistance;
         public static int BreedingPartnersGeneEntropy => instance.breedingPartnersGeneEntropy;
         public static int EggGeneEntropy => instance.eggGeneEntropy;
-
         public static EggBed EggBedPrefab => instance.eggBedPrefab;
+        public static float MaxAppliableForce => instance.maxAppliedForce;
+        public static float PlayerMass => instance.playerMass;
+        public static float EnemyImmunityDuration => instance.enemyImmunityDuration;
+        
 
 
         public static string GetRomanDigit(int digit) => instance.romanDigits[digit];
@@ -58,10 +69,18 @@ namespace Definitions
         public static Color GetDeadColor(float t) => deathGradient.Evaluate(t);
         public static Color GetGeneColor(GeneType geneType) => instance.geneColors[(int) geneType];
         public static int GetMutationCost(int lvl) => (lvl + 1) * instance.mutationCostPerLevel;
-        
 
-        
 
+
+
+        public static SandFunnel CreateSandFunnel(Vector2 position)
+        {
+            var funnel = Instantiate(instance.sandFunnel, instance.gameObjectsTransform);
+            funnel.transform.position = position;
+            funnel.enabled = true;
+            return funnel;
+        }
+        
         public static EggDrop CreateEggDrop(Egg egg)=>
             Instantiate(instance.eggDropPrefab, instance.gameObjectsTransform)
                 .SetEgg(egg);
@@ -86,6 +105,7 @@ namespace Definitions
         private void Awake()
         {
             EnemyPhysicsLayerMask = LayerMask.NameToLayer("EnemyPhysics");
+            EnemyAttackLayerMask = LayerMask.NameToLayer("EnemyAttacks");
             instance = this;
             deathGradient = new Gradient();
             deathGradient.SetKeys(

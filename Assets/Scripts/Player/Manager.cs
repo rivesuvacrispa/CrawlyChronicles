@@ -36,11 +36,11 @@ namespace Player
         public static PlayerStats PlayerStats => Instance.currentStats;
         
         [SerializeField] private float health;
-
+        
+        public Manager() => Instance = this;
 
         private void Awake()
         {
-            Instance = this;
             currentStats = baseStats;
             MainMenu.OnResetRequested += OnResetRequested;
         }
@@ -146,7 +146,7 @@ namespace Player
 
         private void OnDestroy()
         {
-            OnDamageableDestroy?.Invoke();
+            OnProviderDestroy?.Invoke();
             TimeManager.OnDayStart -= OnDayStart;
             MainMenu.OnResetRequested -= OnResetRequested;
         }
@@ -170,7 +170,7 @@ namespace Player
 
 
         // IDamageable
-        public event IDamageable.DamageableEvent OnDamageableDestroy;
+        public event IDamageable.DestructionProviderEvent OnProviderDestroy;
         public Transform Transform => transform;
         public float HealthbarOffsetY => healthbarOffsetY;
         public float HealthbarWidth => healthbarWidth;

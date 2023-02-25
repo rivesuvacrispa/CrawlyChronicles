@@ -50,7 +50,7 @@ namespace Gameplay.Enemies
             if (aggressive)
             {
                 stateController.SetState(AIState.Follow, 
-                    onTargetReach: o => BasicAttack(),
+                    onTargetReach: BasicAttack,
                     reachDistance: 1.25f);
             } else {
                 StopInterest();
@@ -62,28 +62,28 @@ namespace Gameplay.Enemies
         {
         }
 
+        protected override void OnStunEnd()
+        {
+            if(!TimeManager.IsDay) OnNightStart(0);
+        }
+
         public override void OnFoodLocated(FoodBed foodBed)
         {
             if (!hungry) return;
             stateController.SetState(AIState.Follow, 
-                followTarget: foodBed.gameObject,
-                o => {
-                    if(o is not null)
-                    {
-                        GlobalDefinitions.CreateRandomGeneDrop(transform.position);
-                        foodBed.Eat();
-                        hungry = false;
-                        StartCoroutine(HungerRoutine());
-                    }
+                followTarget: foodBed,
+                () => {
+                    GlobalDefinitions.CreateRandomGeneDrop(transform.position);
+                    foodBed.Eat();
+                    hungry = false;
+                    StartCoroutine(HungerRoutine());
                     stateController.SetState(AIState.Wander);
                 });
         }
 
         protected override void OnDamageTaken()
         {
-            OnNeutralDamaged -= OnNeutralDamage;
             OnNeutralDamaged?.Invoke(rb.position);
-            aggressive = true;
         }
 
         public void Interact()
@@ -99,8 +99,7 @@ namespace Gameplay.Enemies
             float t = 0;
             while (t < 2f)
             {
-                rb.rotation = PhysicsUtility
-                    .RotateTowardsPosition(rb.position, rb.rotation, Player.Movement.Position, 5);
+                rb.RotateTowardsPosition(Player.Movement.Position, 5);
                 t += Time.deltaTime;
                 yield return null;
             }
@@ -135,11 +134,13 @@ namespace Gameplay.Enemies
             if(Vector2.Distance(rb.position, pos) > 7.5f) return;
             StopInterest();
             aggressive = true;
+            CanBreed = false;
+            stateController.SetState(AIState.Follow, 
+                onTargetReach: BasicAttack,
+                reachDistance: 1.25f);
             OnNeutralDamaged -= OnNeutralDamage;
         }
-
-        protected override void OnDayStart(int day) { }
-
+        
         private void SubEvents()
         {
             OnNeutralDamaged += OnNeutralDamage;
@@ -167,8 +168,7 @@ namespace Gameplay.Enemies
             UnsubEvents();
             stateController.SetState(AIState.None);
             StopInterest();
-            rb.rotation = PhysicsUtility
-                .RotateTowardsPosition(rb.position, rb.rotation, Player.Movement.Position, 360);
+            rb.RotateTowardsPosition(Player.Movement.Position, 360);
             breedAnimator.Play(BreedAnimHash);
             breedingParticles.Play();
             BreedingManager.Instance.PlayBreedingAnimation();

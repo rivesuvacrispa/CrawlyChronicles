@@ -1,6 +1,6 @@
 ﻿using System.Collections;
-using Camera;
 using Gameplay.Interaction;
+using Scripts.SoundEffects;
 using UnityEngine;
 
 namespace Player
@@ -18,6 +18,7 @@ namespace Player
         private Coroutine comboExpirationRoutine;
 
         public bool IsAttacking => attackGO.activeInHierarchy;
+        public static bool IsInComboDash { get; private set; }
 
         private void Update()
         {
@@ -34,7 +35,7 @@ namespace Player
 
         private void Attack()
         {
-            if (movementComponent.Dash(MainCamera.WorldMousePos, dashDuration, 
+            if (movementComponent.Dash(dashDuration, 
                 () => {
                     attackGO.SetActive(false);
                     StartComboExpiration();
@@ -43,9 +44,9 @@ namespace Player
             {
                 if(comboExpirationRoutine is not null) 
                     StopCoroutine(comboExpirationRoutine);
+                PlayerAudioController.Instance.PlayAttack(comboCounter);
                 comboCounter++;
                 attackGO.SetActive(true);
-                // animator.Play(claw1Hash);
                 hitbox.Disable();
             }
         }
@@ -57,8 +58,12 @@ namespace Player
                     attackGO.SetActive(false);
                     ExpireCombo();
                     hitbox.Enable();
+                    PlayerAudioController.Instance.StopAction();
+                    IsInComboDash = false;
                 }))
             {
+                IsInComboDash = true;
+                PlayerAudioController.Instance.PlayCombo();
                 StopCoroutine(comboExpirationRoutine);
                 attackGO.SetActive(true);
                 hitbox.Disable();
@@ -74,7 +79,6 @@ namespace Player
         {
             comboCounter = 0;
             comboExpirationRoutine = null;
-            // animator.Play(claw0Hash);
         }
 
         private IEnumerator ComboExpirationRoutine()

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using Gameplay.Enemies;
+using Scripts.SoundEffects;
 using UnityEngine;
 
 namespace Player
@@ -7,7 +8,6 @@ namespace Player
     [RequireComponent(typeof(Collider2D))]
     public class PlayerHitbox : MonoBehaviour
     {
-        [SerializeField] private float knockback;
         [SerializeField] private Movement movement;
         [SerializeField] private SpriteRenderer bodySprite;
         [SerializeField] private Gradient immunityGradient;
@@ -26,13 +26,14 @@ namespace Player
         private void OnCollisionEnter2D(Collision2D col)
         {
             if(col.gameObject.TryGetComponent(out Enemy enemy))
-                Damage(col.transform.position, enemy.Scriptable.Damage, enemy.Scriptable.Knockback);
+                Damage(col.transform.position, enemy.Scriptable.Damage, enemy.Scriptable.AttackPower);
         }
         
-        private void Damage(Vector3 pos, float damage, float kb)
+        private void Damage(Vector3 pos, float damage, float knockbackPower)
         {
+            PlayerAudioController.Instance.PlayHit();
             if (Manager.Instance.GodMode) return;
-            movement.Knockback(pos, 0.35f, kb);
+            movement.Knockback(pos, knockbackPower);
             Manager.Instance.Damage(damage);
             OnDamageTaken?.Invoke(damage);
             StartCoroutine(ImmunityRoutine());

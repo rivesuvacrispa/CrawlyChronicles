@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Scripts.SoundEffects;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,7 +14,7 @@ namespace UI
         [SerializeField] private Image rightArrow;
  
         private readonly List<GameObject> steps = new();
-        private int currentStep;
+        private int currentStep = -1;
         private int stepsAmount;
 
         private void CollectSteps()
@@ -49,7 +50,10 @@ namespace UI
         private void SelectTutorialStep(int step)
         {
             step = Mathf.Clamp(step, 0, stepsAmount - 1);
-            steps[currentStep].SetActive(false);
+            if(step == currentStep) return;
+
+            UIAudioController.Instance.PlaySelect();
+            if(currentStep != -1) steps[currentStep].SetActive(false);
             currentStep = step;
             var stepGO = steps[currentStep];
             stepGO.SetActive(true);

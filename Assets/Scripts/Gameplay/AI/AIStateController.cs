@@ -6,6 +6,7 @@ using Gameplay.Enemies;
 using Gameplay.Food;
 using Pathfinding;
 using UnityEngine;
+using Util;
 
 namespace Gameplay.AI
 {
@@ -24,12 +25,11 @@ namespace Gameplay.AI
         private CallbackableAIPath aiPath;
         private AIDestinationSetter destinationSetter;
         private float defaultReachDistance;
-
+        private ITransformProvider currentFollowTarget;
+        
         public AIState CurrentState { get; private set; }
-        private Transform currentFollowTarget;
-        
 
-        
+
         private void Awake()
         {
             enemy = GetComponent<Enemy>();
@@ -52,8 +52,8 @@ namespace Gameplay.AI
 
         public void SetState(
             AIState newState, 
-            GameObject followTarget = null, 
-            Action<GameObject> onTargetReach = null,
+            ITransformProvider followTarget = null, 
+            Action onTargetReach = null,
             float reachDistance = float.NaN)
         {
             if(newState == CurrentState) return;
@@ -72,7 +72,7 @@ namespace Gameplay.AI
                     SetWander();
                     break;
                 case AIState.Follow:
-                    SetFollow(followTarget, onTargetReach, reachDistance);
+                    StartCoroutine(SetFollow(followTarget, onTargetReach, reachDistance));
                     break;
                 case AIState.None:
                     SetNone();
@@ -120,19 +120,19 @@ namespace Gameplay.AI
             };
         }
 
-        private void SetFollow(GameObject targetGO, Action<GameObject> onTargetReach, float reachDistance)
+        private IEnumerator SetFollow(ITransformProvider target, Action onTargetReach, float reachDistance)
         {
-            if (reachDistance.Equals(float.NaN)) SetDefaultReachDistance();
-            else aiPath.endReachedDistance = reachDistance;
-            Transform target = targetGO is null ? Player.Movement.Transform : targetGO.transform;
-            
+            yield return new WaitForEndOfFrame();
+            aiPath.endReachedDistance = reachDistance.Equals(float.NaN) ? defaultReachDistance : reachDistance;
+            target ??= Player.Manager.Instance;
+            currentFollowTarget = target;
             DisableLocator();
             AutoRepath();
             destinationSetter.enabled = true;
             aiPath.enabled = true;
-            destinationSetter.target = target;
-            if (onTargetReach is not null)
-                aiPath.Callback = () => onTargetReach(targetGO);
+            destinationSetter.target = target.Transform;
+            target.OnProviderDestroy += OnFollowTargetDestroy;
+            if (onTargetReach is not null) aiPath.Callback = onTargetReach;
         }
 
         private void SetNone()
@@ -163,7 +163,6 @@ namespace Gameplay.AI
 
         public void SetEtherial(bool isEtherial)
         {
-            Debug.Log($"Set etherial: {isEtherial}");
             physicsCollider.enabled = !isEtherial;
             if(isEtherial) hitbox.Disable();
             else hitbox.Enable();
@@ -180,8 +179,7 @@ namespace Gameplay.AI
         {
             var startNode = AstarPath.active.GetNearest(enemy.Position).node;
             var nodes = PathUtilities.BFS(startNode, enemy.Scriptable.WanderingRadius);
-            if(nodes.Count == 0)
-                return;
+            if(nodes.Count == 0) return;
             var randomPoint = PathUtilities.GetPointsOnNodes(nodes, 1)[0];
             aiPath.destination = randomPoint;
             aiPath.SearchPath();
@@ -196,6 +194,7 @@ namespace Gameplay.AI
         private void CancelPath()
         {
             CancelCallback();
+            DiscardFollowTarget();
             aiPath.SetPath(null);
         }
 
@@ -215,11 +214,27 @@ namespace Gameplay.AI
             }
         }
 
+        private void DiscardFollowTarget()
+        {
+            if(currentFollowTarget is null) return;
+            currentFollowTarget.OnProviderDestroy -= OnFollowTargetDestroy;
+            currentFollowTarget = null;
+        }
+
+        private void OnFollowTargetDestroy()
+        {
+            Debug.Log("Target destroy");
+            SetState(AIState.Wander);
+        }
+
         private void SetDefaultReachDistance() => aiPath.endReachedDistance = defaultReachDistance;
         private void DisableLocator() => locator.gameObject.SetActive(false);
-
         private void EnableLocator() => locator.gameObject.SetActive(true);
-
-        private void OnDestroy() => locator.OnTargetLocated -= OnLocatorTriggered;
+        private void OnDestroy()
+        {
+            locator.OnTargetLocated -= OnLocatorTriggered;
+            if(currentFollowTarget is not null)
+                currentFollowTarget.OnProviderDestroy -= OnFollowTargetDestroy;
+        }
     }
 }

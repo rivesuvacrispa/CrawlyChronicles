@@ -237,6 +237,7 @@ GameObject:
   - component: {fileID: 7535955531934290307}
   - component: {fileID: 1257248844208185513}
   - component: {fileID: 3531841061269730929}
+  - component: {fileID: 1744619610801876669}
   m_Layer: 5
   m_Name: MutationButton
   m_TagString: Untagged
@@ -314,6 +315,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tooltipProvider: {fileID: 1257248844208185513}
+--- !u!114 &1744619610801876669
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7734317555411081119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 644a3d48da5d4096b880d00ec7428da6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &487629435753975059
 PrefabInstance:
   m_ObjectHideFlags: 0

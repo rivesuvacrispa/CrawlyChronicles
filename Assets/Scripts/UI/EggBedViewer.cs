@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Gameplay;
-using Genes;
 using UnityEngine;
 
 namespace UI

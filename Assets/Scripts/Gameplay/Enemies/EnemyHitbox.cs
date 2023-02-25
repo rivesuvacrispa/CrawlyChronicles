@@ -13,13 +13,14 @@ namespace Gameplay.Enemies
 
         private void OnCollisionEnter2D(Collision2D _)
         {
-            enemy.Damage(Player.Movement.Position,
-                Player.Manager.PlayerStats.AttackDamage, 
-                Player.Manager.PlayerStats.AttackKnockback, 0.75f);
+            enemy.Damage(Player.Manager.PlayerStats.AttackDamage, 
+                Player.Manager.PlayerStats.AttackPower, 0.5f);
         }
 
         public void Enable() => collider.enabled = true;
+
         public void Disable() => collider.enabled = false;
+
         public bool Enabled => collider.enabled;
     }
 }

@@ -10,10 +10,10 @@ namespace Camera
 
         private void Start()
         {
-            Target = Player.Movement.Transform;
+            Target = Player.Manager.Instance.Transform;
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             Vector3 move = Vector3.MoveTowards(transform.position, Target.position, followingSpeed * Time.deltaTime);
             move.z = -10;

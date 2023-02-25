@@ -52,7 +52,7 @@ namespace Gameplay.Food
             BreedingManager.Instance.AddFood();
             OnEatenByPlayer();
         }
-        
+
         public void OnInteractionStart() { }
         public void OnInteractionStop() { }
         public bool CanInteract() => true;
@@ -65,7 +65,7 @@ namespace Gameplay.Food
         
         // INotificationProvider
         public event INotificationProvider.NotificationProviderEvent OnDataUpdate;
-        public event INotificationProvider.NotificationProviderEvent OnProviderDestroy;
+        public event INotificationProvider.DestructionProviderEvent OnProviderDestroy;
         public Transform Transform => transform;
         public string NotificationText => amount.ToString();
     }

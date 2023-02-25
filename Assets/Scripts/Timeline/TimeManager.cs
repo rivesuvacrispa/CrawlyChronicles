@@ -2,7 +2,6 @@
 using GameCycle;
 using UI;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Timeline
@@ -16,6 +15,7 @@ namespace Timeline
         [SerializeField] private int dayDurationInSeconds = 30;
         [SerializeField] private int nightDurationInSeconds = 120;
         [SerializeField] private int playerLifespanInSeconds = 300;
+        [SerializeField] private ParticleSystem fireflyParticles;
         
         private int dayCounter;
         private int time;
@@ -90,6 +90,7 @@ namespace Timeline
 
         private void StartDay()
         {
+            fireflyParticles.Stop();
             StatRecorder.daysSurvived++;
             dayCounter++;
             time = 0;
@@ -98,6 +99,7 @@ namespace Timeline
 
         private void StartNight()
         {
+            if(fireflyParticles.gameObject.activeSelf) fireflyParticles.Play();
             OnNightStart?.Invoke(dayCounter);
         }
 

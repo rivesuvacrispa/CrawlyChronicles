@@ -20,7 +20,7 @@ namespace UI
         public void SetTarget(IDamageable damageable)
         {
             target = damageable;
-            damageable.OnDamageableDestroy += OnDamageableDestroy;
+            damageable.OnProviderDestroy += OnDamageableDestroy;
             UpdateWidth();
         }
         
@@ -107,7 +107,7 @@ namespace UI
 
         private void OnDamageableDestroy()
         {
-            target.OnDamageableDestroy -= OnDamageableDestroy;
+            target.OnProviderDestroy -= OnDamageableDestroy;
             Destroy(gameObject);
         }
         

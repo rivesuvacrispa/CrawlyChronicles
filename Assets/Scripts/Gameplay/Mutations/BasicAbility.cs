@@ -1,5 +1,4 @@
-﻿using System.Text;
-using Player;
+﻿using Player;
 using Scriptable;
 using UI;
 using UnityEngine;

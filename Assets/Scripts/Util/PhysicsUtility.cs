@@ -1,29 +1,52 @@
-﻿using Unity.Mathematics;
+﻿using Definitions;
 using UnityEngine;
 
 namespace Util
 {
     public static class PhysicsUtility
     {
-        public static Vector2 GetKnockbackVelocity(Vector2 victim, Vector2 attacker, float knockbackPower) 
+        public static Vector2 GetVelocityBackwards(Vector2 victim, Vector2 attacker, float knockbackPower) 
             => (victim - attacker).normalized * knockbackPower;
         
-        public static float RotateTowardsPosition(Vector2 originPos, float originRotation, Vector2 targetPos, float delta)
+        public static void RotateTowardsPosition(this Rigidbody2D rb, Vector2 targetPos, float delta) 
+            => rb.rotation = RotationTowards(rb.position, rb.rotation, targetPos, delta);
+
+        public static float RotationTowards(Vector2 pos, float rot, Vector2 targetPos, float delta)
         {
-            Vector2 rotateDirection = targetPos - originPos;
-            float angle = Mathf.Atan2(rotateDirection.y, rotateDirection.x) - Mathf.PI * 0.5f;
-            return RotateTowardsAngle(originRotation, angle, delta);
+            Vector2 direction = targetPos - pos;
+            float angle = direction.GetAngle() - 90f;
+            return Mathf.MoveTowardsAngle(rot, angle, delta);
         }
 
-        private static float RotateTowardsAngle(float rotation, float angle, float delta)
-        {
-            return Quaternion.RotateTowards(
-                Quaternion.Euler(0, 0, rotation), 
-                quaternion.Euler(0, 0, angle),
-                delta).eulerAngles.z;
-        }
-
+        public static float GetAngle(this Vector2 v) => Mathf.Atan2(v.y, v.x) * Mathf.Rad2Deg;
+        
         public static float CalculateDamage(float incomingDamage, float armor)
             => incomingDamage * incomingDamage / (incomingDamage + armor);
+
+        public static void AddClampedForceTowards
+            (this Rigidbody2D rb, 
+            Vector2 direction, 
+            float force, 
+            ForceMode2D mode, 
+            float maxAmplifier = 1) 
+                => rb.AddForce(
+                    (direction - rb.position).normalized * 
+                    Mathf.Clamp(force, 0, GlobalDefinitions.MaxAppliableForce * maxAmplifier) * 
+                    rb.mass / GlobalDefinitions.PlayerMass, mode);
+        
+        public static void AddClampedForceBackwards
+            (this Rigidbody2D rb, 
+            Vector2 direction, 
+            float force, 
+            ForceMode2D mode,
+            float maxAmplifier = 1) 
+                => rb.AddForce(
+                    -1 *
+                    (direction - rb.position).normalized * 
+                    Mathf.Clamp(force, 0, GlobalDefinitions.MaxAppliableForce * maxAmplifier) * 
+                    rb.mass / GlobalDefinitions.PlayerMass, mode);
+
+        public static float GetKnockbackResistance(float playerMass)
+            => Mathf.InverseLerp(0, GlobalDefinitions.PlayerMass * 2, playerMass) - 0.1f;
     }
 }

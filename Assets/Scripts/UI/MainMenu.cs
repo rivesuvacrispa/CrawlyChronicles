@@ -5,7 +5,6 @@ using Gameplay;
 using Gameplay.Abilities;
 using Genes;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace UI
@@ -16,10 +15,12 @@ namespace UI
         [SerializeField] private GameObject rootGO;
         [SerializeField] private GameObject gameUICanvas;
         [SerializeField] private GameObject gameOverGO;
+        [SerializeField] private GameObject settingsGO;
         [SerializeField] private TutorialMenu tutorialMenu;
         [SerializeField] private PauseMenu pauseMenu;
-        [FormerlySerializedAs("statsText")] 
         [SerializeField] private Text gameOverStatsText;
+
+        private bool settingsOpenedFromMainMenu;
         
         public delegate void MainMenuEvent();
         public static event MainMenuEvent OnResetRequested;
@@ -75,20 +76,45 @@ namespace UI
             Time.timeScale = 1;
         }
 
-        public void Pause() => pauseMenu.gameObject.SetActive(true);
-
         public void Restart()
         {
             ResetGame();
             pauseMenu.gameObject.SetActive(false);
         }
+
+        public void ShowSettingsMenu(bool fromMainMenu)
+        {
+            settingsOpenedFromMainMenu = fromMainMenu;
+            if(fromMainMenu) rootGO.SetActive(false);
+            else
+            {
+                pauseMenu.gameObject.SetActive(false);
+                Time.timeScale = 0;
+            }
+            settingsGO.SetActive(true);
+        }
+
+        public void CloseSettingsMenu()
+        {
+            settingsGO.SetActive(false);
+            if (settingsOpenedFromMainMenu)
+                rootGO.SetActive(true);
+            else
+                pauseMenu.gameObject.SetActive(true);
+        }
+        
+        public void Pause() => pauseMenu.gameObject.SetActive(true);
+
+        public void Exit() => Application.Quit();
+
+        
         
         private void ResetGame()
         {
             OnResetRequested?.Invoke();
             CreateFirstEggBed();
         }
-
+        
         private void CreateFirstEggBed()
         {
             var bed = Instantiate(GlobalDefinitions.EggBedPrefab, GlobalDefinitions.GameObjectsTransform);
@@ -105,7 +131,5 @@ namespace UI
             bed.SetEggs(eggs);
             bed.transform.position = new Vector3(15, 15, 0);
         }
-
-        public void Exit() => Application.Quit();
     }
 }

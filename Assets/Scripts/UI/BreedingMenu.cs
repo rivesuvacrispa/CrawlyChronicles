@@ -1,5 +1,4 @@
-﻿using GameCycle;
-using Gameplay;
+﻿using Gameplay;
 using Gameplay.Enemies;
 using Genes;
 using Player;

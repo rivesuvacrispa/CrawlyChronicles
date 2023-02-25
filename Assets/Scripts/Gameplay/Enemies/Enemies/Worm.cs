@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using Gameplay.AI;
 using Gameplay.Food;
+using Timeline;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -18,10 +18,10 @@ namespace Gameplay.Enemies
         private bool hungry = true;
 
         private Coroutine diggingRoutine;
-        private Coroutine digCooldownRoutine;
+        private Coroutine digDelayRoutine;
         
         
-        public override void OnMapEntered() => DigIn(0.5f);
+        public override void OnMapEntered() => DigIn(0f);
 
         public override void OnPlayerLocated()
         {
@@ -35,17 +35,13 @@ namespace Gameplay.Enemies
         {
             if(!hungry) return;
             stateController.SetState(AIState.Follow, 
-                followTarget: foodBed.gameObject,
-                onTargetReach: o => {
-                    if(o is not null)
-                    {
-                        DigOut(() =>
-                        {
-                            foodBed.Eat();
-                            hungry = false;
-                            StartCoroutine(HungerRoutine());
-                        });
-                    }
+                followTarget: foodBed,
+                onTargetReach: () =>
+                {
+                    DigOut(0f);
+                    foodBed.Eat();
+                    hungry = false;
+                    StartCoroutine(HungerRoutine());
                     stateController.SetState(AIState.Wander);
                 },
                 reachDistance: 1.3f);
@@ -54,9 +50,9 @@ namespace Gameplay.Enemies
         protected override void OnDamageTaken()
         {
             InterruptDigging();
-            if(digCooldownRoutine is null) DigIn(5f);
+            DigIn(3f);
             stateController.SetState(AIState.Follow, 
-                onTargetReach: o => BasicAttack(),
+                onTargetReach: BasicAttack,
                 reachDistance: 0.75f);
         }
 
@@ -65,19 +61,21 @@ namespace Gameplay.Enemies
             if (diggingRoutine is null) return;
             StopCoroutine(diggingRoutine);
             diggingRoutine = null;
-            animator.Play(walkHash);
+            animator.Play(scriptable.WalkAnimHash);
         }
 
         private void DigIn(float delay)
         {
             if(digged) return;
-            digCooldownRoutine = StartCoroutine(DigCooldownRoutine(delay));
+            if(digDelayRoutine is not null) StopCoroutine(digDelayRoutine);
+            digDelayRoutine = StartCoroutine(DigInDelayRoutine(delay));
         }
 
-        private void DigOut(Action continuation)
+        private void DigOut(float delay)
         {
             if(!digged) return;
-            diggingRoutine = StartCoroutine(DiggingOutRoutine(continuation));
+            if(digDelayRoutine is not null) StopCoroutine(digDelayRoutine);
+            digDelayRoutine = StartCoroutine(DigOutDelayRoutine(delay));
         }
 
         private IEnumerator DiggingInRoutine()
@@ -87,14 +85,20 @@ namespace Gameplay.Enemies
             animator.Play(DiggingInAnimHash);
             yield return new WaitForSeconds(9 / 11f);
             digged = true;
+            diggingRoutine = null;
             stateController.SetEtherial(true);
             dirtParticles.Play();
             stateController.ReturnMoveControl();
-            stateController.SetState(AIState.Wander);
-            diggingRoutine = null;
+            if (TimeManager.IsDay)
+                StartCoroutine(FleeRoutine());
+            else
+            {
+                stateController.SetState(AIState.Wander);
+                DigOut(Random.Range(5f, 8f));
+            }
         }
 
-        private IEnumerator DiggingOutRoutine(Action continuation)
+        private IEnumerator DiggingOutRoutine()
         {
             stateController.TakeMoveControl();
             animator.Play(DiggingOutAnimHash);
@@ -105,15 +109,40 @@ namespace Gameplay.Enemies
             yield return new WaitForSeconds(9 / 11f);
             stateController.ReturnMoveControl();
             diggingRoutine = null;
-            DigIn(Random.Range(4.5f, 6.5f));
-            continuation();
+            if (TimeManager.IsDay)
+                StartCoroutine(FleeRoutine());
+            else
+                DigIn(Random.Range(5f, 8f));
         }
 
-        private IEnumerator DigCooldownRoutine(float delay)
+        private IEnumerator DigInDelayRoutine(float delay)
         {
             yield return new WaitForSeconds(delay);
-            digCooldownRoutine = null;
             diggingRoutine = StartCoroutine(DiggingInRoutine());
+            digDelayRoutine = null;
+        }  
+        
+        private IEnumerator DigOutDelayRoutine(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            diggingRoutine = StartCoroutine(DiggingOutRoutine());
+            digDelayRoutine = null;
+        }
+
+        protected override void OnDayStart(int day)
+        {
+            if(diggingRoutine is null) StartCoroutine(FleeRoutine());
+        }
+
+        private IEnumerator FleeRoutine()
+        {
+            stateController.SetEtherial(true);
+            if(digDelayRoutine is not null) StopCoroutine(digDelayRoutine);
+            DigIn(0f);
+            yield return new WaitForSeconds(2f);
+            dirtParticles.Stop();
+            yield return new WaitForSeconds(2f);
+            Destroy(gameObject);
         }
         
         private IEnumerator HungerRoutine()

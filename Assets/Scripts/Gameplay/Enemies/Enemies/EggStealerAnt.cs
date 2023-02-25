@@ -2,7 +2,6 @@
 using GameCycle;
 using Gameplay.AI;
 using Gameplay.Food;
-using Genes;
 using UnityEngine;
 
 namespace Gameplay.Enemies
@@ -27,13 +26,13 @@ namespace Gameplay.Enemies
         public override void OnPlayerLocated()
         {
             stateController.SetState(AIState.Follow, 
-                onTargetReach: o => BasicAttack(),
+                onTargetReach: BasicAttack,
                 reachDistance: 0.75f);
         }
 
         public override void OnEggsLocated(EggBed eggBed)
         {
-            stateController.SetState(AIState.Follow, eggBed.gameObject, (go) =>
+            stateController.SetState(AIState.Follow, eggBed, () =>
             {
                 if(eggBed.RemoveOne(out holdingEgg))
                 {

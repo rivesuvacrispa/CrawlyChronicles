@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Scripts.SoundEffects;
 using UI;
 using UnityEngine;
 
@@ -68,6 +69,7 @@ namespace Gameplay.Interaction
             if (interactable is null) yield break;
 
             Interacting = true;
+            PlayerAudioController.Instance.PlayInteract();
             continuouslyInteractable.OnInteractionStart();
             popup.SetFilling(0);
             float duration = continuouslyInteractable.InteractionTime;
@@ -85,17 +87,17 @@ namespace Gameplay.Interaction
                 yield return null;
             }
             
+            popup.SetFilling(0);
+            continuouslyInteractable.OnInteractionStop();
+            PlayerAudioController.Instance.StopAction();
+            Interacting = false;
+            
             if(!interrupted)
             {
                 interactable.Interact();
                 popup.Disable();
                 StartCoroutine(InteractionRoutine(continuouslyInteractable));
-            } else
-            {
-                popup.SetFilling(0);
-                continuouslyInteractable.OnInteractionStop();
             }
-            Interacting = false;
         }
 
         private void UpdatePopup()

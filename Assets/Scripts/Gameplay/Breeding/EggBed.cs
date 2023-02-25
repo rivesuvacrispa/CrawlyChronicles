@@ -2,7 +2,6 @@
 using Definitions;
 using GameCycle;
 using Gameplay.AI.Locators;
-using Genes;
 using Gameplay.Interaction;
 using UI;
 using UnityEngine;
@@ -98,7 +97,7 @@ namespace Gameplay
         
         // INotificationProvider 
         public event INotificationProvider.NotificationProviderEvent OnDataUpdate;
-        public event INotificationProvider.NotificationProviderEvent OnProviderDestroy;
+        public event INotificationProvider.DestructionProviderEvent OnProviderDestroy;
         public Transform Transform => transform;
         public string NotificationText => EggsAmount.ToString();
 

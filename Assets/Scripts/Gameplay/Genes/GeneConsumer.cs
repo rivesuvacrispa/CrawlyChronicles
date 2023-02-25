@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using Definitions;
 using Player;
+using Scripts.SoundEffects;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
@@ -29,6 +30,7 @@ namespace Genes
             Color color = GlobalDefinitions.GetGeneColor(geneType);
             if(routine is not null) StopCoroutine(routine);
             routine = StartCoroutine(ConsumingRoutine(color, 0.5f));
+            PlayerAudioController.Instance.PlayGenePickup();
         }
 
         private IEnumerator ConsumingRoutine(Color color, float duration)

@@ -159,7 +159,6 @@ namespace UI
                 BreedingManager.Instance.SetTrioGene(mutated.Genes);
                 AbilityController.UpdateAbilities(mutated);
                 Time.timeScale = 1;
-
             }
         }
         
