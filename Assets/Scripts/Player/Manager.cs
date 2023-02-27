@@ -14,6 +14,7 @@ namespace Player
     {
         public static Manager Instance { get; private set; }
 
+        [SerializeField] private ParticleSystem healingParticles;
         [SerializeField] private Animator spriteAnimator;
         [SerializeField] private Movement movement;
         [SerializeField] private MainMenu mainMenu;
@@ -99,6 +100,7 @@ namespace Player
         public void AddHealth(float amount)
         {
             if(health < 0 || health >= currentStats.MaxHealth) return;
+            healingParticles.Play();
             health = Mathf.Clamp(health + amount, health, currentStats.MaxHealth);
             UpdateHealthbar();
         }

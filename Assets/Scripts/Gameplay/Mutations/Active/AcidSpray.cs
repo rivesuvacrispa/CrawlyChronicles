@@ -1,5 +1,7 @@
 ﻿using System.Text;
+using Definitions;
 using Gameplay.Enemies;
+using Player;
 using UnityEngine;
 using Util;
 
@@ -40,10 +42,10 @@ namespace Gameplay.Abilities.Active
         private void OnParticleCollision(GameObject other)
         {
             if (other.TryGetComponent(out Enemy enemy)) 
-                enemy.Damage(damage, knockbackPower, stunDuration);
+                enemy.Damage(GetAbilityDamage(damage), knockbackPower, stunDuration, GlobalDefinitions.PoisonColor, ignoreArmor: true);
         }
 
-        public override string GetLevelDescription(int lvl)
+        public override string GetLevelDescription(int lvl, bool withUpgrade)
         {
             StringBuilder sb = new StringBuilder();
 
@@ -55,7 +57,7 @@ namespace Gameplay.Abilities.Active
             float dmg = LerpLevel(damageLvl1, damageLvl10, lvl);
             float prevDmg = 0;
 
-            if (lvl > 0)
+            if (lvl > 0 && withUpgrade)
             {
                 var prevLvl = lvl - 1;
                 prevCd = Scriptable.GetCooldown(prevLvl);
@@ -64,7 +66,7 @@ namespace Gameplay.Abilities.Active
                 prevDmg = LerpLevel(damageLvl1, damageLvl10, prevLvl);
             }
             
-            sb.AddAbilityLine("Cooldown", Scriptable.GetCooldown(lvl), prevCd, false);
+            sb.AddAbilityLine("Cooldown", Scriptable.GetCooldown(lvl), prevCd, false, suffix: "s");
             sb.AddAbilityLine("Spray width", width, prevWidth);
             sb.AddAbilityLine("Spray amount", amount, prevAmount);
             sb.AddAbilityLine("Spray damage", dmg, prevDmg);

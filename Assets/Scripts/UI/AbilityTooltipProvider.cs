@@ -25,7 +25,7 @@ namespace UI
         {
             var provider = (IAbilityTooltipProvider) tooltipProvider;
             transform.localScale = Vector3.one * 1.15f;
-            tooltip.SetTooltip(provider.TooltipData, provider.Level);
+            tooltip.SetTooltip(provider.TooltipData, provider.Level, provider.ShowUpgradeStats);
         }
 
         public virtual void OnPointerExit(PointerEventData eventData)

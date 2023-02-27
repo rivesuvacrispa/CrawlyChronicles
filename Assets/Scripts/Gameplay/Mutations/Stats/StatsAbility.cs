@@ -32,10 +32,10 @@ namespace Gameplay.Abilities.Base
             base.OnDisable();
         }
 
-        public override string GetLevelDescription(int lvl) =>
+        public override string GetLevelDescription(int lvl, bool withUpgrade) =>
             PlayerStats
                 .LerpLevel(statsLvl1, statsLvl10, lvl)
-                .PrintCompared(lvl == 0 ? 
+                .PrintCompared((lvl == 0 || !withUpgrade) ? 
                     new PlayerStats() : 
                     PlayerStats.LerpLevel(statsLvl1, statsLvl10, lvl - 1));
     }

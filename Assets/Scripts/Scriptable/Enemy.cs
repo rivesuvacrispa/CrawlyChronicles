@@ -25,10 +25,14 @@ namespace Scriptable
         [SerializeField] private AudioClip attackAudio;
         [SerializeField] private AudioClip crawlAudio;
         [SerializeField] private AudioClip deathAudio;
-        
-        private Gradient immunityGradient;
         [SerializeField, ShowOnly] private float crawlPitch;
-        public string AnimatorName => animatorName;
+
+        private Gradient immunityGradient;
+        private Gradient poisonGradient;
+        private Gradient lifestealGradient;
+        private bool effectGradientsInitialized;
+        
+        
         public float MaxHealth => maxHealth;
         public Color BodyColor => bodyColor;
         public float HealthbarOffsetY => healthbarOffsetY;
@@ -46,34 +50,20 @@ namespace Scriptable
         public AudioClip DeathAudio => deathAudio;
         public float CrawlPitch => crawlPitch;
 
-
         public int WalkAnimHash { get; private set; }
         public int IdleAnimHash { get; private set; }
         public int DeadAnimHash { get; private set; }
         
-        public Color GetImmunityFrameColor(float time) => immunityGradient.Evaluate(time / GlobalDefinitions.EnemyImmunityDuration);
-
+        
+        
         private void Awake() => Init();
-
+        
         private void Init()
         {
-            WalkAnimHash = Animator.StringToHash(AnimatorName + "Walk");
-            IdleAnimHash = Animator.StringToHash(AnimatorName + "Idle");
-            DeadAnimHash = Animator.StringToHash(AnimatorName + "Dead");
-
+            WalkAnimHash = Animator.StringToHash(animatorName + "Walk");
+            IdleAnimHash = Animator.StringToHash(animatorName + "Idle");
+            DeadAnimHash = Animator.StringToHash(animatorName + "Dead");
             crawlPitch = 1 + Mathf.Lerp( -0.5f, 0.5f, 1 - playerMass / 2f);
-            
-            immunityGradient = new Gradient();
-            immunityGradient.SetKeys(
-                new[]
-                {
-                    new GradientColorKey(Color.white, 0),
-                    new GradientColorKey(bodyColor, 1)
-                }, new[]
-                {
-                    new GradientAlphaKey(1, 0),
-                    new GradientAlphaKey(1, 1),
-                });
         }
         
         private void OnValidate() => Init();

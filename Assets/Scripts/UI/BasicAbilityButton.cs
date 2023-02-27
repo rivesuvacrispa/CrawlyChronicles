@@ -44,5 +44,6 @@ namespace UI
         // IAbilityTooltipProvider
         public BasicMutation TooltipData => Scriptable;
         public int Level => level;
+        public bool ShowUpgradeStats => false;
     }
 }

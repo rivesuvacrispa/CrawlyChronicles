@@ -2,6 +2,7 @@
 using System.Collections;
 using Definitions;
 using GameCycle;
+using Gameplay.Abilities.EntityEffects;
 using Gameplay.AI;
 using Gameplay.Food;
 using Scripts.SoundEffects;
@@ -15,10 +16,13 @@ namespace Gameplay.Enemies
 {
     [RequireComponent(typeof(Animator)),
      RequireComponent(typeof(Rigidbody2D)),
-     RequireComponent(typeof(AIStateController))]
+     RequireComponent(typeof(AIStateController)),
+    RequireComponent(typeof(EffectController))]
     public abstract class Enemy : MonoBehaviour, IDamageable
     {
         public bool debug_Fearless;
+        [SerializeField] protected SpriteRenderer minimapIcon;
+        [SerializeField] private BodyPainter bodyPainter;
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private GameObject attackGO;
         [SerializeField] protected EnemyHitbox hitbox;
@@ -35,10 +39,12 @@ namespace Gameplay.Enemies
         private bool stunned;
         private float attackDelay = 0.75f;
         private bool reckoned;
+        private EffectController effectController;
 
         [field:SerializeField] public EnemySpawnLocation SpawnLocation { get; set; }
         public Scriptable.Enemy Scriptable => scriptable;
         public Vector2 Position => rb.position;
+        public void SetMovementSpeed(float speed) => stateController.SpeedMultiplier = speed;
 
         
         
@@ -56,6 +62,7 @@ namespace Gameplay.Enemies
             animator = GetComponent<Animator>();
             rb = GetComponent<Rigidbody2D>();
             stateController = GetComponent<AIStateController>();
+            effectController = GetComponent<EffectController>();
         }
         
         protected virtual void Start()
@@ -68,19 +75,19 @@ namespace Gameplay.Enemies
             SubEvents();
         }
         
-        public void Damage(float damage, float knockback, float stunDuration) => 
-            Damage(Player.Movement.Position, damage, knockback, stunDuration);
+        public float Damage(float damage, float knockback, float stunDuration, Color damageColor, bool ignoreArmor = false) => 
+            Damage(Player.Movement.Position, damage, knockback, stunDuration, damageColor, ignoreArmor);
 
-        private void Damage(Vector2 attacker, float damage, float knockbackPower, float stunDuration)
+        private float Damage(Vector2 attacker, float damage, float knockbackPower, float stunDuration, Color damageColor, bool ignoreArmor = false)
         {
-            if (reckoned)
+            if (!ignoreArmor && reckoned)
             {
                 reckoned = false;
                 attackDelay = 0.5f;
-                return;
+                return 0;
             }
         
-            damage = PhysicsUtility.CalculateDamage(damage, Scriptable.Armor);
+            damage = ignoreArmor ? damage : PhysicsUtility.CalculateDamage(damage, Scriptable.Armor);
             StatRecorder.damageDealt += damage;
             health -= damage;
             attackDelay = 1f;
@@ -92,26 +99,31 @@ namespace Gameplay.Enemies
             else
             {
                 audioController.PlayAction(scriptable.HitAudio, pitch: SoundUtility.GetRandomPitchTwoSided(0.15f));
-                StartCoroutine(ImmunityRoutine());
+                bodyPainter.Paint(new Gradient().FastGradient(damageColor, scriptable.BodyColor), GlobalDefinitions.EnemyImmunityDuration);
                 if (stunDuration > 0) 
                     StartCoroutine(StunRoutine(stunDuration));
-                if (knockbackPower > 0) 
-                    Knockback(attacker, knockbackPower);
+                if (knockbackPower > 0)
+                {
+                    float duration = Mathf.Lerp(Mathf.Clamp01(knockbackPower), 0, 0.25f);
+                    Knockback(attacker, knockbackPower, duration);
+                }
             }
+
+            return damage;
         }
 
-        private void Knockback(Vector2 attacker, float force)
+        private void Knockback(Vector2 attacker, float force, float duration)
         {
             float kbResistance = PhysicsUtility.GetKnockbackResistance(scriptable.Mass);
             rb.AddClampedForceBackwards(attacker, force * (1 - kbResistance), ForceMode2D.Impulse);
-            StartCoroutine(KnockbackRoutine());
+            StartCoroutine(KnockbackRoutine(duration));
         }
 
         public void Reckon(Vector2 attacker, float force)
         {
             StopAttack();
             attackDelay = 0.5f;
-            Knockback(attacker, force);
+            Knockback(attacker, force, 0.3f);
             reckoned = true;
             StartCoroutine(CancelReckon());
         }
@@ -124,6 +136,8 @@ namespace Gameplay.Enemies
 
         private void Die()
         {
+            ClearEffects();
+            minimapIcon.enabled = false;
             StatRecorder.enemyKills++;
             StopAllCoroutines();
             attackGO.SetActive(false);
@@ -178,27 +192,15 @@ namespace Gameplay.Enemies
         
         private IEnumerator DeathRoutine()
         {
-            float t = 0;
-            while (t < 1f)
-            {
-                spriteRenderer.color = GlobalDefinitions.GetDeadColor(t);
-                t += Time.deltaTime;
-                yield return null;
-            }
+            bodyPainter.Paint(GlobalDefinitions.DeathGradient, 1f);
+            rb.mass = 0.001f;
+            yield return new WaitForSeconds(1f);
             
             rb.simulated = false;
-            Color deadColor = GlobalDefinitions.GetDeadColor(1);
-            spriteRenderer.color = deadColor;
-
             yield return new WaitForSeconds(GlobalDefinitions.DespawnTime);
             
-            t = 0;
-            while (t < 1f)
-            {
-                spriteRenderer.color = deadColor.WithAlpha(1 - t);
-                t += Time.deltaTime;
-                yield return null;
-            }
+            bodyPainter.Fade(1f);
+            yield return new WaitForSeconds(1f);
             
             Destroy(gameObject);
         }
@@ -239,9 +241,9 @@ namespace Gameplay.Enemies
             audioController.PlayState(scriptable.CrawlAudio, true, scriptable.CrawlPitch);
         }
         
-        private IEnumerator KnockbackRoutine()
+        private IEnumerator KnockbackRoutine(float duration)
         {
-            float t = 0.25f;
+            float t = duration;
             while (t > 0)
             {
                 stateController.TakeMoveControl();
@@ -252,21 +254,12 @@ namespace Gameplay.Enemies
             stateController.ReturnMoveControl();
         }
         
-        private IEnumerator ImmunityRoutine()
-        {
-            hitbox.Disable();
+        public void AddEffect<T>(EntityEffectData data) where T : EntityEffect
+            => effectController.AddEffect<T>(data);
 
-            float t = 0;
-            while (t < GlobalDefinitions.EnemyImmunityDuration)
-            {
-                spriteRenderer.color = scriptable.GetImmunityFrameColor(t);
-                t += Time.deltaTime;
-                yield return null;
-            }
+        public void ClearEffects() => effectController.ClearAll();
+        
 
-            spriteRenderer.color = scriptable.BodyColor;
-            hitbox.Enable();
-        }
         
         protected virtual void OnDestroy()
         {
@@ -278,6 +271,7 @@ namespace Gameplay.Enemies
         protected virtual void OnDayStart(int day)
         {
             if(debug_Fearless) return;
+            StopAttack();
             stateController.SetEtherial(true);
             stateController.SetState(AIState.Flee);
         }

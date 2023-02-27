@@ -1,4 +1,5 @@
 ﻿using Definitions;
+using Player;
 using UnityEngine;
 
 namespace Util
@@ -20,7 +21,7 @@ namespace Util
 
         public static float GetAngle(this Vector2 v) => Mathf.Atan2(v.y, v.x) * Mathf.Rad2Deg;
         
-        public static float CalculateDamage(float incomingDamage, float armor)
+        public static float CalculateDamage(float incomingDamage, float armor) 
             => incomingDamage * incomingDamage / (incomingDamage + armor);
 
         public static void AddClampedForceTowards

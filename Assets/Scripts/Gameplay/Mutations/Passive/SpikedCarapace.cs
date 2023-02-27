@@ -24,14 +24,14 @@ namespace Gameplay.Abilities.Passive
         [SerializeField] private float damageLvl1;
         [SerializeField] private float damageLvl10;
 
-        private float probability;
+        private float procRate;
         private float damage;
         
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
             if(particleSystem.isPlaying) particleSystem.Stop();
-            probability = LerpLevel(probabilityLvl1, probabilityLvl10, lvl);
+            procRate = LerpLevel(probabilityLvl1, probabilityLvl10, lvl);
             damage = LerpLevel(damageLvl1, damageLvl10, lvl);
             var emission = particleSystem.emission;
             emission.SetBurst(0, new ParticleSystem.Burst(0, 
@@ -45,13 +45,14 @@ namespace Gameplay.Abilities.Passive
         
         private void OnDamageTaken(float dmg)
         {
-            if(dmg >= damageCap || Random.value <= probability) Activate();
+            if(dmg >= damageCap || Random.value <= GetPassiveProcRate(procRate)) 
+                Activate();
         }
         
         private void OnParticleCollision(GameObject other)
         {
             if (other.TryGetComponent(out Enemy enemy)) 
-                enemy.Damage(damage, knockbackPower, stunDuration);
+                enemy.Damage(GetAbilityDamage(damage), knockbackPower, stunDuration, Color.white);
         }
         
         protected override void OnDisable()
@@ -66,7 +67,7 @@ namespace Gameplay.Abilities.Passive
             PlayerHitbox.OnDamageTaken += OnDamageTaken;
         }
         
-        public override string GetLevelDescription(int lvl)
+        public override string GetLevelDescription(int lvl, bool withUpgrade)
         {
             StringBuilder sb = new StringBuilder();
             
@@ -77,7 +78,7 @@ namespace Gameplay.Abilities.Passive
             float dmg = LerpLevel(damageLvl1, damageLvl10, lvl);
             float prevDmg = 0;
 
-            if (lvl > 0)
+            if (lvl > 0 && withUpgrade)
             {
                 var prevLvl = lvl - 1;
                 prevProb = LerpLevel(probabilityLvl1, probabilityLvl10, prevLvl);
@@ -85,11 +86,11 @@ namespace Gameplay.Abilities.Passive
                 prevDmg = LerpLevel(damageLvl1, damageLvl10, prevLvl);
             }
 
-            sb.AddAbilityLine("Trigger chance", prob, prevProb);
+            sb.AddAbilityLine("Trigger chance", prob, prevProb, percent: true);
             sb.AddAbilityLine("Spikes amount", amount, prevAmount);
             sb.AddAbilityLine("Spikes damage", dmg, prevDmg);
             sb.AddAbilityLine("Damage cap", damageCap, 0);
-            sb.AddAbilityLine("Stun duration", stunDuration, 0);
+            sb.AddAbilityLine("Stun duration", stunDuration, 0, suffix: "s");
             sb.AddAbilityLine("Knockback", knockbackPower, 0);
             return sb.ToString();
         }

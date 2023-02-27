@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using Definitions;
+using Gameplay.Abilities.EntityEffects;
 using Gameplay.AI.Locators;
 using Gameplay.Enemies;
 using Gameplay.Food;
@@ -27,8 +28,20 @@ namespace Gameplay.AI
         private float defaultReachDistance;
         private ITransformProvider currentFollowTarget;
         
+        
         public AIState CurrentState { get; private set; }
+        private float speedMultiplier = 1;
+        private float currentSpeed = 1;
 
+        public float SpeedMultiplier
+        {
+            get => speedMultiplier;
+            set
+            {
+                speedMultiplier = value;
+                UpdateMovementSpeed();
+            }
+        }
 
         private void Awake()
         {
@@ -46,7 +59,7 @@ namespace Gameplay.AI
         {            
             yield return new WaitUntil(() => EnemySpawnLocation.InitializedLocationsAmount == EnemySpawner.SpawnLocationsCount);
             SetState(debug_AIState);
-            SetMovementSpeed(enemy.Scriptable.MovementSpeed);
+            UpdateMovementSpeed();
             locator.SetRadius(enemy.Scriptable.LocatorRadius);
         }
 
@@ -128,6 +141,8 @@ namespace Gameplay.AI
             currentFollowTarget = target;
             DisableLocator();
             AutoRepath();
+            currentSpeed = 1;
+            UpdateMovementSpeed();
             destinationSetter.enabled = true;
             aiPath.enabled = true;
             destinationSetter.target = target.Transform;
@@ -150,14 +165,17 @@ namespace Gameplay.AI
             AutoRepath();
             destinationSetter.enabled = false;
             aiPath.enabled = true;
-            SetMovementSpeed(enemy.Scriptable.MovementSpeed * GlobalDefinitions.WanderingSpeedMultiplier);
+            currentSpeed = GlobalDefinitions.WanderingSpeedMultiplier;
+            UpdateMovementSpeed();
             PickRandomDestination();
             aiPath.Callback = PickRandomDestination;
         }
 
         private void SetFlee()
         {
-            SetMovementSpeed(enemy.Scriptable.MovementSpeed * GlobalDefinitions.FleeingSpeedMultiplier);
+            enemy.ClearEffects();
+            currentSpeed = GlobalDefinitions.FleeingSpeedMultiplier;
+            UpdateMovementSpeed();
             SetState(AIState.Exit);
         }
 
@@ -187,7 +205,7 @@ namespace Gameplay.AI
         
         private void DoNotRepath() => aiPath.autoRepath.mode = AutoRepathPolicy.Mode.Never;
         private void AutoRepath() => aiPath.autoRepath.mode = AutoRepathPolicy.Mode.Dynamic;
-        private void SetMovementSpeed(float speed) => aiPath.maxSpeed = speed;
+        private void UpdateMovementSpeed() => aiPath.maxSpeed = currentSpeed * enemy.Scriptable.MovementSpeed * SpeedMultiplier;
 
         public void CancelCallback() => aiPath.Callback = null;
         
@@ -221,11 +239,7 @@ namespace Gameplay.AI
             currentFollowTarget = null;
         }
 
-        private void OnFollowTargetDestroy()
-        {
-            Debug.Log("Target destroy");
-            SetState(AIState.Wander);
-        }
+        private void OnFollowTargetDestroy() => SetState(AIState.Wander);
 
         private void SetDefaultReachDistance() => aiPath.endReachedDistance = defaultReachDistance;
         private void DisableLocator() => locator.gameObject.SetActive(false);

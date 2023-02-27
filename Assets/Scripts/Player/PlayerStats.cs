@@ -15,6 +15,8 @@ namespace Player
         [SerializeField] private float attackDamage;
         [SerializeField] private float armor;
         [SerializeField] private float immunityDuration;
+        [SerializeField] private float abilityDamage;
+        [SerializeField] private float passiveProcRate;
 
         public float MaxHealth => maxHealth;
         public float AttackPower => attackPower;
@@ -23,10 +25,13 @@ namespace Player
         public float ImmunityDuration => immunityDuration;
         public float MovementSpeed => movementSpeed;
         public float RotationSpeed => rotationSpeed;
+        public float AbilityDamage => abilityDamage;
+        public float PassiveProcRate => passiveProcRate;
 
 
         public PlayerStats(float movementSpeed = 0, float rotationSpeed = 0, float maxHealth = 0, 
-            float attackPower = 0, float attackDamage = 0, float armor = 0, float immunityDuration = 0)
+            float attackPower = 0, float attackDamage = 0, float armor = 0, float immunityDuration = 0,
+            float abilityDamage = 0, float passiveProcRate = 0)
         {
             this.movementSpeed = movementSpeed;
             this.rotationSpeed = rotationSpeed;
@@ -35,6 +40,8 @@ namespace Player
             this.attackDamage = attackDamage;
             this.armor = armor;
             this.immunityDuration = immunityDuration;
+            this.abilityDamage = abilityDamage;
+            this.passiveProcRate = passiveProcRate;
         }
 
         public void AddStats(PlayerStats baseStats, PlayerStats stats)
@@ -46,6 +53,8 @@ namespace Player
             attackDamage = Mathf.Clamp(AttackDamage + stats.AttackDamage, baseStats.AttackDamage, float.MaxValue);
             armor = Mathf.Clamp(Armor + stats.Armor, baseStats.Armor, float.MaxValue);
             immunityDuration = Mathf.Clamp(ImmunityDuration + stats.ImmunityDuration, baseStats.ImmunityDuration, float.MaxValue);
+            abilityDamage = Mathf.Clamp(abilityDamage + stats.abilityDamage, baseStats.abilityDamage, float.MaxValue);
+            passiveProcRate = Mathf.Clamp(passiveProcRate + stats.passiveProcRate, baseStats.passiveProcRate, float.MaxValue);
         }
 
         public static PlayerStats LerpLevel(PlayerStats lvl1, PlayerStats lvl10, int level)
@@ -57,7 +66,9 @@ namespace Player
                 attackPower: Mathf.Lerp(lvl1.AttackPower,lvl10.AttackPower,level / 9f),
                 attackDamage: Mathf.Lerp(lvl1.AttackDamage,lvl10.AttackDamage,level / 9f),
                 armor: Mathf.Lerp(lvl1.Armor,lvl10.Armor,level / 9f),
-                immunityDuration: Mathf.Lerp(lvl1.ImmunityDuration,lvl10.ImmunityDuration,level / 9f));
+                immunityDuration: Mathf.Lerp(lvl1.ImmunityDuration,lvl10.ImmunityDuration,level / 9f),
+                abilityDamage: Mathf.Lerp(lvl1.abilityDamage,lvl10.abilityDamage,level / 9f),
+                passiveProcRate: Mathf.Lerp(lvl1.passiveProcRate,lvl10.passiveProcRate,level / 9f));
         }
 
         public PlayerStats Negated()
@@ -69,7 +80,9 @@ namespace Player
                 attackPower: -AttackPower,
                 attackDamage: -AttackDamage,
                 armor: -Armor,
-                immunityDuration: -ImmunityDuration);
+                immunityDuration: -ImmunityDuration,
+                abilityDamage: -abilityDamage,
+                passiveProcRate: -passiveProcRate);
         }
 
         public static PlayerStats Zero => new();
@@ -90,7 +103,9 @@ namespace Player
             if(includeZeros || Armor > 0) 
                 sb.Append("<color=orange>").Append("Armor: ").Append("</color>").Append(Armor.ToString("n1")).Append("\n");
             if(includeZeros || ImmunityDuration > 0) 
-                sb.Append("<color=orange>").Append("Immunity frame: ").Append("</color>").Append(ImmunityDuration.ToString("n1"));
+                sb.Append("<color=orange>").Append("Immunity frame: ").Append("</color>").Append(ImmunityDuration.ToString("n1")).Append("\n");
+            if(includeZeros || abilityDamage > 0) 
+                sb.Append("<color=orange>").Append("Ability damage: ").Append("</color>").Append("+").Append((int) (abilityDamage * 100)).Append("%");
             return sb.ToString();
         }
 
@@ -104,7 +119,8 @@ namespace Player
             if (AttackPower > 0) sb.AddAbilityLine("Attack power", AttackPower, with.attackPower);
             if (AttackDamage > 0) sb.AddAbilityLine("Attack damage", AttackDamage, with.attackDamage);
             if (Armor > 0) sb.AddAbilityLine("Armor", Armor, with.armor);
-            if (ImmunityDuration > 0) sb.AddAbilityLine("Immunity frame", ImmunityDuration, with.immunityDuration);
+            if (ImmunityDuration > 0) sb.AddAbilityLine("Immunity frame", ImmunityDuration, with.immunityDuration, suffix: "s");
+            if (abilityDamage > 0) sb.AddAbilityLine("Ability damage", abilityDamage, with.abilityDamage, percent: true, prefix: "+", suffix: "%");
 
             return sb.ToString();
         }

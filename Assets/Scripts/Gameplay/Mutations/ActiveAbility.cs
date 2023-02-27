@@ -1,4 +1,5 @@
-﻿using Scriptable;
+﻿using Player;
+using Scriptable;
 
 namespace Gameplay.Abilities
 {
@@ -7,7 +8,6 @@ namespace Gameplay.Abilities
         public new ActiveMutation Scriptable => (ActiveMutation) scriptable;
         public float Cooldown => Scriptable.GetCooldown(level);
 
-        
         public abstract void Activate();
     }
 }

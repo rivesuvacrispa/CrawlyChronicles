@@ -35,6 +35,8 @@ namespace Definitions
         [SerializeField] private Color deadColor;
         [SerializeField] private Color eggPuddleColor;
         [SerializeField] private Color[] geneColors = new Color[3];
+        [SerializeField] private Color poisonColor;
+        [SerializeField] private Color lifestealColor;
         [Header("Physics")]
         [SerializeField] private float playerMass = 0.175f;
         [SerializeField] private float maxAppliedForce = 5;
@@ -61,12 +63,13 @@ namespace Definitions
         public static float MaxAppliableForce => instance.maxAppliedForce;
         public static float PlayerMass => instance.playerMass;
         public static float EnemyImmunityDuration => instance.enemyImmunityDuration;
-        
+        public static Color PoisonColor => instance.poisonColor;
+        public static Color LifestealColor => instance.lifestealColor;
+        public static Gradient DeathGradient => deathGradient;
 
 
         public static string GetRomanDigit(int digit) => instance.romanDigits[digit];
         public static Sprite GetEggsBedSprite(int eggsAmount) => instance.eggSprites[Mathf.Clamp(eggsAmount - 1, 0, 5)];
-        public static Color GetDeadColor(float t) => deathGradient.Evaluate(t);
         public static Color GetGeneColor(GeneType geneType) => instance.geneColors[(int) geneType];
         public static int GetMutationCost(int lvl) => (lvl + 1) * instance.mutationCostPerLevel;
 

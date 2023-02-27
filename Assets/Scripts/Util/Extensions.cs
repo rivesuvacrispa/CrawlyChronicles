@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using UnityEngine;
 
 namespace Util
@@ -10,19 +11,49 @@ namespace Util
             return new Color(c.r, c.g, c.b, a);
         }
 
-        public static StringBuilder AddAbilityLine(this StringBuilder sb, string title, float value, float previousValue, bool withPlus = true)
+        public static Gradient FastGradient(this Gradient g, Color a, Color b)
+        {
+            g.SetKeys(
+                new[]
+                {
+                    new GradientColorKey(a, 0),
+                    new GradientColorKey(b, 1)
+                }, new[]
+                {
+                    new GradientAlphaKey(1, 0),
+                    new GradientAlphaKey(1, 1),
+                });
+            return g;
+        }
+
+        public static StringBuilder AddAbilityLine(
+            this StringBuilder sb, 
+            string title, 
+            float value, 
+            float previousValue, 
+            bool withUpgradePlus = true, 
+            bool percent = false,
+            string prefix = "",
+            string suffix = "")
         {
             sb.Append("<color=orange>")
                 .Append(title)
                 .Append(": ")
                 .Append("</color>")
-                .Append(value.ToString("n1"));
+                .Append(prefix)
+                .Append(percent ? $"{(int)(value * 100)}%" : value.ToString("n1"))
+                .Append(suffix);
             
-            if (previousValue != 0) 
+            if (previousValue != 0)
+            {
+                float diff = value - previousValue;
                 sb.Append(" <color=lime>(")
-                .Append(withPlus ? "+" : string.Empty)
-                .Append((value - previousValue).ToString("n1"))
-                .Append(")</color>");
+                    .Append(withUpgradePlus ? "+" : string.Empty)
+                    .Append(percent ? $"{(int)(diff * 100)}%" : diff.ToString("n1"))
+                    .Append(")")
+                    .Append(suffix)
+                    .Append("</color>");
+            }
             
             return sb.Append("\n");
         }

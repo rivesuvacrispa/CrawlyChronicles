@@ -11,6 +11,7 @@ namespace Definitions
         [SerializeField] private bool vSync;
         [SerializeField] private bool ambient;
         [SerializeField] private bool fpsCounter;
+        [SerializeField] private float motionBlur;
 
         public float SfxVolume => sfxVolume;
         public float MusicVolume => musicVolume;
@@ -18,8 +19,9 @@ namespace Definitions
         public bool VSync => vSync;
         public bool Ambient => ambient;
         public bool FpsCounter => fpsCounter;
+        public float MotionBlur => motionBlur;
 
-        public SettingsData(float sfxVolume, float musicVolume, int targetFramerate, bool vSync, bool ambient, bool fpsCounter)
+        public SettingsData(float sfxVolume, float musicVolume, int targetFramerate, bool vSync, bool ambient, bool fpsCounter, float motionBlur)
         {
             this.sfxVolume = sfxVolume;
             this.musicVolume = musicVolume;
@@ -27,6 +29,7 @@ namespace Definitions
             this.vSync = vSync;
             this.ambient = ambient;
             this.fpsCounter = fpsCounter;
+            this.motionBlur = motionBlur;
         }
 
         public static SettingsData Default() => new
@@ -35,6 +38,7 @@ namespace Definitions
                 60,
                 false,
                 true,
-                true);
+                true,
+                0.5f);
     }
 }

@@ -1,7 +1,9 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using Gameplay.Interaction;
 using Scripts.SoundEffects;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Player
 {
@@ -11,13 +13,17 @@ namespace Player
         [SerializeField] private Movement movementComponent;
         [SerializeField] private float dashDuration;
         [SerializeField] private float comboRotationSpeed;
-        [SerializeField] private GameObject attackGO;
+        [FormerlySerializedAs("attackGO")] 
+        [SerializeField] private PlayerAttack attack;
         [SerializeField] private float comboExpirationTime;
 
         private int comboCounter;
         private Coroutine comboExpirationRoutine;
 
-        public bool IsAttacking => attackGO.activeInHierarchy;
+
+        
+        
+        public bool IsAttacking => attack.IsActive;
         public static bool IsInComboDash { get; private set; }
 
         private void Update()
@@ -32,12 +38,12 @@ namespace Player
                     Attack();
             } 
         }
-
+        
         private void Attack()
         {
             if (movementComponent.Dash(dashDuration, 
                 () => {
-                    attackGO.SetActive(false);
+                    attack.Disable();
                     StartComboExpiration();
                     hitbox.Enable();
                 }))
@@ -46,7 +52,7 @@ namespace Player
                     StopCoroutine(comboExpirationRoutine);
                 PlayerAudioController.Instance.PlayAttack(comboCounter);
                 comboCounter++;
-                attackGO.SetActive(true);
+                attack.Enable();
                 hitbox.Disable();
             }
         }
@@ -55,7 +61,7 @@ namespace Player
         {
             if (movementComponent.ComboDash(dashDuration * 2, comboRotationSpeed, 
                 () => {
-                    attackGO.SetActive(false);
+                    attack.Disable();
                     ExpireCombo();
                     hitbox.Enable();
                     PlayerAudioController.Instance.StopAction();
@@ -64,8 +70,9 @@ namespace Player
             {
                 IsInComboDash = true;
                 PlayerAudioController.Instance.PlayCombo();
-                StopCoroutine(comboExpirationRoutine);
-                attackGO.SetActive(true);
+                if(comboExpirationRoutine is not null) 
+                    StopCoroutine(comboExpirationRoutine);
+                attack.Enable();
                 hitbox.Disable();
             }
         }

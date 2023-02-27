@@ -36,15 +36,21 @@ namespace UI
             button.interactable = isAffordable;
         }
 
+        public void OnPopupEnd()
+        {
+            
+        }
+        
         public void Click()
         {
             OnClick(Scriptable, Lvl);
-            Destroy(gameObject);
+            gameObject.SetActive(false);
         }
 
 
         // IAbilityTooltipProvider
         public BasicMutation TooltipData => Scriptable;
         public int Level => Lvl;
+        public bool ShowUpgradeStats => true;
     }
 }

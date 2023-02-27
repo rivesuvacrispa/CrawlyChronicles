@@ -133,7 +133,7 @@ namespace Gameplay.Enemies
         {
             if(diggingRoutine is null) StartCoroutine(FleeRoutine());
         }
-
+        
         private IEnumerator FleeRoutine()
         {
             stateController.SetEtherial(true);

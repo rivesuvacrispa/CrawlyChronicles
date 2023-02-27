@@ -151,7 +151,7 @@ namespace Gameplay
             eggLayRoutine = null;
         }
         
-        private void LayEggs(Vector2 position, TrioGene genes, MutationData mutationData)
+        public void LayEggs(Vector2 position, TrioGene genes, MutationData mutationData)
         {
             var bed = Instantiate(GlobalDefinitions.EggBedPrefab, GlobalDefinitions.GameObjectsTransform);
             int amount = Random.Range(3, 7);

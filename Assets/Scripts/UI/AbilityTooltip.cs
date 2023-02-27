@@ -16,12 +16,12 @@ namespace UI
         [SerializeField] private Image geneTypeImage;
         [SerializeField] private GameObject costGO;
         
-        public void SetTooltip(BasicMutation mutation, int lvl)
+        public void SetTooltip(BasicMutation mutation, int lvl, bool withUpgrade)
         {
             button.SetMutation(mutation, lvl);
             nameText.text = mutation.Name;
             descriptionText.text = mutation.Description + "\n\n" + AbilityController
-                .GetAbilityLevelDescription(mutation, lvl);
+                .GetAbilityLevelDescription(mutation, lvl, withUpgrade);
             costText.text = GlobalDefinitions.GetMutationCost(lvl).ToString();
             geneTypeImage.color = GlobalDefinitions.GetGeneColor(mutation.GeneType);
             rootGO.SetActive(true);

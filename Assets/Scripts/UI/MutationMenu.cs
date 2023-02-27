@@ -68,7 +68,7 @@ namespace UI
             var available = LinqUtility.ToHashSet(allMutations);
             available.ExceptWith(maxed);
 
-            int amount = Random.Range(3, 7);
+            int amount = Random.Range(3, 13);
             if (amount > available.Count) amount = available.Count;
             while (amount > 0)
             {

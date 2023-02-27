@@ -28,8 +28,8 @@ namespace Player
             MainMenu.OnResetRequested += OnResetRequested;
         }
 
-        public static string GetAbilityLevelDescription(BasicMutation mutation, int lvl) 
-            => abilitiesDict[mutation].GetLevelDescription(lvl);
+        public static string GetAbilityLevelDescription(BasicMutation mutation, int lvl, bool withUpgrade) 
+            => abilitiesDict[mutation].GetLevelDescription(lvl, withUpgrade);
 
         public void CreateUIElement(BasicAbility ability)
         {

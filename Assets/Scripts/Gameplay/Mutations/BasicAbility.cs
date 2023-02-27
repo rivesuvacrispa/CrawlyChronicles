@@ -15,12 +15,14 @@ namespace Gameplay.Abilities
         public BasicAbilityButton Button { get; set; }
         public int Level => level;
         public bool Learned { get; private set; }
-        
-        
-        
+
+
+        protected static float GetPassiveProcRate(float proc) => proc * Manager.PlayerStats.PassiveProcRate;
+        protected static float GetAbilityDamage(float damage) => damage + damage * Manager.PlayerStats.AbilityDamage;
+
         private void Awake() => abilityController.CreateUIElement(this);
 
-        private void Start() => SetLevel(level, true);
+        protected virtual void Start() => SetLevel(level, true);
 
         public void SetLevel(int newLevel, bool forceUpdate = false)
         {
@@ -49,6 +51,6 @@ namespace Gameplay.Abilities
             Button.SetActive(true);
         }
 
-        public virtual string GetLevelDescription(int lvl) => string.Empty;
+        public virtual string GetLevelDescription(int lvl, bool withUpgrade) => string.Empty;
     }
 }

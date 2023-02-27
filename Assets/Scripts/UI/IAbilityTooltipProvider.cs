@@ -5,6 +5,7 @@ namespace UI
     public interface IAbilityTooltipProvider
     {
         public BasicMutation TooltipData { get; }
-        int Level { get; }
+        public int Level { get; }
+        public bool ShowUpgradeStats { get; }
     }
 }

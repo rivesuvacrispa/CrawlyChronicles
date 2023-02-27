@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using Definitions;
 using Gameplay.Abilities;
+using Player;
 using Scriptable;
 using UnityEngine;
 using UnityEngine.UI;
@@ -35,11 +36,12 @@ namespace UI
 
         public void Activate()
         {
-            if(onCooldown) return;
+            bool notGodMode = !Manager.Instance.GodMode;
+            if(onCooldown && notGodMode) return;
 
             ActiveAbility activeAbility = (ActiveAbility) ability;
             activeAbility.Activate();
-            StartCoroutine(CooldownRoutine(activeAbility.Cooldown));
+            if(notGodMode) StartCoroutine(CooldownRoutine(activeAbility.Cooldown));
         }
 
         private IEnumerator CooldownRoutine(float duration)

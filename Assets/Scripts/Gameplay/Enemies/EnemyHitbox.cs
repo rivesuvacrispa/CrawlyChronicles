@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using Definitions;
+using Player;
+using UnityEngine;
 
 namespace Gameplay.Enemies
 {
@@ -8,19 +11,29 @@ namespace Gameplay.Enemies
         [SerializeField] private Enemy enemy;
 
         private new Collider2D collider;
+
+
         
         private void Awake() => collider = GetComponent<Collider2D>();
 
         private void OnCollisionEnter2D(Collision2D _)
         {
-            enemy.Damage(Player.Manager.PlayerStats.AttackDamage, 
-                Player.Manager.PlayerStats.AttackPower, 0.5f);
+            float damage = enemy.Damage(Manager.PlayerStats.AttackDamage, 
+                Manager.PlayerStats.AttackPower, 0.35f, Color.white);
+            if(PlayerAttack.CurrentAttackEffect is not null)
+                PlayerAttack.CurrentAttackEffect.Impact(enemy, damage);
+            StartCoroutine(ImmunityRoutine());
         }
 
         public void Enable() => collider.enabled = true;
 
         public void Disable() => collider.enabled = false;
-
-        public bool Enabled => collider.enabled;
+        
+        private IEnumerator ImmunityRoutine()
+        { 
+            Disable();
+            yield return new WaitForSeconds(GlobalDefinitions.EnemyImmunityDuration);
+            Enable();
+        }
     }
 }

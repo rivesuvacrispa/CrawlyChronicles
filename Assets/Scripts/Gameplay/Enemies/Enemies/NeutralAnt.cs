@@ -131,9 +131,10 @@ namespace Gameplay.Enemies
 
         private void OnNeutralDamage(Vector2 pos)
         {
-            if(Vector2.Distance(rb.position, pos) > 7.5f) return;
+            if(Vector2.Distance(rb.position, pos) > 7.5f || stateController.CurrentState == AIState.Enter) return;
             StopInterest();
             aggressive = true;
+            minimapIcon.color = Color.red;
             CanBreed = false;
             stateController.SetState(AIState.Follow, 
                 onTargetReach: BasicAttack,

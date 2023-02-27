@@ -51,6 +51,9 @@ namespace Gameplay.Enemies
         protected override void OnDamageTaken()
         {
             if(holdingEgg is not null) DropEgg();
+            stateController.SetState(AIState.Follow, 
+                onTargetReach: BasicAttack,
+                reachDistance: 0.75f);
         }
 
         private void DropEgg()
