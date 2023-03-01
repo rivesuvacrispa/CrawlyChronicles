@@ -82,7 +82,7 @@ namespace Gameplay.Abilities.Active
                 prevCd = Scriptable.GetCooldown(prevLvl);
                 prevDur = LerpLevel(durationLvl1, durationLvl10, prevLvl);
                 prevSpd = LerpLevel(speedLvl1, speedLvl10, prevLvl);
-                prevDmg = LerpLevel(damageBoostLvl1, damageBoostLvl10, lvl);
+                prevDmg = LerpLevel(damageBoostLvl1, damageBoostLvl10, prevLvl);
             }
 
             sb.AddAbilityLine("Cooldown", Scriptable.GetCooldown(lvl), prevCd, false, suffix: "s");

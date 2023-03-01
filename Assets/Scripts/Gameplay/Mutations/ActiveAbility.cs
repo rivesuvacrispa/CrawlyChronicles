@@ -1,5 +1,4 @@
-﻿using Player;
-using Scriptable;
+﻿using Scriptable;
 
 namespace Gameplay.Abilities
 {

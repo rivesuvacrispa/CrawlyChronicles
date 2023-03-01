@@ -51,9 +51,7 @@ namespace Gameplay.Enemies
         {
             InterruptDigging();
             DigIn(3f);
-            stateController.SetState(AIState.Follow, 
-                onTargetReach: BasicAttack,
-                reachDistance: 0.75f);
+            AttackPlayer();
         }
 
         private void InterruptDigging()
@@ -84,6 +82,7 @@ namespace Gameplay.Enemies
             stateController.TakeMoveControl();
             animator.Play(DiggingInAnimHash);
             yield return new WaitForSeconds(9 / 11f);
+            minimapIcon.gameObject.SetActive(false);
             digged = true;
             diggingRoutine = null;
             stateController.SetEtherial(true);
@@ -104,6 +103,7 @@ namespace Gameplay.Enemies
             animator.Play(DiggingOutAnimHash);
             dirtParticles.Stop();
             yield return new WaitForSeconds(2 / 11f);
+            minimapIcon.gameObject.SetActive(true);
             digged = false;
             stateController.SetEtherial(false);
             yield return new WaitForSeconds(9 / 11f);

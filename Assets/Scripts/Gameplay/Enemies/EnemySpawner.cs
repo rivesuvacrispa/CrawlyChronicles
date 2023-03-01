@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Definitions;
+using Scriptable;
 using Timeline;
 using UI;
 using UnityEngine;
@@ -11,13 +12,17 @@ namespace Gameplay.Enemies
     {
         [SerializeField] private Enemy neutral;
         [SerializeField] private EnemyList enemyList = new();
-        [SerializeField] private int neutralsPerMinute = 6;
-        [SerializeField] private int enemyPerMinute;
-        [SerializeField] private int enemyPerDayModifier = 10;
         [SerializeField] private Transform enemySpawnPointsTransform;
+        [Header("Spawn rates")]
+        [SerializeField] private float neutralsPerMinute;
+        [SerializeField] private float enemyPerMinute;
+        [SerializeField] private float enemyPerDayModifier;
 
-        private readonly List<EnemySpawnLocation> enemySpawnPoints = new();
+        // Depends on difficulty
+        private float currentEnemyPerMinute;
+        private float currentEnemyPerDay;
         
+        private readonly List<EnemySpawnLocation> enemySpawnPoints = new();
         public static int SpawnLocationsCount { get; private set; }
         
         
@@ -26,9 +31,11 @@ namespace Gameplay.Enemies
             foreach (Transform child in enemySpawnPointsTransform)
                 enemySpawnPoints.Add(child.GetComponent<EnemySpawnLocation>());
             SpawnLocationsCount = enemySpawnPoints.Count;
-            MainMenu.OnResetRequested += OnResetRequested;
+            SubToEvents();
         }
-        
+
+        private void Start() => OnDifficultyChanged(SettingsMenu.SelectedDifficulty);
+
         private void SpawnEnemy(Enemy toSpawn, EnemySpawnLocation location)
         {
             Enemy enemy = Instantiate(toSpawn, GlobalDefinitions.GameObjectsTransform);
@@ -52,7 +59,7 @@ namespace Gameplay.Enemies
                 {
                     var day = TimeManager.Instance.DayCounter - 1;
                     SpawnEnemy(enemyList.GetRandomEnemyForDay(day), GetRandomSpawnPoint());
-                    yield return new WaitForSeconds(60f / (enemyPerMinute + enemyPerDayModifier * day));
+                    yield return new WaitForSeconds(60f / (currentEnemyPerMinute + currentEnemyPerDay * day));
                 }
             }
         }
@@ -64,8 +71,26 @@ namespace Gameplay.Enemies
             StopAllCoroutines();
             StartCoroutine(SpawnRoutine());
         }
-        private void OnDestroy() => MainMenu.OnResetRequested -= OnResetRequested;
+
+        private void OnDifficultyChanged(Difficulty difficulty)
+        {
+            float modifier = difficulty.EnemySpawnRate;
+            currentEnemyPerMinute = enemyPerMinute * modifier;
+            currentEnemyPerDay = enemyPerDayModifier * modifier;
+        }
         
+        private void SubToEvents()
+        {
+            MainMenu.OnResetRequested += OnResetRequested;
+            SettingsMenu.OnDifficultyChanged += OnDifficultyChanged;
+        }
+        
+        private void OnDestroy()
+        {
+            MainMenu.OnResetRequested -= OnResetRequested;
+            SettingsMenu.OnDifficultyChanged -= OnDifficultyChanged;
+        }
+
 
         private EnemySpawnLocation GetRandomSpawnPoint() => enemySpawnPoints[Random.Range(0, enemySpawnPoints.Count)];
     }

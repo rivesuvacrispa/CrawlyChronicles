@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using UnityEngine;
 
 namespace Util
@@ -41,7 +40,7 @@ namespace Util
                 .Append(": ")
                 .Append("</color>")
                 .Append(prefix)
-                .Append(percent ? $"{(int)(value * 100)}%" : value.ToString("n1"))
+                .Append(percent ? $"{(int)(value * 100)}%" : value.ToString("0.##"))
                 .Append(suffix);
             
             if (previousValue != 0)
@@ -49,9 +48,9 @@ namespace Util
                 float diff = value - previousValue;
                 sb.Append(" <color=lime>(")
                     .Append(withUpgradePlus ? "+" : string.Empty)
-                    .Append(percent ? $"{(int)(diff * 100)}%" : diff.ToString("n1"))
-                    .Append(")")
+                    .Append(percent ? $"{(int)(diff * 100)}%" : diff.ToString("0.##"))
                     .Append(suffix)
+                    .Append(")")
                     .Append("</color>");
             }
             

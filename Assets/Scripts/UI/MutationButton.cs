@@ -44,7 +44,8 @@ namespace UI
         public void Click()
         {
             OnClick(Scriptable, Lvl);
-            gameObject.SetActive(false);
+            foreach (Transform t in transform) 
+                t.gameObject.SetActive(false);
         }
 
 

@@ -6,30 +6,31 @@ using Gameplay.Abilities;
 using Gameplay.Enemies;
 using Genes;
 using Player;
+using Scriptable;
 using UI;
 using UnityEngine;
 using UnityEngine.UI;
 using Util;
+using Random = UnityEngine.Random;
 
 namespace Gameplay
 {
     public class BreedingManager : MonoBehaviour, INotificationProvider
     {
         public static BreedingManager Instance { get; private set; }
-
+        [Header("Definitions")]
+        [SerializeField] private float mutationRerollCost;
+        [SerializeField] private int breedingFoodRequirement;
+        [SerializeField] private int pregnancyDuration = 5;
+        [Header("Refs")]
         [SerializeField] private BreedingMenu breedingMenu;
         [SerializeField] private GeneDisplay geneDisplay;
-        [SerializeField] private int pregnancyDuration = 5;
         [SerializeField] private Animator animator;
         [SerializeField] private ParticleSystem breedingParticles;
         [SerializeField] private GeneConsumer geneConsumer;
-        [Header("Eggs")]
         [SerializeField] private Text totalEggsText;
-        [Header("Food")]
         [SerializeField] private Text foodText;
-        [SerializeField] private int breedingFoodRequirement;
 
-        private int totalEggsAmount;
         private int currentFoodAmount;
         private PopupNotification popupNotification;
         private static int eggLayingTimer;
@@ -38,17 +39,25 @@ namespace Gameplay
         private readonly int breedAnimHash = Animator.StringToHash("PlayerBodyBreeding");
         private readonly int idleAnimHash = Animator.StringToHash("PlayerBodyIdle");
 
+        // Depends on difficulty
+        private float currentMutationRerollCost;
+        private int currentBreedingFoodRequirement;
+
+        public static int TotalEggsAmount { get; private set; }
         [field:SerializeField] public TrioGene TrioGene { get; private set; } = TrioGene.Zero;
-        public bool CanBreed => currentFoodAmount >= breedingFoodRequirement && eggLayingTimer == 0;
+        public bool CanBreed => currentFoodAmount >= currentBreedingFoodRequirement && eggLayingTimer == 0;
+        public float MutationRerollCost => currentMutationRerollCost;
         
         
         
-        private void Awake()
+        private void Awake() => Instance = this;
+
+        private void Start()
         {
-            Instance = this;
+            OnDifficultyChanged(SettingsMenu.SelectedDifficulty);
             SetCurrentFoodAmount(0);
             SetTotalEggsAmount(0);
-            MainMenu.OnResetRequested += OnResetRequested;
+            SubToEvents();
         }
 
         private void OnResetRequested()
@@ -68,14 +77,14 @@ namespace Gameplay
         
         private void SetTotalEggsAmount(int newAmount)
         {
-            totalEggsAmount = newAmount;
+            TotalEggsAmount = newAmount;
             UpdateTotalEggsText();
         }
         
-        public void AddGene(GeneType geneType)
+        public void AddGene(GeneType geneType, int amount)
         {
             geneConsumer.ConsumeGene(geneType);
-            TrioGene.AddGene(geneType);
+            TrioGene.AddGene(geneType, amount);
             geneDisplay.UpdateGeneText(TrioGene, geneType);
         }
 
@@ -87,20 +96,20 @@ namespace Gameplay
         
         private void UpdateTotalEggsText()
         {
-            totalEggsText.text = totalEggsAmount.ToString();
-            totalEggsText.color = totalEggsAmount == 0 ? Color.red : Color.white;
+            totalEggsText.text = TotalEggsAmount.ToString();
+            totalEggsText.color = TotalEggsAmount == 0 ? Color.red : Color.white;
         }
         
         private void UpdateFoodText()
         {
-            foodText.text = $"{currentFoodAmount}/{breedingFoodRequirement}";
-            foodText.color = currentFoodAmount >= breedingFoodRequirement ? Color.green : Color.white;
+            foodText.text = $"{currentFoodAmount}/{currentBreedingFoodRequirement}";
+            foodText.color = currentFoodAmount >= currentBreedingFoodRequirement ? Color.green : Color.white;
         }
 
         
         public void AddTotalEggsAmount(int amount)
         {
-            totalEggsAmount += amount;
+            TotalEggsAmount += amount;
             UpdateTotalEggsText();
         }
 
@@ -127,7 +136,7 @@ namespace Gameplay
         {
             StatRecorder.timesBreed++;
             breedingParticles.Play();
-            currentFoodAmount -= breedingFoodRequirement;
+            currentFoodAmount -= currentBreedingFoodRequirement;
             eggLayingTimer = pregnancyDuration;
             eggLayRoutine = StartCoroutine(EggLayRoutine(genes, mutationData));
             UpdateFoodText();
@@ -145,7 +154,7 @@ namespace Gameplay
             }
             
             breedingParticles.Stop();
-            LayEggs(Player.Movement.Position, genes, mutationData);
+            LayEggs(Movement.Position, genes, mutationData);
             Destroy(popupNotification.gameObject);
             popupNotification = null;
             eggLayRoutine = null;
@@ -187,11 +196,25 @@ namespace Gameplay
         {
             breedingMenu.Open(partner);
         }
+        
+        private void OnDifficultyChanged(Difficulty difficulty)
+        {
+            currentMutationRerollCost = mutationRerollCost * difficulty.GeneRerollCost;
+            currentBreedingFoodRequirement = Mathf.FloorToInt(breedingFoodRequirement * difficulty.BreedingCost);
+            UpdateFoodText();
+        }
+
+        private void SubToEvents()
+        {
+            MainMenu.OnResetRequested += OnResetRequested;
+            SettingsMenu.OnDifficultyChanged += OnDifficultyChanged;
+        }
 
         private void OnDestroy()
         {
             OnProviderDestroy?.Invoke();
             MainMenu.OnResetRequested -= OnResetRequested;
+            SettingsMenu.OnDifficultyChanged -= OnDifficultyChanged;
         }
 
 

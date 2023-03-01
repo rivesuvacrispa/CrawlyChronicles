@@ -12,18 +12,19 @@ namespace Genes
     {
         [SerializeField] private new Light2D light;
         [SerializeField] private SpriteRenderer spriteRenderer;
-        [SerializeField] private GeneType geneType = GeneType.Neutral;
+        [SerializeField] private GeneType geneType = GeneType.Adaptive;
+        [SerializeField] private int amount = -1;
 
         private void Start()
         {
-            SetGeneType(geneType);
-            enabled = false;
+            if(amount == -1) SetData(geneType, 1);
             StartCoroutine(SpawnRoutine());
             MainMenu.OnResetRequested += OnResetRequested;
         }
         
-        public GeneDrop SetGeneType(GeneType newType)
+        public GeneDrop SetData(GeneType newType, int count)
         {
+            amount = count;
             geneType = newType;
             Color geneColor = GlobalDefinitions.GetGeneColor(newType);
             light.color = geneColor;
@@ -58,12 +59,13 @@ namespace Genes
             }
 
             StatRecorder.genesCollected++;
-            BreedingManager.Instance.AddGene(geneType);
+            BreedingManager.Instance.AddGene(geneType, amount);
             Destroy(gameObject);
         }
 
         private IEnumerator SpawnRoutine()
         {
+            enabled = false;
             yield return new WaitForSeconds(0.75f);
             enabled = true;
         }

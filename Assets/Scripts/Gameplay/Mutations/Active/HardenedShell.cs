@@ -80,13 +80,13 @@ namespace Gameplay.Abilities.Active
                 prevCd = Scriptable.GetCooldown(prevLvl);
                 prevDur = LerpLevel(durationLvl1, durationLvl10, prevLvl);
                 prevArm = LerpLevel(armorLvl1, armorLvl10, prevLvl);
-                prevProc = LerpLevel(procChanceLvl1, procChanceLvl10, lvl);
+                prevProc = LerpLevel(procChanceLvl1, procChanceLvl10, prevLvl);
             }
 
             sb.AddAbilityLine("Cooldown", Scriptable.GetCooldown(lvl), prevCd, false, suffix: "s");
             sb.AddAbilityLine("Duration", dur, prevDur, suffix: "s");
             sb.AddAbilityLine("Armor boost", arm, prevArm, percent: true);
-            sb.AddAbilityLine("Proc chance boost", proc, prevProc, percent: true);
+            sb.AddAbilityLine("Procs boost", proc, prevProc, percent: true);
             
             return sb.ToString();
         }

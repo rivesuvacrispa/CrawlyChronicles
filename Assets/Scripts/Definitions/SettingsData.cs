@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Util;
 
 namespace Definitions
 {
@@ -12,6 +13,7 @@ namespace Definitions
         [SerializeField] private bool ambient;
         [SerializeField] private bool fpsCounter;
         [SerializeField] private float motionBlur;
+        [SerializeField] private OverallDifficulty difficulty;
 
         public float SfxVolume => sfxVolume;
         public float MusicVolume => musicVolume;
@@ -20,8 +22,13 @@ namespace Definitions
         public bool Ambient => ambient;
         public bool FpsCounter => fpsCounter;
         public float MotionBlur => motionBlur;
+        public OverallDifficulty Difficulty
+        {
+            get => difficulty;
+            set => difficulty = value;
+        }
 
-        public SettingsData(float sfxVolume, float musicVolume, int targetFramerate, bool vSync, bool ambient, bool fpsCounter, float motionBlur)
+        public SettingsData(float sfxVolume, float musicVolume, int targetFramerate, bool vSync, bool ambient, bool fpsCounter, float motionBlur, OverallDifficulty difficulty)
         {
             this.sfxVolume = sfxVolume;
             this.musicVolume = musicVolume;
@@ -30,6 +37,7 @@ namespace Definitions
             this.ambient = ambient;
             this.fpsCounter = fpsCounter;
             this.motionBlur = motionBlur;
+            this.difficulty = difficulty;
         }
 
         public static SettingsData Default() => new
@@ -39,6 +47,7 @@ namespace Definitions
                 false,
                 true,
                 true,
-                0.5f);
+                0.5f,
+                OverallDifficulty.Affordable);
     }
 }

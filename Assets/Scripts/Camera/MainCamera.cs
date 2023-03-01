@@ -11,7 +11,7 @@ namespace Camera
         private UnityEngine.Camera cam;
         private static MainCamera instance;
         
-        public static Vector3 WorldMousePos { get; private set; }
+        public static Vector2 WorldMousePos { get; private set; }
 
 
         public static void ToggleFreeMode()

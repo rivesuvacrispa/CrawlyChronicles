@@ -1,5 +1,4 @@
-﻿using Gameplay.AI;
-using Gameplay.Food;
+﻿using Gameplay.Food;
 
 namespace Gameplay.Enemies
 {
@@ -7,16 +6,12 @@ namespace Gameplay.Enemies
     {
         public override void OnMapEntered()
         {
-            stateController.SetState(AIState.Follow, 
-                onTargetReach: BasicAttack,
-                reachDistance: 1.25f);
+            AttackPlayer();
         }
 
         public override void OnPlayerLocated()
         {
-            stateController.SetState(AIState.Follow, 
-                onTargetReach: BasicAttack,
-                reachDistance: 1.25f);
+            AttackPlayer();
         }
 
         public override void OnEggsLocated(EggBed eggBed)

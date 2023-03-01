@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using Definitions;
-using Gameplay.Abilities.EntityEffects;
 using Gameplay.AI.Locators;
 using Gameplay.Enemies;
 using Gameplay.Food;

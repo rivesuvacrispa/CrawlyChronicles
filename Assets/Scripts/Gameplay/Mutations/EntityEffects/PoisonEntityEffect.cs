@@ -13,7 +13,13 @@ namespace Gameplay.Abilities.EntityEffects
         protected override void Tick()
         {
             PoisonEffectData data = (PoisonEffectData) Data;
-            Enemy.Damage(data.Damage, 0.1f, 0, GlobalDefinitions.PoisonColor, true);
+            Enemy.Damage(
+                data.Damage, 
+                Player.Movement.Position, 
+                0.1f,
+                0, 
+                GlobalDefinitions.PoisonColor,
+                true);
         }
 
         protected override void OnRemoved() => Enemy.SetMovementSpeed(1f);

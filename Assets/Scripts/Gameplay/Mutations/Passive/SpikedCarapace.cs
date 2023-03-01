@@ -10,7 +10,6 @@ namespace Gameplay.Abilities.Passive
     public class SpikedCarapace : BasicAbility
     {
         [SerializeField] private new ParticleSystem particleSystem;
-        [SerializeField] private int damageCap;
         [Header("Trigger chance")]
         [SerializeField, Range(0, 1)] private float probabilityLvl1;
         [SerializeField, Range(0, 1)] private float probabilityLvl10;
@@ -43,28 +42,32 @@ namespace Gameplay.Abilities.Passive
             particleSystem.Play();
         }
         
-        private void OnDamageTaken(float dmg)
+        private void OnStruck(float dmg)
         {
-            if(dmg >= damageCap || Random.value <= GetPassiveProcRate(procRate)) 
-                Activate();
+            if(Random.value <= GetPassiveProcRate(procRate)) Activate();
         }
         
         private void OnParticleCollision(GameObject other)
         {
-            if (other.TryGetComponent(out Enemy enemy)) 
-                enemy.Damage(GetAbilityDamage(damage), knockbackPower, stunDuration, Color.white);
+            if (other.TryGetComponent(out IDamageableEnemy enemy)) 
+                enemy.Damage(
+                    GetAbilityDamage(damage),
+                    Movement.Position,
+                    knockbackPower,
+                    stunDuration,
+                    Color.white);
         }
         
         protected override void OnDisable()
         {
             base.OnDisable();
-            PlayerHitbox.OnDamageTaken -= OnDamageTaken;
+            PlayerHitbox.OnStruck -= OnStruck;
         }
 
         protected override void OnEnable()
         {
             base.OnEnable();
-            PlayerHitbox.OnDamageTaken += OnDamageTaken;
+            PlayerHitbox.OnStruck += OnStruck;
         }
         
         public override string GetLevelDescription(int lvl, bool withUpgrade)
@@ -89,7 +92,6 @@ namespace Gameplay.Abilities.Passive
             sb.AddAbilityLine("Trigger chance", prob, prevProb, percent: true);
             sb.AddAbilityLine("Spikes amount", amount, prevAmount);
             sb.AddAbilityLine("Spikes damage", dmg, prevDmg);
-            sb.AddAbilityLine("Damage cap", damageCap, 0);
             sb.AddAbilityLine("Stun duration", stunDuration, 0, suffix: "s");
             sb.AddAbilityLine("Knockback", knockbackPower, 0);
             return sb.ToString();

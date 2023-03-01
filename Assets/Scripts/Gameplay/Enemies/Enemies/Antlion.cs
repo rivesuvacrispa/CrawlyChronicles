@@ -51,9 +51,7 @@ namespace Gameplay.Enemies
             if (funnel is not null) funnel.enabled = false;
             funnelingRoutine = null;
             animator.speed = 1;
-            stateController.SetState(AIState.Follow, 
-                onTargetReach: BasicAttack,
-                reachDistance: 1.25f);
+            AttackPlayer();
         }
         
         private void StartFunneling()

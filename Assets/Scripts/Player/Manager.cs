@@ -2,6 +2,7 @@
 using GameCycle;
 using Gameplay;
 using Gameplay.Interaction;
+using Scripts.SoundEffects;
 using Timeline;
 using UI;
 using UnityEngine;
@@ -14,6 +15,7 @@ namespace Player
     {
         public static Manager Instance { get; private set; }
 
+        [SerializeField] private PlayerHitbox hitbox;
         [SerializeField] private ParticleSystem healingParticles;
         [SerializeField] private Animator spriteAnimator;
         [SerializeField] private Movement movement;
@@ -105,17 +107,31 @@ namespace Player
             UpdateHealthbar();
         }
         
-        public void Damage(float damage)
+        public float Damage(
+            float damage, 
+            Vector3 position,
+            float knockback, 
+            float stunDuration = 0, 
+            Color damageColor = default,
+            bool ignoreArmor = false)
         {
-            health -= PhysicsUtility.CalculateDamage(damage, currentStats.Armor);
+            if (hitbox.Immune || GodMode) return 0;
+            PlayerAudioController.Instance.PlayHit();
+            movement.Knockback(position, knockback);
+            damage = ignoreArmor ? damage : PhysicsUtility.CalculateDamage(damage, currentStats.Armor);
+            health -= damage;
             UpdateHealthbar();
             if (health <= float.Epsilon) Die();
+            else hitbox.Hit();
+            return damage;
         }
+        
+        public void Knockback(Vector2 pos, float knockback) => movement.Knockback(pos, knockback);
 
         private void UpdateHealthbar()
         {
             healthbar.SetValue(health / currentStats.MaxHealth);
-            healthText.text = health.ToString("n2");
+            healthText.text = health.ToString("0.##");
         }
         
         public void Die()

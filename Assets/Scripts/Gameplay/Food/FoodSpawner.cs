@@ -1,8 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Scriptable;
 using UI;
 using UnityEngine;
+using Util;
 
 namespace Gameplay.Food
 {
@@ -12,23 +14,24 @@ namespace Gameplay.Food
         [SerializeField] private Transform foodSpawnPointsTransform;
         [SerializeField] private float foodPerMinute;
 
+        // Depends on difficulty
+        private float currentFoodPerMinute;
+        
         private readonly List<FoodSpawnPoint> foodSpawnPoints = new();
 
         private void Awake()
         {
             foreach (Transform child in foodSpawnPointsTransform)
                 foodSpawnPoints.Add(child.gameObject.GetComponent<FoodSpawnPoint>());
-            MainMenu.OnResetRequested += OnResetRequested;
+            SubToEvents();
         }
 
-        private void OnDestroy()
-        {
-            MainMenu.OnResetRequested -= OnResetRequested;
-        }
+
 
         private void Start()
         {
             StartCoroutine(FoodSpawningRoutine());
+            OnDifficultyChanged(SettingsMenu.SelectedDifficulty);
         }
 
         private void OnResetRequested()
@@ -50,9 +53,9 @@ namespace Gameplay.Food
 
         private IEnumerator FoodSpawningRoutine()
         {
-            while (foodPerMinute > 0)
+            while (currentFoodPerMinute > 0)
             {
-                float delay = 60f / foodPerMinute;
+                float delay = 60f / currentFoodPerMinute;
                 delay -= delay * Random.value * 0.3f - 0.15f;
                 yield return new WaitForSeconds(delay);
                 
@@ -61,5 +64,19 @@ namespace Gameplay.Food
         }
 
         private FoodBed GetRandomFood() => foodPrefabs[Random.Range(0, foodPrefabs.Count)];
+
+        private void OnDifficultyChanged(Difficulty difficulty) => currentFoodPerMinute = foodPerMinute * difficulty.FoodSpawnRate;
+        
+        private void SubToEvents()
+        {
+            MainMenu.OnResetRequested += OnResetRequested;
+            SettingsMenu.OnDifficultyChanged += OnDifficultyChanged;
+        }
+        
+        private void OnDestroy()
+        {
+            MainMenu.OnResetRequested -= OnResetRequested;
+            SettingsMenu.OnDifficultyChanged -= OnDifficultyChanged;
+        }
     }
 }

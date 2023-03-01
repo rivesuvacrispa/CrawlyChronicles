@@ -1,15 +1,19 @@
 ﻿using System.Text;
 using Definitions;
-using Gameplay.Enemies;
 using Player;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Util;
 
 namespace Gameplay.Abilities.Active
 {
     public class AcidSpray : ActiveAbility
     {
-        [SerializeField] private new ParticleSystem particleSystem;
+        [FormerlySerializedAs("particleSystem")] 
+        [SerializeField] private ParticleSystem basicParticleSystem;
+        [SerializeField] private ParticleSystem comboParticleSystem;
+        [SerializeField] private ParticleCollisionProvider provider1;
+        [SerializeField] private ParticleCollisionProvider provider2;
         [Header("Particles amount")] 
         [SerializeField] private int amountLvl1;
         [SerializeField] private int amountLvl10;
@@ -26,23 +30,52 @@ namespace Gameplay.Abilities.Active
         
         private float damage;
 
+        protected override void Start()
+        {
+            base.Start();
+            provider1.OnCollision += OnBulletCollision;
+            provider2.OnCollision += OnBulletCollision;
+        }
+
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
-            if(particleSystem.isPlaying) particleSystem.Stop();
+            if(basicParticleSystem.isPlaying) basicParticleSystem.Stop();
+            if(comboParticleSystem.isPlaying) comboParticleSystem.Stop();
             damage = LerpLevel(damageLvl1, damageLvl10, lvl);
-            var emission = particleSystem.emission;
-            var shape = particleSystem.shape;
-            shape.angle = LerpLevel(amountLvl1, amountLvl10, lvl);
-            emission.SetBurst(0, new ParticleSystem.Burst(0, LerpLevel(angleLvl1, angleLvl10, lvl)));
+            var emission = basicParticleSystem.emission;
+            var shape = basicParticleSystem.shape;
+            shape.angle = LerpLevel(angleLvl1, angleLvl10, lvl);
+            emission.SetBurst(0, new ParticleSystem.Burst(0, LerpLevel(amountLvl1, amountLvl10, lvl)));
+            emission = comboParticleSystem.emission;
+            emission.SetBurst(0, new ParticleSystem.Burst(0, 2 *LerpLevel(amountLvl1, amountLvl10, lvl)));
+
         }
 
-        public override void Activate() => particleSystem.Play();
-
-        private void OnParticleCollision(GameObject other)
+        public override void Activate()
         {
-            if (other.TryGetComponent(out Enemy enemy)) 
-                enemy.Damage(GetAbilityDamage(damage), knockbackPower, stunDuration, GlobalDefinitions.PoisonColor, ignoreArmor: true);
+            if (AttackController.IsInComboDash)
+                comboParticleSystem.Play();
+            else
+                basicParticleSystem.Play();
+        }
+        
+        private void OnBulletCollision(IDamageable damageable)
+        {
+            if(damageable is IDamageableEnemy enemy)
+                enemy.Damage(
+                    GetAbilityDamage(damage), 
+                    Movement.Position,
+                    knockbackPower, 
+                    stunDuration, 
+                    GlobalDefinitions.PoisonColor, 
+                    ignoreArmor: true);
+        }
+
+        private void OnDestroy()
+        {
+            provider1.OnCollision -= OnBulletCollision;
+            provider2.OnCollision -= OnBulletCollision;
         }
 
         public override string GetLevelDescription(int lvl, bool withUpgrade)

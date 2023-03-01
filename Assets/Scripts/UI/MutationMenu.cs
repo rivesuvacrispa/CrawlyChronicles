@@ -16,7 +16,7 @@ namespace UI
     public class MutationMenu : MonoBehaviour
     {
         private static MutationMenu instance;
-        
+
         [SerializeField] private RespawnManager respawnManager;
         [SerializeField] private AbilityTooltip tooltip;
         [SerializeField] private Transform currentMutationsTransform;
@@ -25,6 +25,7 @@ namespace UI
         [SerializeField] private MutationButton mutationButtonPrefab;
         [SerializeField] private GeneDisplay geneDisplay;
         [SerializeField] private List<BasicMutation> allMutations = new();
+        [SerializeField] private MutationsRerollButton rerollButton;
 
         [SerializeField] private Egg hatchingEgg = new(TrioGene.Zero, new MutationData());
 
@@ -32,11 +33,12 @@ namespace UI
         private TrioGene genesLeft;
         private readonly Dictionary<BasicMutation, BasicAbilityButton> basicAbilityButtons = new();
         private Dictionary<BasicMutation, int> current = new();
-
+        private TrioGene rerollCost;
+        
         [Header("Debug")]
         public BasicMutation debug_MutationToAdd;
         public int debug_MutationLevelToAdd;
-
+        
         public Egg HatchingEgg => hatchingEgg;
 
 
@@ -55,7 +57,9 @@ namespace UI
             geneDisplay.UpdateTrioText(genesLeft);
             current = egg.MutationData.GetAll();
             ShowCurrentMutations();
+            UpdateRerollButton();
             CreateMutations();
+            
             gameObject.SetActive(true);
         }
 
@@ -120,6 +124,7 @@ namespace UI
             genesLeft.SetGene(mutation.GeneType, genesLeft.GetGene(mutation.GeneType) - cost);
             geneDisplay.UpdateTrioText(genesLeft);
             RefreshAffrodable();
+            UpdateRerollButton();
             StatRecorder.timesMutated++;
         }
 
@@ -131,7 +136,7 @@ namespace UI
             btn.GetComponent<AbilityTooltipProvider>().SetTooltip(tooltip);
             basicAbilityButtons.Add(mutation, btn);
         }
-        
+
         private bool CanAfford(BasicMutation mutation, int level) =>
             genesLeft.GetGene(mutation.GeneType) >= GlobalDefinitions.GetMutationCost(level);
 
@@ -162,8 +167,25 @@ namespace UI
             }
         }
         
+        public void Reroll()
+        {
+            genesLeft.SetGene(0, genesLeft.GetGene(0) - rerollCost.GetGene(0));
+            genesLeft.SetGene(1, genesLeft.GetGene(1) - rerollCost.GetGene(1));
+            genesLeft.SetGene(2, genesLeft.GetGene(2) - rerollCost.GetGene(2));
+            geneDisplay.UpdateTrioText(genesLeft);
+            foreach (Transform t in newMutationsTransform) 
+                Destroy(t.gameObject);
+            UpdateRerollButton();
+            CreateMutations();
+        }
         
-        
+        private void UpdateRerollButton()
+        {
+            rerollCost = genesLeft.AsRerollCost(BreedingManager.Instance.MutationRerollCost);
+            rerollButton.SetCost(rerollCost, genesLeft);
+        }
+
+
         // Utils
         public void ClearAll()
         {
@@ -182,7 +204,7 @@ namespace UI
         public void Refresh()
         {
             ClearAll();
-            ShowNonStatic(MutationTarget.Egg, hatchingEgg);
+            ShowNonStatic(mutationTarget, hatchingEgg);
         }
 
         public void Save()

@@ -35,7 +35,7 @@ namespace Genes
 
         private IEnumerator ConsumingRoutine(Color color, float duration)
         {
-            hitbox.BlockColor = true;
+            hitbox.BlockColorChange = true;
             light.intensity = initialIntensity;
             light.color = color;
             light.enabled = true;
@@ -64,7 +64,7 @@ namespace Genes
                 yield return null;
             }
 
-            hitbox.BlockColor = false;
+            hitbox.BlockColorChange = false;
             light.enabled = false;
             spriteRenderer.color = normalSpriteColor;
             routine = null;

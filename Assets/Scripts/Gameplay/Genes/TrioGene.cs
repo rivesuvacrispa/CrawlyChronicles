@@ -11,7 +11,8 @@ namespace Genes
 
         public int GetGene(GeneType geneType) => trio[(int) geneType];
         public int GetGene(int geneType) => trio[geneType];
-        public void SetGene(GeneType geneType, int amount) => trio[(int) geneType] = amount;
+        public void SetGene(GeneType geneType, int amount) => SetGene((int) geneType, amount);
+        public void SetGene(int geneType, int amount) => trio[geneType] = amount;
         public void AddGene(GeneType geneType) => trio[(int) geneType]++;
         public void AddGene(GeneType geneType, int amount) => trio[(int) geneType] += amount;
         
@@ -42,6 +43,14 @@ namespace Genes
                 Math.Abs(universal)
             };
         }
+
+        public TrioGene Multiply(float value)
+        {
+            return new TrioGene(
+                (int)(trio[0] * value), 
+                (int)(trio[1] * value), 
+                (int)(trio[2] * value));
+        }
         
         public TrioGene Randomize(int entropy)
         {
@@ -51,6 +60,25 @@ namespace Genes
                 Random.Range(Universal - entropy, Universal + entropy + 1));
         }
 
+        public TrioGene AsRerollCost(float cost)
+        {
+            int minValue = int.MaxValue;
+            int minIndex = 0;
+            for (var i = 0; i < trio.Length; i++)
+            {
+                if (trio[i] > minValue) continue;
+                minIndex = i;
+                minValue = trio[i];
+            }
+            
+            TrioGene costTrio = new TrioGene(
+                  (int) Mathf.Clamp(trio[0] * cost, 5, 500),
+                  (int) Mathf.Clamp(trio[0] * cost, 5, 500),
+                  (int) Mathf.Clamp(trio[0] * cost, 5, 500));
+            costTrio.SetGene(minIndex, 0);
+            return costTrio;
+        }
+        
         public static TrioGene Median(TrioGene first, TrioGene second)
         {
             return new TrioGene(

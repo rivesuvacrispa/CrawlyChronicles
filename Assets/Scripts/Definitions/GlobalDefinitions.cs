@@ -36,7 +36,6 @@ namespace Definitions
         [SerializeField] private Color eggPuddleColor;
         [SerializeField] private Color[] geneColors = new Color[3];
         [SerializeField] private Color poisonColor;
-        [SerializeField] private Color lifestealColor;
         [Header("Physics")]
         [SerializeField] private float playerMass = 0.175f;
         [SerializeField] private float maxAppliedForce = 5;
@@ -54,6 +53,7 @@ namespace Definitions
         public static float InteractionDistance => instance.interactionDistance;
         public static int EnemyPhysicsLayerMask { get; private set; }
         public static int EnemyAttackLayerMask { get; private set; }
+        public static int PlayerAttackLayerMask { get; private set; }
         public static Sprite PuddleSprite => instance.puddleSprite;
         public static Color EggPuddleColor => instance.eggPuddleColor;
         public static float GenePickupDistance => instance.genePickupDistance;
@@ -64,7 +64,7 @@ namespace Definitions
         public static float PlayerMass => instance.playerMass;
         public static float EnemyImmunityDuration => instance.enemyImmunityDuration;
         public static Color PoisonColor => instance.poisonColor;
-        public static Color LifestealColor => instance.lifestealColor;
+        public static Color DeadColor => instance.deadColor;
         public static Gradient DeathGradient => deathGradient;
 
 
@@ -72,10 +72,9 @@ namespace Definitions
         public static Sprite GetEggsBedSprite(int eggsAmount) => instance.eggSprites[Mathf.Clamp(eggsAmount - 1, 0, 5)];
         public static Color GetGeneColor(GeneType geneType) => instance.geneColors[(int) geneType];
         public static int GetMutationCost(int lvl) => (lvl + 1) * instance.mutationCostPerLevel;
+        
 
-
-
-
+        
         public static SandFunnel CreateSandFunnel(Vector2 position)
         {
             var funnel = Instantiate(instance.sandFunnel, instance.gameObjectsTransform);
@@ -87,14 +86,21 @@ namespace Definitions
         public static EggDrop CreateEggDrop(Egg egg)=>
             Instantiate(instance.eggDropPrefab, instance.gameObjectsTransform)
                 .SetEgg(egg);
+        
+        public static void CreateEggSquash(Vector3 pos)
+        {
+            var egg = Instantiate(instance.eggDropPrefab, instance.gameObjectsTransform);
+            egg.Squash();
+            egg.transform.position = pos;
+        }
 
         public static PopupNotification CreateNotification(INotificationProvider provider, bool isStatic = true) =>
             Instantiate(instance.popupNotificationPrefab, instance.worldCanvasTransform)
                 .SetDataProvider(provider, isStatic);
 
-        public static void CreateGeneDrop(Vector3 position, GeneType geneType) =>
+        public static void CreateGeneDrop(Vector3 position, GeneType geneType, int amount = 1) =>
             Instantiate(instance.geneDropPrefab, instance.gameObjectsTransform)
-                .SetGeneType(geneType)
+                .SetData(geneType, amount)
                     .transform.localPosition = position;
 
         public static void CreateRandomGeneDrop(Vector3 position) =>
@@ -109,6 +115,7 @@ namespace Definitions
         {
             EnemyPhysicsLayerMask = LayerMask.NameToLayer("EnemyPhysics");
             EnemyAttackLayerMask = LayerMask.NameToLayer("EnemyAttacks");
+            PlayerAttackLayerMask = LayerMask.NameToLayer("PlayerAttacks");
             instance = this;
             deathGradient = new Gradient();
             deathGradient.SetKeys(

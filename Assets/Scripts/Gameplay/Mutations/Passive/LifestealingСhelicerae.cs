@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using Gameplay.Abilities.EntityEffects;
 using Gameplay.Enemies;
 using Mutations.AttackEffects;
 using Player;
@@ -41,7 +40,6 @@ namespace Gameplay.Abilities.Passive
         private void OnImpact(Enemy enemy, float damage)
         {
             Manager.Instance.AddHealth(damage * lifesteal);
-            // if(!Manager.Instance.GodMode) 
             StartCoroutine(CooldownRoutine());
         }
 

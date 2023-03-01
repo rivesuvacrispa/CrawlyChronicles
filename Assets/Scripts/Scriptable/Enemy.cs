@@ -12,15 +12,21 @@ namespace Scriptable
         [SerializeField] private float healthbarOffsetY;
         [SerializeField] private float healthbarWidth;
         [SerializeField] private Color bodyColor;
-        [Header("Stats fields")] 
+
+        [Header("Dependent stats")]
         [SerializeField] private float maxHealth;
         [SerializeField] private float attackPower;
         [SerializeField] private float damage;
         [SerializeField] private float armor;
+        
+        [Header("Undepended stats")]
+        [SerializeField] private float attackDistance = 1;
         [SerializeField] private float movementSpeed;
         [SerializeField] private float locatorRadius;
         [SerializeField] private int wanderingRadius;
         [SerializeField, Range(0, 2f)] private float playerMass;
+        
+        [Header("Audio")]
         [SerializeField] private AudioClip hitAudio;
         [SerializeField] private AudioClip attackAudio;
         [SerializeField] private AudioClip crawlAudio;
@@ -31,18 +37,16 @@ namespace Scriptable
         private Gradient poisonGradient;
         private Gradient lifestealGradient;
         private bool effectGradientsInitialized;
-        
-        
-        public float MaxHealth => maxHealth;
+
+
+        public float AttackDistance => attackDistance;
         public Color BodyColor => bodyColor;
         public float HealthbarOffsetY => healthbarOffsetY;
         public float HealthbarWidth => healthbarWidth;
         public int WanderingRadius => wanderingRadius;
         public float MovementSpeed => movementSpeed;
         public float LocatorRadius => locatorRadius;
-        public float Damage => damage;
-        public float AttackPower => attackPower;
-        public float Armor => armor;
+
         public float Mass => GlobalDefinitions.PlayerMass * playerMass;
         public AudioClip HitAudio => hitAudio;
         public AudioClip AttackAudio => attackAudio;
@@ -50,14 +54,35 @@ namespace Scriptable
         public AudioClip DeathAudio => deathAudio;
         public float CrawlPitch => crawlPitch;
 
+
+        public float MaxHealth => currentMaxHealth;
+        public float Damage => currentDamage;
+        public float AttackPower => currentAttackPower;
+        public float Armor => currentArmor;
+
+
+        private float currentMaxHealth;
+        private float currentAttackPower;
+        private float currentDamage;
+        private float currentArmor;
+
         public int WalkAnimHash { get; private set; }
         public int IdleAnimHash { get; private set; }
         public int DeadAnimHash { get; private set; }
+
         
         
+        public void OnDifficultyChanged(Difficulty difficulty)
+        {
+            float multiplier = difficulty.EnemyStatsMultiplier;
+            currentMaxHealth = maxHealth * multiplier;
+            currentAttackPower = attackPower * multiplier;
+            currentDamage = damage * multiplier;
+            currentArmor = armor * multiplier;
+        }
         
         private void Awake() => Init();
-        
+
         private void Init()
         {
             WalkAnimHash = Animator.StringToHash(animatorName + "Walk");
@@ -67,5 +92,6 @@ namespace Scriptable
         }
         
         private void OnValidate() => Init();
+
     }
 }

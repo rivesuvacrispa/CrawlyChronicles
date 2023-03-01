@@ -48,11 +48,9 @@ namespace Gameplay.Enemies
         public override void OnPlayerLocated()
         {
             if (aggressive)
+                AttackPlayer();
+            else
             {
-                stateController.SetState(AIState.Follow, 
-                    onTargetReach: BasicAttack,
-                    reachDistance: 1.25f);
-            } else {
                 StopInterest();
                 if(TimeManager.IsDay && CanBreed) interestRoutine = StartCoroutine(InterestRoutine());
             }
@@ -69,7 +67,7 @@ namespace Gameplay.Enemies
 
         public override void OnFoodLocated(FoodBed foodBed)
         {
-            if (!hungry) return;
+            if (!hungry || foodBed is RadioactiveFungi) return;
             stateController.SetState(AIState.Follow, 
                 followTarget: foodBed,
                 () => {
@@ -136,9 +134,7 @@ namespace Gameplay.Enemies
             aggressive = true;
             minimapIcon.color = Color.red;
             CanBreed = false;
-            stateController.SetState(AIState.Follow, 
-                onTargetReach: BasicAttack,
-                reachDistance: 1.25f);
+            AttackPlayer();
             OnNeutralDamaged -= OnNeutralDamage;
         }
         

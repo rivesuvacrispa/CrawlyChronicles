@@ -18,17 +18,27 @@ namespace Gameplay.Enemies
 
         private void OnCollisionEnter2D(Collision2D _)
         {
-            float damage = enemy.Damage(Manager.PlayerStats.AttackDamage, 
-                Manager.PlayerStats.AttackPower, 0.35f, Color.white);
+            float damage = enemy.Damage(
+                Manager.PlayerStats.AttackDamage,
+                Movement.Position,
+                Manager.PlayerStats.AttackPower,
+                0.35f, 
+                Color.white);
+            
             if(PlayerAttack.CurrentAttackEffect is not null)
                 PlayerAttack.CurrentAttackEffect.Impact(enemy, damage);
-            StartCoroutine(ImmunityRoutine());
+            if(damage <= enemy.Scriptable.MaxHealth) 
+                StartCoroutine(ImmunityRoutine());
+            else 
+                Die();
         }
 
         public void Enable() => collider.enabled = true;
 
         public void Disable() => collider.enabled = false;
-        
+
+        public void Die() => Disable();
+
         private IEnumerator ImmunityRoutine()
         { 
             Disable();

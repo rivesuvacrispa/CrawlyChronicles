@@ -6,10 +6,10 @@ namespace UI
 {
     public class GeneDisplay : MonoBehaviour
     {
-        [SerializeField] private Text[] geneTexts = new Text[3];
+        [SerializeField] protected Text[] geneTexts = new Text[3];
         
-        public void UpdateGeneText(TrioGene trio, GeneType geneType) => geneTexts[(int) geneType].text = trio.GetGene(geneType).ToString();
-        private void UpdateGeneText(TrioGene trio, int geneType) => geneTexts[geneType].text = trio.GetGene(geneType).ToString();
+        public void UpdateGeneText(TrioGene trio, GeneType geneType) => UpdateGeneText(trio, (int) geneType);
+        protected virtual void UpdateGeneText(TrioGene trio, int geneType) => geneTexts[geneType].text = trio.GetGene(geneType).ToString();
 
         public void UpdateTrioAsMedian(TrioGene trio)
         {

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using Definitions;
 using GameCycle;
 using Gameplay.Abilities.EntityEffects;
@@ -18,16 +17,16 @@ namespace Gameplay.Enemies
      RequireComponent(typeof(Rigidbody2D)),
      RequireComponent(typeof(AIStateController)),
     RequireComponent(typeof(EffectController))]
-    public abstract class Enemy : MonoBehaviour, IDamageable
+    public abstract class Enemy : MonoBehaviour, IDamageableEnemy, IEnemyAttack
     {
         public bool debug_Fearless;
-        [SerializeField] protected SpriteRenderer minimapIcon;
         [SerializeField] private BodyPainter bodyPainter;
-        [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private GameObject attackGO;
+        [SerializeField] private AudioController audioController;
+        [SerializeField] protected SpriteRenderer minimapIcon;
+        [SerializeField] protected SpriteRenderer spriteRenderer;
         [SerializeField] protected EnemyHitbox hitbox;
         [SerializeField] protected Scriptable.Enemy scriptable;
-        [SerializeField] private AudioController audioController;
 
         protected Animator animator;
         protected Rigidbody2D rb;
@@ -74,11 +73,14 @@ namespace Gameplay.Enemies
             PlayCrawl();
             SubEvents();
         }
-        
-        public float Damage(float damage, float knockback, float stunDuration, Color damageColor, bool ignoreArmor = false) => 
-            Damage(Player.Movement.Position, damage, knockback, stunDuration, damageColor, ignoreArmor);
 
-        private float Damage(Vector2 attacker, float damage, float knockbackPower, float stunDuration, Color damageColor, bool ignoreArmor = false)
+        public float Damage(
+            float damage, 
+            Vector3 position,
+            float knockback, 
+            float stunDuration, 
+            Color damageColor,
+            bool ignoreArmor = false)
         {
             if (!ignoreArmor && reckoned)
             {
@@ -102,10 +104,10 @@ namespace Gameplay.Enemies
                 bodyPainter.Paint(new Gradient().FastGradient(damageColor, scriptable.BodyColor), GlobalDefinitions.EnemyImmunityDuration);
                 if (stunDuration > 0) 
                     StartCoroutine(StunRoutine(stunDuration));
-                if (knockbackPower > 0)
+                if (knockback > 0)
                 {
-                    float duration = Mathf.Lerp(Mathf.Clamp01(knockbackPower), 0, 0.25f);
-                    Knockback(attacker, knockbackPower, duration);
+                    float duration = Mathf.Lerp(Mathf.Clamp01(knockback), 0, 0.25f);
+                    Knockback(position, knockback, duration);
                 }
             }
 
@@ -141,7 +143,7 @@ namespace Gameplay.Enemies
             StatRecorder.enemyKills++;
             StopAllCoroutines();
             attackGO.SetActive(false);
-            hitbox.Disable();
+            hitbox.Die();
             stateController.SetState(AIState.None);
             rb.rotation = 0;
             rb.constraints = RigidbodyConstraints2D.FreezeRotation;
@@ -163,11 +165,19 @@ namespace Gameplay.Enemies
             attackGO.SetActive(false);
         }
         
-        protected void BasicAttack()
+        private void BasicAttack()
         {
             if(attackRoutine is not null || stunned) return;
             attackRoutine = StartCoroutine(AttackRoutine());
         }
+
+        protected void AttackPlayer(float reachDistance = 0)
+        {
+            if (reachDistance == 0) reachDistance = scriptable.AttackDistance;
+            stateController.SetState(AIState.Follow, 
+                onTargetReach: BasicAttack,
+                reachDistance: reachDistance);
+        } 
         
         
         
@@ -296,5 +306,10 @@ namespace Gameplay.Enemies
         public Transform Transform => transform;
         public float HealthbarOffsetY => scriptable.HealthbarOffsetY;
         public float HealthbarWidth => scriptable.HealthbarWidth;
+        
+        // IEnemyAttack
+        public Vector3 AttackPosition => transform.position;
+        public float AttackDamage => scriptable.Damage;
+        public float AttackPower => scriptable.AttackPower;
     }
 }

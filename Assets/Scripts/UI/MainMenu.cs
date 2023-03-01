@@ -1,11 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Definitions;
 using GameCycle;
 using Gameplay;
 using Gameplay.Abilities;
 using Genes;
+using Scriptable;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 namespace UI
 {
@@ -16,24 +19,41 @@ namespace UI
         [SerializeField] private GameObject gameUICanvas;
         [SerializeField] private GameObject gameOverGO;
         [SerializeField] private GameObject settingsGO;
+        [SerializeField] private GameObject difficultyGO;
         [SerializeField] private TutorialMenu tutorialMenu;
         [SerializeField] private PauseMenu pauseMenu;
         [SerializeField] private Text gameOverStatsText;
-
+        [SerializeField] private Text subtitleText;
+        
         private bool settingsOpenedFromMainMenu;
         
         public delegate void MainMenuEvent();
+
         public static event MainMenuEvent OnResetRequested;
         
         private void Start()
         {
-            Application.targetFrameRate = 60;
-        
+            /*
+             *  Nitro
+             *  Hleb
+             *  Vatrushka
+             *  Salad
+             */
+            subtitleText.text = $"{Application.version}\nby RivesUvaCrispa\naka Cpeed4";
             if(showOnStartup) ShowMainMenu();
+        }
+
+
+
+        public void ShowDifficultyMenu()
+        {
+            rootGO.SetActive(false);
+            difficultyGO.SetActive(true);
         }
 
         public void ShowMainMenu()
         {
+            difficultyGO.SetActive(false);
             pauseMenu.gameObject.SetActive(false);
             Time.timeScale = 0;
             rootGO.SetActive(true);

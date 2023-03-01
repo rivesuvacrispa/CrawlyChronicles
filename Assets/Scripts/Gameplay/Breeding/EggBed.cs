@@ -3,6 +3,7 @@ using Definitions;
 using GameCycle;
 using Gameplay.AI.Locators;
 using Gameplay.Interaction;
+using Genes;
 using UI;
 using UnityEngine;
 using Util;
@@ -10,7 +11,7 @@ using Util;
 namespace Gameplay
 {
     [RequireComponent(typeof(SpriteRenderer))]
-    public class EggBed : MonoBehaviour, INotificationProvider, ILocatorTarget, IInteractable
+    public class EggBed : MonoBehaviour, INotificationProvider, ILocatorTarget, IContinuouslyInteractable
     {
         [SerializeField] private List<Egg> storedEggs = new();
         
@@ -18,6 +19,12 @@ namespace Gameplay
 
         public int EggsAmount => storedEggs.Count;
         public Egg GetEgg(int index) => storedEggs[index];
+        
+        private enum InteractionState
+        {
+            Eat,
+            ReturnEgg,
+        }
         
         
         
@@ -89,6 +96,25 @@ namespace Gameplay
             OnDataUpdate?.Invoke();
         }
 
+        private void Eat()
+        {
+            RemoveOne(out var egg);
+            BreedingManager.Instance.AddFood();
+            float genesAmount = Random.value * 0.05f;
+            TrioGene drop = egg.Genes.Multiply(genesAmount);
+            Vector3 pos = transform.position;
+            GlobalDefinitions.CreateEggSquash(pos + (Vector3) Random.insideUnitCircle.normalized * 0.25f);
+            DropGenes(pos, GeneType.Aggressive, drop.Aggressive);
+            DropGenes(pos, GeneType.Defensive, drop.Defensive);
+            DropGenes(pos, GeneType.Adaptive, drop.Universal);
+        }
+        
+        private static void DropGenes(Vector3 pos, GeneType type, int amount)
+        {
+            if (amount > 0) GlobalDefinitions.CreateGeneDrop
+                (pos + (Vector3)Random.insideUnitCircle * 0.75f, type, amount);
+        }
+
         private void OnEggBedsCollectionRequested(List<EggBed> eggBeds) => eggBeds.Add(this);
         private void OnResetRequested() => Destroy(gameObject);
 
@@ -103,17 +129,43 @@ namespace Gameplay
 
 
         
-        // IInteractable
+        // IContinuouslyInteractable
+        private InteractionState interactionState;
+        
         public void Interact()
         {
-            AddEgg(Player.Manager.Instance.HoldingEgg);
-            StatRecorder.eggsLost--;
-            Player.Manager.Instance.RemoveEgg();
+            if(interactionState == InteractionState.ReturnEgg)
+            {
+                AddEgg(Player.Manager.Instance.HoldingEgg);
+                StatRecorder.eggsLost--;
+                Player.Manager.Instance.RemoveEgg();
+            }
+            else Eat();
         }
 
-        public bool CanInteract() => Player.Manager.Instance.IsHoldingEgg && EggsAmount < 12;
+        public bool CanInteract()
+        {
+            if (Player.Manager.Instance.IsHoldingEgg)
+            {
+                if (EggsAmount >= 12) return false;
+                interactionState = InteractionState.ReturnEgg;
+            }
+            else interactionState = InteractionState.Eat;
+
+            return true;
+        }
+
         public float PopupDistance => 0.75f;
-        public string ActionTitle => "Return egg";
+        public string ActionTitle => interactionState == InteractionState.ReturnEgg ? "Return egg" : "Eat";
         Vector3 IInteractable.Position => transform.position;
+        public void OnInteractionStart()
+        {
+        }
+
+        public void OnInteractionStop()
+        {
+        }
+
+        public float InteractionTime => interactionState == InteractionState.ReturnEgg ? 0 : 1.5f;
     }
 }

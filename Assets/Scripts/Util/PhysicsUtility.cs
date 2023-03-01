@@ -1,13 +1,15 @@
 ﻿using Definitions;
-using Player;
 using UnityEngine;
 
 namespace Util
 {
     public static class PhysicsUtility
     {
-        public static Vector2 GetVelocityBackwards(Vector2 victim, Vector2 attacker, float knockbackPower) 
-            => (victim - attacker).normalized * knockbackPower;
+        public static Vector2 GetVelocityBackwards(Vector2 victim, Vector2 attacker, float velocity) 
+            => (victim - attacker).normalized * velocity;
+        
+        public static Vector2 GetVelocityTowards(Vector2 victim, Vector2 attacker, float velocity) 
+            => (attacker - victim).normalized * velocity;
         
         public static void RotateTowardsPosition(this Rigidbody2D rb, Vector2 targetPos, float delta) 
             => rb.rotation = RotationTowards(rb.position, rb.rotation, targetPos, delta);

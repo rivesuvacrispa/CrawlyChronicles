@@ -1,4 +1,5 @@
 ﻿using Definitions;
+using UnityEngine;
 
 namespace Gameplay.Food
 {
@@ -7,7 +8,7 @@ namespace Gameplay.Food
         protected override void OnEatenByPlayer()
         {
             Player.Manager.Instance.AddHealthPercent(0.1f);
-            GlobalDefinitions.CreateRandomGeneDrop(Position);
+            if(Random.value >= 0.5f) GlobalDefinitions.CreateRandomGeneDrop(Position);
         }
     }
 }

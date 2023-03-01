@@ -1,62 +1,58 @@
 ﻿using System.Collections;
 using Gameplay.Enemies;
-using Scripts.SoundEffects;
 using UnityEngine;
+using Util;
 
 namespace Player
 {
     [RequireComponent(typeof(Collider2D))]
     public class PlayerHitbox : MonoBehaviour
     {
-        [SerializeField] private Movement movement;
-        [SerializeField] private SpriteRenderer bodySprite;
+        [SerializeField] private BodyPainter bodyPainter;
         [SerializeField] private Gradient immunityGradient;
         
-        private new Collider2D collider;
+        public bool Immune { get; private set; }
         
-        public bool BlockColor { get; set; }
+        public bool BlockColorChange { get; set; }
 
         public delegate void PlayerHitboxEvent(float damage);
-        public static event PlayerHitboxEvent OnDamageTaken;
+        public static event PlayerHitboxEvent OnStruck;
         
         
         
-        private void Awake() => collider = GetComponent<Collider2D>();
-
         private void OnCollisionEnter2D(Collision2D col)
         {
-            if(col.gameObject.TryGetComponent(out Enemy enemy))
-                Damage(col.transform.position, enemy.Scriptable.Damage, enemy.Scriptable.AttackPower);
+            if (col.gameObject.TryGetComponent(out IEnemyAttack attack))
+            {
+                OnStruck?.Invoke(0);
+                Debug.Log($"Collision with {col.gameObject.name}");
+                Manager.Instance.Damage(attack.AttackDamage, attack.AttackPosition, attack.AttackPower);
+            }
         }
-        
-        private void Damage(Vector3 pos, float damage, float knockbackPower)
-        {
-            PlayerAudioController.Instance.PlayHit();
-            if (Manager.Instance.GodMode) return;
-            movement.Knockback(pos, knockbackPower);
-            Manager.Instance.Damage(damage);
-            OnDamageTaken?.Invoke(damage);
-            StartCoroutine(ImmunityRoutine());
-        }
-        
+
+        public void Hit() => StartCoroutine(ImmunityRoutine());
+
         private IEnumerator ImmunityRoutine()
         {
-            Disable();
+            Immune = true;
 
             float duration = Manager.PlayerStats.ImmunityDuration;
-            float t = 0;
-            while (t < duration)
-            {
-                if(!BlockColor) bodySprite.color = immunityGradient.Evaluate(t / duration);
-                t += Time.deltaTime;
-                yield return null;
-            }
-
-            bodySprite.color = immunityGradient.Evaluate(1);
-            Enable();
+            bodyPainter.Paint(immunityGradient, duration);
+            yield return new WaitForSeconds(duration);
+            
+            Immune = false;
         }
         
-        public void Enable() => collider.enabled = true;
-        public void Disable() => collider.enabled = false;
+        public void Enable()
+        {
+            StopAllCoroutines();
+            Immune = false;
+        }
+
+        public void Disable()
+        {
+            StopAllCoroutines();
+            Immune = true;
+        }
     }
 }

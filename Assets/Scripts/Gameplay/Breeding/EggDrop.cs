@@ -13,14 +13,16 @@ namespace Gameplay
     public class EggDrop : MonoBehaviour, IInteractable
     {
         [SerializeReference] private Egg egg;
-        private bool crashed;
+        private bool squashed;
         private bool immune = true;
 
 
         private void Start()
         {
-            egg ??= new Egg(TrioGene.Zero, new MutationData());
             MainMenu.OnResetRequested += OnResetRequested;
+            
+            if(squashed) return;
+            egg ??= new Egg(TrioGene.Zero, new MutationData());
             StartCoroutine(ImmunityRoutine());
         }
 
@@ -37,24 +39,27 @@ namespace Gameplay
 
         private void OnCollisionEnter2D(Collision2D col)
         {
-            if(immune) return;
-            if (col.gameObject.layer.Equals(GlobalDefinitions.EnemyPhysicsLayerMask))
-            {
-                var spriteRenderer = GetComponent<SpriteRenderer>();
-                spriteRenderer.sprite = GlobalDefinitions.PuddleSprite;
-                spriteRenderer.color = GlobalDefinitions.EggPuddleColor;
-                spriteRenderer.sortingOrder = -1;
-                GetComponent<Collider2D>().enabled = false;
-                GetComponent<Rigidbody2D>().simulated = false;
-                transform.rotation = Quaternion.identity;
-                crashed = true;
-                StartCoroutine(FadeRoutine(spriteRenderer));
-            }
+            if(immune || !col.gameObject.layer.Equals(GlobalDefinitions.EnemyPhysicsLayerMask)) return;
+            Squash();
+        }
+
+        public void Squash()
+        {
+            squashed = true;
+            var spriteRenderer = GetComponent<SpriteRenderer>();
+            spriteRenderer.sprite = GlobalDefinitions.PuddleSprite;
+            spriteRenderer.color = GlobalDefinitions.EggPuddleColor;
+            spriteRenderer.sortingLayerName = "Ground";
+            spriteRenderer.sortingOrder = -1;
+            GetComponent<Collider2D>().enabled = false;
+            GetComponent<Rigidbody2D>().simulated = false;
+            transform.rotation = Quaternion.identity;
+            StartCoroutine(FadeRoutine(spriteRenderer));
         }
 
         private IEnumerator FadeRoutine(SpriteRenderer spriteRenderer)
         {
-            yield return new WaitForSeconds(15);
+            yield return new WaitForSeconds(10);
 
             float initialAlpha = spriteRenderer.color.a;
             float t = 0;
@@ -72,7 +77,7 @@ namespace Gameplay
 
         private IEnumerator ImmunityRoutine()
         {
-            yield return new WaitForSeconds(3);
+            yield return new WaitForSeconds(5);
             immune = false;
         }
 
@@ -85,7 +90,7 @@ namespace Gameplay
             Destroy(gameObject);
         }
 
-        public bool CanInteract() => !Player.Manager.Instance.IsHoldingEgg && !crashed;
+        public bool CanInteract() => !Player.Manager.Instance.IsHoldingEgg && !squashed;
         public float PopupDistance => 0.5f;
         public string ActionTitle => "Pickup egg";
         public Vector3 Position => transform.position;

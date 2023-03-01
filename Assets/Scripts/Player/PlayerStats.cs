@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Util;
 
 namespace Player

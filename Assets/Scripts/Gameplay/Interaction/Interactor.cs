@@ -54,7 +54,8 @@ namespace Gameplay.Interaction
 
             if(Input.GetKeyDown(KeyCode.E) && CanInteract)
             {
-                if (interactable is IContinuouslyInteractable continuouslyInteractable)
+                if (interactable is IContinuouslyInteractable continuouslyInteractable
+                    && continuouslyInteractable.InteractionTime != 0)
                     StartCoroutine(InteractionRoutine(continuouslyInteractable));
                 else
                 {

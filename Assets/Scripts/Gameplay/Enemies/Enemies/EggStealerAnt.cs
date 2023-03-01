@@ -20,14 +20,13 @@ namespace Gameplay.Enemies
 
         public override void OnMapEntered()
         {
-            stateController.SetState(AIState.Wander);
+            if(BreedingManager.TotalEggsAmount == 0) AttackPlayer();
+            else stateController.SetState(AIState.Wander);
         }
 
         public override void OnPlayerLocated()
         {
-            stateController.SetState(AIState.Follow, 
-                onTargetReach: BasicAttack,
-                reachDistance: 0.75f);
+            AttackPlayer();
         }
 
         public override void OnEggsLocated(EggBed eggBed)
@@ -51,9 +50,7 @@ namespace Gameplay.Enemies
         protected override void OnDamageTaken()
         {
             if(holdingEgg is not null) DropEgg();
-            stateController.SetState(AIState.Follow, 
-                onTargetReach: BasicAttack,
-                reachDistance: 0.75f);
+            AttackPlayer();
         }
 
         private void DropEgg()
