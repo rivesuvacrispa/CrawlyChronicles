@@ -7,7 +7,8 @@ namespace Scriptable
     [CreateAssetMenu(menuName = "Scriptable/Enemy")]
     public class Enemy : ScriptableObject
     {
-        [Header("Utility fields")]
+        [Header("Utility fields")] 
+        [SerializeField] private bool hasAttackAnimation;
         [SerializeField] private string animatorName;
         [SerializeField] private float healthbarOffsetY;
         [SerializeField] private float healthbarWidth;
@@ -18,8 +19,9 @@ namespace Scriptable
         [SerializeField] private float attackPower;
         [SerializeField] private float damage;
         [SerializeField] private float armor;
-        
-        [Header("Undepended stats")]
+
+        [Header("Undepended stats")] 
+        [SerializeField] private float attackDelay = 0.75f;
         [SerializeField] private float attackDistance = 1;
         [SerializeField] private float movementSpeed;
         [SerializeField] private float locatorRadius;
@@ -40,6 +42,7 @@ namespace Scriptable
 
 
         public float AttackDistance => attackDistance;
+        public float AttackDelay => attackDelay;
         public Color BodyColor => bodyColor;
         public float HealthbarOffsetY => healthbarOffsetY;
         public float HealthbarWidth => healthbarWidth;
@@ -53,6 +56,7 @@ namespace Scriptable
         public AudioClip CrawlAudio => crawlAudio;
         public AudioClip DeathAudio => deathAudio;
         public float CrawlPitch => crawlPitch;
+        public bool HasAttackAnimation => hasAttackAnimation;
 
 
         public float MaxHealth => currentMaxHealth;
@@ -69,6 +73,7 @@ namespace Scriptable
         public int WalkAnimHash { get; private set; }
         public int IdleAnimHash { get; private set; }
         public int DeadAnimHash { get; private set; }
+        public int AttackAnimHash { get; private set; }
 
         
         
@@ -88,6 +93,7 @@ namespace Scriptable
             WalkAnimHash = Animator.StringToHash(animatorName + "Walk");
             IdleAnimHash = Animator.StringToHash(animatorName + "Idle");
             DeadAnimHash = Animator.StringToHash(animatorName + "Dead");
+            AttackAnimHash = Animator.StringToHash(animatorName + "Attack");
             crawlPitch = 1 + Mathf.Lerp( -0.5f, 0.5f, 1 - playerMass / 2f);
         }
         

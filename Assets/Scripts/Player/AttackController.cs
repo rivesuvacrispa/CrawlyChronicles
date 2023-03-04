@@ -19,7 +19,9 @@ namespace Player
         private int comboCounter;
         private Coroutine comboExpirationRoutine;
 
-
+        public delegate void AttackCotrollerEvent();
+        public static event AttackCotrollerEvent OnAttackStart;
+        
         
         
         public bool IsAttacking => attack.IsActive;
@@ -47,6 +49,7 @@ namespace Player
                     hitbox.Enable();
                 }))
             {
+                OnAttackStart?.Invoke();
                 if(comboExpirationRoutine is not null) 
                     StopCoroutine(comboExpirationRoutine);
                 PlayerAudioController.Instance.PlayAttack(comboCounter);
@@ -67,6 +70,7 @@ namespace Player
                     IsInComboDash = false;
                 }))
             {
+                OnAttackStart?.Invoke();
                 IsInComboDash = true;
                 PlayerAudioController.Instance.PlayCombo();
                 if(comboExpirationRoutine is not null) 

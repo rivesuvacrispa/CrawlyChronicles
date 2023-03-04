@@ -61,7 +61,15 @@ namespace Scripts.Gameplay.Bosses
             if(dmg <= 0) return;
             currentHealth = Mathf.Clamp(currentHealth - dmg, 0, maxHealth);
             UpdateHealth();
-            if (currentHealth <= 0.01f) animator.Play(OutroAnimHash);
+            if (currentHealth <= 0.01f) Die();
+        }
+
+        public void Die()
+        {
+            isActive = false;
+            currentHealth = 0;
+            UpdateHealth();
+            animator.Play(OutroAnimHash);
         }
     }
 }

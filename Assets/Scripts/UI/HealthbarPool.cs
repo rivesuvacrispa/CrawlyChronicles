@@ -9,10 +9,9 @@ namespace UI
     {
         public static HealthbarPool Instance { get; private set; }
 
-        [FormerlySerializedAs("healthBarPrefab")] 
         [SerializeField] private Healthbar healthbarPrefab;
 
-        private void Awake() => Instance = this;
+        private HealthbarPool() => Instance = this;
 
         public Healthbar Create(IDamageable damageable)
         {

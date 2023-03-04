@@ -33,12 +33,6 @@ namespace UI
         
         private void Start()
         {
-            /*
-             *  Nitro
-             *  Hleb
-             *  Vatrushka
-             *  Salad
-             */
             subtitleText.text = $"{Application.version}\nby RivesUvaCrispa\naka Cpeed4";
             if(showOnStartup) ShowMainMenu();
         }

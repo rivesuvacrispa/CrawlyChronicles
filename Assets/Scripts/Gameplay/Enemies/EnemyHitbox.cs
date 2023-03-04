@@ -13,6 +13,8 @@ namespace Gameplay.Enemies
         private new Collider2D collider;
 
 
+        public bool Enabled => collider.enabled;
+        
         
         private void Awake() => collider = GetComponent<Collider2D>();
 
@@ -27,23 +29,33 @@ namespace Gameplay.Enemies
             
             if(PlayerAttack.CurrentAttackEffect is not null)
                 PlayerAttack.CurrentAttackEffect.Impact(enemy, damage);
-            if(damage <= enemy.Scriptable.MaxHealth) 
-                StartCoroutine(ImmunityRoutine());
-            else 
-                Die();
         }
 
-        public void Enable() => collider.enabled = true;
+        public void Enable()
+        {
+            StopAllCoroutines();
+            collider.enabled = true;
+        }
 
-        public void Disable() => collider.enabled = false;
+        public void Disable()
+        {
+            StopAllCoroutines();
+            collider.enabled = false;
+        }
 
-        public void Die() => Disable();
+        public void Die()
+        {
+            StopAllCoroutines();
+            Disable();
+        }
+
+        public void Hit() => StartCoroutine(ImmunityRoutine());
 
         private IEnumerator ImmunityRoutine()
         { 
-            Disable();
+            collider.enabled = false;
             yield return new WaitForSeconds(GlobalDefinitions.EnemyImmunityDuration);
-            Enable();
+            collider.enabled = true;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Definitions;
+﻿using System;
+using Definitions;
 using UnityEngine;
 
 namespace Util
@@ -19,6 +20,15 @@ namespace Util
             Vector2 direction = targetPos - pos;
             float angle = direction.GetAngle() - 90f;
             return Mathf.MoveTowardsAngle(rot, angle, delta);
+        }
+
+        public static bool AngleBetween(Vector2 a, Vector2 b, float angle)
+        {
+            float aa = a.GetAngle();
+            float bb = b.GetAngle();
+            aa *= aa;
+            bb *= bb;
+            return Math.Abs(aa - bb) <= angle * angle;
         }
 
         public static float GetAngle(this Vector2 v) => Mathf.Atan2(v.y, v.x) * Mathf.Rad2Deg;
@@ -50,6 +60,6 @@ namespace Util
                     rb.mass / GlobalDefinitions.PlayerMass, mode);
 
         public static float GetKnockbackResistance(float playerMass)
-            => Mathf.InverseLerp(0, GlobalDefinitions.PlayerMass * 2, playerMass) - 0.1f;
+            => Mathf.InverseLerp(0, GlobalDefinitions.PlayerMass * 2, playerMass);
     }
 }

@@ -8,6 +8,7 @@ using Scripts.SoundEffects;
 using Timeline;
 using UI;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Util;
 using Random = UnityEngine.Random;
 
@@ -19,7 +20,8 @@ namespace Gameplay.Enemies
     RequireComponent(typeof(EffectController))]
     public abstract class Enemy : MonoBehaviour, IDamageableEnemy, IEnemyAttack
     {
-        public bool debug_Fearless;
+        [FormerlySerializedAs("Fearless")] 
+        [SerializeField] protected bool fearless;
         [SerializeField] private BodyPainter bodyPainter;
         [SerializeField] private GameObject attackGO;
         [SerializeField] private AudioController audioController;
@@ -31,16 +33,18 @@ namespace Gameplay.Enemies
         protected Animator animator;
         protected Rigidbody2D rb;
         protected AIStateController stateController;
-        
         private Healthbar healthbar;
-        private float health;
         private Coroutine attackRoutine;
-        private bool stunned;
-        private float attackDelay = 0.75f;
-        private bool reckoned;
         private EffectController effectController;
 
+        protected bool spawnedBySpawner;
+        private float health;
+        private bool stunned;
+        private float attackDelay;
+        private bool reckoned;
+
         [field:SerializeField] public EnemySpawnLocation SpawnLocation { get; set; }
+        public EnemyWallCollider WallCollider { get; set; }
         public Scriptable.Enemy Scriptable => scriptable;
         public Vector2 Position => rb.position;
         public void SetMovementSpeed(float speed) => stateController.SpeedMultiplier = speed;
@@ -56,7 +60,7 @@ namespace Gameplay.Enemies
 
         protected abstract void OnDamageTaken();
         
-        private void Awake()
+        protected void Awake()
         {
             animator = GetComponent<Animator>();
             rb = GetComponent<Rigidbody2D>();
@@ -68,6 +72,7 @@ namespace Gameplay.Enemies
         {
             rb.mass = scriptable.Mass;
             health = scriptable.MaxHealth;
+            attackDelay = scriptable.AttackDelay;
             spriteRenderer.color = scriptable.BodyColor;
             healthbar = HealthbarPool.Instance.Create(this);
             PlayCrawl();
@@ -82,6 +87,8 @@ namespace Gameplay.Enemies
             Color damageColor,
             bool ignoreArmor = false)
         {
+            if (!hitbox.Enabled) return 0;
+            
             if (!ignoreArmor && reckoned)
             {
                 reckoned = false;
@@ -97,9 +104,14 @@ namespace Gameplay.Enemies
             healthbar.SetValue(Mathf.Clamp01(health / scriptable.MaxHealth));
             OnDamageTaken();
 
-            if (health <= float.Epsilon) Die();
+            if (health <= float.Epsilon)
+            {
+                Die();
+                hitbox.Die();
+            }
             else
             {
+                hitbox.Hit();
                 audioController.PlayAction(scriptable.HitAudio, pitch: SoundUtility.GetRandomPitchTwoSided(0.15f));
                 bodyPainter.Paint(new Gradient().FastGradient(damageColor, scriptable.BodyColor), GlobalDefinitions.EnemyImmunityDuration);
                 if (stunDuration > 0) 
@@ -120,7 +132,7 @@ namespace Gameplay.Enemies
             rb.AddClampedForceBackwards(attacker, force * (1 - kbResistance), ForceMode2D.Impulse);
             StartCoroutine(KnockbackRoutine(duration));
         }
-
+        
         public void Reckon(Vector2 attacker, float force)
         {
             StopAttack();
@@ -143,8 +155,9 @@ namespace Gameplay.Enemies
             StatRecorder.enemyKills++;
             StopAllCoroutines();
             attackGO.SetActive(false);
-            hitbox.Die();
             stateController.SetState(AIState.None);
+            spriteRenderer.sortingLayerName = "Ground";
+            spriteRenderer.sortingOrder = 0;
             rb.rotation = 0;
             rb.constraints = RigidbodyConstraints2D.FreezeRotation;
             audioController.PlayAction(scriptable.DeathAudio, pitch: SoundUtility.GetRandomPitchTwoSided(0.15f));
@@ -155,14 +168,15 @@ namespace Gameplay.Enemies
             StartCoroutine(DeathRoutine());
             UnsubEvents();
         }
-        
-        private void StopAttack()
+
+        protected void StopAttack()
         {
             if(attackRoutine is not null) 
                 StopCoroutine(attackRoutine);
             stateController.ReturnMoveControl();
             attackRoutine = null;
             attackGO.SetActive(false);
+            if(scriptable.HasAttackAnimation) PlayCrawl();
         }
         
         private void BasicAttack()
@@ -171,7 +185,7 @@ namespace Gameplay.Enemies
             attackRoutine = StartCoroutine(AttackRoutine());
         }
 
-        protected void AttackPlayer(float reachDistance = 0)
+        protected virtual void AttackPlayer(float reachDistance = 0)
         {
             if (reachDistance == 0) reachDistance = scriptable.AttackDistance;
             stateController.SetState(AIState.Follow, 
@@ -184,19 +198,30 @@ namespace Gameplay.Enemies
         // Routines & utils
         private IEnumerator AttackRoutine()
         {
-            yield return new WaitForSeconds(attackDelay);
+            stateController.TakeMoveControl();
+            
+            float t = attackDelay * 0.5f;
+            while (t > 0)
+            {
+                if(!rb.freezeRotation) rb.RotateTowardsPosition(Player.Movement.Position, 5);
+                t -= Time.deltaTime;
+                yield return null;
+            }
+            
             audioController.PlayAction(scriptable.AttackAudio);
             attackGO.SetActive(true);
-            stateController.TakeMoveControl();
+            if(scriptable.HasAttackAnimation) animator.Play(scriptable.AttackAnimHash);
             var playerPos = Player.Movement.Position;
-            rb.RotateTowardsPosition(playerPos, 90);
+            if(!rb.freezeRotation) rb.RotateTowardsPosition(playerPos, 90);
             rb.AddClampedForceTowards(playerPos, scriptable.AttackPower, ForceMode2D.Impulse);
             
             yield return new WaitForSeconds(0.4f);
 
+            if(scriptable.HasAttackAnimation) PlayCrawl();
             attackGO.SetActive(false);
             stateController.ReturnMoveControl();
-            attackDelay = 0.75f;
+            yield return new WaitForSeconds(attackDelay * 0.5f);
+            attackDelay = scriptable.AttackDelay;
             attackRoutine = null;
         }
         
@@ -209,7 +234,7 @@ namespace Gameplay.Enemies
             rb.simulated = false;
             yield return new WaitForSeconds(GlobalDefinitions.DespawnTime);
             
-            bodyPainter.Fade(1f);
+            bodyPainter.FadeOut(1f);
             yield return new WaitForSeconds(1f);
             
             Destroy(gameObject);
@@ -245,7 +270,7 @@ namespace Gameplay.Enemies
             audioController.StopState();
         }
 
-        private void PlayCrawl()
+        protected void PlayCrawl()
         {
             animator.Play(scriptable.WalkAnimHash);
             audioController.PlayState(scriptable.CrawlAudio, true, scriptable.CrawlPitch);
@@ -263,11 +288,11 @@ namespace Gameplay.Enemies
             
             stateController.ReturnMoveControl();
         }
-        
+
         public void AddEffect<T>(EntityEffectData data) where T : EntityEffect
             => effectController.AddEffect<T>(data);
 
-        public void ClearEffects() => effectController.ClearAll();
+        private void ClearEffects() => effectController.ClearAll();
         
 
         
@@ -280,8 +305,11 @@ namespace Gameplay.Enemies
 
         protected virtual void OnDayStart(int day)
         {
-            if(debug_Fearless) return;
+            if(fearless || SpawnLocation is null) return;
+            PlayCrawl();
             StopAttack();
+            ClearEffects();
+            stateController.ReturnMoveControl();
             stateController.SetEtherial(true);
             stateController.SetState(AIState.Flee);
         }
@@ -294,11 +322,18 @@ namespace Gameplay.Enemies
 
         private void UnsubEvents() => TimeManager.OnDayStart -= OnDayStart;
 
-        private void OnResetRequested()
+        private void OnResetRequested() => Destroy(gameObject);
+
+        public virtual void OnWallCollision() { }
+
+        public void OnSpawnedBySpawner()
         {
-            if(debug_Fearless) return;
-            Destroy(gameObject);
+            spawnedBySpawner = true;
+            SpawnLocation = EnemyWaveSpawner.GetRandomSpawnPoint();
+            stateController.StartingState = AIState.Wander;
+            if (TimeManager.IsDay) fearless = true;
         }
+        
 
 
         // IDamageable

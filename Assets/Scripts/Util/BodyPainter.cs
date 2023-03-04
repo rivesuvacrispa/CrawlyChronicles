@@ -7,34 +7,43 @@ namespace Util
     public class BodyPainter : MonoBehaviour
     {
         private SpriteRenderer spriteRenderer;
+
+        private Coroutine fadeRoutine;
+        private Coroutine colorRoutine;
         
         private void Awake() => spriteRenderer = GetComponent<SpriteRenderer>();
 
         public void Paint(Gradient gradient, float duration)
         {
-            StopAllCoroutines();
-            StartCoroutine(PaintRoutine(gradient, duration));
+            if(colorRoutine is not null) StopCoroutine(colorRoutine);
+            colorRoutine = StartCoroutine(PaintRoutine(gradient, duration));
         }
 
-        public void Fade(float duration)
+        public void FadeOut(float duration)
         {
-            StopAllCoroutines();
-            StartCoroutine(FadeRoutine(duration));
+            if(fadeRoutine is not null) StopCoroutine(fadeRoutine);
+            fadeRoutine = StartCoroutine(FadeRoutine(duration, 0));
         }
-
-        private IEnumerator FadeRoutine(float duration)
+        
+        public void FadeIn(float duration)
+        {
+            if(fadeRoutine is not null) StopCoroutine(fadeRoutine);
+            fadeRoutine = StartCoroutine(FadeRoutine(duration, 1));
+        }
+        
+        private IEnumerator FadeRoutine(float duration, int direction)
         {
             Color color = spriteRenderer.color;
-            SetColor(color.WithAlpha(1));
             float t = 0;
             while (t < duration)
             {
+                SetColor(color.WithAlpha(direction == 0 ? 1 - Mathf.Clamp01(t / duration) : Mathf.Clamp01(t / duration)));
                 t += Time.deltaTime;
-                SetColor(color.WithAlpha(1 - Mathf.Clamp01(t / duration)));                
                 yield return null;
             }
             
-            SetColor(color.WithAlpha(0));
+            SetColor(color.WithAlpha(direction == 0 ? 0 : 1));
+            fadeRoutine = null;
         }
         
         private IEnumerator PaintRoutine(Gradient gradient, float duration)
@@ -42,14 +51,23 @@ namespace Util
             float t = 0;
             while (t < duration)
             {
+                SetColor(gradient.Evaluate(Mathf.Clamp01(t / duration)).WithAlpha(spriteRenderer.color.a));
                 t += Time.deltaTime;
-                SetColor(gradient.Evaluate(Mathf.Clamp01(t / duration)));                
                 yield return null;
             }
             
-            SetColor(gradient.Evaluate(1));
+            SetColor(gradient.Evaluate(1).WithAlpha(spriteRenderer.color.a));
+            colorRoutine = null;
         }
 
-        private void SetColor(Color c) => spriteRenderer.color = c;
+        public void ResetColor(Color c)
+        {
+            StopAllCoroutines();
+            SetColor(c);
+        }
+        public void SetColor(Color c) => spriteRenderer.color = c;
+        public void SetSortingLayer(string layer) => spriteRenderer.sortingLayerName = layer;
+        public void SetSortingOrder(int order) => spriteRenderer.sortingOrder = order;
+        public void SetMaterial(Material material) => spriteRenderer.material = material;
     }
 }

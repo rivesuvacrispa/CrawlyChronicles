@@ -14,23 +14,26 @@ namespace UI
         private Vector2 providerStaticPosition;
         private bool isActive;
         private bool isStatic;
-        private Transform cachedTransfrom;
+        private bool doNotHide;
+        private Transform cachedTransform;
 
         private static readonly int PopoutHash = Animator.StringToHash("PopupNotificationPopout");
         private static readonly int PopupHash = Animator.StringToHash("PopupNotificationPopup");
         
         
         
-        public PopupNotification SetDataProvider(INotificationProvider target, bool staticProvider)
+        public PopupNotification SetDataProvider(INotificationProvider target, bool staticProvider, bool showAlways)
         {
+            doNotHide = showAlways;
             provider = target;
             provider.OnDataUpdate += UpdateText;
             provider.OnProviderDestroy += OnProviderDestroy;
-            cachedTransfrom = target.Transform;
+            cachedTransform = target.Transform;
             isStatic = staticProvider;
-            providerStaticPosition = cachedTransfrom.position;
+            providerStaticPosition = cachedTransform.position;
             transform.localPosition = providerStaticPosition;
-            animator.gameObject.SetActive(false);
+            if(!showAlways) animator.gameObject.SetActive(false);
+            else SetActive(true);
             UpdateText();
             return this;
         }
@@ -55,12 +58,13 @@ namespace UI
 
         private void Update()
         {
+            if(doNotHide) return;
             // TODO: This def can be rewritten
-            Vector2 positionToUse = isStatic ? providerStaticPosition : cachedTransfrom.position;
+            Vector2 positionToUse = isStatic ? providerStaticPosition : cachedTransform.position;
             float distanceToPlayer = (positionToUse - Player.Movement.Position).sqrMagnitude;
             SetActive(distanceToPlayer <= GlobalDefinitions.InteractionDistance);
 
-            if (!isStatic) transform.localPosition = cachedTransfrom.position;
+            if (!isStatic) transform.localPosition = cachedTransform.position;
         }
 
         private void SetActive(bool activeState)

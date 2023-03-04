@@ -11,6 +11,8 @@ namespace Definitions
     {
         private static GlobalDefinitions instance;
         [Header("Miscs")] 
+        [SerializeField] private Material defaultSpriteMaterial;
+        [SerializeField] private Transform mapCenterTransform;
         [SerializeField] private int mutationCostPerLevel;
         [SerializeField] private string[] romanDigits = new string[10];
         [SerializeField] private Sprite[] eggSprites = new Sprite[6];
@@ -53,7 +55,7 @@ namespace Definitions
         public static float InteractionDistance => instance.interactionDistance;
         public static int EnemyPhysicsLayerMask { get; private set; }
         public static int EnemyAttackLayerMask { get; private set; }
-        public static int PlayerAttackLayerMask { get; private set; }
+        public static int DefaultLayerMask { get; private set; }
         public static Sprite PuddleSprite => instance.puddleSprite;
         public static Color EggPuddleColor => instance.eggPuddleColor;
         public static float GenePickupDistance => instance.genePickupDistance;
@@ -66,6 +68,8 @@ namespace Definitions
         public static Color PoisonColor => instance.poisonColor;
         public static Color DeadColor => instance.deadColor;
         public static Gradient DeathGradient => deathGradient;
+        public static Transform MapCenter => instance.mapCenterTransform;
+        public static Material DefaultSpriteMaterial => instance.defaultSpriteMaterial;
 
 
         public static string GetRomanDigit(int digit) => instance.romanDigits[digit];
@@ -94,9 +98,9 @@ namespace Definitions
             egg.transform.position = pos;
         }
 
-        public static PopupNotification CreateNotification(INotificationProvider provider, bool isStatic = true) =>
+        public static PopupNotification CreateNotification(INotificationProvider provider, bool isStatic = true, bool showAlways = false) =>
             Instantiate(instance.popupNotificationPrefab, instance.worldCanvasTransform)
-                .SetDataProvider(provider, isStatic);
+                .SetDataProvider(provider, isStatic, showAlways);
 
         public static void CreateGeneDrop(Vector3 position, GeneType geneType, int amount = 1) =>
             Instantiate(instance.geneDropPrefab, instance.gameObjectsTransform)
@@ -115,7 +119,7 @@ namespace Definitions
         {
             EnemyPhysicsLayerMask = LayerMask.NameToLayer("EnemyPhysics");
             EnemyAttackLayerMask = LayerMask.NameToLayer("EnemyAttacks");
-            PlayerAttackLayerMask = LayerMask.NameToLayer("PlayerAttacks");
+            DefaultLayerMask = LayerMask.NameToLayer("Default");
             instance = this;
             deathGradient = new Gradient();
             deathGradient.SetKeys(

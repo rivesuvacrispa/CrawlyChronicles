@@ -6,6 +6,7 @@ using Gameplay.Enemies;
 using Gameplay.Food;
 using Pathfinding;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Util;
 
 namespace Gameplay.AI
@@ -19,7 +20,7 @@ namespace Gameplay.AI
         [SerializeField] private EnemyHitbox hitbox;
         [SerializeField] private Collider2D physicsCollider;
 
-        public AIState debug_AIState;
+        [field: SerializeField] public AIState StartingState { get; set; } = AIState.Enter;
         
         private Enemy enemy;
         private CallbackableAIPath aiPath;
@@ -56,8 +57,8 @@ namespace Gameplay.AI
 
         private IEnumerator Start()
         {            
-            yield return new WaitUntil(() => EnemySpawnLocation.InitializedLocationsAmount == EnemySpawner.SpawnLocationsCount);
-            SetState(debug_AIState);
+            yield return new WaitUntil(() => EnemySpawnLocation.InitializedLocationsAmount == EnemyWaveSpawner.SpawnLocationsCount);
+            SetState(StartingState);
             UpdateMovementSpeed();
             locator.SetRadius(enemy.Scriptable.LocatorRadius);
         }
@@ -97,7 +98,7 @@ namespace Gameplay.AI
             }
             
             CurrentState = newState;
-            debug_AIState = newState;
+            StartingState = newState;
         }
 
         private void SetEnter()
@@ -126,10 +127,7 @@ namespace Gameplay.AI
             aiPath.destination = enemy.SpawnLocation.SpawnPosition;
             aiPath.SearchPath();
             aiPath.endReachedDistance = 1f;
-            aiPath.Callback = () =>
-            {
-                Destroy(gameObject);
-            };
+            aiPath.Callback = () => Destroy(gameObject);
         }
 
         private IEnumerator SetFollow(ITransformProvider target, Action onTargetReach, float reachDistance)
@@ -172,7 +170,6 @@ namespace Gameplay.AI
 
         private void SetFlee()
         {
-            enemy.ClearEffects();
             currentSpeed = GlobalDefinitions.FleeingSpeedMultiplier;
             UpdateMovementSpeed();
             SetState(AIState.Exit);

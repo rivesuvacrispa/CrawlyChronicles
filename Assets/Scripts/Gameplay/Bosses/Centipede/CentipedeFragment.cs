@@ -75,11 +75,10 @@ namespace Scripts.Gameplay.Bosses.Centipede
             // Multiple collisions may happen in a single frame so this check is required to
             // make sure that the fragment dies only once
             if (dead || !hitbox.Enabled) return 0;
-            if(damageColor == default) damageColor = Color.white; 
             damage = ignoreArmor ? damage : PhysicsUtility.CalculateDamage(damage, CentipedeDefinitions.Armor * (int) fragmentType * 0.5f);
             StatRecorder.damageDealt += damage;
             SetHealth(currentHealth - damage);
-            painter.Paint(new Gradient().FastGradient(damageColor, spriteRenderer.color), GlobalDefinitions.EnemyImmunityDuration);
+            painter.Paint(new Gradient().FastGradient(Color.white, spriteRenderer.color), GlobalDefinitions.EnemyImmunityDuration);
             if (currentHealth <= 0)
             {
                 Bossbar.Instance.Damage(damage + currentHealth);
@@ -148,7 +147,7 @@ namespace Scripts.Gameplay.Bosses.Centipede
                 rb.angularDrag = 2f;
             }
             yield return new WaitForSeconds(6f);
-            painter.Fade(2f);
+            painter.FadeOut(2f);
             yield return new WaitForSeconds(2.1f);
             Destroy(gameObject);
         }

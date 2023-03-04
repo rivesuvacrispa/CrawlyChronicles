@@ -41,9 +41,8 @@ namespace Timeline
         {
             StopAllCoroutines();
             dayCounter = 0;
-            time = 0;
             ResetLifespan();
-            StartDay();
+            StartDay(dayDurationInSeconds / 2);
             UpdateUI();
             cycleDuration = dayDurationInSeconds + nightDurationInSeconds;
             StartCoroutine(DayCycleRoutine());
@@ -88,12 +87,12 @@ namespace Timeline
             DeathCounter.StopCounter();
         }
 
-        private void StartDay()
+        private void StartDay(int startFrom = 0)
         {
             fireflyParticles.Stop();
             StatRecorder.daysSurvived++;
             dayCounter++;
-            time = 0;
+            time = startFrom;
             OnDayStart?.Invoke(dayCounter);
         }
 

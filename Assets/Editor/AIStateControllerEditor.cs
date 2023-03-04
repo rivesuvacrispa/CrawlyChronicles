@@ -11,6 +11,6 @@ public class AIStateControllerEditor : Editor {
 
         DrawDefaultInspector();
 
-        if (GUILayout.Button ("Update state")) manager.SetState(manager.debug_AIState);
+        if (GUILayout.Button ("Update state")) manager.SetState(manager.StartingState);
     }
 }

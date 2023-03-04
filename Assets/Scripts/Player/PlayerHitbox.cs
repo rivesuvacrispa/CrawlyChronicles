@@ -25,7 +25,6 @@ namespace Player
             if (col.gameObject.TryGetComponent(out IEnemyAttack attack))
             {
                 OnStruck?.Invoke(0);
-                Debug.Log($"Collision with {col.gameObject.name}");
                 Manager.Instance.Damage(attack.AttackDamage, attack.AttackPosition, attack.AttackPower);
             }
         }

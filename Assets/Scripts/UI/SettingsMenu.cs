@@ -37,6 +37,8 @@ namespace UI
         
         private void Awake()
         {
+            Debug.Log("Awake settings");
+            
             sfxVolumeSlider.onValueChanged.AddListener(UpdateSFXVolume);
             musicVolumeSlider.onValueChanged.AddListener(UpdateMusicVolume);
             targetFramerateSlider.onValueChanged.AddListener(UpdateTargetFramerate);

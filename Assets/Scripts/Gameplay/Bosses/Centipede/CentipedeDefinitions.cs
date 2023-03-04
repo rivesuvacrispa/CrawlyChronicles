@@ -44,8 +44,10 @@ namespace Scripts.Gameplay.Bosses.Centipede
 
         private CentipedeDefinitions() => instance = this;
 
-        private void Start()
+        private void Awake()
         {
+            Debug.Log("Awake centipede");
+            
             OnDifficultyChanged(SettingsMenu.SelectedDifficulty);
             SettingsMenu.OnDifficultyChanged += OnDifficultyChanged;
         }

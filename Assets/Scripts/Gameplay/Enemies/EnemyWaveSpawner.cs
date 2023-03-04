@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Gameplay.Enemies
 {
-    public class EnemySpawner : MonoBehaviour
+    public class EnemyWaveSpawner : MonoBehaviour
     {
         [SerializeField] private Enemy neutral;
         [SerializeField] private EnemyList enemyList = new();
@@ -22,15 +22,15 @@ namespace Gameplay.Enemies
         private float currentEnemyPerMinute;
         private float currentEnemyPerDay;
         
-        private readonly List<EnemySpawnLocation> enemySpawnPoints = new();
+        private static readonly List<EnemySpawnLocation> EnemySpawnPoints = new();
         public static int SpawnLocationsCount { get; private set; }
         
         
         private void Awake()
         {
             foreach (Transform child in enemySpawnPointsTransform)
-                enemySpawnPoints.Add(child.GetComponent<EnemySpawnLocation>());
-            SpawnLocationsCount = enemySpawnPoints.Count;
+                EnemySpawnPoints.Add(child.GetComponent<EnemySpawnLocation>());
+            SpawnLocationsCount = EnemySpawnPoints.Count;
             SubToEvents();
         }
 
@@ -92,6 +92,6 @@ namespace Gameplay.Enemies
         }
 
 
-        private EnemySpawnLocation GetRandomSpawnPoint() => enemySpawnPoints[Random.Range(0, enemySpawnPoints.Count)];
+        public static EnemySpawnLocation GetRandomSpawnPoint() => EnemySpawnPoints[Random.Range(0, EnemySpawnPoints.Count)];
     }
 }
