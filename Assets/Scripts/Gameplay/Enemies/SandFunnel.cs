@@ -17,7 +17,7 @@ namespace Gameplay.Enemies
 
         private Coroutine stepRoutine;
         
-        private void Awake() => player ??= Player.Manager.Instance.Transform;
+        private void Awake() => player ??= Player.PlayerManager.Instance.Transform;
         private void OnEnable()
         {
             stepRoutine ??= StartCoroutine(StepRoutine(power));
@@ -37,7 +37,7 @@ namespace Gameplay.Enemies
             float dist = (playerPos - pos).sqrMagnitude;
             if(dist > radius) return;
 
-            Player.Movement.AddForce(PhysicsUtility.GetVelocityBackwards(
+            Player.PlayerMovement.AddForce(PhysicsUtility.GetVelocityBackwards(
                 pos, playerPos, currentPower * (1 - dist / radius)));
         }
 

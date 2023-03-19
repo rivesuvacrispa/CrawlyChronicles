@@ -4,48 +4,51 @@ using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Definitions;
+using GameCycle;
+using Gameplay.Interfaces;
+using Mutations.AttackEffects;
+using Player;
+using Scripts.Gameplay.Bosses.Centipede;
+using Scripts.Util.Interfaces;
 using UnityEngine;
 using Util;
+using Util.Interfaces;
 using Random = UnityEngine.Random;
 
 namespace Scripts.Gameplay.Bosses.Terrorwing
 {
-    public class Terrorwing : MonoBehaviour
+    public class Terrorwing : Boss, IDamageableEnemy, IEnemyAttack, IImpactable
     {
         public TerrorwingPattern debug_PatternToSet;
+        public bool debug_DieFromPlayer;
+        [Header("Refs")] 
         [SerializeField] private Animator animator;
         [SerializeField] private ParticleSystem deathParticles;
-        [Header("Refs")]
+        [SerializeField] private GameObject attackGO;
+        [SerializeField] private TerrorwingHitbox mainHitbox;
         [SerializeField] private TerrorwingProjectile projectilePrefab;
         [SerializeField] private TerrorwingClone original;
         [SerializeField] private TerrorwingClone[] allClones = new TerrorwingClone[4];
         [Header("Stats")]
         [SerializeField] private float flySpeed;
         [SerializeField] private float rotationSpeed;
-
         [Header("Swipe attack")] 
-        [SerializeField] private int numberOfAttacks;
+        [SerializeField] private Vector2Int numberOfAttacks;
         [SerializeField] private float swipeAttackSpeed;
-        [SerializeField] private float swipeAttackDistance;
-        [SerializeField] private float distanceToComeback;
         [Header("Bombardier")] 
-        [SerializeField] private float shootingSpeed;
         [SerializeField] private float aimScatter;
         [SerializeField] private float orbitTime;
-        [SerializeField] private int orbitsAmount;
+        [SerializeField] private Vector2Int orbitsAmount;
         [SerializeField] private float orbitSpeed;
-
         [Header("Bullet hell")] 
         [SerializeField] private TerrorwingBulletHell bulletHell;
         [SerializeField] private float bulletHellDuration;
-
         [Header("Illusions")]
-        [SerializeField] private int illusionCycleAmount;
+        [SerializeField] private Vector2Int illusionCycleAmount;
         [SerializeField] private float illusionRotationSpeed;
         [SerializeField] private float illusionsDistance;
-        [SerializeField] private float illusionsFadeTime;
 
-        private TerrorwingPattern currentPattern = TerrorwingPattern.Spawn;
+        private TerrorwingPattern currentPattern = TerrorwingPattern.SwipeAttack;
         private CancellationTokenSource destructionCts;
         private CancellationTokenSource shootingCts;
         private CancellationTokenSource illusionsCts;
@@ -58,14 +61,51 @@ namespace Scripts.Gameplay.Bosses.Terrorwing
             TerrorwingPattern.BulletHell
         };
 
+        private static readonly int DeathAnimHash = Animator.StringToHash("TerrorwingDeath");
+        private static readonly int FlyAnimHash = Animator.StringToHash("TerrorwingFly");
+        private static readonly int AttackAnimHash = Animator.StringToHash("TerrorwingAttack");
+        
         private readonly Stack<TerrorwingPattern> patternSequence = new(3);
 
         private bool destroyed;
         private bool died;
+        private float currentHealth;
 
 
-
+        
         private void Awake() => rb = GetComponent<Rigidbody2D>();
+
+        // Boss
+        protected override void Enrage() => PlayerManager.Instance.Die(true);
+
+        public override void Flee() => Die(false);
+
+        protected override void Start()
+        {
+            currentHealth = TerrorwingDefinitions.MaxHealth;
+            Bossbar.Instance.SetMaxHealth(currentHealth);
+            base.Start();
+            ForcePattern(debug_PatternToSet);
+        }
+
+        protected override void OnDestroy()
+        {
+            destroyed = true;
+            DisposeAll();
+            base.OnDestroy();
+        }
+
+        protected override bool InvokeDestructionEvent()
+        {
+            if (base.InvokeDestructionEvent())
+            {
+                mainHitbox.Die();
+                attackGO.SetActive(false);
+                return true;
+            }
+            return false;
+        }
+
 
         private void BuildPatternSequence()
         {
@@ -73,14 +113,6 @@ namespace Scripts.Gameplay.Bosses.Terrorwing
             patternSequence.Clear();
             foreach (TerrorwingPattern pattern in patterns) 
                 patternSequence.Push(pattern);
-        }
-        
-        private void Start()
-        {
-            Bossbar.Instance.SetMaxHealth(99999);
-            Bossbar.Instance.SetName("Terrorwing");
-            Bossbar.Instance.SetActive(true);
-            ForcePattern(debug_PatternToSet);
         }
 
         public void ForcePattern(TerrorwingPattern pattern)
@@ -91,15 +123,7 @@ namespace Scripts.Gameplay.Bosses.Terrorwing
             
             DisposeAll();
             destructionCts = new CancellationTokenSource();
-            var token = destructionCts.Token;
-            
-            PatternsTask(cancellationToken: token).Forget();
-        }
-
-        private void OnDestroy()
-        {
-            destroyed = true;
-            DisposeAll();
+            PatternsTask(cancellationToken: destructionCts.Token).Forget();
         }
 
         private void DisposeAll()
@@ -121,7 +145,7 @@ namespace Scripts.Gameplay.Bosses.Terrorwing
         
         private async UniTask SwipeAttackTask(CancellationToken cancellationToken)
         {
-            int counter = numberOfAttacks;
+            int counter = Random.Range(numberOfAttacks.x, numberOfAttacks.y + 1);
             while (counter > 0 && currentPattern == TerrorwingPattern.SwipeAttack)
             {
                 await SingleSwipeAttackTask(cancellationToken);
@@ -131,21 +155,29 @@ namespace Scripts.Gameplay.Bosses.Terrorwing
 
         private async UniTask SingleSwipeAttackTask(CancellationToken cancellationToken)
         {
-            await CustomCoroutines.MoveUntilFacingAndCloseEnough(rb, Player.Manager.Instance.Transform, flySpeed, rotationSpeed, swipeAttackDistance,
-                cancellationToken: cancellationToken);
+            await TaskUtility.MoveUntilFacingAndCloseEnough(rb, PlayerManager.Instance.Transform, flySpeed, 
+                rotationSpeed, TerrorwingDefinitions.SwipeAttackDistance, cancellationToken: cancellationToken);
             await ResetSpeed(cancellationToken);
                 
-            rb.AddClampedForceTowards(Player.Movement.Position, swipeAttackSpeed, ForceMode2D.Impulse);
-
-            await KeepDistanceTask(distanceToComeback, cancellationToken: cancellationToken);
+            mainHitbox.Disable();
+            animator.Play(AttackAnimHash);
+            attackGO.SetActive(true);
+            rb.AddClampedForceTowards(PlayerMovement.Position, swipeAttackSpeed, ForceMode2D.Impulse);
+            
+            await KeepDistanceTask(TerrorwingDefinitions.SwipeAttackDistance, cancellationToken: cancellationToken);
+            attackGO.SetActive(false);
+            animator.Play(FlyAnimHash);
+            mainHitbox.Enable();
         }
 
         private async UniTask KeepDistanceTask(float distance, Transform target = default, CancellationToken cancellationToken = default)
         {
-            if (target == default) target = Player.Manager.Instance.Transform;
+            if (target == default) target = PlayerManager.Instance.Transform;
             await UniTask.Delay(TimeSpan.FromMilliseconds(250f), cancellationToken: cancellationToken);
-            await CustomCoroutines.WaitUntilDistanceGained(rb, target, flySpeed, rotationSpeed, + 2, cancellationToken: cancellationToken);
-            await CustomCoroutines.WaitUntilDistanceReached(rb, target, flySpeed, rotationSpeed, distance, cancellationToken: cancellationToken);
+            await TaskUtility.MoveUntilFacingAndCloseEnough(rb, null, flySpeed, rotationSpeed, 2.5f,
+                staticTarget: target.position + (Vector3) Random.insideUnitCircle.normalized * 5, 
+                cancellationToken: cancellationToken);
+            await TaskUtility.WaitUntilDistanceReached(rb, target, flySpeed, rotationSpeed, distance, cancellationToken: cancellationToken);
         }
 
         private async UniTask ShootTask(CancellationToken cancellationToken)
@@ -155,35 +187,36 @@ namespace Scripts.Gameplay.Bosses.Terrorwing
                 var spawner = original.ProjectileSpawners[Random.Range(0, 4)];
                 var projectile = spawner.Spawn(projectilePrefab);
                 var scatter = Random.insideUnitCircle * aimScatter;
-                var target = Player.Movement.Position + (Vector2) Player.Manager.Instance.Transform.up + scatter;
+                var target = PlayerMovement.Position + (Vector2) PlayerManager.Instance.Transform.up + scatter;
                 projectile.Target = target;
-                await UniTask.Delay(TimeSpan.FromSeconds(shootingSpeed), cancellationToken: cancellationToken);
+                await UniTask.Delay(TimeSpan.FromSeconds(TerrorwingDefinitions.BombardierShootingSpeed),
+                    cancellationToken: cancellationToken);
             }
         }
 
         private async UniTask OrbitWithAttackTask(CancellationToken cancellationToken)
         {
-            await KeepDistanceTask(swipeAttackDistance, cancellationToken: cancellationToken);
-
             var axis = new Vector3(0, 0, 1);
-            int orbitCounter = orbitsAmount;
+            int orbitCounter = Random.Range(orbitsAmount.x, orbitsAmount.y + 1);
 
             while (orbitCounter > 0 && currentPattern == TerrorwingPattern.Bombardier)
             {
-                axis *= Random.value >= 0.5f ? 1 : -1;
+                await KeepDistanceTask(TerrorwingDefinitions.SwipeAttackDistance,
+                    cancellationToken: cancellationToken);
+                
+                axis *= Random.value > 0.5f ? 1 : -1;
                 shootingCts = new CancellationTokenSource();
                 ShootTask(shootingCts.Token).Forget();
                 
-                float t = orbitTime;
+                float t = orbitTime * Random.Range(0.8f, 1.2f);
                 while (t > 0)
                 {
-                    Vector2 playerPos = Player.Movement.Position;
+                    Vector2 playerPos = PlayerMovement.Position;
                     transform.RotateAround(playerPos, axis, orbitSpeed * Time.deltaTime);
-                    rb.RotateTowardsPosition(playerPos, 360);
+                    // rb.RotateTowardsPosition(playerPos, 360);
                     t -= Time.deltaTime;
                     await UniTask.Yield(cancellationToken: cancellationToken);
                 }
-                animator.Play("TerrorwingFly");
                 DisposeTokenSource(shootingCts);
                 shootingCts = null;
                 
@@ -195,7 +228,7 @@ namespace Scripts.Gameplay.Bosses.Terrorwing
 
         private async UniTask BulletHellTask(CancellationToken cancellationToken)
         {
-            await CustomCoroutines.WaitUntilDistanceReached(rb, GlobalDefinitions.MapCenter, flySpeed * 0.33f, rotationSpeed, 1, cancellationToken: cancellationToken);
+            await TaskUtility.WaitUntilDistanceReached(rb, GlobalDefinitions.MapCenter, flySpeed * 0.33f, rotationSpeed, 1, cancellationToken: cancellationToken);
             await UniTask.WhenAll(
                 bulletHell.StartBulletHell(3, bulletHellDuration, cancellationToken: cancellationToken),
                 BulletHellAnimationTask(cancellationToken));
@@ -204,10 +237,11 @@ namespace Scripts.Gameplay.Bosses.Terrorwing
         private async UniTask IllusionsTask(CancellationToken cancellationToken)
         {
             illusionsCts = new CancellationTokenSource();
-            int counter = illusionCycleAmount;
-            await CustomCoroutines.WaitUntilDistanceReached(rb, Player.Manager.Instance.Transform, flySpeed, rotationSpeed, 3, cancellationToken: cancellationToken);
+            int counter = Random.Range(illusionCycleAmount.x, illusionCycleAmount.y + 1);
+            await TaskUtility.WaitUntilDistanceReached(rb, PlayerManager.Instance.Transform, flySpeed, rotationSpeed, 3, cancellationToken: cancellationToken);
             await FadeOriginal(false, cancellationToken);
 
+            rb.simulated = false;
             IllusionsRotationTask(illusionsCts.Token).Forget();
             
             while (counter > 0 && currentPattern == TerrorwingPattern.Illusions)
@@ -215,7 +249,7 @@ namespace Scripts.Gameplay.Bosses.Terrorwing
                 allClones = allClones.OrderBy(_ => Random.value).ToArray();
 
                 await FadeAll(true, cancellationToken);
-                if(Random.value >= 0.5f) 
+                if(Random.value > 0.5f) 
                     allClones[Random.Range(0, 4)].ShootBullets(projectilePrefab, 8, 0.25f, cancellationToken).Forget();
                 else
                 {
@@ -227,10 +261,12 @@ namespace Scripts.Gameplay.Bosses.Terrorwing
             }
 
             DisposeTokenSource(illusionsCts);
+            rb.simulated = true;
             illusionsCts = null;
+            transform.position = PlayerMovement.Position + Random.insideUnitCircle.normalized * 3;
             SetClonesSimulated(false);
             original.transform.localPosition = Vector3.zero;
-            original.transform.rotation = Quaternion.identity;
+            original.transform.localRotation = Quaternion.identity;
             await UniTask.WhenAll(
                 FadeOriginal(true,  cancellationToken),
                 KeepDistanceTask(5, cancellationToken: cancellationToken));
@@ -240,32 +276,35 @@ namespace Scripts.Gameplay.Bosses.Terrorwing
         private async UniTask IllusionsRotationTask(CancellationToken cancellationToken)
         {
             SetClonesSimulated(true);
+            
             float angle = 0;
             while (currentPattern == TerrorwingPattern.Illusions)
             {
-                var playerPos = Player.Movement.Position;
-                rb.position = playerPos;
+                Vector3 playerPos = PlayerMovement.Position;
+                transform.position = playerPos;
                 for (int i = 0; i < 4; i++)
                 {
                     var clone = allClones[i];
                     float a = angle + i * Mathf.PI / 2;
                     Vector2 pos = new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * illusionsDistance;
-                    clone.UpdatePosition(pos, playerPos);
+                    clone.UpdateIllusionPosition(pos, playerPos);
                 }
 
                 angle += illusionRotationSpeed * Time.deltaTime;
                 await UniTask.Yield(cancellationToken);
             }
+
             SetClonesSimulated(false);
         }
 
         private async UniTask FadeOriginal(bool isActive, CancellationToken cancellationToken)
         {
-            await original.SetActive(isActive, illusionsFadeTime, cancellationToken: cancellationToken);
+            await original.SetActive(isActive, TerrorwingDefinitions.IllusionsFadeTime, cancellationToken: cancellationToken);
         }
         
         private async UniTask FadeAll(bool isActive, CancellationToken cancellationToken)
         {
+            float illusionsFadeTime = TerrorwingDefinitions.IllusionsFadeTime;
             IEnumerable<UniTask> tasks = new[]
             {
                 allClones[0].SetActive(isActive, illusionsFadeTime, cancellationToken: cancellationToken),
@@ -299,16 +338,30 @@ namespace Scripts.Gameplay.Bosses.Terrorwing
             await UniTask.WaitForFixedUpdate(cancellationToken: cancellationToken);
         }
 
-
-        private async UniTask DeathTask(CancellationToken cancellationToken)
+        public void Die(bool fromPlayer)
+        {
+            died = true;
+            DisposeAll();
+            destructionCts = new CancellationTokenSource();
+            DeathTask(destructionCts.Token, fromPlayer).Forget();
+        }
+        
+        private async UniTask DeathTask(CancellationToken cancellationToken, bool fromPlayer)
         {
             await ResetSpeed(cancellationToken);
             rb.simulated = false;
-            Bossbar.Instance.Die();
-            animator.Play("TerrorwingDeath");
-            await UniTask.Delay(TimeSpan.FromSeconds(0.1f), cancellationToken: cancellationToken);
+            animator.Play(DeathAnimHash);
             deathParticles.Play();
-            await original.Die(cancellationToken: cancellationToken);
+
+            if (fromPlayer)
+                base.Die();
+            else
+                InvokeDestructionEvent();
+
+            await UniTask.WhenAll(
+                original.Die(cancellationToken: cancellationToken, fromPlayer),
+                UniTask.WaitUntil(() => !deathParticles.isPlaying, cancellationToken: cancellationToken));
+            
             Destroy(gameObject);
         }
         
@@ -316,39 +369,89 @@ namespace Scripts.Gameplay.Bosses.Terrorwing
         {
             while (!died && !destroyed && patternSequence.TryPop(out var pattern))
             {
-                bool canceled;
+                bool canceled = false;
                 currentPattern = pattern;
-                Debug.Log($"Playing {pattern}");
                 switch (pattern)
                 {
                     case TerrorwingPattern.Illusions:
                         canceled = await IllusionsTask(cancellationToken).SuppressCancellationThrow();
-                        if(canceled && !destroyed)
-                        {
-                            DisposeTokenSource(illusionsCts);
-                            SetClonesSimulated(false);
-                            foreach (TerrorwingClone clone in allClones) clone.DieIfClone();
-                            original.ResetColor();
-                        }
                         break;
                     case TerrorwingPattern.SwipeAttack:
-                        await SwipeAttackTask(cancellationToken);
+                        canceled = await SwipeAttackTask(cancellationToken).SuppressCancellationThrow();
                         break;
                     case TerrorwingPattern.Bombardier:
-                        await OrbitWithAttackTask(cancellationToken);
+                        canceled = await OrbitWithAttackTask(cancellationToken).SuppressCancellationThrow();
                         break;
                     case TerrorwingPattern.BulletHell:
                         canceled = await BulletHellTask(cancellationToken).SuppressCancellationThrow();
-                        if(canceled && !destroyed) bulletHell.StopBulletHell();
-                        break;
-                    case TerrorwingPattern.Death:
-                        died = true;
-                        await DeathTask(cancellationToken);
                         break;
                 }
-                
-                if(patternSequence.Count == 0) BuildPatternSequence();
+
+                if (canceled && !destroyed) 
+                    CleanupStates();
+
+                if(!died && !destroyed && patternSequence.Count == 0) BuildPatternSequence();
             }
         }
+
+        private void CleanupStates()
+        {
+            DisposeTokenSource(illusionsCts);
+            DisposeTokenSource(shootingCts);
+            SetClonesSimulated(false);
+            original.ResetColor();
+            mainHitbox.Enable();
+            animator.Play(FlyAnimHash);
+            bulletHell.StopBulletHell();
+            attackGO.SetActive(false);
+            illusionsCts = null;
+            shootingCts = null;
+            rb.simulated = true;
+            original.transform.localPosition = Vector3.zero;
+            original.transform.localRotation = Quaternion.identity;
+            foreach (TerrorwingClone clone in allClones) clone.DieIfClone();
+        }
+        
+        
+        
+        // IDamageableEnemy
+        public Transform Transform => transform;
+        public float HealthbarOffsetY => 0;
+        public float HealthbarWidth => 0;
+
+        public float Damage(
+            float damage, 
+            Vector3 position = default, 
+            float knockback = 0f, 
+            float stunDuration = 0f, 
+            Color damageColor = default,
+            bool ignoreArmor = false,
+            AttackEffect effect = null)
+        {
+            if(rb.simulated && !mainHitbox.Immune)
+            {
+                mainHitbox.Hit();
+                original.PaintDamage();
+            }
+            
+            StatRecorder.damageDealt += damage;
+            currentHealth -= damage;
+            
+            if (currentHealth <= 0)
+                Die(true);
+            else
+                Bossbar.Instance.Damage(damage);
+
+            effect?.Impact(this, damage);
+
+            return damage;
+        }
+        
+        
+        
+        // IEnemyAttack
+        public Vector3 AttackPosition => transform.position + (Vector3) Random.insideUnitCircle.normalized;
+        public float AttackDamage => TerrorwingDefinitions.ContactDamage;
+        public float AttackPower => 10;
     }
 }

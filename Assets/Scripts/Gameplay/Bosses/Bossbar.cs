@@ -14,10 +14,10 @@ namespace Scripts.Gameplay.Bosses
         [SerializeField] private Gradient gradient;
         [SerializeField] private Animator animator;
 
-        private bool isActive;
         private float currentHealth;
         private float maxHealth;
         private static readonly int OutroAnimHash = Animator.StringToHash("BossbarOutro");
+        private static readonly int IntroAnimHash = Animator.StringToHash("BossbarIntro");
         
         
         private Bossbar() => Instance = this;
@@ -26,11 +26,12 @@ namespace Scripts.Gameplay.Bosses
         
         public void SetActive(bool state)
         {
-            if(isActive == state) return;
-
-            isActive = state;
+            animator.StopPlayback();
             if(state)
+            {
                 rootGO.SetActive(true);
+                animator.Play(IntroAnimHash);
+            }
             else animator.Play(OutroAnimHash);
         }
 
@@ -61,15 +62,8 @@ namespace Scripts.Gameplay.Bosses
             if(dmg <= 0) return;
             currentHealth = Mathf.Clamp(currentHealth - dmg, 0, maxHealth);
             UpdateHealth();
-            if (currentHealth <= 0.01f) Die();
         }
 
-        public void Die()
-        {
-            isActive = false;
-            currentHealth = 0;
-            UpdateHealth();
-            animator.Play(OutroAnimHash);
-        }
+        public void Die() => SetActive(false);
     }
 }

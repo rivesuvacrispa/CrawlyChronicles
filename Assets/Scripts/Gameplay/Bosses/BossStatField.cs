@@ -12,10 +12,8 @@ namespace Scripts.Gameplay.Bosses
             new(BossDifficulty.Default),
             new(BossDifficulty.Unfair),
         };
-
-        public T CurrentValue { get; private set; }
-
-        public void ChangeDifficulty(Difficulty difficulty) => CurrentValue = values[(int)difficulty.OverallDifficulty].Value;
+        
+        public T ChangeDifficulty(Difficulty difficulty) => values[(int)difficulty.OverallDifficulty].Value;
 
         
         

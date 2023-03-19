@@ -2,14 +2,18 @@
 using Definitions;
 using GameCycle;
 using Gameplay.AI.Locators;
+using Mutations.AttackEffects;
+using Player;
+using Scripts.Util.Interfaces;
 using UI;
 using UnityEngine;
 using Util;
+using Util.Interfaces;
 
 namespace Scripts.Gameplay.Bosses.Centipede
 {
     [RequireComponent(typeof(BodyPainter))]
-    public class CentipedeFragment : MonoBehaviour, IDamageableEnemy
+    public class CentipedeFragment : MonoBehaviour, IDamageableEnemy, IImpactable
     {
         [SerializeField] private ParticleSystem sprayParticles;
         [SerializeField] private ParticleCollisionProvider particleCollisionProvider;
@@ -36,7 +40,7 @@ namespace Scripts.Gameplay.Bosses.Centipede
         
         
         
-        protected virtual void Awake()
+        private void Awake()
         {
             hitbox = GetComponentInChildren<CentipedeHitbox>();
             hitbox.Fragment = this;
@@ -70,7 +74,8 @@ namespace Scripts.Gameplay.Bosses.Centipede
             float knockback = 0, 
             float stunDuration = 0, 
             Color damageColor = default,
-            bool ignoreArmor = false)
+            bool ignoreArmor = false,
+            AttackEffect effect = null)
         {
             // Multiple collisions may happen in a single frame so this check is required to
             // make sure that the fragment dies only once
@@ -79,6 +84,7 @@ namespace Scripts.Gameplay.Bosses.Centipede
             StatRecorder.damageDealt += damage;
             SetHealth(currentHealth - damage);
             painter.Paint(new Gradient().FastGradient(Color.white, spriteRenderer.color), GlobalDefinitions.EnemyImmunityDuration);
+            
             if (currentHealth <= 0)
             {
                 Bossbar.Instance.Damage(damage + currentHealth);
@@ -89,6 +95,9 @@ namespace Scripts.Gameplay.Bosses.Centipede
                 hitbox.Hit();
                 Bossbar.Instance.Damage(damage);
             }
+            
+            effect?.Impact(this, damage);
+            
             return damage;
         }
 
@@ -122,6 +131,7 @@ namespace Scripts.Gameplay.Bosses.Centipede
                     backFragment.gameObject.AddComponent(typeof(CentipedeHead));
             }
             
+            CentipedeBoss.Instance.OnFragmentDeath();
             StartCoroutine(DespawnRoutine());
         }
 
@@ -163,6 +173,7 @@ namespace Scripts.Gameplay.Bosses.Centipede
             backFragment = fragment;
             fragment.frontFragment = this;
             fragment.transform.position = transform.position;
+            fragment.transform.SetParent(CentipedeBoss.Instance.transform);
             fragment.MaxHealth = MaxHealth;
             fragment.UpdateColor((float) posFromTail / length);
             Bossbar.Instance.AddMaxHealth(CentipedeDefinitions.FragmentHealth);
@@ -176,7 +187,7 @@ namespace Scripts.Gameplay.Bosses.Centipede
             float distance = (target - pos).sqrMagnitude;
             rb.RotateTowardsPosition(target, rotationSpeed);
 
-            float speed = CentipedeDefinitions.Speed * distance;
+            float speed = CentipedeDefinitions.FragmentSpeed * distance;
             if (speed > maxSpeed) speed = maxSpeed;
             rb.velocity = distance < CentipedeDefinitions.FollowRadius ?
                 Vector2.zero : transform.up * speed;
@@ -212,7 +223,7 @@ namespace Scripts.Gameplay.Bosses.Centipede
         
         private void OnBulletCollision(IDamageable damageable)
         {
-            if (damageable is Player.Manager manager)
+            if (damageable is PlayerManager manager)
             {
                 manager.Damage(
                     CentipedeDefinitions.PoisonDamage, 
@@ -224,7 +235,7 @@ namespace Scripts.Gameplay.Bosses.Centipede
 
         private void OnPlayerLocated(ILocatorTarget target)
         {
-            if(target is Player.Movement)
+            if(target is PlayerMovement)
             {
                 sprayCooldownRoutine = StartCoroutine(SprayCooldownRoutine());
                 sprayParticles.Play();
@@ -237,7 +248,8 @@ namespace Scripts.Gameplay.Bosses.Centipede
             particleCollisionProvider.OnCollision -= OnBulletCollision;
             locator.OnTargetLocated -= OnPlayerLocated;
         }
-
+        
+        
 
         // IDamageable
         public event IDestructionEventProvider.DestructionProviderEvent OnProviderDestroy;

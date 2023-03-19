@@ -4,10 +4,11 @@ using Gameplay.Food;
 using Player;
 using UnityEngine;
 using Util;
+using Util.Interfaces;
 
 namespace Gameplay.Enemies
 {
-    public class Cockroach : Enemy
+    public class Cockroach : Enemy, IWallCollisionListener
     {
         [SerializeField] private float evadeDistance;
         [SerializeField] private float evadeSpeed;
@@ -15,10 +16,13 @@ namespace Gameplay.Enemies
 
         private Coroutine evadeRoutine;
         private bool canEvade = true;
-        
+
+
+
         protected override void Start()
         {
             base.Start();
+            EntityWallCollider.enabled = false;
             AttackController.OnAttackStart += OnPlayerAttack;
         }
 
@@ -31,7 +35,7 @@ namespace Gameplay.Enemies
 
         public override void OnEggsLocated(EggBed eggBed) { }
 
-        public override void OnFoodLocated(FoodBed foodBed) { }
+        public override void OnFoodLocated(Foodbed foodBed) { }
 
         protected override void OnDamageTaken()
         {
@@ -40,10 +44,10 @@ namespace Gameplay.Enemies
 
         private void OnPlayerAttack()
         {
-            var playerpos = Movement.Position;
+            var playerpos = PlayerMovement.Position;
             var direction = rb.position - playerpos;
             if(!canEvade || evadeRoutine is not null || direction.sqrMagnitude > evadeDistance ||
-               !PhysicsUtility.AngleBetween(Manager.Instance.Transform.up, direction, 90)) return;
+               !PhysicsUtility.AngleBetween(PlayerManager.Instance.Transform.up, direction, 90)) return;
             StopAttack();
             rb.AddClampedForceBackwards(playerpos, 3, ForceMode2D.Impulse);
             evadeRoutine = StartCoroutine(EvadeRoutine(direction, 0.33f));
@@ -51,7 +55,7 @@ namespace Gameplay.Enemies
         
         private IEnumerator EvadeRoutine(Vector2 direction, float duration)
         {
-            WallCollider.enabled = true;
+            EntityWallCollider.enabled = true;
             stateController.SetState(AIState.None);
             float t = duration;
             while (t > 0)
@@ -66,7 +70,7 @@ namespace Gameplay.Enemies
             while (t > 0)
             {
                 stateController.TakeMoveControl();
-                rb.AddClampedForceBackwards(Movement.Position, evadeSpeed, ForceMode2D.Force);
+                rb.AddClampedForceBackwards(PlayerMovement.Position, evadeSpeed, ForceMode2D.Force);
                 rb.RotateTowardsPosition(rb.position + rb.velocity, 10);
                 t -= Time.deltaTime;
                 yield return null;
@@ -74,7 +78,7 @@ namespace Gameplay.Enemies
 
             evadeRoutine = null;
             stateController.SetState(AIState.Wander);
-            WallCollider.enabled = false;
+            EntityWallCollider.enabled = false;
             stateController.ReturnMoveControl();
             StartCoroutine(EvasionCooldown(1.5f));
         }
@@ -85,21 +89,14 @@ namespace Gameplay.Enemies
             yield return new WaitForSeconds(duration);
             canEvade = true;
         }
-
-        public override void OnWallCollision()
-        {
-            CancelEvade();
-            stateController.SetState(AIState.Wander);
-            StartCoroutine(EvasionCooldown(5f));
-        }
-
+        
         private void CancelEvade()
         {
             if(evadeRoutine is null) return; 
             StopCoroutine(evadeRoutine);
             stateController.ReturnMoveControl();
             evadeRoutine = null;
-            WallCollider.enabled = false;
+            EntityWallCollider.enabled = false;
         }
 
         protected override void OnDayStart(int day)
@@ -114,5 +111,17 @@ namespace Gameplay.Enemies
             base.OnDestroy();
             AttackController.OnAttackStart -= OnPlayerAttack;
         }
+        
+        
+        // IWallCollisionListener
+        public EntityWallCollider EntityWallCollider { get; set; }
+        public void OnWallCollisionEnter()
+        {
+            CancelEvade();
+            stateController.SetState(AIState.Wander);
+            StartCoroutine(EvasionCooldown(5f));
+        }
+
+        public void OnWallCollisionExit() { }
     }
 }

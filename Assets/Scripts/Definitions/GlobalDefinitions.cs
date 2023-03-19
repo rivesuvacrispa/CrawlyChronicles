@@ -1,9 +1,12 @@
 ﻿using Gameplay;
+using Gameplay.Abilities;
 using Gameplay.Enemies;
 using Genes;
+using Scriptable;
 using UI;
 using UnityEngine;
-using Util;
+using UnityEngine.Rendering;
+using Util.Interfaces;
 
 namespace Definitions
 {
@@ -11,6 +14,7 @@ namespace Definitions
     {
         private static GlobalDefinitions instance;
         [Header("Miscs")] 
+        [SerializeField] private Volume globalVolume;
         [SerializeField] private Material defaultSpriteMaterial;
         [SerializeField] private Transform mapCenterTransform;
         [SerializeField] private int mutationCostPerLevel;
@@ -28,6 +32,7 @@ namespace Definitions
         [SerializeField] private float interactionDistance;
         [SerializeField] private float genePickupDistance;
         [Header("Prefabs")] 
+        [SerializeField] private MutationDrop mutationDropPrefab;
         [SerializeField] private SandFunnel sandFunnel;
         [SerializeField] private EggBed eggBedPrefab;
         [SerializeField] private EggDrop eggDropPrefab;
@@ -45,6 +50,7 @@ namespace Definitions
         
         
         private static Gradient deathGradient;
+        private static VolumeProfile globalVolumeProfile;
         
         
         public static Transform GameObjectsTransform => instance.gameObjectsTransform;
@@ -70,14 +76,31 @@ namespace Definitions
         public static Gradient DeathGradient => deathGradient;
         public static Transform MapCenter => instance.mapCenterTransform;
         public static Material DefaultSpriteMaterial => instance.defaultSpriteMaterial;
+        public static VolumeProfile GlobalVolumeProfile => globalVolumeProfile;
+        
 
 
         public static string GetRomanDigit(int digit) => instance.romanDigits[digit];
         public static Sprite GetEggsBedSprite(int eggsAmount) => instance.eggSprites[Mathf.Clamp(eggsAmount - 1, 0, 5)];
         public static Color GetGeneColor(GeneType geneType) => instance.geneColors[(int) geneType];
         public static int GetMutationCost(int lvl) => (lvl + 1) * instance.mutationCostPerLevel;
-        
 
+        public static Vector3 GetRandomPointAroundMap(int radius)
+            => (Vector3) Random.insideUnitCircle.normalized * radius + instance.mapCenterTransform.position;
+        
+        
+        
+        public static void DropGenesRandomly(Vector3 pos, GeneType type, int amount, float radius = 0.75f)
+        {
+            if (amount > 0) CreateGeneDrop(pos + (Vector3) Random.insideUnitCircle * radius, type, amount);
+        }
+
+        public static void CreateMutationDrop(Vector3 pos, BasicMutation basicMutation)
+        {
+            var drop = Instantiate(instance.mutationDropPrefab, instance.gameObjectsTransform);
+            drop.transform.position = pos;
+            drop.SetData(basicMutation);
+        }
         
         public static SandFunnel CreateSandFunnel(Vector2 position)
         {
@@ -87,8 +110,8 @@ namespace Definitions
             return funnel;
         }
         
-        public static EggDrop CreateEggDrop(Egg egg)=>
-            Instantiate(instance.eggDropPrefab, instance.gameObjectsTransform)
+        public static EggDrop CreateEggDrop(Egg egg)
+            => Instantiate(instance.eggDropPrefab, instance.gameObjectsTransform)
                 .SetEgg(egg);
         
         public static void CreateEggSquash(Vector3 pos)
@@ -117,10 +140,11 @@ namespace Definitions
 
         private void Awake()
         {
+            instance = this;
             EnemyPhysicsLayerMask = LayerMask.NameToLayer("EnemyPhysics");
             EnemyAttackLayerMask = LayerMask.NameToLayer("EnemyAttacks");
             DefaultLayerMask = LayerMask.NameToLayer("Default");
-            instance = this;
+            globalVolumeProfile = globalVolume.profile;
             deathGradient = new Gradient();
             deathGradient.SetKeys(
                 new[]

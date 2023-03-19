@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Definitions;
 using UnityEngine;
 
 namespace Util
@@ -23,6 +24,24 @@ namespace Util
                     new GradientAlphaKey(1, 1),
                 });
             return g;
+        }
+
+        public static void PlayDead(this BodyPainter painter, int sortOrder)
+        {
+            painter.SetSortingLayer("Ground");
+            painter.SetSortingOrder(sortOrder);
+            painter.SetMaterial(GlobalDefinitions.DefaultSpriteMaterial);
+            painter.Paint(GlobalDefinitions.DeathGradient, 1f);
+            if(!painter.TryGetComponent(out Rigidbody2D partRb)) 
+                partRb = painter.gameObject.AddComponent<Rigidbody2D>();
+            partRb.transform.localScale = Vector3.one;
+            partRb.simulated = true;
+            partRb.gravityScale = 0;
+            partRb.drag = 1f;
+            partRb.angularDrag = 2f;
+            partRb.angularVelocity = 720f;
+            partRb.AddForce(Random.insideUnitCircle.normalized * 2f, 
+                ForceMode2D.Impulse);
         }
 
         public static StringBuilder AddAbilityLine(
@@ -56,5 +75,8 @@ namespace Util
             
             return sb.Append("\n");
         }
+
+        public static StringBuilder AppendColored(this StringBuilder sb, string color, string text) 
+            => sb.Append($"<color={color}>{text}</color>");
     }
 }

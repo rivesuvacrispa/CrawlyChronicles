@@ -47,9 +47,9 @@ namespace Genes
         public TrioGene Multiply(float value)
         {
             return new TrioGene(
-                (int)(trio[0] * value), 
-                (int)(trio[1] * value), 
-                (int)(trio[2] * value));
+                Mathf.CeilToInt(trio[0] * value), 
+                Mathf.CeilToInt(trio[1] * value), 
+                Mathf.CeilToInt(trio[2] * value));
         }
         
         public TrioGene Randomize(int entropy)

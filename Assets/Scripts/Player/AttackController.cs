@@ -2,18 +2,18 @@
 using Gameplay.Interaction;
 using Scripts.SoundEffects;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Player
 {
     public class AttackController : MonoBehaviour
     {
+        [Header("Refs")]
         [SerializeField] private PlayerHitbox hitbox;
-        [SerializeField] private Movement movementComponent;
+        [SerializeField] private PlayerMovement movementComponent;
+        [SerializeField] private PlayerAttack attack;
+        [Header("Stats")]
         [SerializeField] private float dashDuration;
         [SerializeField] private float comboRotationSpeed;
-        [FormerlySerializedAs("attackGO")] 
-        [SerializeField] private PlayerAttack attack;
         [SerializeField] private float comboExpirationTime;
 
         private int comboCounter;

@@ -18,7 +18,7 @@ namespace UI
         private static MutationMenu instance;
 
         [SerializeField] private RespawnManager respawnManager;
-        [SerializeField] private AbilityTooltip tooltip;
+        [SerializeField] private MutationAbilityTooltip tooltip;
         [SerializeField] private Transform currentMutationsTransform;
         [SerializeField] private Transform newMutationsTransform;
         [SerializeField] private BasicAbilityButton basicAbilityButtonPrefab;
@@ -35,9 +35,6 @@ namespace UI
         private Dictionary<BasicMutation, int> current = new();
         private TrioGene rerollCost;
         
-        [Header("Debug")]
-        public BasicMutation debug_MutationToAdd;
-        public int debug_MutationLevelToAdd;
         
         public Egg HatchingEgg => hatchingEgg;
 
@@ -65,21 +62,46 @@ namespace UI
 
         private void CreateMutations()
         {
+            //// Now food can be consumed up to breeding requirement only
+            //// Blue fungi drops genes when food is max
+            // More neutrals
+            // Fungi glows during night only
+            // Add food particles
+            // Maybe fungi grows at night and disapper at day and other food grows at day and not at night
+            //// neutrals change animation when flee dead
+            //// health in percent
+            // immune wasp?
+            //// more cooldown on queens fertility
+            //// queens fertility needs food
+            //// autocast particles
+            // enemies not spawning more? <----- CHECK
+            // enemies become stronger when you mutate? or each day?
+            
+
+
+
             Dictionary<BasicMutation, int> variants = new();
             HashSet<BasicMutation> maxed = new();
+            List<BasicMutation> specials = new();
             foreach (var (basicMutation, lvl) in current)
+            {
                 if (lvl == 9) maxed.Add(basicMutation);
-            var available = LinqUtility.ToHashSet(allMutations);
-            available.ExceptWith(maxed);
+                else if(basicMutation.Special) specials.Add(basicMutation);
+            }
+            var availableSet = LinqUtility.ToHashSet(allMutations.Where(m => !m.Special));
+            availableSet.ExceptWith(maxed);
+            var available = availableSet.ToList();
+            available.AddRange(specials);
 
-            int amount = Random.Range(3, 13);
-            if (amount > available.Count) amount = available.Count;
+            int amount = Random.Range(6, 13);
+            int len = available.Count;
+            if (amount > len) amount = len;
             while (amount > 0)
             {
-                BasicMutation chosenOne = available.ToArray()[Random.Range(0, available.Count)];
+                BasicMutation chosenOne = available[Random.Range(0, len)];
                 if (variants.ContainsKey(chosenOne))
                 {
-                    if(variants.Count == available.Count) break;
+                    if(variants.Count == len) break;
                     continue;
                 }
 
@@ -187,29 +209,12 @@ namespace UI
 
 
         // Utils
-        public void ClearAll()
+        private void ClearAll()
         {
             foreach (Transform t in currentMutationsTransform) Destroy(t.gameObject);
             foreach (Transform t in newMutationsTransform) Destroy(t.gameObject);
             basicAbilityButtons.Clear();
             current.Clear();
-        }
-
-        public void ResetEgg()
-        {
-            genesLeft = TrioGene.Zero;
-            hatchingEgg = new Egg(TrioGene.Zero, new MutationData());
-        }
-
-        public void Refresh()
-        {
-            ClearAll();
-            ShowNonStatic(mutationTarget, hatchingEgg);
-        }
-
-        public void Save()
-        {
-            hatchingEgg = new Egg(genesLeft, new MutationData(current));
         }
     }
 

@@ -1,5 +1,5 @@
 ﻿using System;
-using Gameplay.Enemies;
+using Scripts.Util.Interfaces;
 using UnityEngine;
 
 namespace Mutations.AttackEffects
@@ -7,14 +7,14 @@ namespace Mutations.AttackEffects
     public class AttackEffect
     {
         public Gradient Color { get; }
-        private readonly Action<Enemy, float> onImpact;
+        private readonly Action<IImpactable, float> onImpact;
         
-        public AttackEffect(Gradient color, Action<Enemy, float> onImpact)
+        public AttackEffect(Gradient color, Action<IImpactable, float> onImpact)
         {
             Color = color;
             this.onImpact = onImpact;
         }
 
-        public void Impact(Enemy enemy, float damage) => onImpact(enemy, damage);
+        public void Impact(IImpactable impactable, float damage) => onImpact(impactable, damage);
     }
 }

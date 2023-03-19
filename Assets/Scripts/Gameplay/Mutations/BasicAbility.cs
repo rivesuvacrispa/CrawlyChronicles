@@ -17,8 +17,8 @@ namespace Gameplay.Abilities
         public bool Learned { get; private set; }
 
 
-        protected static float GetPassiveProcRate(float proc) => proc * Manager.PlayerStats.PassiveProcRate;
-        protected static float GetAbilityDamage(float damage) => damage + damage * Manager.PlayerStats.AbilityDamage;
+        protected static float GetPassiveProcRate(float proc) => proc * PlayerManager.PlayerStats.PassiveProcRate;
+        protected static float GetAbilityDamage(float damage) => damage + damage * PlayerManager.PlayerStats.AbilityDamage;
 
         private void Awake() => abilityController.CreateUIElement(this);
 

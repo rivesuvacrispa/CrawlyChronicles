@@ -99,6 +99,6 @@ namespace Gameplay.Enemies
         }
 
         public override void OnEggsLocated(EggBed eggBed) { }
-        public override void OnFoodLocated(FoodBed foodBed) { }
+        public override void OnFoodLocated(Foodbed foodBed) { }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Definitions;
 using GameCycle;
 using Gameplay.Abilities;
+using Gameplay.Abilities.Active;
 using Gameplay.Enemies;
 using Genes;
 using Player;
@@ -10,7 +11,7 @@ using Scriptable;
 using UI;
 using UnityEngine;
 using UnityEngine.UI;
-using Util;
+using Util.Interfaces;
 using Random = UnityEngine.Random;
 
 namespace Gameplay
@@ -113,10 +114,12 @@ namespace Gameplay
             UpdateTotalEggsText();
         }
 
-        public void AddFood()
+        public bool AddFood()
         {
+            if (currentFoodAmount >= currentBreedingFoodRequirement) return false;
             currentFoodAmount++;
             UpdateFoodText();
+            return true;
         }
 
         public void PlayBreedingAnimation()
@@ -154,7 +157,7 @@ namespace Gameplay
             }
             
             breedingParticles.Stop();
-            LayEggs(Movement.Position, genes, mutationData);
+            LayEggs(PlayerMovement.Position, genes, mutationData);
             Destroy(popupNotification.gameObject);
             popupNotification = null;
             eggLayRoutine = null;
@@ -163,7 +166,7 @@ namespace Gameplay
         public void LayEggs(Vector2 position, TrioGene genes, MutationData mutationData)
         {
             var bed = Instantiate(GlobalDefinitions.EggBedPrefab, GlobalDefinitions.GameObjectsTransform);
-            int amount = Random.Range(3, 7);
+            int amount = Mathf.RoundToInt(Random.Range(Mathf.Clamp(2f + QueensFertility.EggsAmount, 2f, 6f), 6f));
             StatRecorder.eggsLayed += amount;
             var eggs = new List<Egg>();
             while (amount > 0)
@@ -221,7 +224,7 @@ namespace Gameplay
         // INotificationProvider
         public event INotificationProvider.NotificationProviderEvent OnDataUpdate;
         public event INotificationProvider.DestructionProviderEvent OnProviderDestroy;
-        public Transform Transform => Manager.Instance.Transform;
+        public Transform Transform => PlayerManager.Instance.Transform;
         public string NotificationText => eggLayingTimer.ToString();
     }
 }

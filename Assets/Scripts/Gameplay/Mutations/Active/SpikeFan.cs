@@ -2,6 +2,7 @@
 using Player;
 using UnityEngine;
 using Util;
+using Util.Interfaces;
 
 namespace Gameplay.Abilities.Active
 {
@@ -35,18 +36,13 @@ namespace Gameplay.Abilities.Active
             emission.rateOverTime = LerpLevel(amountLvl1, amountLvl10, lvl);
             main.duration = LerpLevel(durationLvl1, durationLvl10, lvl);
         }
-
-        private void OnParticleTrigger()
-        {
-            Debug.Log("Trigger?");
-        }
-
+        
         private void OnParticleCollision(GameObject other)
         {
             if (other.TryGetComponent(out IDamageableEnemy enemy))
                 enemy.Damage(
                     GetAbilityDamage(damage),
-                    Movement.Position,
+                    PlayerMovement.Position,
                     knockbackPower,
                     stunDuration,
                     Color.white);

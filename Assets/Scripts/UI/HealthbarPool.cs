@@ -1,7 +1,6 @@
 ﻿using Definitions;
 using UnityEngine;
-using UnityEngine.Serialization;
-using Util;
+using Util.Interfaces;
 
 namespace UI
 {

@@ -12,12 +12,12 @@ namespace Scripts.Gameplay.Bosses.Centipede
 
         private void OnTriggerEnter2D(Collider2D col)
         {
-            if (Manager.Instance.Damage(
+            if (PlayerManager.Instance.Damage(
                     CentipedeDefinitions.AttackDamage,
                     transform.position,
                     CentipedeDefinitions.Knockback) == 0)
             {
-                Manager.Instance.Knockback((Vector2) transform.position + Random.insideUnitCircle.normalized,
+                PlayerManager.Instance.Knockback((Vector2) transform.position + Random.insideUnitCircle.normalized,
                     CentipedeDefinitions.Knockback);
             }
             if(gameObject.activeInHierarchy) StartCoroutine(DelayRoutine());

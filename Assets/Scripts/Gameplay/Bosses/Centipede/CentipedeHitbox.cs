@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using Definitions;
-using Gameplay.Enemies;
 using Player;
 using UnityEngine;
 
@@ -17,14 +16,16 @@ namespace Scripts.Gameplay.Bosses.Centipede
         
         private void Awake() => collider = GetComponent<Collider2D>();
 
-        // Player damage is not realized with IEnemyAttack because player hitbox 
+        // Player damage is not coded with IEnemyAttack because player hitbox 
         // does not detect trigger entering
         private void OnTriggerEnter2D(Collider2D col)
         {
             if (col.gameObject.TryGetComponent(out PlayerHitbox _))
-                Manager.Instance.Damage(CentipedeDefinitions.ContactDamage, transform.position,
+                PlayerManager.Instance.Damage(CentipedeBoss.ContactDamage, transform.position,
                     CentipedeDefinitions.Knockback);
-            else Fragment.Damage(Manager.PlayerStats.AttackDamage);
+            else Fragment.Damage(
+                PlayerManager.PlayerStats.AttackDamage,
+                effect: PlayerAttack.CurrentAttackEffect);
         }
 
         public void Hit() => StartCoroutine(ImmunityRoutine());

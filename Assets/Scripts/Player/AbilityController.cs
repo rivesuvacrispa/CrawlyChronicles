@@ -14,7 +14,7 @@ namespace Player
         private static AbilityController instance;
 
         [SerializeField] private GameObject uiGO;
-        [SerializeField] private AbilityButton abilityButtonPrefab;
+        [SerializeField] private ActiveAbilityButton abilityButtonPrefab;
         [SerializeField] private BasicAbilityButton basicAbilityPrefab;
         [SerializeField] private Transform activeButtonsTransform;
         [SerializeField] private Transform basicButtonsTransform;

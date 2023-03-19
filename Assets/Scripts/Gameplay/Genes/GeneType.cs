@@ -4,6 +4,6 @@
     {
         Aggressive = 0,
         Defensive = 1,
-        Adaptive = 2
+        Neutral = 2
     }
 }

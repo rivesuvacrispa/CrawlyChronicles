@@ -8,7 +8,12 @@ namespace Gameplay.Abilities
     {
         private readonly Dictionary<BasicMutation, int> mutations = new();
 
-        public void Add(BasicMutation mutation, int lvl) => mutations.Add(mutation, lvl);
+        public void Add(BasicMutation mutation, int lvl)
+        {
+            if(mutations.ContainsKey(mutation)) return;
+            mutations.Add(mutation, lvl);
+        }
+
         public Dictionary<BasicMutation, int> GetAll() => mutations;
 
         public MutationData Randomize() 

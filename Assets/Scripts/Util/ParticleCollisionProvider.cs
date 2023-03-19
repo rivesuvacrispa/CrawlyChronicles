@@ -1,12 +1,12 @@
-﻿using UI;
-using UnityEngine;
+﻿using UnityEngine;
+using Util.Interfaces;
 
 namespace Util
 {
     [RequireComponent(typeof(ParticleSystem))]
     public class ParticleCollisionProvider : MonoBehaviour
     {
-        public delegate void CollisionEvent(IDamageable enemy);
+        public delegate void CollisionEvent(IDamageable col);
         public event CollisionEvent OnCollision;
         
         

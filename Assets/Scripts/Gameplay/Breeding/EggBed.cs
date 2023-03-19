@@ -6,7 +6,7 @@ using Gameplay.Interaction;
 using Genes;
 using UI;
 using UnityEngine;
-using Util;
+using Util.Interfaces;
 
 namespace Gameplay
 {
@@ -100,20 +100,16 @@ namespace Gameplay
         {
             RemoveOne(out var egg);
             BreedingManager.Instance.AddFood();
-            float genesAmount = Random.value * 0.05f;
+            float genesAmount = Random.value * 0.75f;
             TrioGene drop = egg.Genes.Multiply(genesAmount);
             Vector3 pos = transform.position;
             GlobalDefinitions.CreateEggSquash(pos + (Vector3) Random.insideUnitCircle.normalized * 0.25f);
-            DropGenes(pos, GeneType.Aggressive, drop.Aggressive);
-            DropGenes(pos, GeneType.Defensive, drop.Defensive);
-            DropGenes(pos, GeneType.Adaptive, drop.Universal);
+            GlobalDefinitions.DropGenesRandomly(pos, GeneType.Aggressive, drop.Aggressive);
+            GlobalDefinitions.DropGenesRandomly(pos, GeneType.Defensive, drop.Defensive);
+            GlobalDefinitions.DropGenesRandomly(pos, GeneType.Neutral, drop.Universal);
         }
         
-        private static void DropGenes(Vector3 pos, GeneType type, int amount)
-        {
-            if (amount > 0) GlobalDefinitions.CreateGeneDrop
-                (pos + (Vector3)Random.insideUnitCircle * 0.75f, type, amount);
-        }
+
 
         private void OnEggBedsCollectionRequested(List<EggBed> eggBeds) => eggBeds.Add(this);
         private void OnResetRequested() => Destroy(gameObject);
@@ -136,16 +132,16 @@ namespace Gameplay
         {
             if(interactionState == InteractionState.ReturnEgg)
             {
-                AddEgg(Player.Manager.Instance.HoldingEgg);
+                AddEgg(Player.PlayerManager.Instance.HoldingEgg);
                 StatRecorder.eggsLost--;
-                Player.Manager.Instance.RemoveEgg();
+                Player.PlayerManager.Instance.RemoveEgg();
             }
             else Eat();
         }
 
         public bool CanInteract()
         {
-            if (Player.Manager.Instance.IsHoldingEgg)
+            if (Player.PlayerManager.Instance.IsHoldingEgg)
             {
                 if (EggsAmount >= 12) return false;
                 interactionState = InteractionState.ReturnEgg;
@@ -166,6 +162,6 @@ namespace Gameplay
         {
         }
 
-        public float InteractionTime => interactionState == InteractionState.ReturnEgg ? 0 : 1.5f;
+        public float InteractionTime => interactionState == InteractionState.ReturnEgg ? 0 : 1f;
     }
 }

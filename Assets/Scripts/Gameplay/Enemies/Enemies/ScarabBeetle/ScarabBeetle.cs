@@ -25,7 +25,7 @@ namespace Gameplay.Enemies
             float t = duration;
             while (t > 0)
             {
-                rb.RotateTowardsPosition(2 * rb.position - Player.Movement.Position, 5f);
+                rb.RotateTowardsPosition(2 * rb.position - Player.PlayerMovement.Position, 5f);
                 t -= Time.deltaTime;
                 yield return null;
             }
@@ -35,7 +35,7 @@ namespace Gameplay.Enemies
 
         public override void OnEggsLocated(EggBed eggBed) { }
 
-        public override void OnFoodLocated(FoodBed foodBed) { }
+        public override void OnFoodLocated(Foodbed foodBed) { }
 
         protected override void OnDamageTaken() { }
     }

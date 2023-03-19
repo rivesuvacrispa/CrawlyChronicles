@@ -1,7 +1,7 @@
 ﻿using Definitions;
 using UnityEngine;
 using UnityEngine.UI;
-using Util;
+using Util.Interfaces;
 
 namespace UI
 {
@@ -61,7 +61,7 @@ namespace UI
             if(doNotHide) return;
             // TODO: This def can be rewritten
             Vector2 positionToUse = isStatic ? providerStaticPosition : cachedTransform.position;
-            float distanceToPlayer = (positionToUse - Player.Movement.Position).sqrMagnitude;
+            float distanceToPlayer = (positionToUse - Player.PlayerMovement.Position).sqrMagnitude;
             SetActive(distanceToPlayer <= GlobalDefinitions.InteractionDistance);
 
             if (!isStatic) transform.localPosition = cachedTransform.position;

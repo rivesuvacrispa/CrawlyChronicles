@@ -31,7 +31,7 @@ namespace Gameplay.Enemies
         {
         }
 
-        public override void OnFoodLocated(FoodBed foodBed)
+        public override void OnFoodLocated(Foodbed foodBed)
         {
             if(!hungry) return;
             stateController.SetState(AIState.Follow, 

@@ -4,6 +4,7 @@ using Player;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Util;
+using Util.Interfaces;
 
 namespace Gameplay.Abilities.Active
 {
@@ -65,7 +66,7 @@ namespace Gameplay.Abilities.Active
             if(damageable is IDamageableEnemy enemy)
                 enemy.Damage(
                     GetAbilityDamage(damage), 
-                    Movement.Position,
+                    PlayerMovement.Position,
                     knockbackPower, 
                     stunDuration, 
                     GlobalDefinitions.PoisonColor, 

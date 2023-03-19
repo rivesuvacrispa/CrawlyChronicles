@@ -1,8 +1,8 @@
 ﻿using System.Text;
-using Gameplay.Enemies;
 using Player;
 using UnityEngine;
 using Util;
+using Util.Interfaces;
 using Random = UnityEngine.Random;
 
 namespace Gameplay.Abilities.Passive
@@ -52,7 +52,7 @@ namespace Gameplay.Abilities.Passive
             if (other.TryGetComponent(out IDamageableEnemy enemy)) 
                 enemy.Damage(
                     GetAbilityDamage(damage),
-                    Movement.Position,
+                    PlayerMovement.Position,
                     knockbackPower,
                     stunDuration,
                     Color.white);

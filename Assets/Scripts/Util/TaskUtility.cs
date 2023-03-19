@@ -1,12 +1,10 @@
-﻿using System.Collections;
-using System.Threading;
+﻿using System.Threading;
 using Cysharp.Threading.Tasks;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Util
 {
-    public static class CustomCoroutines
+    public static class TaskUtility
     {
         public static async UniTask MoveUntilFacingAndCloseEnough(
             Rigidbody2D actorRb,
@@ -14,15 +12,17 @@ namespace Util
             float moveSpeed,
             float rotationSpeed, 
             float reachDistance,
-            CancellationToken cancellationToken = default)
+            CancellationToken cancellationToken = default,
+            Vector3 staticTarget = default)
         {
+            if(staticTarget.Equals(default)) staticTarget = Vector3.zero;
             reachDistance *= reachDistance;
             float angle = float.MaxValue;
             float distance = float.MaxValue;
             while (angle >= 15 || distance > reachDistance)
             {
                 Vector2 pos = actorRb.position;
-                Vector2 targetPos = target.position;
+                Vector2 targetPos = target is null ? staticTarget : target.position;
                 Vector2 up = actorRb.transform.up;
                 distance = (pos - targetPos).sqrMagnitude;
                 
@@ -47,6 +47,14 @@ namespace Util
                 a.RotateTowardsPosition(bPos, rotationSpeed);
                 await UniTask.WaitForFixedUpdate(cancellationToken: cancellationToken);
             }
+        }
+
+        public static async UniTask StepTowardsWhileReachingDistance(Rigidbody2D a, Transform b, float moveSpeed,
+            float rotationSpeed, float reachDistance, CancellationToken cancellationToken = default)
+        {
+            a.AddClampedForceTowards(a.position + (Vector2) a.transform.up, moveSpeed, ForceMode2D.Force);
+            a.RotateTowardsPosition(b.position, rotationSpeed);
+            await WaitUntilDistanceReached(a, b, moveSpeed, rotationSpeed, reachDistance, cancellationToken);
         }
         
         public static async UniTask WaitUntilDistanceGained(Rigidbody2D a, Transform b, float moveSpeed, float rotationSpeed, float reachDistance, CancellationToken cancellationToken = default)

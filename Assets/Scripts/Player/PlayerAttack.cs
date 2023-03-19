@@ -11,7 +11,7 @@ namespace Player
     [RequireComponent(typeof(Collider2D))]
     public class PlayerAttack : MonoBehaviour
     {
-        [SerializeField] private Movement movement;
+        [SerializeField] private PlayerMovement movement;
         [SerializeField] private TrailRenderer trailRenderer;
         [SerializeField, Range(0, 1)] private float basicEffectChance;
 
@@ -33,7 +33,7 @@ namespace Player
             {
                 PlayerAudioController.Instance.PlayReckoning();
                 Vector2 point = col.contacts[0].point;
-                float force = Manager.PlayerStats.AttackPower;
+                float force = PlayerManager.PlayerStats.AttackPower;
                 movement.Knockback(point, force);
                 enemy.Reckon(point, force);
             }
@@ -43,7 +43,7 @@ namespace Player
         {
             effect = null;
             if (effects.Count == 0 ||
-                Random.value > basicEffectChance * Manager.PlayerStats.PassiveProcRate) 
+                Random.value > basicEffectChance * PlayerManager.PlayerStats.PassiveProcRate) 
                 return false;
             effect = effects[Random.Range(0, effects.Count)];
             return true;

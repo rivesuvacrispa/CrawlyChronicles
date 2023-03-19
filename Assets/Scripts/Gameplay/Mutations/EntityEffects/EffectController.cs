@@ -1,17 +1,16 @@
-﻿using Gameplay.Enemies;
+﻿using Scripts.Util.Interfaces;
 using UnityEngine;
 
 namespace Gameplay.Abilities.EntityEffects
 {
-    [RequireComponent(typeof(Enemy))]
     public class EffectController : MonoBehaviour
     {
-        private Enemy enemy;
+        private IImpactEffectAffectable target;
         private GameObject effectsGO;
 
         private void Awake()
         {
-            enemy = GetComponent<Enemy>();
+            target = GetComponent<IImpactEffectAffectable>();
             effectsGO = new GameObject("Effects");
             effectsGO.transform.SetParent(transform);
         }
@@ -20,7 +19,7 @@ namespace Gameplay.Abilities.EntityEffects
         {
             EntityEffect effect = effectsGO.TryGetComponent(out effect) ? 
                 effect : 
-                effectsGO.AddComponent<T>().Init(enemy);
+                effectsGO.AddComponent<T>().SetTarget(target);
             effect.Refresh(data);
         }
 

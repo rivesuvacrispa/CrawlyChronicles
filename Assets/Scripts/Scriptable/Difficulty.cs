@@ -16,14 +16,13 @@ namespace Scriptable
         [SerializeField, Range(0, 2)] private float enemyStatsMultiplier;
         [SerializeField, Range(0, 2)] private float geneRerollCost;
         [SerializeField, Range(0, 2)] private float breedingCost;
-        [SerializeField] private BossDifficulty bossDifficulty;
+        [SerializeField] private string bossString;
 
         public float EnemySpawnRate => enemySpawnRate;
         public float FoodSpawnRate => foodSpawnRate;
         public float EnemyStatsMultiplier => enemyStatsMultiplier;
         public float GeneRerollCost => geneRerollCost;
         public float BreedingCost => breedingCost;
-        public BossDifficulty BossDifficulty => bossDifficulty;
         public OverallDifficulty OverallDifficulty => difficulty;
 
         public override string ToString()
@@ -37,7 +36,7 @@ namespace Scriptable
             AddEnemyStatsString(sb);
             AddDescriptionString(sb, geneRerollCost, "Gene reroll cost");
             AddDescriptionString(sb, breedingCost, "Breeding cost");
-            sb.Append("<color=orange>").Append(BossDifficulty).Append("</color> bosses\n");
+            sb.Append(bossString);
             return sb.ToString();
         }
 

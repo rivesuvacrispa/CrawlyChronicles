@@ -10,7 +10,7 @@ namespace Camera
 
         private void Start()
         {
-            Target = Player.Manager.Instance.Transform;
+            Target = Player.PlayerManager.Instance.Transform;
         }
 
         private void LateUpdate()

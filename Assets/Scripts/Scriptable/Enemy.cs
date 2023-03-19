@@ -7,6 +7,7 @@ namespace Scriptable
     [CreateAssetMenu(menuName = "Scriptable/Enemy")]
     public class Enemy : ScriptableObject
     {
+        [SerializeField] private int canSpawnSinceDay;
         [Header("Utility fields")] 
         [SerializeField] private bool hasAttackAnimation;
         [SerializeField] private string animatorName;
@@ -16,15 +17,15 @@ namespace Scriptable
 
         [Header("Dependent stats")]
         [SerializeField] private float maxHealth;
-        [SerializeField] private float attackPower;
         [SerializeField] private float damage;
         [SerializeField] private float armor;
 
         [Header("Undepended stats")] 
+        [SerializeField] private float attackPower;
         [SerializeField] private float attackDelay = 0.75f;
         [SerializeField] private float attackDistance = 1;
         [SerializeField] private float movementSpeed;
-        [SerializeField] private float locatorRadius;
+        [SerializeField] private LocatorRadius locatorRadius;
         [SerializeField] private int wanderingRadius;
         [SerializeField, Range(0, 2f)] private float playerMass;
         
@@ -41,6 +42,7 @@ namespace Scriptable
         private bool effectGradientsInitialized;
 
 
+        public int CanSpawnSinceDay => canSpawnSinceDay;
         public float AttackDistance => attackDistance;
         public float AttackDelay => attackDelay;
         public Color BodyColor => bodyColor;
@@ -48,8 +50,7 @@ namespace Scriptable
         public float HealthbarWidth => healthbarWidth;
         public int WanderingRadius => wanderingRadius;
         public float MovementSpeed => movementSpeed;
-        public float LocatorRadius => locatorRadius;
-
+        public float LocatorRadius => (int) locatorRadius / 10f;
         public float Mass => GlobalDefinitions.PlayerMass * playerMass;
         public AudioClip HitAudio => hitAudio;
         public AudioClip AttackAudio => attackAudio;
@@ -61,12 +62,11 @@ namespace Scriptable
 
         public float MaxHealth => currentMaxHealth;
         public float Damage => currentDamage;
-        public float AttackPower => currentAttackPower;
+        public float AttackPower => attackPower;
         public float Armor => currentArmor;
 
 
         private float currentMaxHealth;
-        private float currentAttackPower;
         private float currentDamage;
         private float currentArmor;
 
@@ -81,7 +81,6 @@ namespace Scriptable
         {
             float multiplier = difficulty.EnemyStatsMultiplier;
             currentMaxHealth = maxHealth * multiplier;
-            currentAttackPower = attackPower * multiplier;
             currentDamage = damage * multiplier;
             currentArmor = armor * multiplier;
         }

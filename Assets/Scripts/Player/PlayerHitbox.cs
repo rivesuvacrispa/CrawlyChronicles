@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using Gameplay.Enemies;
+using Gameplay.Interfaces;
 using UnityEngine;
 using Util;
 
@@ -25,7 +25,7 @@ namespace Player
             if (col.gameObject.TryGetComponent(out IEnemyAttack attack))
             {
                 OnStruck?.Invoke(0);
-                Manager.Instance.Damage(attack.AttackDamage, attack.AttackPosition, attack.AttackPower);
+                PlayerManager.Instance.Damage(attack.AttackDamage, attack.AttackPosition, attack.AttackPower);
             }
         }
 
@@ -35,7 +35,7 @@ namespace Player
         {
             Immune = true;
 
-            float duration = Manager.PlayerStats.ImmunityDuration;
+            float duration = PlayerManager.PlayerStats.ImmunityDuration;
             bodyPainter.Paint(immunityGradient, duration);
             yield return new WaitForSeconds(duration);
             

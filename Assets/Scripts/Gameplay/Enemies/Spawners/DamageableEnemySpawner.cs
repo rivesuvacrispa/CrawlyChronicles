@@ -1,11 +1,15 @@
-﻿using UI;
+﻿using GameCycle;
+using Mutations.AttackEffects;
+using Scripts.Util.Interfaces;
+using UI;
 using UnityEngine;
 using Util;
+using Util.Interfaces;
 
 namespace Gameplay.Enemies.Spawners
 {
     [RequireComponent(typeof(EnemySpawnerHitbox))]
-    public class DamageableEnemySpawner : EnemySpawner, IDamageableEnemy
+    public class DamageableEnemySpawner : EnemySpawner, IDamageableEnemy, IImpactable
     {
         [SerializeField] private float maxHealth;
         [SerializeField] private float armor;
@@ -31,16 +35,22 @@ namespace Gameplay.Enemies.Spawners
             float knockback = 0, 
             float stunDuration = 0,
             Color damageColor = default,
-            bool ignoreArmor = false)
+            bool ignoreArmor = false,
+            AttackEffect effect = null)
         {
             if (!hitbox.Enabled) return 0;
             damage = ignoreArmor ? damage : PhysicsUtility.CalculateDamage(damage, armor);
             currentHealth -= damage;
+            StatRecorder.damageDealt += damage;
             healthbar.SetValue(Mathf.Clamp01(currentHealth / maxHealth));
+
             if (currentHealth <= 0)
                 Destroy(gameObject);
             else 
                 hitbox.Hit();
+            
+            effect?.Impact(this, damage);
+
             return damage;
         }
     }

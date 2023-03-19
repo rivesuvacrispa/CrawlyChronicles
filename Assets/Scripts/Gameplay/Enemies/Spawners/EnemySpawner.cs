@@ -1,9 +1,8 @@
 ﻿using System.Collections;
 using Definitions;
-using Gameplay.AI;
-using Timeline;
+using UI;
 using UnityEngine;
-using Util;
+using Util.Interfaces;
 
 namespace Gameplay.Enemies.Spawners
 {
@@ -15,6 +14,7 @@ namespace Gameplay.Enemies.Spawners
 
         protected virtual void Start()
         {
+            MainMenu.OnResetRequested += OnResetRequested;
             GlobalDefinitions.CreateNotification(this, true, true);
         }
 
@@ -42,9 +42,17 @@ namespace Gameplay.Enemies.Spawners
             enemy.transform.position = transform.position;
         }
 
-        private void OnDestroy() => OnProviderDestroy?.Invoke();
+        private void OnDestroy()
+        {
+            MainMenu.OnResetRequested -= OnResetRequested;
+            OnProviderDestroy?.Invoke();
+        }
 
+        private void OnResetRequested() => Destroy(gameObject);
 
+        
+
+        // INotificationProvider
         public event IDestructionEventProvider.DestructionProviderEvent OnProviderDestroy;
         public Transform Transform => transform;
         public event INotificationProvider.NotificationProviderEvent OnDataUpdate;

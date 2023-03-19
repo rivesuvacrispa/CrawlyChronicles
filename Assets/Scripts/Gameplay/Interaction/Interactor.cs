@@ -47,7 +47,7 @@ namespace Gameplay.Interaction
             }
 
             CanInteract = interactable.CanInteract() &&
-                          Player.Manager.Instance.AllowInteract;
+                          Player.PlayerManager.Instance.AllowInteract;
             
             if(CanInteract) UpdatePopup();
             else popup.Disable();
@@ -104,7 +104,7 @@ namespace Gameplay.Interaction
         private void UpdatePopup()
         {
             Vector2 interactablePos = interactable.Position;
-            Vector2 pos = interactablePos + (interactablePos - Player.Movement.Position).normalized * interactable.PopupDistance;
+            Vector2 pos = interactablePos + (interactablePos - Player.PlayerMovement.Position).normalized * interactable.PopupDistance;
             popup.transform.position = pos;
             popup.Enable(interactable.ActionTitle, KeyCode.E);
         }

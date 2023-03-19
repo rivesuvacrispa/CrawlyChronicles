@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using Player;
+using UI;
+using UnityEngine;
 
 namespace Scripts.Gameplay.Bosses.Terrorwing
 {
@@ -18,6 +20,7 @@ namespace Scripts.Gameplay.Bosses.Terrorwing
 
         private void Explode()
         {
+            enabled = false;
             animator.enabled = true;
             explosion.Play();
             animator.Play(ExplosionAnimHash);
@@ -25,17 +28,17 @@ namespace Scripts.Gameplay.Bosses.Terrorwing
 
         private void Start()
         {
-            if (Target.Equals(Vector2.zero)) Target = Player.Movement.Position;
+            MainMenu.OnResetRequested += OnResetRequested;
+            if (Target.Equals(Vector2.zero)) Target = PlayerMovement.Position;
             Vector2 pos = transform.position;
             RotateTowardsTarget(Target - pos, 360);
         }
 
         private void Update()
         {
-            if(lifeTime >= 15f)
+            if(lifeTime >= 5f)
             {
                 Explode();
-                enabled = false;
                 return;
             }
             Vector2 pos = transform.position;
@@ -45,7 +48,6 @@ namespace Scripts.Gameplay.Bosses.Terrorwing
             if (distance < 0.25f)
             {
                 Explode();
-                enabled = false;
                 return;
             }
 
@@ -60,6 +62,22 @@ namespace Scripts.Gameplay.Bosses.Terrorwing
             float a = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + 90;
             Quaternion angle = Quaternion.Euler(new Vector3(0, 0, a));
             transform.rotation = Quaternion.RotateTowards(transform.rotation, angle, delta * Time.deltaTime);
+        }
+
+        private void OnResetRequested() => Destroy(gameObject);
+
+        private void OnDestroy() => MainMenu.OnResetRequested -= OnResetRequested;
+
+        private void OnTriggerEnter2D(Collider2D col)
+        {
+            if (col.gameObject.TryGetComponent(out PlayerHitbox _))
+            {
+                Explode();
+                PlayerManager.Instance.Damage(
+                    TerrorwingDefinitions.ExplosionDamage,
+                    transform.position + (Vector3) Random.insideUnitCircle.normalized,
+                    5);
+            }
         }
     }
 }

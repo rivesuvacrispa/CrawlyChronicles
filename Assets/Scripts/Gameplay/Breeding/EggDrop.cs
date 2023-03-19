@@ -12,6 +12,7 @@ namespace Gameplay
     [RequireComponent(typeof(SpriteRenderer))]
     public class EggDrop : MonoBehaviour, IInteractable
     {
+        [SerializeField] private SpriteRenderer minimapIcon;
         [SerializeReference] private Egg egg;
         private bool squashed;
         private bool immune = true;
@@ -45,6 +46,7 @@ namespace Gameplay
 
         public void Squash()
         {
+            minimapIcon.enabled = false;
             squashed = true;
             var spriteRenderer = GetComponent<SpriteRenderer>();
             spriteRenderer.sprite = GlobalDefinitions.PuddleSprite;
@@ -59,17 +61,17 @@ namespace Gameplay
 
         private IEnumerator FadeRoutine(SpriteRenderer spriteRenderer)
         {
-            yield return new WaitForSeconds(10);
+            yield return new WaitForSeconds(5);
 
             float initialAlpha = spriteRenderer.color.a;
-            float t = 0;
-            while (t < 2)
+            float t = 2;
+            while (t > 0)
             {
-                float alpha = 1 - t;
-                t += Time.deltaTime;
+                float alpha = t / 2f;
+                t -= Time.deltaTime;
 
-                if(alpha > initialAlpha) continue;
-                spriteRenderer.color = spriteRenderer.color.WithAlpha(alpha);
+                if(alpha < initialAlpha) spriteRenderer.color = spriteRenderer.color.WithAlpha(alpha);
+                yield return null;
             }
             
             Destroy(gameObject);
@@ -86,11 +88,11 @@ namespace Gameplay
         // IInteractable
         public void Interact()
         {
-            Player.Manager.Instance.PickEgg(egg);
+            Player.PlayerManager.Instance.PickEgg(egg);
             Destroy(gameObject);
         }
 
-        public bool CanInteract() => !Player.Manager.Instance.IsHoldingEgg && !squashed;
+        public bool CanInteract() => !Player.PlayerManager.Instance.IsHoldingEgg && !squashed;
         public float PopupDistance => 0.5f;
         public string ActionTitle => "Pickup egg";
         public Vector3 Position => transform.position;

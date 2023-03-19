@@ -14,7 +14,7 @@ namespace UI
             if (tooltip is null) enabled = false;
         }
 
-        public void SetTooltip(AbilityTooltip newTooltip)
+        public void SetTooltip<T>(T newTooltip) where T : AbilityTooltip
         {
             tooltip = newTooltip;
             enabled = true;

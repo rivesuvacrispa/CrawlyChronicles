@@ -36,7 +36,7 @@ namespace Gameplay.Abilities.Active
         public override void Activate()
         {
             StopAllCoroutines();
-            Manager.Instance.AddStats(activeStats.Negated());
+            PlayerManager.Instance.AddStats(activeStats.Negated());
             StartCoroutine(AbilityRoutine());
         }
 
@@ -44,13 +44,13 @@ namespace Gameplay.Abilities.Active
         {
             particleSystem.Play();
             activeStats = new PlayerStats
-                (armor: Manager.PlayerStats.Armor * armor,
+                (armor: PlayerManager.PlayerStats.Armor * armor,
                 passiveProcRate: procChance);
-            Manager.Instance.AddStats(activeStats);
+            PlayerManager.Instance.AddStats(activeStats);
 
             yield return new WaitForSeconds(duration);
 
-            Manager.Instance.AddStats(activeStats.Negated());
+            PlayerManager.Instance.AddStats(activeStats.Negated());
             activeStats = PlayerStats.Zero;
             particleSystem.Stop();
         }
@@ -59,7 +59,7 @@ namespace Gameplay.Abilities.Active
         {
             base.OnDisable();
             StopAllCoroutines();
-            Manager.Instance.AddStats(activeStats.Negated());
+            PlayerManager.Instance.AddStats(activeStats.Negated());
         }
         
         public override string GetLevelDescription(int lvl, bool withUpgrade)

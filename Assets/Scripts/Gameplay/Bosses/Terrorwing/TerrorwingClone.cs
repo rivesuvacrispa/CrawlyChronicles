@@ -2,20 +2,30 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Definitions;
+using Mutations.AttackEffects;
+using Scripts.Gameplay.Bosses.Centipede;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using Util;
+using Util.Interfaces;
 
 namespace Scripts.Gameplay.Bosses.Terrorwing
 {
-    public class TerrorwingClone : MonoBehaviour
+    public class TerrorwingClone : MonoBehaviour, IDamageableEnemy
     {
-        [SerializeField] private ParticleSystem radialParticals;
+        [SerializeField] private bool original;
+
+        [Header("Colliders")]
+        [SerializeField] private TerrorwingHitbox hitbox;
+
+        [Header("Refs")] 
+        [SerializeField] private ParticleCollisionProvider particleCollisionProvider;
+        [SerializeField] private Terrorwing terrorwing;
         [SerializeField] private Rigidbody2D rb;
+        [SerializeField] private ParticleSystem radialParticals;
         [SerializeField] private TrailRenderer[] trails = new TrailRenderer[4];
         [SerializeField] private BodyPainter[] painters = new BodyPainter[5];
         [SerializeField] private TerrorwingProjectileSpawner[] projectileSpawners;
-        [SerializeField] private bool original;
 
         [Header("Disable upon death")] 
         [SerializeField] private new Light2D light;
@@ -34,6 +44,7 @@ namespace Scripts.Gameplay.Bosses.Terrorwing
 
         private void Start()
         {
+            particleCollisionProvider.OnCollision += OnBulletCollision;
             if (original) alive = true;
         }
 
@@ -54,7 +65,7 @@ namespace Scripts.Gameplay.Bosses.Terrorwing
                 }
                 else
                 {
-                    if (original) fadeDuration *= 1.5f;
+                    if (original) fadeDuration *= 1.25f;
                     foreach (BodyPainter painter in painters) painter.FadeOut(fadeDuration);
                     alive = false;
                     await UniTask.Delay(TimeSpan.FromSeconds(fadeDuration), cancellationToken: cancellationToken);
@@ -63,10 +74,10 @@ namespace Scripts.Gameplay.Bosses.Terrorwing
             }
         }
 
-        public void ResetColor()
+        public void ResetColor(Color c = default)
         {
             foreach (BodyPainter painter in painters) 
-                painter.ResetColor(Color.white);
+                painter.ResetColor(c);
         }
         
         private void SetTrailsActive(bool isActive)
@@ -74,10 +85,7 @@ namespace Scripts.Gameplay.Bosses.Terrorwing
             foreach (TrailRenderer trail in trails) trail.emitting = isActive;
         }
 
-        public void ShootRadial()
-        {
-            radialParticals.Play();
-        }
+        public void ShootRadial() => radialParticals.Play();
 
         public async UniTask ShootBullets(TerrorwingProjectile projectile, int amount, float delay, CancellationToken cancellationToken = default)
         {
@@ -88,7 +96,7 @@ namespace Scripts.Gameplay.Bosses.Terrorwing
             }
         }
 
-        public void UpdatePosition(Vector2 pos, Vector2 playerPos)
+        public void UpdateIllusionPosition(Vector2 pos, Vector2 playerPos)
         {
             transform.localPosition = pos;
             rb.RotateTowardsPosition(playerPos, 360);
@@ -102,40 +110,78 @@ namespace Scripts.Gameplay.Bosses.Terrorwing
             gameObject.SetActive(false);
         }
         
-        public async UniTask Die(CancellationToken cancellationToken = default)
+        public async UniTask Die(CancellationToken cancellationToken = default, bool fromPlayer = true)
         {
+            hitbox.Die();
             bodyParticles1.Stop();
             bodyParticles2.Stop();
             SetTrailsActive(false);
-            ResetColor();
+            ResetColor(fromPlayer ? default : new Color(0, 0, 0, 0.01f));
 
-            foreach (BodyPainter painter in painters)
+            if(fromPlayer)
             {
-                painter.SetSortingLayer("Ground");
-                painter.SetSortingOrder(100);
-                painter.SetMaterial(GlobalDefinitions.DefaultSpriteMaterial);
-                painter.Paint(GlobalDefinitions.DeathGradient, 1f);
-                if(!painter.TryGetComponent(out Rigidbody2D partRb)) 
-                    partRb = painter.gameObject.AddComponent<Rigidbody2D>();
-                partRb.transform.localScale = Vector3.one;
-                partRb.simulated = true;
-                partRb.gravityScale = 0;
-                partRb.drag = 1f;
-                partRb.angularDrag = 2f;
-                partRb.angularVelocity = 720f;
-                partRb.AddForce(UnityEngine.Random.insideUnitCircle.normalized * 2f, 
-                    ForceMode2D.Impulse);
+                foreach (BodyPainter painter in painters)
+                    painter.PlayDead(100);
+                await UniTask.Delay(TimeSpan.FromSeconds(6f), cancellationToken: cancellationToken);
+                await SetActive(false, 2f, cancellationToken: cancellationToken);
             }
+        }
 
-            await UniTask.Delay(TimeSpan.FromSeconds(6f), cancellationToken: cancellationToken);
-            await SetActive(false, 2f, cancellationToken: cancellationToken);
+        public void PaintDamage()
+        {
+            foreach (BodyPainter painter in painters)
+                painter.Paint(new Gradient().FastGradient(Color.black, Color.white),
+                    GlobalDefinitions.EnemyImmunityDuration);
+        }
+
+        private void OnDestroy()
+        {
+            OnProviderDestroy?.Invoke();
+            particleCollisionProvider.OnCollision -= OnBulletCollision;
         }
         
-        // Used by animator
+        private void OnBulletCollision(IDamageable damageable)
+        {
+            if (damageable is Player.PlayerManager manager)
+            {
+                manager.Damage(
+                    TerrorwingDefinitions.BulletHellDamage, 
+                    transform.position,
+                    2,
+                    0, Color.white, true);
+            }
+        }
+
+
+        // Used by animator as an event
         private void DisableAnimator()
         {
             GetComponent<Animator>().enabled = false;
             light.enabled = false;
+        }
+        
+        
+        
+        // IDamageableEnemy
+        public event IDestructionEventProvider.DestructionProviderEvent OnProviderDestroy;
+        public Transform Transform => transform;
+        public float HealthbarOffsetY => 0;
+        public float HealthbarWidth => 0;
+
+        public float Damage(
+            float damage, 
+            Vector3 position = default, 
+            float knockback = 0f, 
+            float stunDuration = 0f, 
+            Color damageColor = default,
+            bool ignoreArmor = false,
+            AttackEffect effect = null)
+        {
+            if(hitbox.Immune) return 0;
+            if(rb.simulated) hitbox.Hit();
+            PaintDamage();
+            if(original) terrorwing.Damage(damage, effect: effect);
+            return damage;
         }
     }
 }

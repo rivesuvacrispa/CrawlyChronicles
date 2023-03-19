@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Scriptable;
-using Timeline;
 using UI;
 using UnityEngine;
 
@@ -10,29 +9,29 @@ namespace Gameplay.Food
 {
     public class FoodSpawner : MonoBehaviour
     {
-        [SerializeField] private FoodBed firstDayDood;
         [SerializeField] private int startingFoodAmount;
-        [SerializeField] private List<FoodBed> foodPrefabs;
-        [SerializeField] private Transform foodSpawnPointsTransform;
         [SerializeField] private float foodPerMinute;
+        [SerializeField] private List<Foodbed> foodbeds;
+        [SerializeField] private Transform foodSpawnPointsTransform;
 
         // Depends on difficulty
         private float currentFoodPerMinute;
         
         private readonly List<FoodSpawnPoint> foodSpawnPoints = new();
 
+        
+        
         private void Awake()
         {
             foreach (Transform child in foodSpawnPointsTransform)
                 foodSpawnPoints.Add(child.gameObject.GetComponent<FoodSpawnPoint>());
             SubToEvents();
         }
-
-
-
+        
         private void Start()
         {
             OnDifficultyChanged(SettingsMenu.SelectedDifficulty);
+            OnResetRequested();
             StartCoroutine(FoodSpawningRoutine());
         }
 
@@ -44,11 +43,11 @@ namespace Gameplay.Food
 
         private void SpawnFood()
         {
-            FoodSpawnPoint foodToSpawn = foodSpawnPoints
+            FoodSpawnPoint spawnpoints = foodSpawnPoints
                 .OrderBy(_ => Random.value)
                 .FirstOrDefault(spawnPoint => spawnPoint.IsEmpty);
-            if (foodToSpawn is not null) 
-                foodToSpawn.Spawn(GetRandomFood());
+            if (spawnpoints is not null) 
+                spawnpoints.Spawn(GetRandomFood());
         }
 
         private IEnumerator FoodSpawningRoutine()
@@ -63,11 +62,10 @@ namespace Gameplay.Food
             }
         }
 
-        private FoodBed GetRandomFood()
-        {
-            if (TimeManager.Instance.DayCounter <= 1) return firstDayDood;
-            return foodPrefabs[Random.Range(0, foodPrefabs.Count)];
-        }
+        private Foodbed GetRandomFood() => foodbeds
+            .Where(bed => bed.CanSpawn(Random.value))
+            .OrderBy(_ => Random.value)
+            .First();
 
         private void OnDifficultyChanged(Difficulty difficulty) => currentFoodPerMinute = foodPerMinute * difficulty.FoodSpawnRate;
         

@@ -7,7 +7,7 @@ namespace UI
         public override void OnPointerEnter(PointerEventData eventData)
         {
             base.OnPointerEnter(eventData);
-            tooltip.ShowCost(false);
+            ((MutationAbilityTooltip) tooltip).ShowCost(false);
         }
     }
 }

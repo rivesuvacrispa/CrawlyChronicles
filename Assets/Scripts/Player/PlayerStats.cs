@@ -90,21 +90,21 @@ namespace Player
         {
             StringBuilder sb = new StringBuilder();
             if(includeZeros || MovementSpeed > 0) 
-                sb.Append("<color=orange>").Append("Movespeed: ").Append("</color>").Append(MovementSpeed.ToString("n1")).Append("\n");
+                sb.AppendColored("orange","Movespeed: ").Append($"{MovementSpeed:n1}\n");
             if(includeZeros || RotationSpeed > 0) 
-                sb.Append("<color=orange>").Append("Rotation speed: ").Append("</color>").Append(RotationSpeed.ToString("n1")).Append("\n");
+                sb.AppendColored("orange","Rotation speed: ").Append($"{RotationSpeed:n1}\n");
             if(includeZeros || MaxHealth > 0) 
-                sb.Append("<color=orange>").Append("Max health: ").Append("</color>").Append(MaxHealth.ToString("n1")).Append("\n");
+                sb.AppendColored("orange","Max health: ").Append($"{MaxHealth:n1}\n");
             if(includeZeros || AttackPower > 0) 
-                sb.Append("<color=orange>").Append("Attack power: ").Append("</color>").Append(AttackPower.ToString("n1")).Append("\n");
+                sb.AppendColored("orange","Attack power: ").Append($"{AttackPower:n1}\n");
             if(includeZeros || AttackDamage > 0) 
-                sb.Append("<color=orange>").Append("Attack damage: ").Append("</color>").Append(AttackDamage.ToString("n1")).Append("\n");
+                sb.AppendColored("orange","Attack damage: ").Append($"{AttackDamage:n1}\n");
             if(includeZeros || Armor > 0) 
-                sb.Append("<color=orange>").Append("Armor: ").Append("</color>").Append(Armor.ToString("n1")).Append("\n");
+                sb.AppendColored("orange","Armor: ").Append($"{Armor:n1}\n");
             if(includeZeros || ImmunityDuration > 0) 
-                sb.Append("<color=orange>").Append("Immunity frame: ").Append("</color>").Append(ImmunityDuration.ToString("n1")).Append("\n");
+                sb.AppendColored("orange","Immunity frame: ").Append($"{ImmunityDuration:n1}\n");
             if(includeZeros || abilityDamage > 0) 
-                sb.Append("<color=orange>").Append("Ability damage: ").Append("</color>").Append("+").Append((int) (abilityDamage * 100)).Append("%");
+                sb.AppendColored("orange","Ability damage: ").Append($"{(int) (abilityDamage * 100)}%\n");
             return sb.ToString();
         }
 

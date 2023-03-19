@@ -65,9 +65,9 @@ namespace Gameplay.Enemies
             if(!TimeManager.IsDay) OnNightStart(0);
         }
 
-        public override void OnFoodLocated(FoodBed foodBed)
+        public override void OnFoodLocated(Foodbed foodBed)
         {
-            if (!hungry || foodBed is RadioactiveFungi) return;
+            if (!hungry || foodBed is Ghostcap) return;
             stateController.SetState(AIState.Follow, 
                 followTarget: foodBed,
                 () => {
@@ -83,21 +83,16 @@ namespace Gameplay.Enemies
         {
             OnNeutralDamaged?.Invoke(rb.position);
         }
-
-        public void Interact()
-        {
-            BreedingManager.Instance.OpenBreedingMenu(this);
-            CanBreed = false;
-        }
-
+        
         private IEnumerator InterestRoutine()
         {
             stateController.TakeMoveControl();
+            animator.Play(Scriptable.IdleAnimHash);
 
             float t = 0;
             while (t < 2f)
             {
-                rb.RotateTowardsPosition(Player.Movement.Position, 5);
+                rb.RotateTowardsPosition(Player.PlayerMovement.Position, 5);
                 t += Time.deltaTime;
                 yield return null;
             }
@@ -105,12 +100,14 @@ namespace Gameplay.Enemies
             stateController.ReturnMoveControl();
             interestRoutine = null;
             stateController.SetState(AIState.Wander);
+            animator.Play(Scriptable.WalkAnimHash);
         }
 
         private void StopInterest()
         {
             if(interestRoutine is not null) StopCoroutine(interestRoutine);
             stateController.ReturnMoveControl();
+            animator.Play(Scriptable.WalkAnimHash);
         }
 
         private IEnumerator HungerRoutine()
@@ -122,6 +119,8 @@ namespace Gameplay.Enemies
         private void OnNightStart(int day)
         {
             StopInterest();
+            if(hitbox.Dead)             
+                animator.Play(Scriptable.IdleAnimHash);
             stateController.SetEtherial(true);
             CanBreed = false;
             stateController.SetState(AIState.Flee);
@@ -159,14 +158,17 @@ namespace Gameplay.Enemies
 
         // IInteractable
         public bool CanInteract() => CanBreed && BreedingManager.Instance.CanBreed;
+        
+        public void Interact() => BreedingManager.Instance.OpenBreedingMenu(this);
 
         public void OnInteractionStart()
         {
             UnsubEvents();
             stateController.SetState(AIState.None);
             StopInterest();
-            rb.RotateTowardsPosition(Player.Movement.Position, 360);
+            rb.RotateTowardsPosition(Player.PlayerMovement.Position, 360);
             breedAnimator.Play(BreedAnimHash);
+            animator.Play(Scriptable.IdleAnimHash);
             breedingParticles.Play();
             BreedingManager.Instance.PlayBreedingAnimation();
         }
@@ -176,6 +178,7 @@ namespace Gameplay.Enemies
             breedAnimator.Play(IdleAnimHash);
             stateController.SetState(AIState.Wander);
             breedingParticles.Stop();
+            animator.Play(Scriptable.WalkAnimHash);
             BreedingManager.Instance.PlayIdleAnimation();
             if(TimeManager.IsDay) SubEvents();
             else OnNightStart(0);

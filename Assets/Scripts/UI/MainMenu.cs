@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Definitions;
 using GameCycle;
 using Gameplay;
 using Gameplay.Abilities;
 using Genes;
-using Scriptable;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
@@ -14,7 +12,9 @@ namespace UI
 {
     public class MainMenu : MonoBehaviour
     {
+#if UNITY_EDITOR
         [SerializeField] private bool showOnStartup;
+#endif
         [SerializeField] private GameObject rootGO;
         [SerializeField] private GameObject gameUICanvas;
         [SerializeField] private GameObject gameOverGO;
@@ -34,7 +34,11 @@ namespace UI
         private void Start()
         {
             subtitleText.text = $"{Application.version}\nby RivesUvaCrispa\naka Cpeed4";
+#if UNITY_EDITOR
             if(showOnStartup) ShowMainMenu();
+#else
+            ShowMainMenu();
+#endif
         }
 
 

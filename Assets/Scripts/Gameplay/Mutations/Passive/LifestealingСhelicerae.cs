@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using Gameplay.Enemies;
 using Mutations.AttackEffects;
 using Player;
+using Scripts.Util.Interfaces;
 using UnityEngine;
 using Util;
 
@@ -37,17 +37,19 @@ namespace Gameplay.Abilities.Passive
             lifesteal = LerpLevel(lifestealLvl1, lifestealLvl10, lvl);
         }
 
-        private void OnImpact(Enemy enemy, float damage)
+        private void OnImpact(IImpactable enemy, float damage)
         {
-            Manager.Instance.AddHealth(damage * lifesteal);
+            PlayerManager.Instance.AddHealth(damage * lifesteal);
             StartCoroutine(CooldownRoutine());
         }
 
         private IEnumerator CooldownRoutine()
         {
+            Debug.Log("Lifesteal cooldown ON");
             PlayerAttack.OnAttackEffectCollectionRequested -= OnAttackEffectCollectionRequested;
             yield return new WaitForSeconds(cooldown);
             PlayerAttack.OnAttackEffectCollectionRequested += OnAttackEffectCollectionRequested;
+            Debug.Log("Lifesteal cooldown OFF");
         }
         
         private void OnAttackEffectCollectionRequested(List<AttackEffect> effects) 

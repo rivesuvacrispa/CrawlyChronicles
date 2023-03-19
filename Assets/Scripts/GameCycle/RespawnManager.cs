@@ -100,15 +100,15 @@ namespace GameCycle
 
         public void Respawn(Egg origin, Egg mutated)
         {
-            Movement.Teleport(selectedEggbed.Transform.position);
+            PlayerMovement.Teleport(selectedEggbed.Transform.position);
             BreedingManager.Instance.SetTrioGene(mutated.Genes);
             BreedingManager.Instance.SetCurrentFoodAmount(0);
             selectedEggbed.RemoveParticular(origin);
             AbilityController.UpdateAbilities(mutated);
-            followMovement.Target = Manager.Instance.Transform;
+            followMovement.Target = PlayerManager.Instance.Transform;
             AbilityController.SetUIActive(true);
             TimeManager.Instance.ResetLifespan();
-            Manager.Instance.OnRespawn();
+            PlayerManager.Instance.OnRespawn();
             Time.timeScale = 1;
         }
     }

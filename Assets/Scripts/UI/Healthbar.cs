@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using Util;
+using Util.Interfaces;
 
 namespace UI
 {

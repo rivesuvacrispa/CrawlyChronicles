@@ -6,8 +6,7 @@ using Gameplay.Enemies;
 using Gameplay.Food;
 using Pathfinding;
 using UnityEngine;
-using UnityEngine.Serialization;
-using Util;
+using Util.Interfaces;
 
 namespace Gameplay.AI
 {
@@ -17,7 +16,7 @@ namespace Gameplay.AI
     public class AIStateController : MonoBehaviour
     {
         [SerializeField] private Locator locator;
-        [SerializeField] private EnemyHitbox hitbox;
+        [SerializeField] private DamageableEnemyHitbox hitbox;
         [SerializeField] private Collider2D physicsCollider;
 
         [field: SerializeField] public AIState StartingState { get; set; } = AIState.Enter;
@@ -57,7 +56,7 @@ namespace Gameplay.AI
 
         private IEnumerator Start()
         {            
-            yield return new WaitUntil(() => EnemySpawnLocation.InitializedLocationsAmount == EnemyWaveSpawner.SpawnLocationsCount);
+            yield return new WaitUntil(() => EnemySpawnLocation.InitializedLocationsAmount == EnemySpawnManager.SpawnLocationsCount);
             SetState(StartingState);
             UpdateMovementSpeed();
             locator.SetRadius(enemy.Scriptable.LocatorRadius);
@@ -134,7 +133,7 @@ namespace Gameplay.AI
         {
             yield return new WaitForEndOfFrame();
             aiPath.endReachedDistance = reachDistance.Equals(float.NaN) ? defaultReachDistance : reachDistance;
-            target ??= Player.Manager.Instance;
+            target ??= Player.PlayerManager.Instance;
             currentFollowTarget = target;
             DisableLocator();
             AutoRepath();
@@ -219,7 +218,7 @@ namespace Gameplay.AI
                 case EggBed eggBed:
                     enemy.OnEggsLocated(eggBed);
                     break;
-                case FoodBed foodBed:
+                case Foodbed foodBed:
                     enemy.OnFoodLocated(foodBed);
                     break;
                 default:

@@ -27,7 +27,9 @@ namespace Gameplay.Enemies.Spawners
         }
 
         private void OnTriggerEnter2D(Collider2D _) 
-            => spawner.Damage(Manager.PlayerStats.AttackDamage);
+            => spawner.Damage(
+                PlayerManager.PlayerStats.AttackDamage,
+                effect: PlayerAttack.CurrentAttackEffect);
         
         public void Hit() => StartCoroutine(ImmunityRoutine());
 

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using Gameplay.Abilities.EntityEffects;
-using Gameplay.Enemies;
 using Mutations.AttackEffects;
 using Player;
+using Scripts.Util.Interfaces;
 using UnityEngine;
 using Util;
 
@@ -36,17 +36,23 @@ namespace Gameplay.Abilities.Passive
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
+            int duration = (int) LerpLevel(durationLvl1, durationLvl10, lvl);
             effectData = new PoisonEffectData
-            ((int) LerpLevel(durationLvl1, durationLvl10, lvl),
+                (duration,
                 LerpLevel(slowLvl1, slowLvl10, lvl),
-                LerpLevel(totalDamageLvl1, totalDamageLvl10, lvl));
+                LerpLevel(totalDamageLvl1, totalDamageLvl10, lvl) / duration);
         }
 
-        private void OnImpact(Enemy enemy, float _) 
-            => enemy.AddEffect<PoisonEntityEffect>(effectData);
+        private void OnImpact(IImpactable impactable, float _)
+        {
+            if(impactable is IImpactEffectAffectable affectable)
+                affectable.AddEffect<PoisonEntityEffect>(effectData);
+        }
 
         private void OnAttackEffectCollectionRequested(List<AttackEffect> effects) 
             => effects.Add(attackEffect);
+        
+        
         
         protected override void OnEnable()
         {

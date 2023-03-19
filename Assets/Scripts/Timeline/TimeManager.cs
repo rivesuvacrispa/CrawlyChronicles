@@ -2,6 +2,7 @@
 using GameCycle;
 using UI;
 using UnityEngine;
+using UnityEngine.Localization;
 using UnityEngine.UI;
 
 namespace Timeline
@@ -10,42 +11,46 @@ namespace Timeline
     {
         public static TimeManager Instance { get; private set; }
 
+        [SerializeField] private LocalizedString localizedString;
         [SerializeField] private Text dayText;
         [SerializeField] private Text lifespanText;
         [SerializeField] private int dayDurationInSeconds = 30;
         [SerializeField] private int nightDurationInSeconds = 120;
         [SerializeField] private int playerLifespanInSeconds = 300;
         [SerializeField] private ParticleSystem fireflyParticles;
-        
+
+        private float lifetime;
         private int dayCounter;
         private int time;
         private int cycleDuration;
         private Coroutine lifespanRoutine;
+        private Coroutine timeRoutine;
 
         public delegate void DayCycleEvent(int dayCounter);
         public static event DayCycleEvent OnDayStart;
         public static event DayCycleEvent OnNightStart;
 
-        public int DayCounter => dayCounter;
+        public static int DayCounter => Instance.dayCounter;
 
         public static bool IsDay => Instance.time < Instance.dayDurationInSeconds;
+        public static int DayDuration => Instance.dayDurationInSeconds;
         
         private TimeManager() => Instance = this;
 
         private void Awake()
         {
             MainMenu.OnResetRequested += OnResetRequested;
+            localizedString.Arguments = new object[] { 1, 0, string.Empty};
+            localizedString.StringChanged += UpdateText;
         }
 
         private void Start()
         {
-            StopAllCoroutines();
+            OnDisable();
             dayCounter = 0;
             ResetLifespan();
-            StartDay(dayDurationInSeconds / 2);
-            UpdateUI();
             cycleDuration = dayDurationInSeconds + nightDurationInSeconds;
-            StartCoroutine(DayCycleRoutine());
+            StartDay(dayDurationInSeconds / 2);
         }
 
         private IEnumerator DayCycleRoutine()
@@ -65,35 +70,45 @@ namespace Timeline
             }
         }
 
-        private IEnumerator LifespanRoutine()
+        private IEnumerator LifespanRoutine(float startingPoint)
         {
-            float timeLeft = playerLifespanInSeconds;
-            while (timeLeft > 0)
+            lifetime = startingPoint;
+            while (lifetime > 0)
             {
-                lifespanText.text = $"{(int) timeLeft / 60:0}:{timeLeft % 60:00}";
-                if(timeLeft <= 10) DeathCounter.StartCounter(timeLeft);
-                timeLeft -= Time.deltaTime;
+                lifespanText.text = $"{(int) lifetime / 60:0}:{lifetime % 60:00}";
+                if(lifetime <= 10) DeathCounter.StartCounter(lifetime);
+                lifetime -= Time.deltaTime;
                 yield return null;
             }
 
             lifespanText.text = "0:00";
-            Player.Manager.Instance.Die();
+            Player.PlayerManager.Instance.Die(false);
         }
         
         public void ResetLifespan()
         {
             if(lifespanRoutine is not null) StopCoroutine(lifespanRoutine);
-            lifespanRoutine = StartCoroutine(LifespanRoutine());
+            lifespanRoutine = StartCoroutine(LifespanRoutine(playerLifespanInSeconds));
             DeathCounter.StopCounter();
         }
 
-        private void StartDay(int startFrom = 0)
+        public void StartDay(int startFrom = 0)
         {
             fireflyParticles.Stop();
             StatRecorder.daysSurvived++;
             dayCounter++;
             time = startFrom;
             OnDayStart?.Invoke(dayCounter);
+            
+            if (timeRoutine is null)
+            {
+                timeRoutine = StartCoroutine(DayCycleRoutine());
+                enabled = true;
+            }
+
+            if (lifespanRoutine is null) 
+                lifespanRoutine = StartCoroutine(LifespanRoutine(lifetime));
+            UpdateUI();
         }
 
         private void StartNight()
@@ -105,18 +120,38 @@ namespace Timeline
         private void UpdateUI()
         {
             bool isDay = time < dayDurationInSeconds;
-            string prefix = isDay ? "Day" : "Night";
             int timeLeft = isDay ? 
                 dayDurationInSeconds - time :
                 cycleDuration - time;
-            dayText.text = $"{prefix} {dayCounter} - {timeLeft / 60}:{(timeLeft % 60):00}";
+            /*string prefix = isDay ? "Day" : "Night";
+            dayText.text = $"{prefix} {dayCounter} - {timeLeft / 60}:{(timeLeft % 60):00}";*/
+
+            localizedString.Arguments[0] = isDay ? 1 : 2;
+            localizedString.Arguments[1] = dayCounter;
+            localizedString.Arguments[2] = $"{timeLeft / 60}:{timeLeft % 60:00}";
+            localizedString.RefreshString();
         }
+
+        private void UpdateText(string text) => dayText.text = text;
 
         private void OnDestroy()
         {
             MainMenu.OnResetRequested -= OnResetRequested;
+            localizedString.StringChanged -= UpdateText;
         }
 
-        private void OnResetRequested() => Start();
+        private void OnDisable()
+        {
+            StopAllCoroutines();
+            timeRoutine = null;
+            lifespanRoutine = null;
+        }
+
+        private void OnResetRequested()
+        {
+            Debug.Log("ResetRequested");
+            enabled = true;
+            Start();
+        }
     }
 }

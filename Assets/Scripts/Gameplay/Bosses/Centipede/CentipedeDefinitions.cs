@@ -1,7 +1,6 @@
 ﻿using Scriptable;
 using UI;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Scripts.Gameplay.Bosses.Centipede
 {
@@ -21,47 +20,45 @@ namespace Scripts.Gameplay.Bosses.Centipede
 
         [Header("Util")]
         [SerializeField] private GameObject centipedeFragmentPrefab;
-        [SerializeField] private float speed = 4;
-        [SerializeField] private float followRadius = 0.2f;
+        [SerializeField] private float fragmentSpeed = 4;
+        [SerializeField] private float followRadius;
         [SerializeField] private Gradient centipedeGradient;
         [SerializeField] private float followRotationSpeed;
 
 
-        public static int BodyLength => instance.bodyLength.CurrentValue;
-        public static float FollowSpeed => instance.followSpeed.CurrentValue;
-        public static float FragmentHealth => instance.fragmentHealth.CurrentValue;
-        public static float ContactDamage => instance.contactDamage.CurrentValue;
-        public static float AttackDamage => instance.attackDamage.CurrentValue;
-        public static float PoisonDamage => instance.poisonDamage.CurrentValue;
-        public static float Knockback => instance.knockback.CurrentValue;
-        public static float Armor => instance.armor.CurrentValue;
-        
+        public static int BodyLength { get; private set; }
+        public static float FollowSpeed { get; private set; }
+        public static float FragmentHealth { get; private set; }
+        public static float ContactDamage { get; private set; }
+        public static float AttackDamage { get; private set; }
+        public static float PoisonDamage { get; private set; }
+        public static float Knockback { get; private set; }
+        public static float Armor { get; private set; }
         public static GameObject FragmentPrefab => instance.centipedeFragmentPrefab;
         public static float FollowRotationSpeed => instance.followRotationSpeed;
-        public static float Speed => instance.speed;
+        public static float FragmentSpeed => instance.fragmentSpeed;
         public static float FollowRadius => instance.followRadius;
 
 
+        
         private CentipedeDefinitions() => instance = this;
 
         private void Awake()
         {
-            Debug.Log("Awake centipede");
-            
             OnDifficultyChanged(SettingsMenu.SelectedDifficulty);
             SettingsMenu.OnDifficultyChanged += OnDifficultyChanged;
         }
 
         private void OnDifficultyChanged(Difficulty difficulty)
         {
-            contactDamage.ChangeDifficulty(difficulty);
-            attackDamage.ChangeDifficulty(difficulty);
-            poisonDamage.ChangeDifficulty(difficulty);
-            knockback.ChangeDifficulty(difficulty);
-            followSpeed.ChangeDifficulty(difficulty);
-            armor.ChangeDifficulty(difficulty);
-            fragmentHealth.ChangeDifficulty(difficulty);
-            bodyLength.ChangeDifficulty(difficulty);
+            ContactDamage = contactDamage.ChangeDifficulty(difficulty);
+            AttackDamage = attackDamage.ChangeDifficulty(difficulty);
+            PoisonDamage = poisonDamage.ChangeDifficulty(difficulty);
+            Knockback = knockback.ChangeDifficulty(difficulty);
+            FollowSpeed = followSpeed.ChangeDifficulty(difficulty);
+            Armor = armor.ChangeDifficulty(difficulty);
+            FragmentHealth = fragmentHealth.ChangeDifficulty(difficulty);
+            BodyLength = bodyLength.ChangeDifficulty(difficulty);
         }
 
         public static Color GetFragmentColor(float value) => instance.centipedeGradient.Evaluate(value);

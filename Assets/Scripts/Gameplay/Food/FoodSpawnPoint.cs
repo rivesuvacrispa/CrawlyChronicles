@@ -6,19 +6,14 @@ namespace Gameplay.Food
     {
         public bool IsEmpty => foodBed is null;
 
-        private FoodBed foodBed;
+        private Foodbed foodBed;
 
-        public void Spawn(FoodBed toSpawn)
+        public void Spawn(Foodbed toSpawn)
         {
             foodBed = Instantiate(toSpawn, transform);
             foodBed.FoodSpawnPoint = this;
         }
 
-        public void Remove()
-        {
-            if(foodBed is not null)
-                Destroy(foodBed.gameObject);
-            foodBed = null;
-        }
+        public void Remove() => foodBed = null;
     }
 }

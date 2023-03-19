@@ -5,7 +5,7 @@ namespace Gameplay.Abilities.Base
 {
     public class StatsAbility : BasicAbility
     {
-        [SerializeField] private Manager playerManager;
+        [SerializeField] private PlayerManager playerManager;
         [SerializeField] private PlayerStats statsLvl1;
         [SerializeField] private PlayerStats statsLvl10;
 

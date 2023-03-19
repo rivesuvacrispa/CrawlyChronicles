@@ -30,15 +30,10 @@ namespace UI
 
         public void SetAffordable(bool isAffordable)
         {
-            bgImage.color = bgImage.color.WithAlpha(isAffordable ? 0.5f : 0.2f);
-            // icon.color = icon.color.WithAlpha(isAffordable ? 1f : 0.8f);
-            lvlText.color = lvlText.color.WithAlpha(isAffordable ? 1f : 0.75f);
+            bgImage.color = bgImage.color.WithAlpha(isAffordable ? 0.5f : 0.1f);
+            icon.color = icon.color.WithAlpha(isAffordable ? 1f : 0.1f);
+            lvlText.color = lvlText.color.WithAlpha(isAffordable ? 1f : 0.1f);
             button.interactable = isAffordable;
-        }
-
-        public void OnPopupEnd()
-        {
-            
         }
         
         public void Click()

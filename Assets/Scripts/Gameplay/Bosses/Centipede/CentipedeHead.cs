@@ -1,5 +1,6 @@
 ﻿using System.Collections;
-using Gameplay.Enemies;
+using Definitions;
+using Gameplay.Interfaces;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -21,14 +22,12 @@ namespace Scripts.Gameplay.Bosses.Centipede
             fragment.PlayAnimation(HeadAnimHash);
             fragment.SetHead();
             fragment.UpdateColor(1);
-            speed = CentipedeDefinitions.FollowRotationSpeed;
+            SetSpeed(1);
+            CentipedeBoss.Instance.OnFlee += OnFlee;
 
             if (first)
             {
                 fragment.MaxHealth = CentipedeDefinitions.FragmentHealth;
-                Bossbar.Instance.SetName("Giant Centipede");
-                Bossbar.Instance.SetMaxHealth(fragment.MaxHealth);
-                Bossbar.Instance.SetActive(true);
                 fragment.CreateFragment(CentipedeDefinitions.BodyLength, CentipedeDefinitions.BodyLength);
             }
         }
@@ -39,6 +38,13 @@ namespace Scripts.Gameplay.Bosses.Centipede
             StartCoroutine(ChangeSpeedRoutine());
         }
 
+        private void OnFlee()
+        {
+            StopAllCoroutines();
+            SetSpeed(2f);
+            StartCoroutine(FleeRoutine());
+        }
+
         private IEnumerator ChangeSpeedRoutine()
         {
             while (enabled)
@@ -47,15 +53,26 @@ namespace Scripts.Gameplay.Bosses.Centipede
                 yield return new WaitForSeconds(Random.Range(3f, 6f));
             }
         }
+
+        private IEnumerator FleeRoutine()
+        {
+            CentipedeBoss.Instance.OnFlee -= OnFlee;
+            Vector2 pos = GlobalDefinitions.GetRandomPointAroundMap(100);
+            while (enabled)
+            {
+                fragment.Move(pos, speed, CentipedeBoss.FollowRotationSpeed);
+                yield return new WaitForFixedUpdate();
+            }
+        }
         
         private IEnumerator DistanceRoutine()
         {
-            Vector2 target = Random.insideUnitCircle.normalized * Random.Range(8f, 12f) + Player.Movement.Position;
+            Vector2 target = Random.insideUnitCircle.normalized * Random.Range(6f, 8f) + Player.PlayerMovement.Position;
             float distance = float.MaxValue;
 
             while (distance > 3f && enabled)
             {
-                fragment.Move(target, speed, CentipedeDefinitions.FollowRotationSpeed);
+                fragment.Move(target, speed, CentipedeBoss.FollowRotationSpeed);
                 distance = ((Vector2) transform.position - target).sqrMagnitude;
                 yield return new WaitForFixedUpdate();
             }
@@ -66,28 +83,33 @@ namespace Scripts.Gameplay.Bosses.Centipede
         private IEnumerator AttackRoutine()
         {
             float distance = float.MaxValue;
-            Vector2 target = Player.Movement.Position;
+            Vector2 target = Player.PlayerMovement.Position;
             
-            while (distance > 1.25f && enabled)
+            while (distance > 1.1f && enabled)
             {
-                fragment.Move(target, speed, CentipedeDefinitions.FollowRotationSpeed);
+                fragment.Move(target, speed, CentipedeBoss.FollowRotationSpeed);
                 distance = ((Vector2) transform.position - target).sqrMagnitude;
                 yield return new WaitForFixedUpdate();
                 
-                target = Player.Movement.Position;
+                target = Player.PlayerMovement.Position;
             }
 
             yield return new WaitForSeconds(1f);
             if(enabled) StartCoroutine(DistanceRoutine());
         }
 
-        private void SetSpeed(float spd) => speed = CentipedeDefinitions.FollowSpeed * spd;
-        
-        
-                        
+        private void SetSpeed(float spd) => speed = CentipedeBoss.FollowMovespeed * spd;
+
+        private void OnDestroy()
+        {
+            if(CentipedeBoss.Instance is not null)
+                CentipedeBoss.Instance.OnFlee -= OnFlee;
+        }
+
+
         // IEnemyAttack
         public Vector3 AttackPosition => transform.position;
-        public float AttackDamage => CentipedeDefinitions.AttackDamage;
+        public float AttackDamage => CentipedeBoss.AttackDamage;
         public float AttackPower => CentipedeDefinitions.Knockback;
     }
 }

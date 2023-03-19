@@ -10,9 +10,17 @@ namespace Util
 
         private Coroutine fadeRoutine;
         private Coroutine colorRoutine;
-        
-        private void Awake() => spriteRenderer = GetComponent<SpriteRenderer>();
 
+        private Color initialColor;
+        
+        private void Awake()
+        {
+            spriteRenderer = GetComponent<SpriteRenderer>();
+            initialColor = spriteRenderer.color;
+        }
+
+        public Color Color => spriteRenderer.color;
+        
         public void Paint(Gradient gradient, float duration)
         {
             if(colorRoutine is not null) StopCoroutine(colorRoutine);
@@ -60,12 +68,19 @@ namespace Util
             colorRoutine = null;
         }
 
-        public void ResetColor(Color c)
+        private void OnDisable() => ResetColor();
+
+        
+        
+        private void SetColor(Color c) => spriteRenderer.color = c;
+
+        public void ResetColor(Color c = default)
         {
+            if (c == default) c = initialColor.WithAlpha(1);
             StopAllCoroutines();
             SetColor(c);
         }
-        public void SetColor(Color c) => spriteRenderer.color = c;
+
         public void SetSortingLayer(string layer) => spriteRenderer.sortingLayerName = layer;
         public void SetSortingOrder(int order) => spriteRenderer.sortingOrder = order;
         public void SetMaterial(Material material) => spriteRenderer.material = material;

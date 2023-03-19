@@ -1,14 +1,14 @@
 ﻿using System.Collections;
-using Gameplay.Enemies;
+using Scripts.Util.Interfaces;
 using UnityEngine;
 
 namespace Gameplay.Abilities.EntityEffects
 {
     public abstract class EntityEffect : MonoBehaviour
     {
-        protected EntityEffectData Data { get; set; }
+        protected EntityEffectData Data { get; private set; }
         protected int Duration { get; set; }
-        protected Enemy Enemy { get; set; }
+        protected IImpactEffectAffectable Target { get; set; }
         
         private Coroutine tickRoutine;
 
@@ -17,10 +17,9 @@ namespace Gameplay.Abilities.EntityEffects
         protected abstract void Tick();
         protected abstract void OnRemoved();
 
-        public EntityEffect Init(Enemy enemy)
+        public EntityEffect SetTarget(IImpactEffectAffectable target)
         {
-            Enemy = enemy;
-            enemy.OnProviderDestroy += OnTargetDestroy;
+            Target = target;
             return this;
         }
         
@@ -59,14 +58,5 @@ namespace Gameplay.Abilities.EntityEffects
             tickRoutine = null;
             OnRemoved();
         }
-
-        private void OnTargetDestroy()
-        {
-            if(tickRoutine is not null) StopCoroutine(tickRoutine);
-            Enemy.OnProviderDestroy -= OnTargetDestroy;
-            Destroy(this);
-        }
-
-        private void OnDestroy() => Enemy.OnProviderDestroy -= OnTargetDestroy;
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using Definitions;
+﻿using Definitions;
 using Scriptable;
 using Scripts.SoundEffects;
 using UnityEngine;
@@ -12,8 +11,10 @@ namespace UI
 {
     public class SettingsMenu : MonoBehaviour
     {
+#if UNITY_EDITOR
         public bool debug_OverrideDifficulty;
         public OverallDifficulty debug_Difficulty;
+#endif
         [SerializeField] private Difficulty[] difficulties = new Difficulty[3];
         [SerializeField] private DifficultyButton[] difficultyButtons = new DifficultyButton[3];
         [Header("UI refs")]
@@ -37,8 +38,6 @@ namespace UI
         
         private void Awake()
         {
-            Debug.Log("Awake settings");
-            
             sfxVolumeSlider.onValueChanged.AddListener(UpdateSFXVolume);
             musicVolumeSlider.onValueChanged.AddListener(UpdateMusicVolume);
             targetFramerateSlider.onValueChanged.AddListener(UpdateTargetFramerate);
@@ -46,7 +45,10 @@ namespace UI
 
 
             ApplySettings(SettingsLoader.CurrentSettings);
+            
+#if UNITY_EDITOR
             if (debug_OverrideDifficulty) SelectedDifficulty = GetDifficulty(debug_Difficulty);
+#endif
         }
 
         private Difficulty GetDifficulty(OverallDifficulty difficulty) => difficulties[(int) difficulty];
@@ -57,20 +59,16 @@ namespace UI
             if(diff is null) diff = GetDifficulty(OverallDifficulty.Affordable);
             OnDifficultyChanged?.Invoke(diff);
 
-            Debug.Log($"Diff changed to {diff.OverallDifficulty}");
             SelectedDifficulty = diff;
             SettingsLoader.CurrentSettings.Difficulty = diff.OverallDifficulty;
             SettingsLoader.SaveSettings(SettingsLoader.CurrentSettings);
-
-
-            int counter = 1;
-            if(OnDifficultyChanged is not null)
-                foreach (Delegate d in OnDifficultyChanged.GetInvocationList())
-                {
-                    Debug.Log($"Receiver {counter++}: {d.Target.GetType()}");
-                }
         }
 
+        public void ResetDifficultyButtons()
+        {
+            difficultyButtons[(int) SelectedDifficulty.OverallDifficulty].Select();
+        }
+        
         private void ApplySettings(SettingsData settings)
         {
             sfxVolumeSlider.value = settings.SfxVolume;

@@ -4,13 +4,17 @@ using GameCycle;
 using Gameplay.Abilities.EntityEffects;
 using Gameplay.AI;
 using Gameplay.Food;
+using Gameplay.Interfaces;
+using Mutations.AttackEffects;
+using Player;
 using Scripts.SoundEffects;
+using Scripts.Util.Interfaces;
 using Timeline;
 using UI;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Util;
-using Random = UnityEngine.Random;
+using Util.Interfaces;
 
 namespace Gameplay.Enemies
 {
@@ -18,7 +22,7 @@ namespace Gameplay.Enemies
      RequireComponent(typeof(Rigidbody2D)),
      RequireComponent(typeof(AIStateController)),
     RequireComponent(typeof(EffectController))]
-    public abstract class Enemy : MonoBehaviour, IDamageableEnemy, IEnemyAttack
+    public abstract class Enemy : MonoBehaviour, IDamageableEnemy, IEnemyAttack, IImpactEffectAffectable
     {
         [FormerlySerializedAs("Fearless")] 
         [SerializeField] protected bool fearless;
@@ -27,7 +31,7 @@ namespace Gameplay.Enemies
         [SerializeField] private AudioController audioController;
         [SerializeField] protected SpriteRenderer minimapIcon;
         [SerializeField] protected SpriteRenderer spriteRenderer;
-        [SerializeField] protected EnemyHitbox hitbox;
+        [SerializeField] protected DamageableEnemyHitbox hitbox;
         [SerializeField] protected Scriptable.Enemy scriptable;
 
         protected Animator animator;
@@ -44,7 +48,6 @@ namespace Gameplay.Enemies
         private bool reckoned;
 
         [field:SerializeField] public EnemySpawnLocation SpawnLocation { get; set; }
-        public EnemyWallCollider WallCollider { get; set; }
         public Scriptable.Enemy Scriptable => scriptable;
         public Vector2 Position => rb.position;
         public void SetMovementSpeed(float speed) => stateController.SpeedMultiplier = speed;
@@ -56,10 +59,10 @@ namespace Gameplay.Enemies
 
         public abstract void OnEggsLocated(EggBed eggBed);
 
-        public abstract void OnFoodLocated(FoodBed foodBed);
+        public abstract void OnFoodLocated(Foodbed foodBed);
 
         protected abstract void OnDamageTaken();
-        
+
         protected void Awake()
         {
             animator = GetComponent<Animator>();
@@ -85,9 +88,10 @@ namespace Gameplay.Enemies
             float knockback, 
             float stunDuration, 
             Color damageColor,
-            bool ignoreArmor = false)
+            bool ignoreArmor = false,
+            AttackEffect effect = null)
         {
-            if (!hitbox.Enabled) return 0;
+            if (hitbox.Immune) return 0;
             
             if (!ignoreArmor && reckoned)
             {
@@ -102,9 +106,10 @@ namespace Gameplay.Enemies
             attackDelay = 1f;
             StopAttack();
             healthbar.SetValue(Mathf.Clamp01(health / scriptable.MaxHealth));
+            
             OnDamageTaken();
-
-            if (health <= float.Epsilon)
+            
+            if (health <= 0)
             {
                 Die();
                 hitbox.Die();
@@ -123,6 +128,8 @@ namespace Gameplay.Enemies
                 }
             }
 
+            effect?.Impact(this, damage);
+
             return damage;
         }
 
@@ -136,7 +143,7 @@ namespace Gameplay.Enemies
         public void Reckon(Vector2 attacker, float force)
         {
             StopAttack();
-            attackDelay = 0.5f;
+            attackDelay = 0.75f;
             Knockback(attacker, force, 0.3f);
             reckoned = true;
             StartCoroutine(CancelReckon());
@@ -163,8 +170,7 @@ namespace Gameplay.Enemies
             audioController.PlayAction(scriptable.DeathAudio, pitch: SoundUtility.GetRandomPitchTwoSided(0.15f));
             audioController.StopState();
             animator.Play(scriptable.DeadAnimHash);
-            if(Random.value <= Gamemode.GeneDropRate) 
-                GlobalDefinitions.CreateRandomGeneDrop(Position);
+            GlobalDefinitions.CreateRandomGeneDrop(Position);
             StartCoroutine(DeathRoutine());
             UnsubEvents();
         }
@@ -203,7 +209,7 @@ namespace Gameplay.Enemies
             float t = attackDelay * 0.5f;
             while (t > 0)
             {
-                if(!rb.freezeRotation) rb.RotateTowardsPosition(Player.Movement.Position, 5);
+                if(!rb.freezeRotation) rb.RotateTowardsPosition(PlayerMovement.Position, 5);
                 t -= Time.deltaTime;
                 yield return null;
             }
@@ -211,7 +217,7 @@ namespace Gameplay.Enemies
             audioController.PlayAction(scriptable.AttackAudio);
             attackGO.SetActive(true);
             if(scriptable.HasAttackAnimation) animator.Play(scriptable.AttackAnimHash);
-            var playerPos = Player.Movement.Position;
+            var playerPos = PlayerMovement.Position;
             if(!rb.freezeRotation) rb.RotateTowardsPosition(playerPos, 90);
             rb.AddClampedForceTowards(playerPos, scriptable.AttackPower, ForceMode2D.Impulse);
             
@@ -289,8 +295,6 @@ namespace Gameplay.Enemies
             stateController.ReturnMoveControl();
         }
 
-        public void AddEffect<T>(EntityEffectData data) where T : EntityEffect
-            => effectController.AddEffect<T>(data);
 
         private void ClearEffects() => effectController.ClearAll();
         
@@ -324,17 +328,21 @@ namespace Gameplay.Enemies
 
         private void OnResetRequested() => Destroy(gameObject);
 
-        public virtual void OnWallCollision() { }
-
         public void OnSpawnedBySpawner()
         {
             spawnedBySpawner = true;
-            SpawnLocation = EnemyWaveSpawner.GetRandomSpawnPoint();
+            SpawnLocation = EnemySpawnManager.GetRandomSpawnPoint();
             stateController.StartingState = AIState.Wander;
             if (TimeManager.IsDay) fearless = true;
         }
         
-
+        
+        
+        // IImpactEffectAffectable
+        public void AddEffect<T>(EntityEffectData data) where T : EntityEffect
+        {
+            if(!hitbox.Dead) effectController.AddEffect<T>(data);
+        }
 
         // IDamageable
         public event IDamageable.DestructionProviderEvent OnProviderDestroy;

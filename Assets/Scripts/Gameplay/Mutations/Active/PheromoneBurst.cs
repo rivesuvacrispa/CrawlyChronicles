@@ -36,24 +36,24 @@ namespace Gameplay.Abilities.Active
         public override void Activate()
         {
             StopAllCoroutines();
-            Manager.Instance.AddStats(activeStats.Negated());
+            PlayerManager.Instance.AddStats(activeStats.Negated());
             StartCoroutine(AbilityRoutine());
         }
 
         private IEnumerator AbilityRoutine()
         {
             trailRenderer.emitting = true;
-            Movement.MoveSpeedAmplifier = speed;
+            PlayerMovement.MoveSpeedAmplifier = speed;
             activeStats = new PlayerStats
-                (attackDamage: Manager.PlayerStats.AttackDamage * damageBoost,
+                (attackDamage: PlayerManager.PlayerStats.AttackDamage * damageBoost,
                 abilityDamage: damageBoost);
-            Manager.Instance.AddStats(activeStats);
+            PlayerManager.Instance.AddStats(activeStats);
             
             yield return new WaitForSeconds(duration);
 
-            Movement.MoveSpeedAmplifier = 1;
+            PlayerMovement.MoveSpeedAmplifier = 1;
             trailRenderer.emitting = false;
-            Manager.Instance.AddStats(activeStats.Negated());
+            PlayerManager.Instance.AddStats(activeStats.Negated());
             activeStats = PlayerStats.Zero;
         }
 
@@ -61,7 +61,7 @@ namespace Gameplay.Abilities.Active
         {
             base.OnDisable();
             StopAllCoroutines();
-            Manager.Instance.AddStats(activeStats.Negated());
+            PlayerManager.Instance.AddStats(activeStats.Negated());
         }
 
         public override string GetLevelDescription(int lvl, bool withUpgrade)
