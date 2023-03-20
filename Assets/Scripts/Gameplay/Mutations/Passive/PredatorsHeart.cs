@@ -54,25 +54,26 @@ namespace Gameplay.Abilities.Passive
         
         public override string GetLevelDescription(int lvl, bool withUpgrade)
         {
-            StringBuilder sb = new StringBuilder();
-
             float hp = LerpLevel(healthLvl1, healthLvl10, lvl);
-            float prevhp = 0;
-            float regen = LerpLevel(regenLvl1, regenLvl10, lvl);
-            float prevRegen = 0;
+            float prevhp = hp;
+            int regen = (int) (LerpLevel(regenLvl1, regenLvl10, lvl) * 100);
+            int prevRegen = regen;
 
             if (lvl > 0 && withUpgrade)
             {
                 var prevLvl = lvl - 1;
                 prevhp = LerpLevel(healthLvl1, healthLvl10, prevLvl);
-                prevRegen = LerpLevel(regenLvl1, regenLvl10, prevLvl);
+                prevRegen = (int) (LerpLevel(regenLvl1, regenLvl10, prevLvl) * 100);
             }
             
-            sb.AddAbilityLine("Max health", hp, prevhp);
-            sb.AddAbilityLine("Healing", regen, prevRegen, percent: true);
-            sb.AddAbilityLine("Healing tickrate", regenDelay, 0, suffix: "s");
+            var args = new object[]
+            {
+                hp,          regen,
+                hp - prevhp, regen - prevRegen,
+                regenDelay
+            };
             
-            return sb.ToString();
+            return scriptable.GetStatDescription(args);
         }
     }
 }

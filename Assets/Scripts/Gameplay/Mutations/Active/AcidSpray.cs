@@ -60,7 +60,7 @@ namespace Gameplay.Abilities.Active
             else
                 basicParticleSystem.Play();
         }
-        
+
         private void OnBulletCollision(IDamageable damageable)
         {
             if(damageable is IDamageableEnemy enemy)
@@ -79,17 +79,16 @@ namespace Gameplay.Abilities.Active
             provider2.OnCollision -= OnBulletCollision;
         }
 
-        public override string GetLevelDescription(int lvl, bool withUpgrade)
+        public override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
         {
-            StringBuilder sb = new StringBuilder();
-
-            float prevCd = 0;
+            float cd = Scriptable.GetCooldown(lvl);
+            float prevCd = cd;
             float width = LerpLevel(angleLvl1, angleLvl10, lvl) * 2;
-            float prevWidth = 0;
+            float prevWidth = width;
             float amount = LerpLevel(amountLvl1, amountLvl10, lvl);
-            float prevAmount = 0;
+            float prevAmount = amount;
             float dmg = LerpLevel(damageLvl1, damageLvl10, lvl);
-            float prevDmg = 0;
+            float prevDmg = dmg;
 
             if (lvl > 0 && withUpgrade)
             {
@@ -99,15 +98,13 @@ namespace Gameplay.Abilities.Active
                 prevAmount = LerpLevel(amountLvl1, amountLvl10, prevLvl);
                 prevDmg = LerpLevel(damageLvl1, damageLvl10, prevLvl);
             }
-            
-            sb.AddAbilityLine("Cooldown", Scriptable.GetCooldown(lvl), prevCd, false, suffix: "s");
-            sb.AddAbilityLine("Spray width", width, prevWidth);
-            sb.AddAbilityLine("Spray amount", amount, prevAmount);
-            sb.AddAbilityLine("Spray damage", dmg, prevDmg);
-            sb.AddAbilityLine("Stun duration", stunDuration, 0);
-            sb.AddAbilityLine("Knockback", knockbackPower, 0);
-            
-            return sb.ToString();
+
+            return new object[]
+            {
+                cd,          width,             dmg,           amount, 
+                cd - prevCd, width - prevWidth, dmg - prevDmg, amount - prevAmount, 
+                stunDuration, knockbackPower
+            };
         }
     }
 }

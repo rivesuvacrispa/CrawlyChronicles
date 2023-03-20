@@ -1,6 +1,6 @@
-﻿using System.Text;
-using UnityEngine;
-using Util;
+﻿using UnityEngine;
+using UnityEngine.Localization.Settings;
+using UnityEngine.Localization.Tables;
 
 namespace Player
 {
@@ -26,6 +26,10 @@ namespace Player
         public float RotationSpeed => rotationSpeed;
         public float AbilityDamage => abilityDamage;
         public float PassiveProcRate => passiveProcRate;
+
+        private static readonly TableEntryReference PlayerStatsStringReference = "Essentials_PlayerStats";
+        private static readonly TableEntryReference PlayerStatsComparedStringReference = "Essentials_PlayerStatsCompared";
+        private static readonly TableReference EssentialsTableReference = "UI_Essentials";
 
 
         public PlayerStats(float movementSpeed = 0, float rotationSpeed = 0, float maxHealth = 0, 
@@ -86,42 +90,44 @@ namespace Player
 
         public static PlayerStats Zero => new();
 
-        public string Print(bool includeZeros)
+        public string Print()
         {
-            StringBuilder sb = new StringBuilder();
-            if(includeZeros || MovementSpeed > 0) 
-                sb.AppendColored("orange","Movespeed: ").Append($"{MovementSpeed:n1}\n");
-            if(includeZeros || RotationSpeed > 0) 
-                sb.AppendColored("orange","Rotation speed: ").Append($"{RotationSpeed:n1}\n");
-            if(includeZeros || MaxHealth > 0) 
-                sb.AppendColored("orange","Max health: ").Append($"{MaxHealth:n1}\n");
-            if(includeZeros || AttackPower > 0) 
-                sb.AppendColored("orange","Attack power: ").Append($"{AttackPower:n1}\n");
-            if(includeZeros || AttackDamage > 0) 
-                sb.AppendColored("orange","Attack damage: ").Append($"{AttackDamage:n1}\n");
-            if(includeZeros || Armor > 0) 
-                sb.AppendColored("orange","Armor: ").Append($"{Armor:n1}\n");
-            if(includeZeros || ImmunityDuration > 0) 
-                sb.AppendColored("orange","Immunity frame: ").Append($"{ImmunityDuration:n1}\n");
-            if(includeZeros || abilityDamage > 0) 
-                sb.AppendColored("orange","Ability damage: ").Append($"{(int) (abilityDamage * 100)}%\n");
-            return sb.ToString();
+            return LocalizationSettings.StringDatabase
+                .GetLocalizedString(EssentialsTableReference, PlayerStatsStringReference, 
+                    arguments: new object[]
+                    {
+                        MovementSpeed,
+                        RotationSpeed,
+                        MaxHealth,
+                        AttackPower,
+                        AttackDamage,
+                        Armor,
+                        (int) (abilityDamage * 100)
+                    });
         }
 
         public string PrintCompared(PlayerStats with)
         {
-            StringBuilder sb = new StringBuilder();
-
-            if (MovementSpeed > 0) sb.AddAbilityLine("Movespeed", MovementSpeed, with.movementSpeed);
-            if (RotationSpeed > 0) sb.AddAbilityLine("Rotation speed", RotationSpeed, with.rotationSpeed);
-            if (MaxHealth > 0) sb.AddAbilityLine("Max health", MaxHealth, with.maxHealth);
-            if (AttackPower > 0) sb.AddAbilityLine("Attack power", AttackPower, with.attackPower);
-            if (AttackDamage > 0) sb.AddAbilityLine("Attack damage", AttackDamage, with.attackDamage);
-            if (Armor > 0) sb.AddAbilityLine("Armor", Armor, with.armor);
-            if (ImmunityDuration > 0) sb.AddAbilityLine("Immunity frame", ImmunityDuration, with.immunityDuration, suffix: "s");
-            if (abilityDamage > 0) sb.AddAbilityLine("Ability damage", abilityDamage, with.abilityDamage, percent: true, prefix: "+", suffix: "%");
-
-            return sb.ToString();
+            int abilityDmg = (int) (abilityDamage * 100);
+            return LocalizationSettings.StringDatabase
+                .GetLocalizedString(EssentialsTableReference, PlayerStatsComparedStringReference,
+                    arguments: new object[]
+                    {
+                        movementSpeed,
+                        rotationSpeed,
+                        maxHealth,
+                        attackPower,
+                        attackDamage,
+                        armor,
+                        abilityDmg,
+                        movementSpeed - with.movementSpeed,
+                        rotationSpeed - with.rotationSpeed,
+                        maxHealth - with.maxHealth,
+                        attackPower - with.attackPower,
+                        attackDamage - with.attackDamage,
+                        armor - with.armor,
+                        abilityDmg - (int) (with.abilityDamage * 100)
+                    });
         }
     }
 }

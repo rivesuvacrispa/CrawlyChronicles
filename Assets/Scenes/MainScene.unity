@@ -2054,7 +2054,7 @@ ParticleSystem:
     serializedVersion: 6
     enabled: 1
     type: 4
-    angle: 60
+    angle: 15
     length: 5
     boxThickness: {x: 0, y: 0, z: 0}
     radiusThickness: 1
@@ -2369,7 +2369,7 @@ ParticleSystem:
       countCurve:
         serializedVersion: 2
         minMaxState: 0
-        scalar: 70
+        scalar: 25
         minScalar: 30
         maxCurve:
           serializedVersion: 2
@@ -17670,6 +17670,10 @@ PrefabInstance:
       value: Stats
       objectReference: {fileID: 0}
     - target: {fileID: 600463446672818295, guid: 7b7bdf40d1d684c43a3e38ac8511e78a, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 600463446672818295, guid: 7b7bdf40d1d684c43a3e38ac8511e78a, type: 3}
       propertyPath: m_UseGraphicAlpha
       value: 0
       objectReference: {fileID: 0}
@@ -17689,16 +17693,18 @@ PrefabInstance:
 
         Max health:
 
-        ATK
-        knockback:
+        Attack
+        power:
 
-        ATK damage:
+        Attack damage:
 
-        Immunity frame:'
+        Armor:
+
+        Ability damage:'
       objectReference: {fileID: 0}
     - target: {fileID: 3984987083430156193, guid: 7b7bdf40d1d684c43a3e38ac8511e78a, type: 3}
       propertyPath: m_Color.a
-      value: 0.5176471
+      value: 0.34117648
       objectReference: {fileID: 0}
     - target: {fileID: 3984987083430156193, guid: 7b7bdf40d1d684c43a3e38ac8511e78a, type: 3}
       propertyPath: m_Color.b
@@ -17824,7 +17830,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 600463446672818295, guid: 7b7bdf40d1d684c43a3e38ac8511e78a, type: 3}
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 7b7bdf40d1d684c43a3e38ac8511e78a, type: 3}
 --- !u!224 &404442540 stripped
@@ -19087,7 +19094,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityController: {fileID: 1918532735}
   scriptable: {fileID: 11400000, guid: 0415620eb7a66d24f9ee49376e8d36fc, type: 2}
-  level: 9
+  level: 0
   basicParticleSystem: {fileID: 110213755}
   comboParticleSystem: {fileID: 1376234603}
   provider1: {fileID: 1376234606}
@@ -25979,7 +25986,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &597407460
 Transform:
   m_ObjectHideFlags: 0
@@ -32301,7 +32308,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 1.5
+      scalar: 1.2
       minScalar: 0.1
       maxCurve:
         serializedVersion: 2
@@ -34228,7 +34235,7 @@ ParticleSystem:
     speedModifier:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 1
+      scalar: 1.4
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -48961,7 +48968,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67b8a9ad8d444efc87a6901d6885b21a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showOnStartup: 1
+  showOnStartup: 0
   rootGO: {fileID: 637381732}
   gameUICanvas: {fileID: 1248225194}
   gameOverGO: {fileID: 132975589}
@@ -57749,12 +57756,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be97027d2c596ba4ba5f099d053142cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  localizedString:
+    m_TableReference:
+      m_TableCollectionName: GUID:8e97275a86380c143a245ccadb89bcc2
+    m_TableEntryReference:
+      m_KeyId: 13804273664
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
   dayText: {fileID: 1309337023}
   lifespanText: {fileID: 329739862}
   dayDurationInSeconds: 60
   nightDurationInSeconds: 120
   playerLifespanInSeconds: 300
   fireflyParticles: {fileID: 9057647174741046319}
+  references:
+    version: 2
+    RefIds: []
 --- !u!114 &1311998321
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -59739,7 +59758,7 @@ ParticleSystem:
       countCurve:
         serializedVersion: 2
         minMaxState: 0
-        scalar: 140
+        scalar: 50
         minScalar: 30
         maxCurve:
           serializedVersion: 2
@@ -64201,7 +64220,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -10, y: -105}
+  m_AnchoredPosition: {x: -10, y: -105.00003}
   m_SizeDelta: {x: 9, y: -489.99997}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!114 &1392214280
@@ -80608,7 +80627,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1643632161
 Transform:
   m_ObjectHideFlags: 0
@@ -91782,7 +91801,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1680073898
 Transform:
   m_ObjectHideFlags: 0
@@ -95168,6 +95187,14 @@ PrefabInstance:
     serializedVersion: 2
     m_TransformParent: {fileID: 8121749056789922192}
     m_Modifications:
+    - target: {fileID: 135701086658633476, guid: 7b7bdf40d1d684c43a3e38ac8511e78a, type: 3}
+      propertyPath: m_StringReference.m_TableEntryReference.m_KeyId
+      value: 143760588800
+      objectReference: {fileID: 0}
+    - target: {fileID: 135701086658633476, guid: 7b7bdf40d1d684c43a3e38ac8511e78a, type: 3}
+      propertyPath: m_StringReference.m_TableReference.m_TableCollectionName
+      value: GUID:7f719762c2b2ee743ab9beb9bccb177e
+      objectReference: {fileID: 0}
     - target: {fileID: 563957714846518760, guid: 7b7bdf40d1d684c43a3e38ac8511e78a, type: 3}
       propertyPath: m_Name
       value: Text_001
@@ -98651,7 +98678,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2080516502
 Transform:
   m_ObjectHideFlags: 0

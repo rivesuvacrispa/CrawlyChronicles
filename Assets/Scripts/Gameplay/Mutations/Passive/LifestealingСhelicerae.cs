@@ -70,23 +70,25 @@ namespace Gameplay.Abilities.Passive
         
         public override string GetLevelDescription(int lvl, bool withUpgrade)
         {
-            StringBuilder sb = new StringBuilder();
-            
             float cd = LerpLevel(cooldownLvl1, cooldownLvl10, lvl);
-            float prevCd = 0;
-            float ls = LerpLevel(lifestealLvl1, lifestealLvl10, lvl);
-            float prevLs = 0;
+            float prevCd = cd;
+            int ls = (int) (LerpLevel(lifestealLvl1, lifestealLvl10, lvl) * 100);
+            int prevLs = ls;
 
             if (lvl > 0 && withUpgrade)
             {
                 var prevLvl = lvl - 1;
                 prevCd = LerpLevel(cooldownLvl1, cooldownLvl10, prevLvl);
-                prevLs = LerpLevel(lifestealLvl1, lifestealLvl10, prevLvl);
+                prevLs = (int) (LerpLevel(lifestealLvl1, lifestealLvl10, prevLvl) * 100);
             }
 
-            sb.AddAbilityLine("Cooldown", cd, prevCd, withUpgradePlus: false, suffix: "s");
-            sb.AddAbilityLine("Lifesteal amount", ls, prevLs, percent: true);
-            return sb.ToString();
+            var args = new object[]
+            {
+                cd,          ls,
+                cd - prevCd, ls - prevLs
+            };
+            
+            return scriptable.GetStatDescription(args);
         }
     }
 }

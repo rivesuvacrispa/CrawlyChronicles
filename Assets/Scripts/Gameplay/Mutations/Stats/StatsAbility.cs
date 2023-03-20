@@ -32,11 +32,13 @@ namespace Gameplay.Abilities.Base
             base.OnDisable();
         }
 
-        public override string GetLevelDescription(int lvl, bool withUpgrade) =>
-            PlayerStats
-                .LerpLevel(statsLvl1, statsLvl10, lvl)
-                .PrintCompared((lvl == 0 || !withUpgrade) ? 
-                    new PlayerStats() : 
-                    PlayerStats.LerpLevel(statsLvl1, statsLvl10, lvl - 1));
+        public override string GetLevelDescription(int lvl, bool withUpgrade)
+        {
+            var selfStats = PlayerStats.LerpLevel(statsLvl1, statsLvl10, lvl);
+            return selfStats.PrintCompared(
+                lvl == 0 || !withUpgrade
+                    ? selfStats
+                    : PlayerStats.LerpLevel(statsLvl1, statsLvl10, lvl - 1));
+        }
     }
 }

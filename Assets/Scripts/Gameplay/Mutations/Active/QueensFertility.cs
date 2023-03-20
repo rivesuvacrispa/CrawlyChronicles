@@ -24,26 +24,26 @@ namespace Gameplay.Abilities.Active
             if(BreedingManager.Instance.CanBreed)
                 BreedingManager.Instance.BecomePregnant(BreedingManager.Instance.TrioGene, AbilityController.GetMutationData());
         }
-        
-        public override string GetLevelDescription(int lvl, bool withUpgrade)
-        {
-            StringBuilder sb = new StringBuilder();
 
-            float prevCd = 0;
-            float eggs = LerpLevel(eggsAmountLvl1, eggsAmountLvl10, lvl) * 0.25f;
-            float prevEggs = 0;
+        public override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
+        {
+            float cd = Scriptable.GetCooldown(lvl);
+            float prevCd = cd;
+            int eggs = (int) (LerpLevel(eggsAmountLvl1, eggsAmountLvl10, lvl) * 0.25f * 100);
+            int prevEggs = eggs;
 
             if (lvl > 0 && withUpgrade)
             {
                 var prevLvl = lvl - 1;
                 prevCd = Scriptable.GetCooldown(prevLvl);
-                prevEggs = LerpLevel(eggsAmountLvl1, eggsAmountLvl10, prevLvl) * 0.25f;
+                prevEggs = (int) (LerpLevel(eggsAmountLvl1, eggsAmountLvl10, prevLvl) * 0.25f * 100);
             }
             
-            sb.AddAbilityLine("Cooldown", Scriptable.GetCooldown(lvl), prevCd, false, suffix: "s");
-            sb.AddAbilityLine("Chance to lay more eggs", eggs, prevEggs, percent: true);
-            
-            return sb.ToString();
+            return new object[]
+            {
+                cd,          eggs,
+                cd - prevCd, eggs - prevEggs
+            };
         }
     }
 }

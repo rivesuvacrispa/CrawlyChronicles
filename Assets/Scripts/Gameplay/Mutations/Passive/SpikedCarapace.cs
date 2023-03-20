@@ -72,29 +72,28 @@ namespace Gameplay.Abilities.Passive
         
         public override string GetLevelDescription(int lvl, bool withUpgrade)
         {
-            StringBuilder sb = new StringBuilder();
-            
-            float prob = LerpLevel(probabilityLvl1, probabilityLvl10, lvl);
-            float prevProb = 0;
+            int prob = (int) (LerpLevel(probabilityLvl1, probabilityLvl10, lvl) * 100);
+            int prevProb = prob;
             float amount = LerpLevel(amountLvl1, amountLvl10, lvl);
-            float prevAmount = 0;
+            float prevAmount = amount;
             float dmg = LerpLevel(damageLvl1, damageLvl10, lvl);
-            float prevDmg = 0;
+            float prevDmg = dmg;
 
             if (lvl > 0 && withUpgrade)
             {
                 var prevLvl = lvl - 1;
-                prevProb = LerpLevel(probabilityLvl1, probabilityLvl10, prevLvl);
+                prevProb = (int) (LerpLevel(probabilityLvl1, probabilityLvl10, prevLvl) * 100);
                 prevAmount = LerpLevel(amountLvl1, amountLvl10, prevLvl);
                 prevDmg = LerpLevel(damageLvl1, damageLvl10, prevLvl);
             }
-
-            sb.AddAbilityLine("Trigger chance", prob, prevProb, percent: true);
-            sb.AddAbilityLine("Spikes amount", amount, prevAmount);
-            sb.AddAbilityLine("Spikes damage", dmg, prevDmg);
-            sb.AddAbilityLine("Stun duration", stunDuration, 0, suffix: "s");
-            sb.AddAbilityLine("Knockback", knockbackPower, 0);
-            return sb.ToString();
+            
+            var args = new object[]
+            {
+                prob,            amount,              dmg,
+                prob - prevProb, amount - prevAmount, dmg - prevDmg,
+                stunDuration, knockbackPower
+            };
+            return scriptable.GetStatDescription(args);
         }
     }
 }

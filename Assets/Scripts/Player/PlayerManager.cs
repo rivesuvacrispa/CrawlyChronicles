@@ -80,7 +80,7 @@ namespace Player
         public void AddStats(PlayerStats stats)
         {
             currentStats.AddStats(baseStats, stats);
-            statsText.text = currentStats.Print(true);
+            statsText.text = currentStats.Print();
         }
         
         public void PickEgg(Egg egg)
@@ -198,7 +198,7 @@ namespace Player
             PlayerMovement.Teleport(new Vector2(15f, 15f));
             currentStats = baseStats;
             health = currentStats.MaxHealth;
-            statsText.text = currentStats.Print(true);
+            statsText.text = currentStats.Print();
             healthText.text = Mathf.CeilToInt(health).ToString();
             UpdateHealthbar();
         }

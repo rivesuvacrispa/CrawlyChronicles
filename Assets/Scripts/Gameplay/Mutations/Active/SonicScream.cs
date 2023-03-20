@@ -51,20 +51,18 @@ namespace Gameplay.Abilities.Active
         }
         
         public override void Activate() => particleSystem.Play();
-        
-        public override string GetLevelDescription(int lvl, bool withUpgrade)
+        public override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
         {
-            StringBuilder sb = new StringBuilder();
-
-            float prevCd = 0;
+            float cd = Scriptable.GetCooldown(lvl);
+            float prevCd = cd;
             float waves = Mathf.FloorToInt(LerpLevel(wavesLvl1, wavesLvl10, lvl));
-            float prevWaves = 0;
+            float prevWaves = waves;
             float life = LerpLevel(lifetimeLvl1, lifetimeLvl10, lvl) * 6;
-            float prevLife = 0;
+            float prevLife = life;
             float stunDur = LerpLevel(stunLvl1, stunLvl10, lvl);
-            float prevStunDur = 0;
+            float prevStunDur = stunDur;
             float kb = LerpLevel(knockbackLvl1, knockbackLvl10, lvl);
-            float prevKb = 0;
+            float prevKb = kb;
 
             if (lvl > 0 && withUpgrade)
             {
@@ -75,14 +73,11 @@ namespace Gameplay.Abilities.Active
                 prevStunDur = LerpLevel(stunLvl1, stunLvl10, prevLvl);
                 prevKb = LerpLevel(knockbackLvl1, knockbackLvl10, prevLvl);
             }
-            
-            sb.AddAbilityLine("Cooldown", Scriptable.GetCooldown(lvl), prevCd, false, suffix: "s");
-            sb.AddAbilityLine("Num of waves", waves, prevWaves);
-            sb.AddAbilityLine("Scream radius", life, prevLife);
-            sb.AddAbilityLine("Stun duration", stunDur, prevStunDur, suffix: "s");
-            sb.AddAbilityLine("Knockback", kb, prevKb);
-            
-            return sb.ToString();
+            return new object[]
+            {
+                cd,          waves,             life,            stunDur,               kb,
+                cd - prevCd, waves - prevWaves, life - prevLife, stunDur - prevStunDur, kb - prevKb,
+            };
         }
     }
 }

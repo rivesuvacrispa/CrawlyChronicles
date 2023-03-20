@@ -39,7 +39,7 @@ namespace Gameplay.Abilities.Active
             PlayerManager.Instance.AddStats(activeStats.Negated());
             StartCoroutine(AbilityRoutine());
         }
-
+        
         private IEnumerator AbilityRoutine()
         {
             trailRenderer.emitting = true;
@@ -64,33 +64,30 @@ namespace Gameplay.Abilities.Active
             PlayerManager.Instance.AddStats(activeStats.Negated());
         }
 
-        public override string GetLevelDescription(int lvl, bool withUpgrade)
+        public override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
         {
-            StringBuilder sb = new StringBuilder();
-
-            float prevCd = 0;
+            float cd = Scriptable.GetCooldown(lvl);
+            float prevCd = cd;
             float dur = LerpLevel(durationLvl1, durationLvl10, lvl);
-            float prevDur = 0;
-            float spd = LerpLevel(speedLvl1, speedLvl10, lvl);
-            float prevSpd = 0;
-            float dmg = LerpLevel(damageBoostLvl1, damageBoostLvl10, lvl);
-            float prevDmg = 0;
+            float prevDur = dur;
+            int spd = (int) (LerpLevel(speedLvl1, speedLvl10, lvl) * 100) - 100;
+            int prevSpd = spd;
+            int dmg = (int) (LerpLevel(damageBoostLvl1, damageBoostLvl10, lvl) * 100);
+            int prevDmg = dmg;
 
             if (lvl > 0 && withUpgrade)
             {
                 int prevLvl = lvl - 1;
                 prevCd = Scriptable.GetCooldown(prevLvl);
                 prevDur = LerpLevel(durationLvl1, durationLvl10, prevLvl);
-                prevSpd = LerpLevel(speedLvl1, speedLvl10, prevLvl);
-                prevDmg = LerpLevel(damageBoostLvl1, damageBoostLvl10, prevLvl);
+                prevSpd = (int) (LerpLevel(speedLvl1, speedLvl10, prevLvl) * 100) - 100;
+                prevDmg = (int) (LerpLevel(damageBoostLvl1, damageBoostLvl10, prevLvl) * 100);
             }
-
-            sb.AddAbilityLine("Cooldown", Scriptable.GetCooldown(lvl), prevCd, false, suffix: "s");
-            sb.AddAbilityLine("Duration", dur, prevDur, suffix: "s");
-            sb.AddAbilityLine("Speed boost", spd, prevSpd, percent: true);
-            sb.AddAbilityLine("Damage boost", dmg, prevDmg, percent: true);
-            
-            return sb.ToString();
+            return new object[]
+            {
+                cd,          dur,           spd,           dmg,
+                cd - prevCd, dur - prevDur, spd - prevSpd, dmg - prevDmg
+            };
         }
     }
 }

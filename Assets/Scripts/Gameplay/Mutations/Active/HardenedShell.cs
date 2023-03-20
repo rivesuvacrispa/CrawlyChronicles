@@ -62,33 +62,31 @@ namespace Gameplay.Abilities.Active
             PlayerManager.Instance.AddStats(activeStats.Negated());
         }
         
-        public override string GetLevelDescription(int lvl, bool withUpgrade)
+        public override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
         {
-            StringBuilder sb = new StringBuilder();
-
-            float prevCd = 0;
+            float cd = Scriptable.GetCooldown(lvl);
+            float prevCd = cd;
             float dur = LerpLevel(durationLvl1, durationLvl10, lvl);
-            float prevDur = 0;
-            float arm = LerpLevel(armorLvl1, armorLvl10, lvl);
-            float prevArm = 0;
-            float proc = LerpLevel(procChanceLvl1, procChanceLvl10, lvl);
-            float prevProc = 0;
+            float prevDur = dur;
+            int arm = (int) (LerpLevel(armorLvl1, armorLvl10, lvl) * 100);
+            int prevArm = arm;
+            int proc = (int) (LerpLevel(procChanceLvl1, procChanceLvl10, lvl) * 100);
+            int prevProc = proc;
 
             if (lvl > 0 && withUpgrade)
             {
                 int prevLvl = lvl - 1;
                 prevCd = Scriptable.GetCooldown(prevLvl);
                 prevDur = LerpLevel(durationLvl1, durationLvl10, prevLvl);
-                prevArm = LerpLevel(armorLvl1, armorLvl10, prevLvl);
-                prevProc = LerpLevel(procChanceLvl1, procChanceLvl10, prevLvl);
+                prevArm = (int) (LerpLevel(armorLvl1, armorLvl10, prevLvl) * 100);
+                prevProc = (int) (LerpLevel(procChanceLvl1, procChanceLvl10, prevLvl) * 100);
             }
-
-            sb.AddAbilityLine("Cooldown", Scriptable.GetCooldown(lvl), prevCd, false, suffix: "s");
-            sb.AddAbilityLine("Duration", dur, prevDur, suffix: "s");
-            sb.AddAbilityLine("Armor boost", arm, prevArm, percent: true);
-            sb.AddAbilityLine("Procs boost", proc, prevProc, percent: true);
             
-            return sb.ToString();
+            return new object[]
+            {
+                cd,          dur,           arm,           proc,
+                cd - prevCd, dur - prevDur, arm - prevArm, proc - prevProc
+            };
         }
     }
 }

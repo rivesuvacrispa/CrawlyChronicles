@@ -54,17 +54,16 @@ namespace Gameplay.Abilities.Active
             else particleSystem.Play();
         }
 
-        public override string GetLevelDescription(int lvl, bool withUpgrade)
+        public override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
         {
-            StringBuilder sb = new StringBuilder();
-
-            float prevCd = 0;
+            float cd = Scriptable.GetCooldown(lvl);
+            float prevCd = cd;
             float dur = LerpLevel(durationLvl1, durationLvl10, lvl);
-            float prevDur = 0;
+            float prevDur = dur;
             float amount = LerpLevel(amountLvl1, amountLvl10, lvl);
-            float prevAmount = 0;
+            float prevAmount = amount;
             float dmg = LerpLevel(damageLvl1, damageLvl10, lvl);
-            float prevDmg = 0;
+            float prevDmg = dmg;
 
             if (lvl > 0 && withUpgrade)
             {
@@ -75,14 +74,12 @@ namespace Gameplay.Abilities.Active
                 prevDmg = LerpLevel(damageLvl1, damageLvl10, prevLvl);
             }
             
-            sb.AddAbilityLine("Cooldown", Scriptable.GetCooldown(lvl), prevCd, false, suffix: "s");
-            sb.AddAbilityLine("Fan duration", dur, prevDur, suffix: "s");
-            sb.AddAbilityLine("Spikes amount", amount, prevAmount);
-            sb.AddAbilityLine("Spikes damage", dmg, prevDmg);
-            sb.AddAbilityLine("Stun duration", stunDuration, 0, suffix: "s");
-            sb.AddAbilityLine("Knockback", knockbackPower, 0);
-            
-            return sb.ToString();
+            return new object[]
+            {
+                cd,          dur,           amount,              dmg, 
+                cd - prevCd, dur - prevDur, amount - prevAmount, dmg - prevDmg,
+                stunDuration, knockbackPower
+            };
         }
     }
 }

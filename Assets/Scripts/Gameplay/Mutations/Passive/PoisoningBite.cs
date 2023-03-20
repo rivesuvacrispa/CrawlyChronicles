@@ -52,8 +52,6 @@ namespace Gameplay.Abilities.Passive
         private void OnAttackEffectCollectionRequested(List<AttackEffect> effects) 
             => effects.Add(attackEffect);
         
-        
-        
         protected override void OnEnable()
         {
             base.OnEnable();
@@ -68,27 +66,28 @@ namespace Gameplay.Abilities.Passive
         
         public override string GetLevelDescription(int lvl, bool withUpgrade)
         {
-            StringBuilder sb = new StringBuilder();
-            
             float dmg = LerpLevel(totalDamageLvl1, totalDamageLvl10, lvl);
-            float prevDmg = 0;
-            float slw = LerpLevel(slowLvl1, slowLvl10, lvl);
-            float prevSlw = 0;
+            float prevDmg = dmg;
+            int slw = (int) (LerpLevel(slowLvl1, slowLvl10, lvl) * 100);
+            int prevSlw = slw;
             float dur = LerpLevel(durationLvl1, durationLvl10, lvl);
-            float prevDur = 0;
+            float prevDur = dur;
 
             if (lvl > 0 && withUpgrade)
             {
                 var prevLvl = lvl - 1;
                 prevDmg = LerpLevel(totalDamageLvl1, totalDamageLvl10, prevLvl);
-                prevSlw = LerpLevel(slowLvl1, slowLvl10, prevLvl);
+                prevSlw = (int) (LerpLevel(slowLvl1, slowLvl10, prevLvl) * 100);
                 prevDur = LerpLevel(durationLvl1, durationLvl10, prevLvl);
             }
-
-            sb.AddAbilityLine("Effect duration", dur, prevDur, suffix: "s");
-            sb.AddAbilityLine("Total damage", dmg, prevDmg);
-            sb.AddAbilityLine("Slow amount", slw, prevSlw, percent: true, prefix: "-");
-            return sb.ToString();
+            
+            var args = new object[]
+            {
+                dur,           dmg,           slw,         
+                dur - prevDur, dmg - prevDmg, slw - prevSlw
+            };
+            
+            return scriptable.GetStatDescription(args);
         }
     }
 }

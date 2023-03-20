@@ -87,28 +87,28 @@ namespace Gameplay.Abilities.Passive
         
         public override string GetLevelDescription(int lvl, bool withUpgrade)
         {
-            StringBuilder sb = new StringBuilder();
-
-            float life = LerpLevel(lifetimeLvl1, lifetimeLvl10, lvl);
-            float prevLife = 0;
+            float life = LerpLevel(lifetimeLvl1, lifetimeLvl10, lvl) * 3;
+            float prevLife = life;
             float amount = LerpLevel(amountLvl1, amountLvl10, lvl);
-            float prevAmount = 0;
+            float prevAmount = amount;
             float dmg = LerpLevel(damageLvl1, damageLvl10, lvl);
-            float prevDmg = 0;
+            float prevDmg = dmg;
 
             if (lvl > 0 && withUpgrade)
             {
                 var prevLvl = lvl - 1;
-                prevLife = LerpLevel(lifetimeLvl1, lifetimeLvl10, prevLvl);
+                prevLife = LerpLevel(lifetimeLvl1, lifetimeLvl10, prevLvl) * 3;
                 prevAmount = LerpLevel(amountLvl1, amountLvl10, prevLvl);
                 prevDmg = LerpLevel(damageLvl1, damageLvl10, prevLvl);
             }
-
-            sb.AddAbilityLine("Aura density", amount, prevAmount);
-            sb.AddAbilityLine("Aura damage", dmg, prevDmg);
-            sb.AddAbilityLine("Aura radius", life * 3, prevLife * 3);
-
-            return sb.ToString();
+            
+            var args = new object[]
+            {
+                 amount,              dmg,           life,           
+                 amount - prevAmount, dmg - prevDmg, life - prevLife,
+            };
+            
+            return scriptable.GetStatDescription(args);
         }
     }
 }

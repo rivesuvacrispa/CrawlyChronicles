@@ -52,38 +52,31 @@ namespace Gameplay.Abilities.Active
         }
         
         public override void Activate() => particleSystem.Play();
-        
-        public override string GetLevelDescription(int lvl, bool withUpgrade)
+        public override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
         {
-            StringBuilder sb = new StringBuilder();
-
-            float prevCd = 0;
+            float cd = Scriptable.GetCooldown(lvl);
+            float prevCd = cd;
             float amount = LerpLevel(amountLvl1, amountLvl10, lvl);
-            float prevAmount = 0;
+            float prevAmount = amount;
             float dmg = LerpLevel(damageLvl1, damageLvl10, lvl);
-            float prevDmg = 0;            
-            float kb = LerpLevel(damageLvl1, damageLvl10, lvl);
-            float prevKb = 0;   
-            float stunDur = LerpLevel(damageLvl1, damageLvl10, lvl);
-            float prevStunDur = 0;
+            float prevDmg = dmg;            
+            float kb = LerpLevel(knockbackLvl1, knockbackLvl10, lvl);
+            float prevKb = kb;   
+            float stunDur = LerpLevel(stunLvl1, stunLvl10, lvl);
+            float prevStunDur = stunDur;
 
             if (lvl > 0 && withUpgrade)
             {
                 var prevLvl = lvl - 1;
                 prevCd = Scriptable.GetCooldown(prevLvl);
-                stunDur = LerpLevel(stunLvl1, stunLvl10, prevLvl);
+                prevStunDur = LerpLevel(stunLvl1, stunLvl10, prevLvl);
                 prevKb = LerpLevel(knockbackLvl1, knockbackLvl10, prevLvl);
                 prevAmount = LerpLevel(amountLvl1, amountLvl10, prevLvl);
                 prevDmg = LerpLevel(damageLvl1, damageLvl10, prevLvl);
             }
-            
-            sb.AddAbilityLine("Cooldown", Scriptable.GetCooldown(lvl), prevCd, false, suffix: "s");
-            sb.AddAbilityLine("Flames amount", amount, prevAmount);
-            sb.AddAbilityLine("Stun duration", stunDur, prevStunDur, suffix: "s");
-            sb.AddAbilityLine("Knockback power", kb, prevKb);
-            sb.AddAbilityLine("Blast damage", dmg, prevDmg);
-            
-            return sb.ToString();
+            return new object[] { 
+                cd,          amount,              stunDur,               dmg,           kb, 
+                cd - prevCd, amount - prevAmount, stunDur - prevStunDur, dmg - prevDmg, kb - prevKb };
         }
     }
 }

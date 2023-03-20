@@ -8,5 +8,9 @@ namespace Gameplay.Abilities
         public float Cooldown => Scriptable.GetCooldown(level);
 
         public abstract void Activate();
+        public abstract object[] GetDescriptionArguments(int lvl, bool withUpgrade);
+
+        public override string GetLevelDescription(int lvl, bool withUpgrade) 
+            => Scriptable.GetStatDescription(GetDescriptionArguments(lvl, withUpgrade));
     }
 }

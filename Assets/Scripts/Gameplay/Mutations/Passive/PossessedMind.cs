@@ -37,17 +37,18 @@ namespace Gameplay.Abilities.Passive
         
         public override string GetLevelDescription(int lvl, bool withUpgrade)
         {
-            StringBuilder sb = new StringBuilder();
-
             float dmg = LerpLevel(damageLvl1, damageLvl10, lvl);
-            float prevDmg = 0;
+            float prevDmg = dmg;
 
             if (lvl > 0 && withUpgrade) 
                 prevDmg = LerpLevel(damageLvl1, damageLvl10, lvl - 1);
-
-            sb.AddAbilityLine("Damage taken", dmg, prevDmg, withUpgradePlus: false);
             
-            return sb.ToString();
+            var args = new object[]
+            {
+                dmg, 
+                dmg - prevDmg
+            };
+            return scriptable.GetStatDescription(args);
         }
     }
 }
