@@ -44,8 +44,10 @@ namespace Gameplay.Food
             if(!destructionInvoked) OnProviderDestroy?.Invoke();
         }
         
-        public void Eat()
+        public bool Eat()
         {
+            if (Amount <= 0) return false;
+            
             Amount--;
             if (Amount <= 0)
             {
@@ -60,6 +62,8 @@ namespace Gameplay.Food
                 OnDataUpdate?.Invoke();
                 UpdateSprite();
             }
+
+            return true;
         }
         
         private void UpdateSprite() => spriteRenderer.sprite = scriptable.GetGrowthSprite(Amount);
@@ -77,10 +81,12 @@ namespace Gameplay.Food
         // IContinuouslyInteractable
         public void Interact()
         {
-            Eat();
-            if(!BreedingManager.Instance.AddFood())
-                GlobalDefinitions.DropGenesRandomly(Position, (GeneType)Random.Range(0, 3), 1, 0.4f);
-            OnEatenByPlayer();
+            if (Eat())
+            {
+                if(!BreedingManager.Instance.AddFood())
+                    GlobalDefinitions.DropGenesRandomly(Position, (GeneType)Random.Range(0, 3), 1, 0.4f);
+                OnEatenByPlayer();
+            }
         }
 
         public void OnInteractionStart() => particleSystem.Play();

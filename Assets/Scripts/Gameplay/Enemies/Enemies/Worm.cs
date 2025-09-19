@@ -39,9 +39,12 @@ namespace Gameplay.Enemies
                 onTargetReach: () =>
                 {
                     DigOut(0f);
-                    foodBed.Eat();
-                    hungry = false;
-                    StartCoroutine(HungerRoutine());
+                    if (foodBed.Eat())
+                    {
+                        hungry = false;
+                        StartCoroutine(HungerRoutine());
+                    }
+                    
                     stateController.SetState(AIState.Wander);
                 },
                 reachDistance: 1.3f);

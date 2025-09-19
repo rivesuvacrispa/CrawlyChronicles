@@ -71,10 +71,9 @@ namespace Gameplay.Enemies
             stateController.SetState(AIState.Follow, 
                 followTarget: foodBed,
                 () => {
-                    if (foodBed.Amount > 0)
+                    if (foodBed.Eat())
                     {
                         GlobalDefinitions.CreateRandomGeneDrop(transform.position);
-                        foodBed.Eat();
                         hungry = false;
                     }
                     
