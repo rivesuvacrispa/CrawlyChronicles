@@ -35,7 +35,7 @@ namespace Gameplay.Enemies
             SubEvents();
             int entropy = GlobalDefinitions.BreedingPartnersGeneEntropy;
             TrioGene = BreedingManager.Instance.TrioGene.Randomize(entropy);
-            TrioGene.AddGene((GeneType) Random.Range(0,3), Random.Range(2 * entropy, 4 * entropy));
+            TrioGene.AddGene(((Scriptable.Enemies.NeutralAnt)scriptable).GeneType, Random.Range(2 * entropy, 4 * entropy));
             
             base.Start();
         }

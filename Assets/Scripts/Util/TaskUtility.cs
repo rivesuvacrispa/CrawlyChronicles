@@ -78,7 +78,7 @@ namespace Util
             float currentSpeed = float.MaxValue;
             while (currentSpeed > speed)
             {
-                currentSpeed = rb.velocity.magnitude;
+                currentSpeed = rb.linearVelocity.magnitude;
                 await UniTask.WaitForFixedUpdate(cancellationToken: cancellationToken);
 
             }

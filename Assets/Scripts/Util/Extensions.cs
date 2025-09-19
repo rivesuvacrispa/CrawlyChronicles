@@ -37,55 +37,11 @@ namespace Util
             partRb.transform.localScale = Vector3.one;
             partRb.simulated = true;
             partRb.gravityScale = 0;
-            partRb.drag = 1f;
-            partRb.angularDrag = 2f;
+            partRb.linearDamping = 1f;
+            partRb.angularDamping = 2f;
             partRb.angularVelocity = 720f;
             partRb.AddForce(Random.insideUnitCircle.normalized * 2f, 
                 ForceMode2D.Impulse);
         }
-
-        public static void AddAbilityLine(this StringBuilder sb,
-            string title,
-            float value,
-            float previousValue,
-            bool withUpgradePlus = true,
-            bool percent = false,
-            string prefix = "",
-            string suffix = "")
-        {
-            sb.AppendColored("orange", $"{title}: ")
-                .Append($"{prefix}" +
-                        $"{(percent ? $"{(int) (value * 100)}%" : value.ToString("0.##"))}" +
-                        $"{suffix}");
-            
-            /*sb.Append("<color=orange>")
-                .Append(title)
-                .Append(": ")
-                .Append("</color>")
-                .Append(prefix)
-                .Append(percent ? $"{(int)(value * 100)}%" : value.ToString("0.##"))
-                .Append(suffix);*/
-            
-            if (previousValue != 0)
-            {
-                float diff = value - previousValue;
-
-                sb.AppendColored("lime", 
-                    $" ({(withUpgradePlus ? "+" : string.Empty)}" +
-                    $"{(percent ? $"{(int)(diff * 100)}%" : diff.ToString("0.##"))}" +
-                    $"{suffix})");
-                /*sb.Append(" <color=lime>(")
-                    .Append(withUpgradePlus ? "+" : string.Empty)
-                    .Append(percent ? $"{(int)(diff * 100)}%" : diff.ToString("0.##"))
-                    .Append(suffix)
-                    .Append(")")
-                    .Append("</color>");*/
-            }
-
-            sb.Append("\n");
-        }
-
-        public static StringBuilder AppendColored(this StringBuilder sb, string color, string text) 
-            => sb.Append($"<color={color}>{text}</color>");
     }
 }

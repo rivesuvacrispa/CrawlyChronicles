@@ -63,11 +63,6 @@ namespace UI
             SettingsLoader.CurrentSettings.Difficulty = diff.OverallDifficulty;
             SettingsLoader.SaveSettings(SettingsLoader.CurrentSettings);
         }
-
-        public void ResetDifficultyButtons()
-        {
-            difficultyButtons[(int) SelectedDifficulty.OverallDifficulty].Select();
-        }
         
         private void ApplySettings(SettingsData settings)
         {

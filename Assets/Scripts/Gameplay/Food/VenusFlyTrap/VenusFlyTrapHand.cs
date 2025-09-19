@@ -19,12 +19,12 @@ namespace Gameplay.Food.VenusFlyTrap
             bool catched = false;
             if (col.gameObject.TryGetComponent(out Enemy enemy))
             {
-                enemy.Damage(999, transform.position, 0, 0, Color.white, true);
+                enemy.Die();
                 catched = true;
             }
             else if (col.gameObject.TryGetComponent(out PlayerManager player))
             {
-                player.Damage(999, transform.position, 0, ignoreArmor: true);
+                player.Die(false);
                 catched = true;
             }
             

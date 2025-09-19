@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿ using Timeline;
+using UnityEngine;
 
 namespace Gameplay.Food.VenusFlyTrap
 {
@@ -26,7 +27,7 @@ namespace Gameplay.Food.VenusFlyTrap
         {
         }
 
-        public override bool CanSpawn(float random) => !existing && random < 1 / 3f;
+        public override bool CanSpawn(float random) => TimeManager.DayCounter > 1 && !existing && random < 1 / 3f;
         protected override void OnDestroy()
         {
             base.OnDestroy();

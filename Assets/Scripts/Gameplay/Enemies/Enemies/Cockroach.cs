@@ -71,13 +71,13 @@ namespace Gameplay.Enemies
             {
                 stateController.TakeMoveControl();
                 rb.AddClampedForceBackwards(PlayerMovement.Position, evadeSpeed, ForceMode2D.Force);
-                rb.RotateTowardsPosition(rb.position + rb.velocity, 10);
+                rb.RotateTowardsPosition(rb.position + rb.linearVelocity, 10);
                 t -= Time.deltaTime;
                 yield return null;
             }
 
             evadeRoutine = null;
-            stateController.SetState(AIState.Wander);
+            AttackPlayer();
             EntityWallCollider.enabled = false;
             stateController.ReturnMoveControl();
             StartCoroutine(EvasionCooldown(1.5f));

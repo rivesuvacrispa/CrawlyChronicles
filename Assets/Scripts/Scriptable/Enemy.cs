@@ -35,13 +35,7 @@ namespace Scriptable
         [SerializeField] private AudioClip crawlAudio;
         [SerializeField] private AudioClip deathAudio;
         [SerializeField, ShowOnly] private float crawlPitch;
-
-        private Gradient immunityGradient;
-        private Gradient poisonGradient;
-        private Gradient lifestealGradient;
-        private bool effectGradientsInitialized;
-
-
+        
         public int CanSpawnSinceDay => canSpawnSinceDay;
         public float AttackDistance => attackDistance;
         public float AttackDelay => attackDelay;

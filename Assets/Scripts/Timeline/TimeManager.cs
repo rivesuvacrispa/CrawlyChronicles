@@ -123,8 +123,6 @@ namespace Timeline
             int timeLeft = isDay ? 
                 dayDurationInSeconds - time :
                 cycleDuration - time;
-            /*string prefix = isDay ? "Day" : "Night";
-            dayText.text = $"{prefix} {dayCounter} - {timeLeft / 60}:{(timeLeft % 60):00}";*/
 
             localizedString.Arguments[0] = isDay ? 1 : 2;
             localizedString.Arguments[1] = dayCounter;
@@ -149,7 +147,6 @@ namespace Timeline
 
         private void OnResetRequested()
         {
-            Debug.Log("ResetRequested");
             enabled = true;
             Start();
         }

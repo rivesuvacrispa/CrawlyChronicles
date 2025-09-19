@@ -2,6 +2,7 @@
 
 namespace Scriptable.Enemies
 {
+    [CreateAssetMenu(menuName = "Scriptable/Enemy/DiggingWasp")]
     public class DiggingWasp : Enemy
     {
         [SerializeField] private GameObject eggBedPrefab;

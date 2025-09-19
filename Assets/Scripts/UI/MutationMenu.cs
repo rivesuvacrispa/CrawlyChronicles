@@ -17,10 +17,16 @@ namespace UI
     {
         private static MutationMenu instance;
 
+
+        [Header("Mutations transforms")]
+        [SerializeField] private Transform specialsTransform;
+        [SerializeField] private Transform passivesTransform;
+        [SerializeField] private Transform activesTransform;
+
+        [Header("Other refs")]
         [SerializeField] private RespawnManager respawnManager;
-        [SerializeField] private MutationAbilityTooltip tooltip;
-        [SerializeField] private Transform currentMutationsTransform;
         [SerializeField] private Transform newMutationsTransform;
+        [SerializeField] private MutationAbilityTooltip tooltip;
         [SerializeField] private BasicAbilityButton basicAbilityButtonPrefab;
         [SerializeField] private MutationButton mutationButtonPrefab;
         [SerializeField] private GeneDisplay geneDisplay;
@@ -35,9 +41,6 @@ namespace UI
         private Dictionary<BasicMutation, int> current = new();
         private TrioGene rerollCost;
         
-        
-        public Egg HatchingEgg => hatchingEgg;
-
 
 
         private MutationMenu() => instance = this;
@@ -64,22 +67,22 @@ namespace UI
         {
             //// Now food can be consumed up to breeding requirement only
             //// Blue fungi drops genes when food is max
-            // More neutrals
-            // Fungi glows during night only
-            // Add food particles
-            // Maybe fungi grows at night and disapper at day and other food grows at day and not at night
             //// neutrals change animation when flee dead
             //// health in percent
-            // immune wasp?
             //// more cooldown on queens fertility
             //// queens fertility needs food
             //// autocast particles
-            // enemies not spawning more? <----- CHECK
+
+            // More neutrals
+            // immune wasp?
             // enemies become stronger when you mutate? or each day?
+            // immune cockroaches
+            // осы умирают неправильно
             
-
-
-
+            //?? мухоловка после съедения отключает атаку
+            //// мухоловка агрит нейтралов
+            //// пофиксить яица
+            
             Dictionary<BasicMutation, int> variants = new();
             HashSet<BasicMutation> maxed = new();
             List<BasicMutation> specials = new();
@@ -152,7 +155,9 @@ namespace UI
 
         private void CreateBasicAbilityButton(BasicMutation mutation, int level)
         {
-            var btn = Instantiate(basicAbilityButtonPrefab, currentMutationsTransform);
+            Transform t = mutation.Special ? specialsTransform :
+                mutation is ActiveMutation ? activesTransform : passivesTransform;
+            var btn = Instantiate(basicAbilityButtonPrefab, t);
             btn.SetVisuals(mutation);
             btn.UpdateLevelText(level);
             btn.GetComponent<AbilityTooltipProvider>().SetTooltip(tooltip);
@@ -211,7 +216,9 @@ namespace UI
         // Utils
         private void ClearAll()
         {
-            foreach (Transform t in currentMutationsTransform) Destroy(t.gameObject);
+            foreach (Transform t in specialsTransform) Destroy(t.gameObject);
+            foreach (Transform t in passivesTransform) Destroy(t.gameObject);
+            foreach (Transform t in activesTransform) Destroy(t.gameObject);
             foreach (Transform t in newMutationsTransform) Destroy(t.gameObject);
             basicAbilityButtons.Clear();
             current.Clear();

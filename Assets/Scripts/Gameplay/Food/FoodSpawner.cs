@@ -54,6 +54,8 @@ namespace Gameplay.Food
         {
             while (currentFoodPerMinute > 0)
             {
+                yield return new WaitForSeconds(1f);
+                
                 float delay = 60f / currentFoodPerMinute;
                 delay -= delay * Random.value * 0.3f - 0.15f;
                 yield return new WaitForSeconds(delay);

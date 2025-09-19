@@ -146,15 +146,15 @@ namespace Scripts.Gameplay.Bosses.Centipede
             spriteRenderer.sortingOrder = 100;
             painter.Paint(new Gradient().FastGradient(spriteRenderer.color, GlobalDefinitions.DeadColor), 1f);
             enabled = false;
-            rb.drag = 1f;
+            rb.linearDamping = 1f;
 
             if (fragmentType is CentipedeFragmentType.Body)
-                rb.velocity = transform.up * 2;
+                rb.linearVelocity = transform.up * 2;
             else
             {
                 rb.AddForce(Random.insideUnitCircle.normalized * 2f, ForceMode2D.Impulse);
                 rb.angularVelocity = 720f;
-                rb.angularDrag = 2f;
+                rb.angularDamping = 2f;
             }
             yield return new WaitForSeconds(6f);
             painter.FadeOut(2f);
@@ -189,7 +189,7 @@ namespace Scripts.Gameplay.Bosses.Centipede
 
             float speed = CentipedeDefinitions.FragmentSpeed * distance;
             if (speed > maxSpeed) speed = maxSpeed;
-            rb.velocity = distance < CentipedeDefinitions.FollowRadius ?
+            rb.linearVelocity = distance < CentipedeDefinitions.FollowRadius ?
                 Vector2.zero : transform.up * speed;
         }
 

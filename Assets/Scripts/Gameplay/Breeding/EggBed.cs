@@ -100,7 +100,7 @@ namespace Gameplay
         {
             RemoveOne(out var egg);
             BreedingManager.Instance.AddFood();
-            float genesAmount = Random.value * 0.75f;
+            float genesAmount = Random.value * 0.05f;
             TrioGene drop = egg.Genes.Multiply(genesAmount);
             Vector3 pos = transform.position;
             GlobalDefinitions.CreateEggSquash(pos + (Vector3) Random.insideUnitCircle.normalized * 0.25f);

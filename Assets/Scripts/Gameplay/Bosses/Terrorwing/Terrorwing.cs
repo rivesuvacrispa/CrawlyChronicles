@@ -333,7 +333,7 @@ namespace Scripts.Gameplay.Bosses.Terrorwing
 
         private async UniTask ResetSpeed(CancellationToken cancellationToken)
         {
-            rb.velocity = Vector2.zero;
+            rb.linearVelocity = Vector2.zero;
             await UniTask.Yield(PlayerLoopTiming.LastPostLateUpdate, cancellationToken: cancellationToken);
             await UniTask.WaitForFixedUpdate(cancellationToken: cancellationToken);
         }

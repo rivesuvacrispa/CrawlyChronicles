@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 6751962458857041776}
   - component: {fileID: 2010914464844024491}
   - component: {fileID: 3324643302011992453}
+  - component: {fileID: 733379714903931835}
   m_Layer: 5
   m_Name: BasicAbilityButton
   m_TagString: Untagged
@@ -43,7 +44,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 70, y: 70}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &769331516126409415
 CanvasRenderer:
@@ -191,6 +192,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 644a3d48da5d4096b880d00ec7428da6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  addSound: 1
+--- !u!114 &733379714903931835
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4116603624949559721}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreLayout: 0
+  m_MinWidth: 70
+  m_MinHeight: 70
+  m_PreferredWidth: 70
+  m_PreferredHeight: 70
+  m_FlexibleWidth: -1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!1 &8040474096002359002
 GameObject:
   m_ObjectHideFlags: 0

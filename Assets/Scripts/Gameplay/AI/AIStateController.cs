@@ -4,6 +4,7 @@ using Definitions;
 using Gameplay.AI.Locators;
 using Gameplay.Enemies;
 using Gameplay.Food;
+using Gameplay.Food.VenusFlyTrap;
 using Pathfinding;
 using UnityEngine;
 using Util.Interfaces;
@@ -218,7 +219,7 @@ namespace Gameplay.AI
                 case EggBed eggBed:
                     enemy.OnEggsLocated(eggBed);
                     break;
-                case Foodbed foodBed:
+                case Foodbed foodBed and not VenusFlyTrap:
                     enemy.OnFoodLocated(foodBed);
                     break;
                 default:

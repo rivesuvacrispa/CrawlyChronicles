@@ -22,12 +22,15 @@ namespace Gameplay.Food
         private static readonly int PopoutAnimHash = Animator.StringToHash("FoodbedPopout");
         private static readonly int PopAnimHash = Animator.StringToHash("FoodbedPop");
 
-        
-        
+
+        private void Awake()
+        {
+            MainMenu.OnResetRequested += OnResetRequested;
+            animator = GetComponent<Animator>();
+        }
+
         protected virtual void Start()
         {
-            animator = GetComponent<Animator>();
-            MainMenu.OnResetRequested += OnResetRequested;
             amount = scriptable.GetRandomAmount();
             var main = particleSystem.main;
             main.startColor = spriteRenderer.color;
@@ -60,7 +63,12 @@ namespace Gameplay.Food
         }
         
         private void UpdateSprite() => spriteRenderer.sprite = scriptable.GetGrowthSprite(amount);
-        private void OnResetRequested() => FoodSpawnPoint.Remove();
+        private void OnResetRequested()
+        {
+            FoodSpawnPoint.Remove();
+            Destroy(gameObject);
+        }
+
         protected abstract void OnEatenByPlayer();
         public abstract bool CanSpawn(float random);
 
@@ -76,7 +84,6 @@ namespace Gameplay.Food
         }
 
         public void OnInteractionStart() => particleSystem.Play();
-
         public void OnInteractionStop() => particleSystem.Stop();
         public virtual bool CanInteract() => amount > 0;
         public float InteractionTime => 1f;

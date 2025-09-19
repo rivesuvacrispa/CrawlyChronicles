@@ -1,12 +1,14 @@
 ﻿using Scriptable;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Localization;
 using UnityEngine.UI;
 
 namespace UI
 {
     public class DifficultyButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
+        [SerializeField] private LocalizedString localizedNameString;
         [SerializeField] private Text nameText;
         [SerializeField] private Text descriptionText;
         [SerializeField] private DifficultySelectionFrame selectionFrame;
@@ -26,6 +28,7 @@ namespace UI
 
         private void OnEnable()
         {
+            localizedNameString.StringChanged += OnLocalizedNameStringChanged;
             if(isSelected)
             {
                 PlaySelected();
@@ -33,7 +36,14 @@ namespace UI
             }
         }
 
-        private void Start() => nameText.text = difficulty.OverallDifficulty.ToString();
+        private void OnDisable() => localizedNameString.StringChanged -= OnLocalizedNameStringChanged;
+
+        private void OnLocalizedNameStringChanged(string text)
+        {
+            nameText.text = text;
+            description = difficulty.GetDescription();
+            if(isSelected) UpdateDescriptionText();
+        }
 
         public void Select()
         {
@@ -52,7 +62,6 @@ namespace UI
 
         private void Awake()
         {
-            description = difficulty.ToString();
             idleAnimHash = Animator.StringToHash($"{difficulty.OverallDifficulty}Idle");
             animHash = Animator.StringToHash(difficulty.OverallDifficulty.ToString());
         }

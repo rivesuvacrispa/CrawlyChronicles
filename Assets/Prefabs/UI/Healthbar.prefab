@@ -243,6 +243,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 792c12d989ff4e40b41e99c5812e8762, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  height: 14
   bgImage: {fileID: 5317340616677688983}
   mainImage: {fileID: 5317340615525116199}
   catchImage: {fileID: 5317340615715005777}

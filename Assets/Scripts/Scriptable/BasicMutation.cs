@@ -18,7 +18,6 @@ namespace Scriptable
         private static readonly TableEntryReference DescriptionReference = "AbilityDescription"; 
         private static readonly TableEntryReference StatsReference = "AbilityStats";
         
-        
         public bool Special => special;
         public GeneType GeneType => geneType;
         public Color SpriteColor => spriteColor;

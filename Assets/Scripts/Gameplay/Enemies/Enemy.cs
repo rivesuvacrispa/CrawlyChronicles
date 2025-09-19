@@ -108,12 +108,9 @@ namespace Gameplay.Enemies
             healthbar.SetValue(Mathf.Clamp01(health / scriptable.MaxHealth));
             
             OnDamageTaken();
-            
+
             if (health <= 0)
-            {
                 Die();
-                hitbox.Die();
-            }
             else
             {
                 hitbox.Hit();
@@ -155,8 +152,9 @@ namespace Gameplay.Enemies
             reckoned = false;
         }
 
-        private void Die()
+        public void Die()
         {
+            hitbox.Die();
             ClearEffects();
             minimapIcon.enabled = false;
             StatRecorder.enemyKills++;
