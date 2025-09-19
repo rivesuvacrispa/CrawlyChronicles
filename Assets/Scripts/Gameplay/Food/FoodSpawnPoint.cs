@@ -14,6 +14,6 @@ namespace Gameplay.Food
             foodBed.FoodSpawnPoint = this;
         }
 
-        public void Remove() => foodBed = null;
+        public void Clear() => foodBed = null;
     }
 }

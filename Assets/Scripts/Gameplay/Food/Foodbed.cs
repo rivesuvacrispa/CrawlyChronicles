@@ -52,7 +52,7 @@ namespace Gameplay.Food
                 animator.Play(PopoutAnimHash);
                 OnProviderDestroy?.Invoke();
                 destructionInvoked = true;
-                if(FoodSpawnPoint is not null) FoodSpawnPoint.Remove();
+                if(FoodSpawnPoint is not null) FoodSpawnPoint.Clear();
             }
             else
             {
@@ -65,7 +65,7 @@ namespace Gameplay.Food
         private void UpdateSprite() => spriteRenderer.sprite = scriptable.GetGrowthSprite(amount);
         private void OnResetRequested()
         {
-            FoodSpawnPoint.Remove();
+            FoodSpawnPoint.Clear();
             Destroy(gameObject);
         }
 

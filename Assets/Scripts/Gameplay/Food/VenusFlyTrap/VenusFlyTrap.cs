@@ -9,12 +9,12 @@ namespace Gameplay.Food.VenusFlyTrap
 
         [SerializeField] private GameObject flowerGO;
 
-        private int catchedTimes;
+        private int caughtTimes;
         
         public void Catch()
         {
-            catchedTimes++;
-            if (catchedTimes >= 6) flowerGO.SetActive(true);
+            caughtTimes++;
+            if (caughtTimes >= 6) flowerGO.SetActive(true);
         }
 
         protected override void Start()
@@ -34,7 +34,7 @@ namespace Gameplay.Food.VenusFlyTrap
             existing = false;
         }
 
-        public override bool CanInteract() => catchedTimes >= 6;
+        public override bool CanInteract() => base.CanInteract() && caughtTimes >= 6;
         protected override bool CreateNotification => false;
     }
 }

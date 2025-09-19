@@ -12,7 +12,9 @@ namespace Gameplay.Interaction
 
         private static IInteractable interactable;
 
-        public static bool CanInteract { get; private set; }
+        public static bool CanInteract () => interactable is not null &&
+                                             interactable.CanInteract() &&
+                                             Player.PlayerManager.Instance.AllowInteract;
         public static bool Interacting { get; private set; }
 
 
@@ -44,13 +46,12 @@ namespace Gameplay.Interaction
                 return;
             }
 
-            CanInteract = interactable.CanInteract() &&
-                          Player.PlayerManager.Instance.AllowInteract;
+            bool canInteract = CanInteract(); 
 
-            if (CanInteract) UpdatePopup();
+            if (canInteract) UpdatePopup();
             else popup.Disable();
 
-            if (Input.GetKeyDown(KeyCode.E) && CanInteract)
+            if (Input.GetKeyDown(KeyCode.E) && canInteract)
             {
                 if (interactable is IContinuouslyInteractable continuouslyInteractable
                     && continuouslyInteractable.InteractionTime != 0)
@@ -77,7 +78,7 @@ namespace Gameplay.Interaction
 
             while (interactionTime < duration)
             {
-                if (Input.GetKeyUp(KeyCode.E) || !CanInteract || interactable is null)
+                if (Input.GetKeyUp(KeyCode.E) || !CanInteract() || interactable is null)
                 {
                     interrupted = true;
                     break;
