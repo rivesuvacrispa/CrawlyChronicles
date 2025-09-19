@@ -25,6 +25,11 @@ namespace Gameplay.Abilities.Active
                 BreedingManager.Instance.BecomePregnant(BreedingManager.Instance.TrioGene, AbilityController.GetMutationData());
         }
 
+        public override bool CanActivate()
+        {
+            return BreedingManager.Instance.CanBreed;
+        }
+
         public override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
         {
             float cd = Scriptable.GetCooldown(lvl);

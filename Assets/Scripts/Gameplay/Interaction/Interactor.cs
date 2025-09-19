@@ -78,7 +78,7 @@ namespace Gameplay.Interaction
             float interactionTime = 0;
             while (interactionTime < duration)
             {
-                if (Input.GetKeyUp(KeyCode.E) || !CanInteract || interactable is null)
+                if (Input.GetKeyUp(KeyCode.E) || !CanInteract)
                 {
                     interrupted = true;
                     break;

@@ -99,14 +99,14 @@ namespace Gameplay.Enemies
                 attackDelay = 0.5f;
                 return 0;
             }
-        
+
             damage = ignoreArmor ? damage : PhysicsUtility.CalculateDamage(damage, Scriptable.Armor);
             StatRecorder.damageDealt += damage;
+            Debug.Log($"{gameObject.name} damaged for {damage} HP, ignore armor: {ignoreArmor}, ar");
             health -= damage;
             attackDelay = 1f;
             StopAttack();
-            healthbar.SetValue(Mathf.Clamp01(health / scriptable.MaxHealth));
-            
+            UpdateHealthbar();
             OnDamageTaken();
 
             if (health <= 0)
@@ -128,6 +128,11 @@ namespace Gameplay.Enemies
             effect?.Impact(this, damage);
 
             return damage;
+        }
+
+        private void UpdateHealthbar()
+        {
+            healthbar.SetValue(Mathf.Clamp01(health / scriptable.MaxHealth));
         }
 
         private void Knockback(Vector2 attacker, float force, float duration)
@@ -154,6 +159,7 @@ namespace Gameplay.Enemies
 
         public void Die()
         {
+            health = 0;
             hitbox.Die();
             ClearEffects();
             minimapIcon.enabled = false;

@@ -73,8 +73,9 @@ namespace UI
         
         public void Activate()
         {
-            if(onCooldown) return;
             ActiveAbility activeAbility = (ActiveAbility) ability;
+            if(onCooldown || !activeAbility.CanActivate()) return;
+            
             activeAbility.Activate();
 #if UNITY_EDITOR
             if(PlayerManager.Instance.GodMode) return;

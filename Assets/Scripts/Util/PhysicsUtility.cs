@@ -44,8 +44,8 @@ namespace Util
             float maxAmplifier = 1) 
                 => rb.AddForce(
                     (direction - rb.position).normalized * 
-                    Mathf.Clamp(force, 0, GlobalDefinitions.MaxAppliableForce * maxAmplifier) * 
-                    rb.mass / GlobalDefinitions.PlayerMass, mode);
+                    (Mathf.Clamp(force, 0, GlobalDefinitions.MaxAppliableForce * maxAmplifier) * rb.mass) / 
+                    GlobalDefinitions.PlayerMass, mode);
         
         public static void AddClampedForceBackwards
             (this Rigidbody2D rb, 
