@@ -1,8 +1,8 @@
 ﻿using System.Collections;
-using Scripts.Util.Interfaces;
 using UnityEngine;
+using Util.Interfaces;
 
-namespace Gameplay.Abilities.EntityEffects
+namespace Gameplay.Mutations.EntityEffects
 {
     public abstract class EntityEffect : MonoBehaviour
     {

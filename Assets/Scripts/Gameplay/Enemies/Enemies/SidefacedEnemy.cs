@@ -1,8 +1,8 @@
-﻿using Gameplay.Food;
+﻿using Gameplay.Breeding;
+using Gameplay.Food;
 using UnityEngine;
 
-
-namespace Gameplay.Enemies
+namespace Gameplay.Enemies.Enemies
 {
     public abstract class SidefacedEnemy : Enemy
     {

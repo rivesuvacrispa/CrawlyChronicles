@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using Definitions;
 using GameCycle;
-using Gameplay.Abilities;
-using Gameplay.Abilities.Active;
-using Gameplay.Enemies;
-using Genes;
+using Gameplay.Enemies.Enemies;
+using Gameplay.Genes;
+using Gameplay.Mutations;
+using Gameplay.Mutations.Active;
 using Player;
 using Scriptable;
 using UI;
@@ -14,7 +14,7 @@ using UnityEngine.UI;
 using Util.Interfaces;
 using Random = UnityEngine.Random;
 
-namespace Gameplay
+namespace Gameplay.Breeding
 {
     public class BreedingManager : MonoBehaviour, INotificationProvider
     {

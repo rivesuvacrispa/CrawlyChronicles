@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Gameplay.Interfaces
+namespace Util.Interfaces
 {
     public interface IEnemyAttack
     {

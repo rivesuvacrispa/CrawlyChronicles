@@ -1,6 +1,6 @@
 ﻿using Definitions;
 using Scriptable;
-using Scripts.SoundEffects;
+using SoundEffects;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;

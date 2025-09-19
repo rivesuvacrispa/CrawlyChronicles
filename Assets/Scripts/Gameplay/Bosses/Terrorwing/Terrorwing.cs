@@ -5,17 +5,14 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Definitions;
 using GameCycle;
-using Gameplay.Interfaces;
-using Mutations.AttackEffects;
+using Gameplay.Mutations.AttackEffects;
 using Player;
-using Scripts.Gameplay.Bosses.Centipede;
-using Scripts.Util.Interfaces;
 using UnityEngine;
 using Util;
 using Util.Interfaces;
 using Random = UnityEngine.Random;
 
-namespace Scripts.Gameplay.Bosses.Terrorwing
+namespace Gameplay.Bosses.Terrorwing
 {
     public class Terrorwing : Boss, IDamageableEnemy, IEnemyAttack, IImpactable
     {

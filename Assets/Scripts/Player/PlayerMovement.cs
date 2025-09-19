@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using Camera;
 using Gameplay.AI.Locators;
-using Scripts.SoundEffects;
+using SoundEffects;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Util;

@@ -1,12 +1,10 @@
-﻿using System.Text;
-using Player;
+﻿using Player;
 using Timeline;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
-using Util;
 using Util.Interfaces;
 
-namespace Gameplay.Abilities.Passive
+namespace Gameplay.Mutations.Passive
 {
     public class GlowingBlood : BasicAbility
     {

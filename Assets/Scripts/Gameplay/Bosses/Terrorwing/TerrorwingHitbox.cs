@@ -1,10 +1,9 @@
 ﻿using System.Collections;
 using Definitions;
 using Player;
-using Scripts.Gameplay.Bosses.Terrorwing;
 using UnityEngine;
 
-namespace Scripts.Gameplay.Bosses.Centipede
+namespace Gameplay.Bosses.Terrorwing
 {
     [RequireComponent(typeof(Collider2D))]
     public class TerrorwingHitbox : MonoBehaviour

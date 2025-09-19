@@ -1,7 +1,7 @@
-﻿using Scripts.OpenWorld.Generation.Noise.Layers;
+﻿using OpenWorld.Generation.Noise.Layers;
 using UnityEngine;
 
-namespace Scripts.OpenWorld.Generation.Noise
+namespace OpenWorld.Generation.Noise
 {
     public class NoiseGenerator : MonoBehaviour
     {

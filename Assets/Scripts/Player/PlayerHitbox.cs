@@ -1,7 +1,7 @@
 ﻿using System.Collections;
-using Gameplay.Interfaces;
 using UnityEngine;
 using Util;
+using Util.Interfaces;
 
 namespace Player
 {

@@ -1,11 +1,9 @@
-﻿using System.Text;
-using Player;
+﻿using Player;
 using UnityEngine;
-using Util;
 using Util.Interfaces;
 using Random = UnityEngine.Random;
 
-namespace Gameplay.Abilities.Passive
+namespace Gameplay.Mutations.Passive
 {
     public class SpikedCarapace : BasicAbility
     {

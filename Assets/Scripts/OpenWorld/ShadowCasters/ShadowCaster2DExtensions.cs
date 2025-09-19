@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
-namespace Scripts.OpenWorld.ShadowCasters
+namespace OpenWorld.ShadowCasters
 {
     public static class ShadowCaster2DExtensions
     {

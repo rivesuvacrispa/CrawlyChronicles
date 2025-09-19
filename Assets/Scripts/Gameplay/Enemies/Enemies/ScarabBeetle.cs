@@ -1,10 +1,11 @@
 ﻿using System.Collections;
 using Gameplay.AI;
+using Gameplay.Breeding;
 using Gameplay.Food;
 using UnityEngine;
 using Util;
 
-namespace Gameplay.Enemies
+namespace Gameplay.Enemies.Enemies
 {
     public class ScarabBeetle : Enemy
     {

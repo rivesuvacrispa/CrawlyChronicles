@@ -1,10 +1,11 @@
 ﻿using Definitions;
 using GameCycle;
 using Gameplay.AI;
+using Gameplay.Breeding;
 using Gameplay.Food;
 using UnityEngine;
 
-namespace Gameplay.Enemies
+namespace Gameplay.Enemies.Enemies
 {
     public class AntEggStealer : Enemy
     {

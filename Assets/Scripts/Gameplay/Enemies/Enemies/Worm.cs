@@ -1,11 +1,12 @@
 ﻿using System.Collections;
 using Gameplay.AI;
+using Gameplay.Breeding;
 using Gameplay.Food;
 using Timeline;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Gameplay.Enemies
+namespace Gameplay.Enemies.Enemies
 {
     public class Worm : Enemy
     {

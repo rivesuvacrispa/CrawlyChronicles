@@ -1,11 +1,11 @@
 ﻿using Definitions;
 using GameCycle;
-using Gameplay;
+using Gameplay.Breeding;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using Util;
 
-namespace Genes
+namespace Gameplay.Genes
 {
     public class GeneDrop : PickupableObject
     {

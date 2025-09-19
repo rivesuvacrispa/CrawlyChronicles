@@ -1,10 +1,10 @@
 ﻿using Definitions;
 using GameCycle;
 using Gameplay;
-using Gameplay.Abilities.EntityEffects;
+using Gameplay.Breeding;
 using Gameplay.Interaction;
-using Mutations.AttackEffects;
-using Scripts.SoundEffects;
+using Gameplay.Mutations.AttackEffects;
+using SoundEffects;
 using Timeline;
 using UI;
 using UnityEngine;

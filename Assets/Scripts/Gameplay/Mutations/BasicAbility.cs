@@ -3,7 +3,7 @@ using Scriptable;
 using UI;
 using UnityEngine;
 
-namespace Gameplay.Abilities
+namespace Gameplay.Mutations
 {
     public class BasicAbility : MonoBehaviour
     {

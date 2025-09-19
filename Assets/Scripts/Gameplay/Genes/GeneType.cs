@@ -1,4 +1,4 @@
-﻿namespace Genes
+﻿namespace Gameplay.Genes
 {
     public enum GeneType
     {

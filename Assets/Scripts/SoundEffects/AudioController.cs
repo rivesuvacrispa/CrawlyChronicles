@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using Util;
 
-namespace Scripts.SoundEffects
+namespace SoundEffects
 {
     public class AudioController : MonoBehaviour
     {

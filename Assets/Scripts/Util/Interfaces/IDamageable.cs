@@ -1,4 +1,4 @@
-﻿using Mutations.AttackEffects;
+﻿using Gameplay.Mutations.AttackEffects;
 using UnityEngine;
 
 namespace Util.Interfaces

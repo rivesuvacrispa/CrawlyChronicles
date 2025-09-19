@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace Scripts.Gameplay.Map
+﻿namespace Gameplay.Map
 {
     public class DiggableWall
     {

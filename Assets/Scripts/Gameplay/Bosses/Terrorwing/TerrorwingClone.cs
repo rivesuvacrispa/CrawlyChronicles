@@ -2,14 +2,13 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Definitions;
-using Mutations.AttackEffects;
-using Scripts.Gameplay.Bosses.Centipede;
+using Gameplay.Mutations.AttackEffects;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using Util;
 using Util.Interfaces;
 
-namespace Scripts.Gameplay.Bosses.Terrorwing
+namespace Gameplay.Bosses.Terrorwing
 {
     public class TerrorwingClone : MonoBehaviour, IDamageableEnemy
     {

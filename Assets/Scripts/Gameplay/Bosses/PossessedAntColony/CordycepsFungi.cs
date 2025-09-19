@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using Random = UnityEngine.Random;
 
-namespace Scripts.Gameplay.Bosses.PossessedAntColony
+namespace Gameplay.Bosses.PossessedAntColony
 {
     public class CordycepsFungi : MonoBehaviour
     {

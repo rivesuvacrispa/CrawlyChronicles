@@ -2,7 +2,7 @@
 using UnityEngine;
 using Util;
 
-namespace Scripts.Gameplay.Bosses
+namespace Gameplay.Bosses
 {
     [System.Serializable]
     public abstract class BossStatField<T>

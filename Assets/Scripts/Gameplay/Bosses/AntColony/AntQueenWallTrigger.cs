@@ -1,7 +1,7 @@
 ﻿using Definitions;
 using UnityEngine;
 
-namespace Scripts.Gameplay.Bosses.AntColony
+namespace Gameplay.Bosses.AntColony
 {
     [RequireComponent(typeof(Collider2D))]
     public class AntQueenWallTrigger : MonoBehaviour

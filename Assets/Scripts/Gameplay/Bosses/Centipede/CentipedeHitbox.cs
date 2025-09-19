@@ -3,7 +3,7 @@ using Definitions;
 using Player;
 using UnityEngine;
 
-namespace Scripts.Gameplay.Bosses.Centipede
+namespace Gameplay.Bosses.Centipede
 {
     [RequireComponent(typeof(Collider2D))]
     public class CentipedeHitbox : MonoBehaviour

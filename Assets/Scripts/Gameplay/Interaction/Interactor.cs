@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using Scripts.SoundEffects;
+using SoundEffects;
 using UI;
 using UnityEngine;
 

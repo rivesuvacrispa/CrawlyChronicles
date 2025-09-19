@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace Scripts.Gameplay.Bosses
+namespace Gameplay.Bosses
 {
     public class Bossbar : MonoBehaviour
     {

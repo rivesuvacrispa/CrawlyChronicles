@@ -1,6 +1,6 @@
-﻿using Gameplay.Abilities.EntityEffects;
+﻿using Gameplay.Mutations.EntityEffects;
 
-namespace Scripts.Util.Interfaces
+namespace Util.Interfaces
 {
     public interface IImpactEffectAffectable : IImpactable
     {

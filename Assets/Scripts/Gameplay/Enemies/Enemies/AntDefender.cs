@@ -1,7 +1,8 @@
 ﻿using Gameplay.AI;
+using Gameplay.Breeding;
 using Gameplay.Food;
 
-namespace Gameplay.Enemies
+namespace Gameplay.Enemies.Enemies
 {
     public class AntDefender : Enemy
     {

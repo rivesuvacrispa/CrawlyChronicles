@@ -1,11 +1,11 @@
 ﻿using System.Collections;
 using Definitions;
 using Player;
-using Scripts.SoundEffects;
+using SoundEffects;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
-namespace Genes
+namespace Gameplay.Genes
 {
     [RequireComponent(typeof(Light2D))]
     public class GeneConsumer : MonoBehaviour

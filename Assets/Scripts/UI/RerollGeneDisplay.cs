@@ -1,4 +1,4 @@
-﻿using Genes;
+﻿using Gameplay.Genes;
 using UnityEngine;
 using UnityEngine.UI;
 using Util;

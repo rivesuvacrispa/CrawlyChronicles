@@ -1,6 +1,6 @@
 ﻿using Scriptable;
 
-namespace Gameplay.Abilities
+namespace Gameplay.Mutations
 {
     public abstract class ActiveAbility : BasicAbility
     {

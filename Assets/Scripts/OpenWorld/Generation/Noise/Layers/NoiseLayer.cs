@@ -1,7 +1,7 @@
-﻿using Scripts.OpenWorld.Generation.Noise.Slicers;
+﻿using OpenWorld.Generation.Noise.Slicers;
 using UnityEngine;
 
-namespace Scripts.OpenWorld.Generation.Noise.Layers
+namespace OpenWorld.Generation.Noise.Layers
 {
     public abstract class NoiseLayer : MonoBehaviour
     {

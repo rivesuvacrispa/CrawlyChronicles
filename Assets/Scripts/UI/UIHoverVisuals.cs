@@ -1,4 +1,4 @@
-﻿using Scripts.SoundEffects;
+﻿using SoundEffects;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;

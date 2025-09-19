@@ -2,7 +2,7 @@
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Genes
+namespace Gameplay.Genes
 {
     [Serializable]
     public struct TrioGene

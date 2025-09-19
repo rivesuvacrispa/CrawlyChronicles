@@ -1,13 +1,13 @@
 ﻿using System.Collections;
 using Definitions;
-using Gameplay.Abilities;
-using Genes;
+using Gameplay.Genes;
 using Gameplay.Interaction;
+using Gameplay.Mutations;
 using UI;
 using UnityEngine;
 using Util;
 
-namespace Gameplay
+namespace Gameplay.Breeding
 {
     [RequireComponent(typeof(SpriteRenderer))]
     public class EggDrop : MonoBehaviour, IInteractable

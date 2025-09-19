@@ -1,4 +1,4 @@
-﻿namespace Scripts.OpenWorld.Generation.Noise.Slicers
+﻿namespace OpenWorld.Generation.Noise.Slicers
 {
     public class OutsideNoiseSlice : NoiseSlice
     {

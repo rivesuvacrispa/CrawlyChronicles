@@ -5,7 +5,7 @@ using UnityEngine;
 using Util;
 using Util.Interfaces;
 
-namespace Scripts.Gameplay.Bosses.Terrorwing
+namespace Gameplay.Bosses.Terrorwing
 {
     public class TerrorwingBulletHell : MonoBehaviour
     {

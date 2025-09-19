@@ -2,13 +2,13 @@
 using Definitions;
 using GameCycle;
 using Gameplay.AI.Locators;
+using Gameplay.Genes;
 using Gameplay.Interaction;
-using Genes;
 using UI;
 using UnityEngine;
 using Util.Interfaces;
 
-namespace Gameplay
+namespace Gameplay.Breeding
 {
     [RequireComponent(typeof(SpriteRenderer))]
     public class EggBed : MonoBehaviour, INotificationProvider, ILocatorTarget, IContinuouslyInteractable

@@ -1,4 +1,4 @@
-﻿namespace Scripts.OpenWorld.Generation.Noise.Layers
+﻿namespace OpenWorld.Generation.Noise.Layers
 {
     public class MultitiveNoiseLayer : NoiseLayer
     {

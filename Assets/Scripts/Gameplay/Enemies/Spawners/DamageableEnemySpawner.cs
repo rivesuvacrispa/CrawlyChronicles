@@ -1,6 +1,5 @@
 ﻿using GameCycle;
-using Mutations.AttackEffects;
-using Scripts.Util.Interfaces;
+using Gameplay.Mutations.AttackEffects;
 using UI;
 using UnityEngine;
 using Util;

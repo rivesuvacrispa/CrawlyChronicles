@@ -1,7 +1,7 @@
-﻿using Scripts.Util.Interfaces;
-using UnityEngine;
+﻿using UnityEngine;
+using Util.Interfaces;
 
-namespace Gameplay.Abilities.EntityEffects
+namespace Gameplay.Mutations.EntityEffects
 {
     public class EffectController : MonoBehaviour
     {

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Scripts.Gameplay.Bosses.Terrorwing
+namespace Gameplay.Bosses.Terrorwing
 {
     public class TerrorwingProjectileSpawner : MonoBehaviour
     {

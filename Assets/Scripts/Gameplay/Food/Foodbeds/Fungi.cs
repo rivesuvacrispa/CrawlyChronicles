@@ -1,7 +1,7 @@
 ﻿using Timeline;
 using UnityEngine.Rendering.Universal;
 
-namespace Gameplay.Food
+namespace Gameplay.Food.Foodbeds
 {
     public abstract class Fungi : Foodbed
     {

@@ -1,4 +1,4 @@
-﻿namespace Scripts.Gameplay.Bosses.Centipede
+﻿namespace Gameplay.Bosses.Centipede
 {
     public enum CentipedeFragmentType
     {

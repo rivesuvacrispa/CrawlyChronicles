@@ -1,8 +1,8 @@
-﻿using Gameplay.Abilities;
-using Genes;
+﻿using Gameplay.Genes;
+using Gameplay.Mutations;
 using UnityEngine;
 
-namespace Gameplay
+namespace Gameplay.Breeding
 {
     [System.Serializable]
     public class Egg

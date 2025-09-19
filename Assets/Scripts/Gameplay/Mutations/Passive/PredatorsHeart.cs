@@ -1,10 +1,8 @@
 ﻿using System.Collections;
-using System.Text;
 using Player;
 using UnityEngine;
-using Util;
 
-namespace Gameplay.Abilities.Passive
+namespace Gameplay.Mutations.Passive
 {
     public class PredatorsHeart : BasicAbility
     {

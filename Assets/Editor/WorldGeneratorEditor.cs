@@ -1,5 +1,4 @@
-﻿using Gameplay.Abilities;
-using Scripts.OpenWorld.Generation;
+﻿using OpenWorld.Generation;
 using UnityEditor;
 using UnityEngine;
 

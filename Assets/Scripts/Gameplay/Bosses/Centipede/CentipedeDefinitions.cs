@@ -2,7 +2,7 @@
 using UI;
 using UnityEngine;
 
-namespace Scripts.Gameplay.Bosses.Centipede
+namespace Gameplay.Bosses.Centipede
 {
     [System.Serializable]
     public class CentipedeDefinitions : MonoBehaviour

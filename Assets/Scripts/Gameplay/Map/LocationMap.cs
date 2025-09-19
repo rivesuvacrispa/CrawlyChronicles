@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Tilemaps;
 
-namespace Scripts.Gameplay.Map
+namespace Gameplay.Map
 {
     public class LocationMap : MonoBehaviour
     {

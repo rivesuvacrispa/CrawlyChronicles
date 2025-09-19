@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using Util;
 
-namespace Scripts.SoundEffects
+namespace SoundEffects
 {
     public class PlayerAudioController : AudioController
     {

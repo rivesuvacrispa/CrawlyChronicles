@@ -1,8 +1,8 @@
 ﻿using System;
-using Scripts.Util.Interfaces;
 using UnityEngine;
+using Util.Interfaces;
 
-namespace Mutations.AttackEffects
+namespace Gameplay.Mutations.AttackEffects
 {
     public class AttackEffect
     {

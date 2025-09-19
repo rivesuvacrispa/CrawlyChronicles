@@ -1,10 +1,11 @@
 ﻿using System.Collections;
 using Definitions;
 using Gameplay.AI;
+using Gameplay.Breeding;
 using Gameplay.Food;
 using UnityEngine;
 
-namespace Gameplay.Enemies
+namespace Gameplay.Enemies.Enemies
 {
     public class DiggingWasp : SidefacedEnemy
     {

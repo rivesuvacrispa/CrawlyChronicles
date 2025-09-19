@@ -1,7 +1,8 @@
 ﻿using Gameplay;
-using Gameplay.Abilities;
+using Gameplay.Breeding;
 using Gameplay.Enemies;
-using Genes;
+using Gameplay.Genes;
+using Gameplay.Mutations;
 using Scriptable;
 using UI;
 using UnityEngine;

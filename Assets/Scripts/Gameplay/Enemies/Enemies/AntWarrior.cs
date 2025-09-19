@@ -1,6 +1,7 @@
-﻿using Gameplay.Food;
+﻿using Gameplay.Breeding;
+using Gameplay.Food;
 
-namespace Gameplay.Enemies
+namespace Gameplay.Enemies.Enemies
 {
     public class AntWarrior : Enemy
     {

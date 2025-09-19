@@ -2,6 +2,7 @@
 using System.Collections;
 using Definitions;
 using Gameplay.AI.Locators;
+using Gameplay.Breeding;
 using Gameplay.Enemies;
 using Gameplay.Food;
 using Gameplay.Food.VenusFlyTrap;

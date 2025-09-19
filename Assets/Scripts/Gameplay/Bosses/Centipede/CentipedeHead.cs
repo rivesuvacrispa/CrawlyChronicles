@@ -1,10 +1,10 @@
 ﻿using System.Collections;
 using Definitions;
-using Gameplay.Interfaces;
 using UnityEngine;
+using Util.Interfaces;
 using Random = UnityEngine.Random;
 
-namespace Scripts.Gameplay.Bosses.Centipede
+namespace Gameplay.Bosses.Centipede
 {
     public class CentipedeHead : MonoBehaviour, IEnemyAttack
     {

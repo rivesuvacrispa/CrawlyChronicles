@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Gameplay;
-using Gameplay.Abilities;
-using Genes;
+using Gameplay.Breeding;
+using Gameplay.Genes;
+using Gameplay.Mutations;
 using Scriptable;
 using UI;
 using UnityEngine;

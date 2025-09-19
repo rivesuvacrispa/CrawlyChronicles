@@ -2,7 +2,7 @@
 using Player;
 using UnityEngine;
 
-namespace Scripts.Gameplay.Bosses.Centipede
+namespace Gameplay.Bosses.Centipede
 {
     public class CentipedeAttack : MonoBehaviour
     {

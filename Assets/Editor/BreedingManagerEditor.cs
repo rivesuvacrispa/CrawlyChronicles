@@ -1,6 +1,6 @@
 ﻿using Gameplay;
-using Gameplay.Abilities;
-using Genes;
+using Gameplay.Breeding;
+using Gameplay.Genes;
 using Player;
 using UnityEditor;
 using UnityEngine;

@@ -2,15 +2,14 @@
 using Definitions;
 using GameCycle;
 using Gameplay.AI.Locators;
-using Mutations.AttackEffects;
+using Gameplay.Mutations.AttackEffects;
 using Player;
-using Scripts.Util.Interfaces;
 using UI;
 using UnityEngine;
 using Util;
 using Util.Interfaces;
 
-namespace Scripts.Gameplay.Bosses.Centipede
+namespace Gameplay.Bosses.Centipede
 {
     [RequireComponent(typeof(BodyPainter))]
     public class CentipedeFragment : MonoBehaviour, IDamageableEnemy, IImpactable

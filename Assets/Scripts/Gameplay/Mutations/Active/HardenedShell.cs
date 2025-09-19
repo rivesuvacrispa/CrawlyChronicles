@@ -1,10 +1,8 @@
 ﻿using System.Collections;
-using System.Text;
 using Player;
 using UnityEngine;
-using Util;
 
-namespace Gameplay.Abilities.Active
+namespace Gameplay.Mutations.Active
 {
     public class HardenedShell : ActiveAbility
     {

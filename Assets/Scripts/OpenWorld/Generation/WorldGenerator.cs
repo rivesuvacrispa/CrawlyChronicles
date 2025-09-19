@@ -1,10 +1,9 @@
-﻿using Scripts.OpenWorld.Generation.Noise;
-using Scripts.OpenWorld.ShadowCasters;
+﻿using OpenWorld.Generation.Noise;
+using OpenWorld.ShadowCasters;
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
 using UnityEngine.Tilemaps;
 
-namespace Scripts.OpenWorld.Generation
+namespace OpenWorld.Generation
 {
     public class WorldGenerator : MonoBehaviour
     {

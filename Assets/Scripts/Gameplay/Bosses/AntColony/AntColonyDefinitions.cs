@@ -2,7 +2,7 @@
 using UI;
 using UnityEngine;
 
-namespace Scripts.Gameplay.Bosses.AntColony
+namespace Gameplay.Bosses.AntColony
 {
     public class AntColonyDefinitions : MonoBehaviour
     {

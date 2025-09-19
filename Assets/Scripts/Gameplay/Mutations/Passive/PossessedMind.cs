@@ -1,8 +1,6 @@
-﻿using System.Text;
-using UnityEngine;
-using Util;
+﻿using UnityEngine;
 
-namespace Gameplay.Abilities.Passive
+namespace Gameplay.Mutations.Passive
 {
     public class PossessedMind : BasicAbility
     {

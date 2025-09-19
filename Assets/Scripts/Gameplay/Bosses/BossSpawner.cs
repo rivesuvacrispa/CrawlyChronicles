@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Util;
 
-namespace Scripts.Gameplay.Bosses
+namespace Gameplay.Bosses
 {
     public class BossSpawner : MonoBehaviour
     {

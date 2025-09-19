@@ -1,9 +1,9 @@
 ﻿using Definitions;
-using Genes;
+using Gameplay.Genes;
 using Timeline;
 using UnityEngine;
 
-namespace Gameplay.Food
+namespace Gameplay.Food.Foodbeds
 {
     public class BlueFungi : Fungi
     {

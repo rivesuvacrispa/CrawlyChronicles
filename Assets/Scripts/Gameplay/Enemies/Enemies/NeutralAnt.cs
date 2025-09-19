@@ -1,14 +1,16 @@
 ﻿using System.Collections;
 using Definitions;
 using Gameplay.AI;
+using Gameplay.Breeding;
 using Gameplay.Food;
-using Genes;
+using Gameplay.Food.Foodbeds;
+using Gameplay.Genes;
 using Gameplay.Interaction;
 using Timeline;
 using UnityEngine;
 using Util;
 
-namespace Gameplay.Enemies
+namespace Gameplay.Enemies.Enemies
 {
     public class NeutralAnt : Enemy, IContinuouslyInteractable
     {

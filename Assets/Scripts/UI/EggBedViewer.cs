@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Gameplay;
+using Gameplay.Breeding;
 using UnityEngine;
 
 namespace UI

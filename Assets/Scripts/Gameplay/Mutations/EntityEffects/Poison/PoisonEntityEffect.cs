@@ -2,7 +2,7 @@
 using Gameplay.Enemies;
 using Util.Interfaces;
 
-namespace Gameplay.Abilities.EntityEffects
+namespace Gameplay.Mutations.EntityEffects.Poison
 {
     public class PoisonEntityEffect : EntityEffect
     {

@@ -2,7 +2,7 @@
 using System.Linq;
 using Scriptable;
 
-namespace Gameplay.Abilities
+namespace Gameplay.Mutations
 {
     public class MutationData
     {

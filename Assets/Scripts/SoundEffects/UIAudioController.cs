@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Scripts.SoundEffects
+namespace SoundEffects
 {
     public class UIAudioController : AudioController
     {

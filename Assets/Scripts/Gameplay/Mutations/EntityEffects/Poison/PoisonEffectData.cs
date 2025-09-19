@@ -1,4 +1,4 @@
-﻿namespace Gameplay.Abilities.EntityEffects
+﻿namespace Gameplay.Mutations.EntityEffects.Poison
 {
     public class PoisonEffectData : EntityEffectData
     {

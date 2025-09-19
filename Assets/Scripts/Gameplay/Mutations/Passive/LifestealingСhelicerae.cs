@@ -1,13 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Text;
-using Mutations.AttackEffects;
+using Gameplay.Mutations.AttackEffects;
 using Player;
-using Scripts.Util.Interfaces;
 using UnityEngine;
-using Util;
+using Util.Interfaces;
 
-namespace Gameplay.Abilities.Passive
+namespace Gameplay.Mutations.Passive
 {
     public class LifestealingСhelicerae : BasicAbility
     {

@@ -1,8 +1,8 @@
 ﻿using System;
-using Scripts.OpenWorld.Generation.Noise.Layers;
+using OpenWorld.Generation.Noise.Layers;
 using UnityEngine;
 
-namespace Scripts.OpenWorld.Generation.Noise.Slicers
+namespace OpenWorld.Generation.Noise.Slicers
 {
     [RequireComponent(typeof(NoiseLayer))]
     public abstract class NoiseSlice : MonoBehaviour

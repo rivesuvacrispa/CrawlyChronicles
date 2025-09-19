@@ -1,9 +1,8 @@
-﻿using System.Text;
+﻿using Gameplay.Breeding;
 using Player;
 using UnityEngine;
-using Util;
 
-namespace Gameplay.Abilities.Active
+namespace Gameplay.Mutations.Active
 {
     public class QueensFertility : ActiveAbility
     {

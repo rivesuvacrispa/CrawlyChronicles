@@ -1,6 +1,6 @@
 ﻿using Timeline;
 
-namespace Gameplay.Food
+namespace Gameplay.Food.Foodbeds
 {
     public class Basil : Foodbed
     {

@@ -1,13 +1,13 @@
 ﻿using System.Collections;
 using Definitions;
-using Genes;
+using Gameplay.Genes;
 using Timeline;
 using UI;
 using UnityEngine;
 using Util;
 using Util.Interfaces;
 
-namespace Scripts.Gameplay.Bosses
+namespace Gameplay.Bosses
 {
     public abstract class Boss : MonoBehaviour, IDestructionEventProvider
     {

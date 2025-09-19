@@ -1,7 +1,7 @@
 ﻿using Player;
 using UnityEngine;
 
-namespace Gameplay.Abilities.Base
+namespace Gameplay.Mutations.Stats
 {
     public class StatsAbility : BasicAbility
     {

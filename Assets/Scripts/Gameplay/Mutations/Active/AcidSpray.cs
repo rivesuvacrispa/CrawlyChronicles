@@ -1,12 +1,11 @@
-﻿using System.Text;
-using Definitions;
+﻿using Definitions;
 using Player;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Util;
 using Util.Interfaces;
 
-namespace Gameplay.Abilities.Active
+namespace Gameplay.Mutations.Active
 {
     public class AcidSpray : ActiveAbility
     {

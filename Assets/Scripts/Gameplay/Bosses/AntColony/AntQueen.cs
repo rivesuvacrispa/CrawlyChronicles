@@ -4,18 +4,16 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Definitions;
 using GameCycle;
-using Gameplay.Abilities.EntityEffects;
 using Gameplay.Enemies;
-using Gameplay.Interfaces;
-using Mutations.AttackEffects;
+using Gameplay.Mutations.AttackEffects;
+using Gameplay.Mutations.EntityEffects;
 using Player;
-using Scripts.Util.Interfaces;
 using UnityEngine;
 using Util;
 using Util.Interfaces;
 using Random = UnityEngine.Random;
 
-namespace Scripts.Gameplay.Bosses.AntColony
+namespace Gameplay.Bosses.AntColony
 {
     public class AntQueen : Boss, IDamageableEnemy, IEnemyAttack, IImpactEffectAffectable
     {

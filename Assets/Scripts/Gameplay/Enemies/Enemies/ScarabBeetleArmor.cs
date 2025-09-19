@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using Util;
 
-namespace Gameplay.Enemies
+namespace Gameplay.Enemies.Enemies
 {
     public class ScarabBeetleArmor : MonoBehaviour
     {

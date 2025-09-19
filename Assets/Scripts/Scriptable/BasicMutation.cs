@@ -1,4 +1,4 @@
-﻿using Genes;
+﻿using Gameplay.Genes;
 using UnityEngine;
 using UnityEngine.Localization.Settings;
 using UnityEngine.Localization.Tables;

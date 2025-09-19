@@ -1,12 +1,12 @@
 ﻿using System.Collections;
 using Definitions;
 using Gameplay.Enemies;
-using Mutations.AttackEffects;
+using Gameplay.Mutations.AttackEffects;
 using UI;
 using UnityEngine;
 using Util.Interfaces;
 
-namespace Scripts.Gameplay.Bosses.AntColony
+namespace Gameplay.Bosses.AntColony
 {
     public class AntColonyEgg : MonoBehaviour, IDamageableEnemy
     {

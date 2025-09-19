@@ -1,7 +1,8 @@
 ﻿using Definitions;
 using Gameplay.AI.Locators;
+using Gameplay.Breeding;
+using Gameplay.Genes;
 using Gameplay.Interaction;
-using Genes;
 using UI;
 using UnityEngine;
 using Util.Interfaces;

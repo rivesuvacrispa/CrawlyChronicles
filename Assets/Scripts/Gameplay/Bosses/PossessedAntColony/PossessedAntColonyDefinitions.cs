@@ -3,7 +3,7 @@ using Scriptable;
 using UI;
 using UnityEngine;
 
-namespace Scripts.Gameplay.Bosses.PossessedAntColony
+namespace Gameplay.Bosses.PossessedAntColony
 {
     [Serializable]
     public class PossessedAntColonyDefinitions : MonoBehaviour

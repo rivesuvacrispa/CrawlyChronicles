@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using Util;
 
-namespace Scripts.Gameplay.Bosses.PossessedAntColony
+namespace Gameplay.Bosses.PossessedAntColony
 {
     public class CordycepsExpansion : MonoBehaviour
     {

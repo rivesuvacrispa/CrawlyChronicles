@@ -1,8 +1,7 @@
 ﻿using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.Tilemaps;
 
-namespace Scripts.OpenWorld.ShadowCasters
+namespace OpenWorld.ShadowCasters
 {
     public class TilemapShadowCaster2D : MonoBehaviour
     {

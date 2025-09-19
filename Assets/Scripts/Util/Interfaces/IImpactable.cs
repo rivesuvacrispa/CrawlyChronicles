@@ -1,4 +1,4 @@
-﻿namespace Scripts.Util.Interfaces
+﻿namespace Util.Interfaces
 {
     public interface IImpactable { }
 }

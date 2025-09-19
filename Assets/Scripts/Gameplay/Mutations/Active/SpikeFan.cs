@@ -1,10 +1,8 @@
-﻿using System.Text;
-using Player;
+﻿using Player;
 using UnityEngine;
-using Util;
 using Util.Interfaces;
 
-namespace Gameplay.Abilities.Active
+namespace Gameplay.Mutations.Active
 {
     public class SpikeFan : ActiveAbility
     {

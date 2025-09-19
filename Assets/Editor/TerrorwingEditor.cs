@@ -1,5 +1,5 @@
 ﻿using Environment;
-using Scripts.Gameplay.Bosses.Terrorwing;
+using Gameplay.Bosses.Terrorwing;
 using UI;
 using UnityEditor;
 using UnityEngine;

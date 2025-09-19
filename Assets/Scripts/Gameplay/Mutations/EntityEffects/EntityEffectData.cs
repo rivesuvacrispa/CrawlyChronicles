@@ -1,4 +1,4 @@
-﻿namespace Gameplay.Abilities.EntityEffects
+﻿namespace Gameplay.Mutations.EntityEffects
 {
     public class EntityEffectData
     {

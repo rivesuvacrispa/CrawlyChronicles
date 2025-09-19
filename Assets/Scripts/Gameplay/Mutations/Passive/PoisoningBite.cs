@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.Text;
-using Gameplay.Abilities.EntityEffects;
-using Mutations.AttackEffects;
+using Gameplay.Mutations.AttackEffects;
+using Gameplay.Mutations.EntityEffects.Poison;
 using Player;
-using Scripts.Util.Interfaces;
 using UnityEngine;
-using Util;
+using Util.Interfaces;
 
-namespace Gameplay.Abilities.Passive
+namespace Gameplay.Mutations.Passive
 {
     public class PoisoningBite : BasicAbility
     {

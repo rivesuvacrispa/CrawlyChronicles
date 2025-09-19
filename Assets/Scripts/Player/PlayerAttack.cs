@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using Definitions;
 using Gameplay.Enemies;
-using Mutations.AttackEffects;
-using Scripts.SoundEffects;
+using Gameplay.Mutations.AttackEffects;
+using SoundEffects;
 using UnityEngine;
 using Util;
 

@@ -1,8 +1,9 @@
-﻿using Player;
+﻿using Gameplay.Breeding;
+using Player;
 using Timeline;
 using UI;
 
-namespace Gameplay.Food
+namespace Gameplay.Food.Foodbeds
 {
     public class Ghostcap : Fungi
     {

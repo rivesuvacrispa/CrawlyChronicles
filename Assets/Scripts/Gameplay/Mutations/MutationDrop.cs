@@ -1,9 +1,10 @@
-﻿using Player;
+﻿using Gameplay.Breeding;
+using Player;
 using Scriptable;
 using UnityEngine;
 using Util;
 
-namespace Gameplay.Abilities
+namespace Gameplay.Mutations
 {
     public class MutationDrop : PickupableObject
     {

@@ -1,12 +1,13 @@
 ﻿using System.Collections;
 using Gameplay.AI;
+using Gameplay.Breeding;
 using Gameplay.Food;
 using Player;
 using UnityEngine;
 using Util;
 using Util.Interfaces;
 
-namespace Gameplay.Enemies
+namespace Gameplay.Enemies.Enemies
 {
     public class Cockroach : Enemy, IWallCollisionListener
     {
