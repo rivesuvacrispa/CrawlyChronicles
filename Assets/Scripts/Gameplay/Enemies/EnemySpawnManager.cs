@@ -28,6 +28,7 @@ namespace Gameplay.Enemies
         
         private static readonly List<EnemySpawnLocation> EnemySpawnPoints = new();
         public static int SpawnLocationsCount { get; private set; }
+        private static int enemyCounter = 0;
 
         private CancellationTokenSource cts = new();
         
@@ -51,9 +52,11 @@ namespace Gameplay.Enemies
         {
             if(BossSpawner.BossAlive) return;
             Enemy enemy = Instantiate(toSpawn, GlobalDefinitions.GameObjectsTransform);
+            enemy.gameObject.name = $"{toSpawn.name}#{enemyCounter}";
             var spawnPoint = GetRandomSpawnPoint();
             enemy.SpawnLocation = spawnPoint;
             enemy.transform.position = spawnPoint.SpawnPosition;
+            enemyCounter++;
         }
         
         private async UniTask DayTask(CancellationToken cancellationToken)

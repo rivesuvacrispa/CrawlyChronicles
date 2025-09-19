@@ -92,7 +92,12 @@ namespace Gameplay.Enemies
             AttackEffect effect = null)
         {
             if (hitbox.Immune) return 0;
-            
+
+            if (damage is float.NaN or 0f)
+            {
+                damage = float.Epsilon;
+            }
+
             if (!ignoreArmor && reckoned)
             {
                 reckoned = false;
@@ -159,7 +164,7 @@ namespace Gameplay.Enemies
 
         public void Die()
         {
-            Debug.Log($"{gameObject.name} died, all coroutines are stopped");
+            Debug.Log($"[{gameObject.name}] died, all coroutines are stopped");
             health = 0;
             hitbox.Die();
             ClearEffects();
@@ -209,7 +214,7 @@ namespace Gameplay.Enemies
         // Routines & utils
         private IEnumerator AttackRoutine()
         {
-            Debug.Log($"{gameObject.name} attacked");
+            Debug.Log($"[{gameObject.name}] attacked");
             stateController.TakeMoveControl();
             
             float t = attackDelay * 0.5f;

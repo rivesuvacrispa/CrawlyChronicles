@@ -13,7 +13,7 @@ namespace Gameplay.AI
             get => callback;
             set
             {
-                Debug.Log($"Ai Path [{GetHashCode()}] callback set to {value}");
+                Debug.Log($"Ai Path [{GetHashCode()}] callback set to <{(value is null ? "None" : value)}>");
                 callback = value;
             }
         }

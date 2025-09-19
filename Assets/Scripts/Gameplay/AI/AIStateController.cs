@@ -71,7 +71,7 @@ namespace Gameplay.AI
         {
             if(newState == CurrentState) return;
             
-            Debug.Log($"{gameObject.name} AI state changed to {newState}");
+            Debug.Log($"[{gameObject.name}] AI state changed to <{newState}>, path: [{(aiPath is null ? "None" : aiPath.GetHashCode())}]");
             
             CancelPath();
             
@@ -180,6 +180,7 @@ namespace Gameplay.AI
 
         public void SetEtherial(bool isEtherial)
         {
+            Debug.Log($"[{gameObject.name}] Set Etherial <{isEtherial}>");
             physicsCollider.enabled = !isEtherial;
             if(isEtherial) hitbox.Disable();
             else hitbox.Enable();
