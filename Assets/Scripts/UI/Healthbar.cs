@@ -47,6 +47,8 @@ namespace UI
 
         private void UpdatePosition()
         {
+            if (target is null) return;
+            
             Vector3 pos = target.Transform.position;
             pos.z = 0;
             pos.y += target.HealthbarOffsetY;

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Definitions;
 using GameCycle;
 using Gameplay;
@@ -35,7 +36,8 @@ namespace UI
         {
             subtitleText.text = $"{Application.version}\nby RivesUvaCrispa\naka Cpeed4";
 #if UNITY_EDITOR
-            if(showOnStartup) ShowMainMenu();
+            if (showOnStartup) ShowMainMenu();
+            else ResetGame();
 #else
             ShowMainMenu();
 #endif

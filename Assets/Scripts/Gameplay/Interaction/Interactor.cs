@@ -8,16 +8,14 @@ namespace Gameplay.Interaction
     [RequireComponent(typeof(Collider2D))]
     public class Interactor : MonoBehaviour
     {
-        
         [SerializeField] private InteractionPopup popup;
-        
+
         private static IInteractable interactable;
-        
+
         public static bool CanInteract { get; private set; }
         public static bool Interacting { get; private set; }
 
 
-        
         public static void Abort()
         {
             interactable = null;
@@ -26,13 +24,13 @@ namespace Gameplay.Interaction
 
         private void OnTriggerEnter2D(Collider2D col)
         {
-            if(Interacting) return;
-            if(col.TryGetComponent(out InteractionCollider iCol)) interactable = iCol.Interactable;
+            if (Interacting) return;
+            if (col.TryGetComponent(out InteractionCollider iCol)) interactable = iCol.Interactable;
         }
 
         private void OnTriggerExit2D(Collider2D col)
         {
-            if(interactable is null) return;
+            if (interactable is null) return;
 
             if (col.TryGetComponent(out InteractionCollider iCol) && interactable == iCol.Interactable)
                 interactable = null;
@@ -48,11 +46,11 @@ namespace Gameplay.Interaction
 
             CanInteract = interactable.CanInteract() &&
                           Player.PlayerManager.Instance.AllowInteract;
-            
-            if(CanInteract) UpdatePopup();
+
+            if (CanInteract) UpdatePopup();
             else popup.Disable();
 
-            if(Input.GetKeyDown(KeyCode.E) && CanInteract)
+            if (Input.GetKeyDown(KeyCode.E) && CanInteract)
             {
                 if (interactable is IContinuouslyInteractable continuouslyInteractable
                     && continuouslyInteractable.InteractionTime != 0)
@@ -76,24 +74,26 @@ namespace Gameplay.Interaction
             float duration = continuouslyInteractable.InteractionTime;
             bool interrupted = false;
             float interactionTime = 0;
+
             while (interactionTime < duration)
             {
-                if (Input.GetKeyUp(KeyCode.E) || !CanInteract)
+                if (Input.GetKeyUp(KeyCode.E) || !CanInteract || interactable is null)
                 {
                     interrupted = true;
                     break;
                 }
+
                 popup.SetFilling(Mathf.Clamp01(interactionTime / duration));
                 interactionTime += Time.deltaTime;
                 yield return null;
             }
-            
+
             popup.SetFilling(0);
             continuouslyInteractable.OnInteractionStop();
             PlayerAudioController.Instance.StopAction();
             Interacting = false;
-            
-            if(!interrupted)
+
+            if (!interrupted)
             {
                 interactable.Interact();
                 popup.Disable();
@@ -104,7 +104,8 @@ namespace Gameplay.Interaction
         private void UpdatePopup()
         {
             Vector2 interactablePos = interactable.Position;
-            Vector2 pos = interactablePos + (interactablePos - Player.PlayerMovement.Position).normalized * interactable.PopupDistance;
+            Vector2 pos = interactablePos + (interactablePos - Player.PlayerMovement.Position).normalized *
+                interactable.PopupDistance;
             popup.transform.position = pos;
             popup.Enable(interactable.ActionTitle, KeyCode.E);
         }

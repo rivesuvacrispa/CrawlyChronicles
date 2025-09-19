@@ -71,6 +71,8 @@ namespace Gameplay.AI
         {
             if(newState == CurrentState) return;
             
+            Debug.Log($"{gameObject.name} AI state changed to {newState}");
+            
             CancelPath();
             
             switch (newState)
@@ -132,7 +134,7 @@ namespace Gameplay.AI
 
         private IEnumerator SetFollow(ITransformProvider target, Action onTargetReach, float reachDistance)
         {
-            yield return new WaitForEndOfFrame();
+            // yield return new WaitForEndOfFrame();
             aiPath.endReachedDistance = reachDistance.Equals(float.NaN) ? defaultReachDistance : reachDistance;
             target ??= Player.PlayerManager.Instance;
             currentFollowTarget = target;
@@ -145,6 +147,7 @@ namespace Gameplay.AI
             destinationSetter.target = target.Transform;
             target.OnProviderDestroy += OnFollowTargetDestroy;
             if (onTargetReach is not null) aiPath.Callback = onTargetReach;
+            yield return null;
         }
 
         private void SetNone()
@@ -230,7 +233,7 @@ namespace Gameplay.AI
 
         private void DiscardFollowTarget()
         {
-            if(currentFollowTarget is null) return;
+            if (currentFollowTarget is null) return;
             currentFollowTarget.OnProviderDestroy -= OnFollowTargetDestroy;
             currentFollowTarget = null;
         }

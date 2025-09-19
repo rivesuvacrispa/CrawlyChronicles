@@ -102,7 +102,7 @@ namespace Gameplay.Enemies
 
             damage = ignoreArmor ? damage : PhysicsUtility.CalculateDamage(damage, Scriptable.Armor);
             StatRecorder.damageDealt += damage;
-            Debug.Log($"{gameObject.name} damaged for {damage} HP, ignore armor: {ignoreArmor}, ar");
+            Debug.Log($"{gameObject.name} damaged for {damage} HP, ignore armor: {ignoreArmor}");
             health -= damage;
             attackDelay = 1f;
             StopAttack();
@@ -159,6 +159,7 @@ namespace Gameplay.Enemies
 
         public void Die()
         {
+            Debug.Log($"{gameObject.name} died, all coroutines are stopped");
             health = 0;
             hitbox.Die();
             ClearEffects();
@@ -208,6 +209,7 @@ namespace Gameplay.Enemies
         // Routines & utils
         private IEnumerator AttackRoutine()
         {
+            Debug.Log($"{gameObject.name} attacked");
             stateController.TakeMoveControl();
             
             float t = attackDelay * 0.5f;
