@@ -14,7 +14,7 @@ namespace Gameplay.Food
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private new ParticleSystem particleSystem;
         
-        private int amount;
+        public int Amount { get; protected set; }
         private Animator animator;
         private bool destructionInvoked;
 
@@ -31,7 +31,7 @@ namespace Gameplay.Food
 
         protected virtual void Start()
         {
-            amount = scriptable.GetRandomAmount();
+            Amount = scriptable.GetRandomAmount();
             var main = particleSystem.main;
             main.startColor = spriteRenderer.color;
             UpdateSprite();
@@ -46,8 +46,8 @@ namespace Gameplay.Food
         
         public void Eat()
         {
-            amount--;
-            if (amount <= 0)
+            Amount--;
+            if (Amount <= 0)
             {
                 animator.Play(PopoutAnimHash);
                 OnProviderDestroy?.Invoke();
@@ -62,7 +62,7 @@ namespace Gameplay.Food
             }
         }
         
-        private void UpdateSprite() => spriteRenderer.sprite = scriptable.GetGrowthSprite(amount);
+        private void UpdateSprite() => spriteRenderer.sprite = scriptable.GetGrowthSprite(Amount);
         private void OnResetRequested()
         {
             FoodSpawnPoint.Clear();
@@ -85,7 +85,7 @@ namespace Gameplay.Food
 
         public void OnInteractionStart() => particleSystem.Play();
         public void OnInteractionStop() => particleSystem.Stop();
-        public virtual bool CanInteract() => amount > 0;
+        public virtual bool CanInteract() => Amount > 0;
         public float InteractionTime => 1f;
         public float PopupDistance => 1.25f;
         public string ActionTitle => "Eat";
@@ -97,7 +97,7 @@ namespace Gameplay.Food
         public event INotificationProvider.NotificationProviderEvent OnDataUpdate;
         public event INotificationProvider.DestructionProviderEvent OnProviderDestroy;
         public Transform Transform => transform;
-        public string NotificationText => amount.ToString();
+        public string NotificationText => Amount.ToString();
         protected virtual bool CreateNotification => true;
     }
 }

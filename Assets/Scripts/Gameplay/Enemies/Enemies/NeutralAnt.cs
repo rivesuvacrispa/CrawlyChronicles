@@ -71,9 +71,13 @@ namespace Gameplay.Enemies
             stateController.SetState(AIState.Follow, 
                 followTarget: foodBed,
                 () => {
-                    GlobalDefinitions.CreateRandomGeneDrop(transform.position);
-                    foodBed.Eat();
-                    hungry = false;
+                    if (foodBed.Amount > 0)
+                    {
+                        GlobalDefinitions.CreateRandomGeneDrop(transform.position);
+                        foodBed.Eat();
+                        hungry = false;
+                    }
+                    
                     StartCoroutine(HungerRoutine());
                     stateController.SetState(AIState.Wander);
                 });
