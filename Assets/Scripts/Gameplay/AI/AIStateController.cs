@@ -6,6 +6,7 @@ using Gameplay.Breeding;
 using Gameplay.Enemies;
 using Gameplay.Food;
 using Gameplay.Food.VenusFlyTrap;
+using Gameplay.Map;
 using Pathfinding;
 using UnityEngine;
 using Util.Interfaces;
@@ -58,7 +59,7 @@ namespace Gameplay.AI
 
         private IEnumerator Start()
         {            
-            yield return new WaitUntil(() => EnemySpawnLocation.InitializedLocationsAmount == EnemySpawnManager.SpawnLocationsCount);
+            yield return new WaitUntil(() => EnemySpawnLocation.InitializedLocationsAmount == MapManager.SpawnLocationsCount);
             SetState(StartingState);
             UpdateMovementSpeed();
             locator.SetRadius(enemy.Scriptable.LocatorRadius);

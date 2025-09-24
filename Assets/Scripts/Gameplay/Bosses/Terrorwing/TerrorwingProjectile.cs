@@ -1,5 +1,6 @@
 ﻿using Player;
 using UI;
+using UI.Menus;
 using UnityEngine;
 
 namespace Gameplay.Bosses.Terrorwing

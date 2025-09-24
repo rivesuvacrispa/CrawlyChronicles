@@ -5,6 +5,7 @@ using Gameplay.Genes;
 using Gameplay.Mutations;
 using Scriptable;
 using UI;
+using UI.Elements;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Util.Interfaces;

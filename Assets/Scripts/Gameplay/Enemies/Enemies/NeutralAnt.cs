@@ -7,6 +7,8 @@ using Gameplay.Food.Foodbeds;
 using Gameplay.Genes;
 using Gameplay.Interaction;
 using Timeline;
+using UI;
+using UI.Menus;
 using UnityEngine;
 using Util;
 
@@ -164,7 +166,7 @@ namespace Gameplay.Enemies.Enemies
         // IInteractable
         public bool CanInteract() => CanBreed && BreedingManager.Instance.CanBreed;
         
-        public void Interact() => BreedingManager.Instance.OpenBreedingMenu(this);
+        public void Interact() => BreedingMenu.OpenBreedingMenu(this);
 
         public void OnInteractionStart()
         {

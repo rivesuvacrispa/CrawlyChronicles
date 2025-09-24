@@ -4,12 +4,15 @@ using GameCycle;
 using Gameplay.AI;
 using Gameplay.Breeding;
 using Gameplay.Food;
+using Gameplay.Map;
 using Gameplay.Mutations.AttackEffects;
 using Gameplay.Mutations.EntityEffects;
 using Player;
 using SoundEffects;
 using Timeline;
 using UI;
+using UI.Elements;
+using UI.Menus;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Util;
@@ -341,7 +344,7 @@ namespace Gameplay.Enemies
         public void OnSpawnedBySpawner()
         {
             spawnedBySpawner = true;
-            SpawnLocation = EnemySpawnManager.GetRandomSpawnPoint();
+            SpawnLocation = MapManager.GetRandomSpawnPoint();
             stateController.StartingState = AIState.Wander;
             if (TimeManager.IsDay) fearless = true;
         }

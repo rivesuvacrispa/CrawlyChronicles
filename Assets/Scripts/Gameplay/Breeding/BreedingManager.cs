@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using Definitions;
 using GameCycle;
-using Gameplay.Enemies.Enemies;
 using Gameplay.Genes;
 using Gameplay.Mutations;
 using Gameplay.Mutations.Active;
 using Player;
 using Scriptable;
 using UI;
+using UI.Elements;
+using UI.Menus;
 using UnityEngine;
 using UnityEngine.UI;
 using Util.Interfaces;
@@ -24,7 +25,6 @@ namespace Gameplay.Breeding
         [SerializeField] private int breedingFoodRequirement;
         [SerializeField] private int pregnancyDuration = 5;
         [Header("Refs")]
-        [SerializeField] private BreedingMenu breedingMenu;
         [SerializeField] private GeneDisplay geneDisplay;
         [SerializeField] private Animator animator;
         [SerializeField] private ParticleSystem breedingParticles;
@@ -193,11 +193,6 @@ namespace Gameplay.Breeding
             if(popupNotification is not null) 
                 Destroy(popupNotification.gameObject);
             popupNotification = null;
-        }
-
-        public void OpenBreedingMenu(NeutralAnt partner)
-        {
-            breedingMenu.Open(partner);
         }
         
         private void OnDifficultyChanged(Difficulty difficulty)

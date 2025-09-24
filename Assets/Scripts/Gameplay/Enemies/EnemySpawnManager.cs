@@ -5,9 +5,11 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Definitions;
 using Gameplay.Bosses;
+using Gameplay.Map;
 using Scriptable;
 using Timeline;
 using UI;
+using UI.Menus;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -17,7 +19,6 @@ namespace Gameplay.Enemies
     {
         [SerializeField] private List<Enemy> neutrals = new();
         [SerializeField] private List<Enemy> enemies = new();
-        [SerializeField] private Transform enemySpawnPointsTransform;
         [Header("Spawn rates")]
         [SerializeField] private float neutralsPerMinute;
         [SerializeField] private float enemyPerMinute;
@@ -26,20 +27,12 @@ namespace Gameplay.Enemies
         private float currentEnemyPerMinute;
         private float currentEnemyPerDay;
         
-        private static readonly List<EnemySpawnLocation> EnemySpawnPoints = new();
-        public static int SpawnLocationsCount { get; private set; }
         private static int enemyCounter = 0;
 
         private CancellationTokenSource cts = new();
         
         
         
-        private void Awake()
-        {
-            foreach (Transform child in enemySpawnPointsTransform)
-                EnemySpawnPoints.Add(child.GetComponent<EnemySpawnLocation>());
-            SpawnLocationsCount = EnemySpawnPoints.Count;
-        }
 
         private void Start() => OnDifficultyChanged(SettingsMenu.SelectedDifficulty);
 
@@ -53,7 +46,7 @@ namespace Gameplay.Enemies
             if(BossSpawner.BossAlive) return;
             Enemy enemy = Instantiate(toSpawn, GlobalDefinitions.GameObjectsTransform);
             enemy.gameObject.name = $"{toSpawn.name}#{enemyCounter}";
-            var spawnPoint = GetRandomSpawnPoint();
+            var spawnPoint = MapManager.GetRandomSpawnPoint();
             enemy.SpawnLocation = spawnPoint;
             enemy.transform.position = spawnPoint.SpawnPosition;
             enemyCounter++;
@@ -151,6 +144,5 @@ namespace Gameplay.Enemies
             DisposeTokenSource();
         }
 
-        public static EnemySpawnLocation GetRandomSpawnPoint() => EnemySpawnPoints[Random.Range(0, EnemySpawnPoints.Count)];
     }
 }

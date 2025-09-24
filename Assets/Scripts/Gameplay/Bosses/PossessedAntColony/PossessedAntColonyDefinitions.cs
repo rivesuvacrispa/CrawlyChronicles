@@ -1,6 +1,7 @@
 ﻿using System;
 using Scriptable;
 using UI;
+using UI.Menus;
 using UnityEngine;
 
 namespace Gameplay.Bosses.PossessedAntColony

@@ -6,6 +6,8 @@ using Gameplay.Genes;
 using Gameplay.Mutations;
 using Scriptable;
 using UI;
+using UI.Elements;
+using UI.Menus;
 using UnityEngine;
 
 namespace Player

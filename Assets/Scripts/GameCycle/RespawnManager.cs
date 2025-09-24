@@ -8,6 +8,8 @@ using Player;
 using SoundEffects;
 using Timeline;
 using UI;
+using UI.Elements;
+using UI.Menus;
 using UnityEngine;
 using UnityEngine.UI;
 
