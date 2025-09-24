@@ -2,6 +2,7 @@
 using Definitions;
 using Gameplay.Player;
 using UnityEngine;
+using Util.Interfaces;
 
 namespace Gameplay.Bosses.Terrorwing
 {
@@ -31,10 +32,10 @@ namespace Gameplay.Bosses.Terrorwing
         {
             if (col.gameObject.TryGetComponent(out PlayerHitbox _))
             {
-                PlayerManager.Instance.Damage(
+                ((IDamageable)PlayerManager.Instance).Damage(
                     TerrorwingDefinitions.ContactDamage,
                     transform.position,
-                    5);
+                    5, 0, default);
                 return true;
             }
 

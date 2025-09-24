@@ -44,7 +44,6 @@ namespace Gameplay.Enemies
         private EffectController effectController;
 
         protected bool spawnedBySpawner;
-        private float health;
         private bool stunned;
         private float attackDelay;
         private bool reckoned;
@@ -76,70 +75,17 @@ namespace Gameplay.Enemies
         protected virtual void Start()
         {
             rb.mass = scriptable.Mass;
-            health = scriptable.MaxHealth;
+            CurrentHealth = scriptable.MaxHealth;
             attackDelay = scriptable.AttackDelay;
             spriteRenderer.color = scriptable.BodyColor;
             healthbar = HealthbarPool.Instance.Create(this);
             PlayCrawl();
             SubEvents();
         }
-
-        public float Damage(
-            float damage, 
-            Vector3 position,
-            float knockback, 
-            float stunDuration, 
-            Color damageColor,
-            bool ignoreArmor = false,
-            AttackEffect effect = null)
-        {
-            if (hitbox.Immune) return 0;
-
-            if (damage is float.NaN or 0f)
-            {
-                damage = float.Epsilon;
-            }
-
-            if (!ignoreArmor && reckoned)
-            {
-                reckoned = false;
-                attackDelay = 0.5f;
-                return 0;
-            }
-
-            damage = ignoreArmor ? damage : PhysicsUtility.CalculateDamage(damage, Scriptable.Armor);
-            ((IDamageable)this).InvokeDamageTakenEvent(damage);
-            Debug.Log($"{gameObject.name} damaged for {damage} HP, ignore armor: {ignoreArmor}");
-            health -= damage;
-            attackDelay = 1f;
-            StopAttack();
-            UpdateHealthbar();
-            OnDamageTaken();
-
-            if (health <= 0)
-                Die();
-            else
-            {
-                hitbox.Hit();
-                audioController.PlayAction(scriptable.HitAudio, pitch: SoundUtility.GetRandomPitchTwoSided(0.15f));
-                bodyPainter.Paint(new Gradient().FastGradient(damageColor, scriptable.BodyColor), GlobalDefinitions.EnemyImmunityDuration);
-                if (stunDuration > 0) 
-                    StartCoroutine(StunRoutine(stunDuration));
-                if (knockback > 0)
-                {
-                    float duration = Mathf.Lerp(Mathf.Clamp01(knockback), 0, 0.25f);
-                    Knockback(position, knockback, duration);
-                }
-            }
-
-            effect?.Impact(this, damage);
-
-            return damage;
-        }
-
+        
         private void UpdateHealthbar()
         {
-            healthbar.SetValue(Mathf.Clamp01(health / scriptable.MaxHealth));
+            healthbar.SetValue(Mathf.Clamp01(CurrentHealth / scriptable.MaxHealth));
         }
 
         private void Knockback(Vector2 attacker, float force, float duration)
@@ -167,11 +113,10 @@ namespace Gameplay.Enemies
         public void Die()
         {
             Debug.Log($"[{gameObject.name}] died, all coroutines are stopped");
-            health = 0;
+            CurrentHealth = 0;
             hitbox.Die();
             ClearEffects();
             minimapIcon.enabled = false;
-            StatRecorder.enemyKills++;
             StopAllCoroutines();
             attackGO.SetActive(false);
             stateController.SetState(AIState.None);
@@ -356,16 +301,60 @@ namespace Gameplay.Enemies
         {
             if(!hitbox.Dead) effectController.AddEffect<T>(data);
         }
+        
+                
+        // IEnemyAttack
+        public Vector3 AttackPosition => transform.position;
+        public float AttackDamage => scriptable.Damage;
+        public float AttackPower => scriptable.AttackPower;
+        
 
         // IDamageable
         public event IDamageable.DestructionProviderEvent OnProviderDestroy;
         public Transform Transform => transform;
         public float HealthbarOffsetY => scriptable.HealthbarOffsetY;
         public float HealthbarWidth => scriptable.HealthbarWidth;
+        public bool Immune => hitbox.Immune;
+        public float Armor => Scriptable.Armor;
+        public float CurrentHealth { get; set; }
         
-        // IEnemyAttack
-        public Vector3 AttackPosition => transform.position;
-        public float AttackDamage => scriptable.Damage;
-        public float AttackPower => scriptable.AttackPower;
+        public bool TryBlockDamage(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
+            bool piercing = false, AttackEffect effect = null)
+        {
+            if (piercing || !reckoned) return false;
+            reckoned = false;
+            attackDelay = 0.5f;
+            return true;
+        }
+
+        public void OnBeforeHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
+            bool piercing = false, AttackEffect effect = null)
+        {
+            attackDelay = 1f;
+            StopAttack();
+            UpdateHealthbar();
+            OnDamageTaken();
+        }
+
+        public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
+            bool piercing = false, AttackEffect effect = null)
+        {
+            Die();
+        }
+
+        public void OnHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
+            bool piercing = false, AttackEffect effect = null)
+        {
+            hitbox.Hit();
+            audioController.PlayAction(scriptable.HitAudio, pitch: SoundUtility.GetRandomPitchTwoSided(0.15f));
+            bodyPainter.Paint(new Gradient().FastGradient(damageColor, scriptable.BodyColor), GlobalDefinitions.EnemyImmunityDuration);
+            if (stunDuration > 0) 
+                StartCoroutine(StunRoutine(stunDuration));
+            if (knockback > 0)
+            {
+                float duration = Mathf.Lerp(Mathf.Clamp01(knockback), 0, 0.25f);
+                Knockback(position, knockback, duration);
+            }
+        }
     }
 }

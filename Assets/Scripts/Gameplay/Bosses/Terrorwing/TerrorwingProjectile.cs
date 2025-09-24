@@ -2,6 +2,7 @@
 using UI;
 using UI.Menus;
 using UnityEngine;
+using Util.Interfaces;
 
 namespace Gameplay.Bosses.Terrorwing
 {
@@ -74,10 +75,10 @@ namespace Gameplay.Bosses.Terrorwing
             if (col.gameObject.TryGetComponent(out PlayerHitbox _))
             {
                 Explode();
-                PlayerManager.Instance.Damage(
+                ((IDamageable)PlayerManager.Instance).Damage(
                     TerrorwingDefinitions.ExplosionDamage,
                     transform.position + (Vector3) Random.insideUnitCircle.normalized,
-                    5);
+                    5, 0, default);
             }
         }
     }

@@ -38,7 +38,6 @@ namespace Gameplay.Bosses.AntColony
 
         private CancellationTokenSource cts;
         private CancellationTokenSource eggLayingCts;
-        private float currentHealth;
         private float maxHealth;
         private float currentMovespeed;
         private float currentDamage;
@@ -58,7 +57,7 @@ namespace Gameplay.Bosses.AntColony
             cts = new CancellationTokenSource();
             currentMovespeed = AntColonyDefinitions.MoveSpeed;
             currentDamage = AntColonyDefinitions.Damage;
-            currentHealth = maxHealth;
+            CurrentHealth = maxHealth;
             AITask(cts.Token).Forget();
         }
 
@@ -204,48 +203,43 @@ namespace Gameplay.Bosses.AntColony
             eggLayingCts = null;
             base.OnDestroy();
         }
-
         
-        
-        // IDamageableEnemy
-        public Transform Transform => transform;
-        public float HealthbarOffsetY => 0;
-        public float HealthbarWidth => 0;
-
-        public float Damage(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool ignoreArmor = false, AttackEffect effect = null)
-        {
-            if (hitbox.Immune) return 0;
-            
-            damage = ignoreArmor ? damage : PhysicsUtility.CalculateDamage(damage, AntColonyDefinitions.Armor);
-            currentHealth -= damage;
-            ((IDamageable)this).InvokeDamageTakenEvent(damage);
-            
-            if (currentHealth <= 0)
-                Die();
-            else
-            {
-                hitbox.Hit();
-                Bossbar.Instance.Damage(damage);
-                var gradient = new Gradient().FastGradient(damageColor, painters[0].Color);
-                foreach (BodyPainter painter in painters) 
-                    painter.Paint(gradient, GlobalDefinitions.EnemyImmunityDuration);
-            }
-            
-            effect?.Impact(this, damage);
-            
-            return damage;
-        }
         
         // IEnemyAttack
         public Vector3 AttackPosition => attackGO.transform.position;
         public float AttackDamage => currentDamage;
         public float AttackPower => 5;
         
+        
         // IImpactEffectAffectable
         public void AddEffect<T>(EntityEffectData data) where T : EntityEffect
         {
             if(!hitbox.Dead) effectController.AddEffect<T>(data);
+        }
+
+        
+        // IDamageableEnemy
+        public Transform Transform => transform;
+        public float HealthbarOffsetY => 0;
+        public float HealthbarWidth => 0;
+        public bool Immune => hitbox.Immune;
+        public float Armor => AntColonyDefinitions.Armor;
+        public float CurrentHealth { get; set; }
+
+        public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
+            bool piercing = false, AttackEffect effect = null)
+        {
+            Die();
+        }
+
+        public void OnHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
+            bool piercing = false, AttackEffect effect = null)
+        {
+            hitbox.Hit();
+            Bossbar.Instance.Damage(damage);
+            var gradient = new Gradient().FastGradient(damageColor, painters[0].Color);
+            foreach (BodyPainter painter in painters) 
+                painter.Paint(gradient, GlobalDefinitions.EnemyImmunityDuration);
         }
     }
 }

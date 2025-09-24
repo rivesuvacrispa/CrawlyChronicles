@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using Gameplay.Player;
 using UnityEngine;
+using Util.Interfaces;
 
 namespace Gameplay.Bosses.Centipede
 {
@@ -12,10 +13,10 @@ namespace Gameplay.Bosses.Centipede
 
         private void OnTriggerEnter2D(Collider2D col)
         {
-            if (PlayerManager.Instance.Damage(
+            if (((IDamageable)PlayerManager.Instance).Damage(
                     CentipedeDefinitions.AttackDamage,
                     transform.position,
-                    CentipedeDefinitions.Knockback) == 0)
+                    CentipedeDefinitions.Knockback, 0, default) == 0)
             {
                 PlayerManager.Instance.Knockback((Vector2) transform.position + Random.insideUnitCircle.normalized,
                     CentipedeDefinitions.Knockback);

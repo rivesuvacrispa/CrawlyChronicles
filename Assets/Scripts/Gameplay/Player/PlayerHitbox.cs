@@ -25,7 +25,9 @@ namespace Gameplay.Player
             if (col.gameObject.TryGetComponent(out IEnemyAttack attack))
             {
                 OnStruck?.Invoke(0);
-                PlayerManager.Instance.Damage(attack.AttackDamage, attack.AttackPosition, attack.AttackPower);
+                ((IDamageable)PlayerManager.Instance)
+                    .Damage(attack.AttackDamage, attack.AttackPosition, 
+                        attack.AttackPower, 0, default);
             }
         }
 

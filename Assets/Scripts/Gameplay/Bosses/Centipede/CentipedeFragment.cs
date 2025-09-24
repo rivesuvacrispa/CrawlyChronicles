@@ -13,7 +13,7 @@ using Util.Interfaces;
 namespace Gameplay.Bosses.Centipede
 {
     [RequireComponent(typeof(BodyPainter))]
-    public class CentipedeFragment : MonoBehaviour, IDamageableEnemy, IImpactable
+    public class CentipedeFragment : MonoBehaviour, IDamageableEnemy
     {
         [SerializeField] private ParticleSystem sprayParticles;
         [SerializeField] private ParticleCollisionProvider particleCollisionProvider;
@@ -21,7 +21,6 @@ namespace Gameplay.Bosses.Centipede
         [SerializeField] private Locator locator;
 
         private Animator animator;
-        private float currentHealth;
         private CentipedeFragment frontFragment;
         private CentipedeFragment backFragment;
         private SpriteRenderer spriteRenderer;
@@ -52,8 +51,13 @@ namespace Gameplay.Bosses.Centipede
 
         private void Start()
         {
-            currentHealth = MaxHealth;
+            CurrentHealth = MaxHealth;
             healthbar = HealthbarPool.Instance.Create(this);
+        }
+
+        private void UpdateHealthBar()
+        {
+            healthbar.SetValue(Mathf.Clamp01(CurrentHealth / MaxHealth));
         }
 
         private void FixedUpdate()
@@ -61,50 +65,12 @@ namespace Gameplay.Bosses.Centipede
             if(frontFragment is null) return;
             Move(frontFragment.transform.position, 100, 30);
         }
-
-        private void SetHealth(float hp)
-        {
-            currentHealth = hp;
-            healthbar.SetValue(Mathf.Clamp01(currentHealth / MaxHealth));
-        }
-
-        public float Damage(
-            float damage, 
-            Vector3 position = default, 
-            float knockback = 0, 
-            float stunDuration = 0, 
-            Color damageColor = default,
-            bool ignoreArmor = false,
-            AttackEffect effect = null)
-        {
-            // Multiple collisions may happen in a single frame so this check is required to
-            // make sure that the fragment dies only once
-            if (dead || !hitbox.Enabled) return 0;
-            damage = ignoreArmor ? damage : PhysicsUtility.CalculateDamage(damage, CentipedeDefinitions.Armor * (int) fragmentType * 0.5f);
-            ((IDamageable)this).InvokeDamageTakenEvent(damage);
-            SetHealth(currentHealth - damage);
-            painter.Paint(new Gradient().FastGradient(Color.white, spriteRenderer.color), GlobalDefinitions.EnemyImmunityDuration);
-            
-            if (currentHealth <= 0)
-            {
-                Bossbar.Instance.Damage(damage + currentHealth);
-                DieFromAttack();
-            }
-            else
-            {
-                hitbox.Hit();
-                Bossbar.Instance.Damage(damage);
-            }
-            
-            effect?.Impact(this, damage);
-            
-            return damage;
-        }
-
+        
         private void DieFromDestruction()
         {
-            Bossbar.Instance.Damage(currentHealth);
-            SetHealth(0);
+            Bossbar.Instance.Damage(CurrentHealth);
+            CurrentHealth = 0;
+            UpdateHealthBar();
             DieFromAttack();
         }
         
@@ -223,9 +189,9 @@ namespace Gameplay.Bosses.Centipede
         
         private void OnBulletCollision(IDamageable damageable)
         {
-            if (damageable is PlayerManager manager)
+            if (damageable is PlayerManager)
             {
-                manager.Damage(
+                damageable.Damage(
                     CentipedeDefinitions.PoisonDamage, 
                     rb.position,
                     CentipedeDefinitions.Knockback * 0.25f,
@@ -256,5 +222,28 @@ namespace Gameplay.Bosses.Centipede
         public Transform Transform => transform;
         public float HealthbarOffsetY => -0.5f;
         public float HealthbarWidth => 80;
+        public bool Immune => dead || !hitbox.Enabled;
+        public float Armor => CentipedeDefinitions.Armor * (int) fragmentType * 0.5f;
+        public float CurrentHealth { get; set; }
+        
+        public void OnBeforeHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
+            bool piercing = false, AttackEffect effect = null)
+        {
+            UpdateHealthBar();
+        }
+
+        public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
+            bool piercing = false, AttackEffect effect = null)
+        {
+            Bossbar.Instance.Damage(damage + CurrentHealth);
+            DieFromAttack();
+        }
+
+        public void OnHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
+            bool piercing = false, AttackEffect effect = null)
+        {
+            hitbox.Hit();
+            Bossbar.Instance.Damage(damage);
+        }
     }
 }

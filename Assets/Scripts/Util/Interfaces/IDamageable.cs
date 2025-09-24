@@ -7,18 +7,92 @@ namespace Util.Interfaces
     {
         public float HealthbarOffsetY { get; }
         public float HealthbarWidth { get; }
+        
+        public delegate void GlobalDamageEvent(IDamageable damageable, float damage);
+        public static event GlobalDamageEvent OnDamageTakenGlobal;
+
+        public delegate void DeathEvent(IDamageable damageable);
+        public static event DeathEvent OnLethalBlow;
+
+        public bool Immune { get; }
+        public float Armor { get; }
+        public float CurrentHealth { get; set; }
 
         public float Damage(
             float damage,
-            Vector3 position, 
-            float knockback, 
-            float stunDuration, 
+            Vector3 position,
+            float knockback,
+            float stunDuration,
             Color damageColor,
-            bool ignoreArmor = false,
+            bool piercing = false,
+            AttackEffect effect = null)
+        {
+            if (Immune) return 0;
+
+            if (damage is float.NaN or 0f)
+                damage = float.Epsilon;
+
+            if (TryBlockDamage(damage, position, knockback, stunDuration, damageColor, piercing, effect))
+                return 0;
+            
+            damage = piercing ? damage : PhysicsUtility.CalculateDamage(damage, Armor);
+
+            CurrentHealth -= damage;
+            
+            OnDamageTakenGlobal?.Invoke(this, damage);
+            OnBeforeHit(damage, position, knockback, stunDuration, damageColor, piercing, effect);
+            
+            if (CurrentHealth <= float.Epsilon)
+            {
+                OnLethalBlow?.Invoke(this);
+                OnLethalHit(damage, position, knockback, stunDuration, damageColor, piercing, effect);
+            }
+            else
+                OnHit(damage, position, knockback, stunDuration, damageColor, piercing, effect);
+            
+            if (effect is not null && this is IImpactable impactable)
+                effect.Impact(impactable, damage);
+
+            return damage;
+        }
+
+        public void OnBeforeHit(
+            float damage,
+            Vector3 position,
+            float knockback,
+            float stunDuration,
+            Color damageColor,
+            bool piercing = false,
+            AttackEffect effect = null)
+        {
+            
+        }
+
+        public bool TryBlockDamage(
+            float damage,
+            Vector3 position,
+            float knockback,
+            float stunDuration,
+            Color damageColor,
+            bool piercing = false,
+            AttackEffect effect = null) => false;
+
+        public void OnLethalHit(
+            float damage,
+            Vector3 position,
+            float knockback,
+            float stunDuration,
+            Color damageColor,
+            bool piercing = false,
             AttackEffect effect = null);
 
-        public delegate void DamageEvent(float damage);
-        public static event DamageEvent OnDamageTaken;
-        public void InvokeDamageTakenEvent(float damage) => OnDamageTaken?.Invoke(damage);
+        public void OnHit(
+            float damage,
+            Vector3 position,
+            float knockback,
+            float stunDuration,
+            Color damageColor,
+            bool piercing = false,
+            AttackEffect effect = null);
     }
 }

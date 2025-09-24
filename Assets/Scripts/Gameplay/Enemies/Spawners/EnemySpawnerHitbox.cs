@@ -3,6 +3,7 @@ using Definitions;
 using Gameplay.Player;
 using UnityEngine;
 using Util;
+using Util.Interfaces;
 
 namespace Gameplay.Enemies.Spawners
 {
@@ -27,9 +28,10 @@ namespace Gameplay.Enemies.Spawners
         }
 
         private void OnTriggerEnter2D(Collider2D _) 
-            => spawner.Damage(
+            => ((IDamageable) spawner).Damage(
                 PlayerManager.PlayerStats.AttackDamage,
-                effect: PlayerAttack.CurrentAttackEffect);
+                default, 0, 0, default, false,
+                PlayerAttack.CurrentAttackEffect);
         
         public void Hit() => StartCoroutine(ImmunityRoutine());
 

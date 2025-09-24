@@ -33,7 +33,8 @@ namespace GameCycle
             PlayerManager.OnPlayerRespawned += OnPlayerRespawned;
             TimeManager.OnDayStart += OnDayStart;
             AntEggStealer.OnEggStolen += OnEggStolen;
-            IDamageable.OnDamageTaken += OnDamageTaken;
+            IDamageable.OnDamageTakenGlobal += DamageTakenGlobal;
+            IDamageable.OnLethalBlow += OnLethalBlow;
             MutationMenu.OnMutationClick += OnMutationClick;
             EggBed.OnEggReturned += OnEggReturn;
         }
@@ -48,7 +49,8 @@ namespace GameCycle
             PlayerManager.OnPlayerRespawned -= OnPlayerRespawned;
             TimeManager.OnDayStart -= OnDayStart;
             AntEggStealer.OnEggStolen -= OnEggStolen;
-            IDamageable.OnDamageTaken -= OnDamageTaken;
+            IDamageable.OnDamageTakenGlobal -= DamageTakenGlobal;
+            IDamageable.OnLethalBlow -= OnLethalBlow;
             MutationMenu.OnMutationClick -= OnMutationClick;
             EggBed.OnEggReturned -= OnEggReturn;
         }
@@ -94,10 +96,15 @@ namespace GameCycle
 
         private void OnEggStolen() => eggsLost++;
 
-        private void OnDamageTaken(float damage) => damageDealt += damage;
+        private void DamageTakenGlobal(IDamageable damageable, float damage)
+        {
+            if (damageable is IDamageableEnemy) damageDealt += damage;
+        }
 
         private void OnMutationClick() => timesMutated++;
 
         private void OnEggReturn() => eggsLost--;
+
+        private void OnLethalBlow(IDamageable damageable) => enemyKills++;
     }
 }

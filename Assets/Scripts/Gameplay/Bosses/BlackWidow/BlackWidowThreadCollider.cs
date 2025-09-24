@@ -1,6 +1,7 @@
 ﻿using Gameplay.Bosses.Centipede;
 using Gameplay.Player;
 using UnityEngine;
+using Util.Interfaces;
 
 namespace Gameplay.Bosses.BlackWidow
 {
@@ -19,8 +20,8 @@ namespace Gameplay.Bosses.BlackWidow
             
             if (col.gameObject.TryGetComponent(out PlayerHitbox _))
             {
-                PlayerManager.Instance.Damage(CentipedeBoss.ContactDamage, contactPoint,
-                    CentipedeDefinitions.Knockback);
+                ((IDamageable)PlayerManager.Instance).Damage(CentipedeBoss.ContactDamage, contactPoint,
+                    CentipedeDefinitions.Knockback, 0, default);
                 
             } else if (!(dead || immune))
             {

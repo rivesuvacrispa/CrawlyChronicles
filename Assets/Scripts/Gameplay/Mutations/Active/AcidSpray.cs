@@ -69,7 +69,7 @@ namespace Gameplay.Mutations.Active
                     knockbackPower, 
                     stunDuration, 
                     GlobalDefinitions.PoisonColor, 
-                    ignoreArmor: true);
+                    piercing: true);
         }
 
         private void OnDestroy()

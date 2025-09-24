@@ -19,7 +19,6 @@ namespace Gameplay.Bosses.AntColony
         public Enemy ToHatch { get; set; }
 
         private float maxHealth;
-        private float currentHealth;
         private Healthbar healthbar;
         
 
@@ -27,7 +26,7 @@ namespace Gameplay.Bosses.AntColony
         {
             Rb = GetComponent<Rigidbody2D>();
             maxHealth = AntColonyDefinitions.EggsHealth;
-            currentHealth = maxHealth;
+            CurrentHealth = maxHealth;
         }
 
         private void Start()
@@ -58,29 +57,31 @@ namespace Gameplay.Bosses.AntColony
 
 
         // IDamageable
-        public float Damage(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool ignoreArmor = false, AttackEffect effect = null)
-        {
-            if (hitbox.Immune) return 0;
-            
-            currentHealth -= damage;
-            healthbar.SetValue(Mathf.Clamp01(currentHealth / maxHealth));
-
-            if (currentHealth <= 0)
-            {
-                Destroy(gameObject);
-                hitbox.Die();
-            }
-            else hitbox.Hit();
-            
-            effect?.Impact(this, damage);
-
-            return damage;
-        }
-        
         public event IDestructionEventProvider.DestructionProviderEvent OnProviderDestroy;
         public Transform Transform => transform;
         public float HealthbarOffsetY => -0.25f;
         public float HealthbarWidth => 80f;
+        public bool Immune => hitbox.Immune;
+        public float Armor => 0;
+        public float CurrentHealth { get; set; }
+
+        public void OnBeforeHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
+            bool piercing = false, AttackEffect effect = null)
+        {
+            healthbar.SetValue(Mathf.Clamp01(CurrentHealth / maxHealth));
+        }
+
+        public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
+            bool piercing = false, AttackEffect effect = null)
+        {
+            Destroy(gameObject);
+            hitbox.Die();
+        }
+
+        public void OnHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
+            bool piercing = false, AttackEffect effect = null)
+        {
+            hitbox.Hit();
+        }
     }
 }

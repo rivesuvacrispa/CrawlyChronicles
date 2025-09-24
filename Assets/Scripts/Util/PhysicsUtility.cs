@@ -33,8 +33,16 @@ namespace Util
 
         public static float GetAngle(this Vector2 v) => Mathf.Atan2(v.y, v.x) * Mathf.Rad2Deg;
         
-        public static float CalculateDamage(float incomingDamage, float armor) 
-            => incomingDamage * incomingDamage / (incomingDamage + armor);
+        public static float CalculateDamage(float incomingDamage, float armor)
+        {
+            if (incomingDamage is float.NaN or 0)
+                return 0;
+
+            if (armor <= 0f)
+                return incomingDamage;
+            
+            return incomingDamage * incomingDamage / (incomingDamage + armor);
+        }
 
         public static void AddClampedForceTowards
             (this Rigidbody2D rb, 

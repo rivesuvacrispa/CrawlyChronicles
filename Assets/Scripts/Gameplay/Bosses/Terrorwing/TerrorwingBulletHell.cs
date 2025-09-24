@@ -32,9 +32,9 @@ namespace Gameplay.Bosses.Terrorwing
 
         private void OnBulletCollision(IDamageable damageable)
         {
-            if (damageable is Player.PlayerManager manager)
+            if (damageable is Player.PlayerManager)
             {
-                manager.Damage(
+                damageable.Damage(
                     TerrorwingDefinitions.BulletHellDamage, 
                     transform.position,
                     2,

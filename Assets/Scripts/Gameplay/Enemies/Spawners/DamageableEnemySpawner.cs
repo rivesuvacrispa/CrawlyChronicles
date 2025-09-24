@@ -9,7 +9,7 @@ using Util.Interfaces;
 namespace Gameplay.Enemies.Spawners
 {
     [RequireComponent(typeof(EnemySpawnerHitbox))]
-    public class DamageableEnemySpawner : EnemySpawner, IDamageableEnemy, IImpactable
+    public class DamageableEnemySpawner : EnemySpawner, IDamageableEnemy
     {
         [SerializeField] private float maxHealth;
         [SerializeField] private float armor;
@@ -17,41 +17,41 @@ namespace Gameplay.Enemies.Spawners
 
         private EnemySpawnerHitbox hitbox;
         private Healthbar healthbar;
-        private float currentHealth;
 
         protected override void Start()
         {
             base.Start();
             healthbar = HealthbarPool.Instance.Create(this);
-            currentHealth = maxHealth;
+            CurrentHealth = maxHealth;
             hitbox = GetComponent<EnemySpawnerHitbox>();
         }
         
         public float HealthbarOffsetY => -0.5f;
         public float HealthbarWidth => 100;
 
-        public float Damage(float damage, 
-            Vector3 position = default, 
-            float knockback = 0, 
-            float stunDuration = 0,
-            Color damageColor = default,
-            bool ignoreArmor = false,
-            AttackEffect effect = null)
+        public bool Immune => !hitbox.Enabled;
+        public float Armor => armor;
+        public float CurrentHealth { get; set; }
+        
+        private void UpdateHealthbar() => healthbar.SetValue(Mathf.Clamp01(CurrentHealth / maxHealth));
+        
+
+        public void OnBeforeHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
+            bool piercing = false, AttackEffect effect = null)
         {
-            if (!hitbox.Enabled) return 0;
-            damage = ignoreArmor ? damage : PhysicsUtility.CalculateDamage(damage, armor);
-            currentHealth -= damage;
-            ((IDamageable)this).InvokeDamageTakenEvent(damage);
-            healthbar.SetValue(Mathf.Clamp01(currentHealth / maxHealth));
+            UpdateHealthbar();
+        }
 
-            if (currentHealth <= 0)
-                Destroy(gameObject);
-            else 
-                hitbox.Hit();
-            
-            effect?.Impact(this, damage);
+        public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
+            bool piercing = false, AttackEffect effect = null)
+        {
+            Destroy(gameObject);
+        }
 
-            return damage;
+        public void OnHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
+            bool piercing = false, AttackEffect effect = null)
+        {
+            hitbox.Hit();
         }
     }
 }

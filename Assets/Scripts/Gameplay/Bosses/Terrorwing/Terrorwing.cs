@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using Definitions;
-using GameCycle;
 using Gameplay.Map;
 using Gameplay.Mutations.AttackEffects;
 using Gameplay.Player;
@@ -15,7 +13,7 @@ using Random = UnityEngine.Random;
 
 namespace Gameplay.Bosses.Terrorwing
 {
-    public class Terrorwing : Boss, IDamageableEnemy, IEnemyAttack, IImpactable
+    public class Terrorwing : Boss, IDamageableEnemy, IEnemyAttack
     {
         public TerrorwingPattern debug_PatternToSet;
         public bool debug_DieFromPlayer;
@@ -67,7 +65,6 @@ namespace Gameplay.Bosses.Terrorwing
 
         private bool destroyed;
         private bool died;
-        private float currentHealth;
 
 
         
@@ -80,8 +77,8 @@ namespace Gameplay.Bosses.Terrorwing
 
         protected override void Start()
         {
-            currentHealth = TerrorwingDefinitions.MaxHealth;
-            Bossbar.Instance.SetMaxHealth(currentHealth);
+            CurrentHealth = TerrorwingDefinitions.MaxHealth;
+            Bossbar.Instance.SetMaxHealth(CurrentHealth);
             base.Start();
             ForcePattern(debug_PatternToSet);
         }
@@ -416,37 +413,23 @@ namespace Gameplay.Bosses.Terrorwing
         public Transform Transform => transform;
         public float HealthbarOffsetY => 0;
         public float HealthbarWidth => 0;
-
-        public float Damage(
-            float damage, 
-            Vector3 position = default, 
-            float knockback = 0f, 
-            float stunDuration = 0f, 
-            Color damageColor = default,
-            bool ignoreArmor = false,
-            AttackEffect effect = null)
+        public bool Immune => false;
+        public float Armor => 0;
+        public float CurrentHealth { get; set; }
+        
+        public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
+            bool piercing = false, AttackEffect effect = null)
         {
-            if(rb.simulated && !mainHitbox.Immune)
-            {
-                mainHitbox.Hit();
-                original.PaintDamage();
-            }
-            
-            currentHealth -= damage;
-            ((IDamageable)this).InvokeDamageTakenEvent(damage);
-            
-            if (currentHealth <= 0)
-                Die(true);
-            else
-                Bossbar.Instance.Damage(damage);
-
-            effect?.Impact(this, damage);
-
-            return damage;
+            Die(true);
         }
-        
-        
-        
+
+        public void OnHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
+            bool piercing = false, AttackEffect effect = null)
+        {
+            Bossbar.Instance.Damage(damage);
+        }
+
+
         // IEnemyAttack
         public Vector3 AttackPosition => transform.position + (Vector3) Random.insideUnitCircle.normalized;
         public float AttackDamage => TerrorwingDefinitions.ContactDamage;

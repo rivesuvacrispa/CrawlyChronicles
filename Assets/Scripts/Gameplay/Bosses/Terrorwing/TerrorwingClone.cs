@@ -3,6 +3,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Definitions;
 using Gameplay.Mutations.AttackEffects;
+using Gameplay.Player;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using Util;
@@ -141,9 +142,9 @@ namespace Gameplay.Bosses.Terrorwing
         
         private void OnBulletCollision(IDamageable damageable)
         {
-            if (damageable is Player.PlayerManager manager)
+            if (damageable is PlayerManager)
             {
-                manager.Damage(
+                damageable.Damage(
                     TerrorwingDefinitions.BulletHellDamage, 
                     transform.position,
                     2,
@@ -166,6 +167,9 @@ namespace Gameplay.Bosses.Terrorwing
         public Transform Transform => transform;
         public float HealthbarOffsetY => 0;
         public float HealthbarWidth => 0;
+        public bool Immune => hitbox.Immune;
+        public float Armor => 0;
+        public float CurrentHealth { get; set; }
 
         public float Damage(
             float damage, 
@@ -173,14 +177,27 @@ namespace Gameplay.Bosses.Terrorwing
             float knockback = 0f, 
             float stunDuration = 0f, 
             Color damageColor = default,
-            bool ignoreArmor = false,
+            bool piercing = false,
             AttackEffect effect = null)
         {
             if(hitbox.Immune) return 0;
             if(rb.simulated) hitbox.Hit();
             PaintDamage();
-            if(original) terrorwing.Damage(damage, effect: effect);
+            if(original) ((IDamageable)terrorwing).Damage(
+                damage, position, knockback, stunDuration, damageColor, piercing, effect);
             return damage;
+        }
+
+        public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
+            bool piercing = false, AttackEffect effect = null)
+        {
+            
+        }
+
+        public void OnHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
+            bool piercing = false, AttackEffect effect = null)
+        {
+            
         }
     }
 }

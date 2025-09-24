@@ -37,8 +37,7 @@ namespace Gameplay.Player
         [SerializeField] private PlayerStats currentStats;
         
         private readonly int deadHash = Animator.StringToHash("PlayerSpriteDead");
-        private float health;
-        
+
         public bool IsHoldingEgg { get; private set; }
         public Egg HoldingEgg { get; private set; }
         public bool AllowInteract => !attackController.IsAttacking;
@@ -72,7 +71,7 @@ namespace Gameplay.Player
         private void Start()
         {
             healthbar.SetTarget(this);
-            health = currentStats.MaxHealth;
+            CurrentHealth = currentStats.MaxHealth;
             UpdateHealthbar();
             TimeManager.OnDayStart += OnDayStart;
         }
@@ -121,41 +120,17 @@ namespace Gameplay.Player
         
         public void AddHealth(float amount)
         {
-            if(health < 0 || health >= currentStats.MaxHealth) return;
+            if(CurrentHealth < 0 || CurrentHealth >= currentStats.MaxHealth) return;
             healingParticles.Play();
-            health = Mathf.Clamp(health + amount, health, currentStats.MaxHealth);
+            CurrentHealth = Mathf.Clamp(CurrentHealth + amount, CurrentHealth, currentStats.MaxHealth);
             UpdateHealthbar();
-        }
-        
-        public float Damage(
-            float damage, 
-            Vector3 position,
-            float knockback, 
-            float stunDuration = 0, 
-            Color damageColor = default,
-            bool ignoreArmor = false,
-            AttackEffect effect = null)
-        {
-#if UNITY_EDITOR
-            if(GodMode) return 0;
-#endif
-            
-            if (hitbox.Immune) return 0;
-            PlayerAudioController.Instance.PlayHit();
-            movement.Knockback(position, knockback);
-            damage = ignoreArmor ? damage : PhysicsUtility.CalculateDamage(damage, currentStats.Armor);
-            health -= damage;
-            UpdateHealthbar();
-            if (health <= float.Epsilon) Die(true);
-            else hitbox.Hit();
-            return damage;
         }
         
         public void Knockback(Vector2 pos, float knockback) => movement.Knockback(pos, knockback);
 
         private void UpdateHealthbar()
         {
-            float value = health / currentStats.MaxHealth;
+            float value = CurrentHealth / currentStats.MaxHealth;
             healthbar.SetValue(value);
             healthText.text = $"{Mathf.RoundToInt(value * 100)}%";
         }
@@ -183,7 +158,7 @@ namespace Gameplay.Player
             movement.enabled = true;
             attackController.enabled = true;
             OnPlayerRespawned?.Invoke();
-            health = currentStats.MaxHealth;
+            CurrentHealth = currentStats.MaxHealth;
             UpdateHealthbar();
             TimeManager.OnDayStart += OnDayStart;
         }
@@ -207,8 +182,8 @@ namespace Gameplay.Player
             RemoveEgg();
             PlayerMovement.Teleport(new Vector2(15f, 15f));
             PlayerStats = baseStats;
-            health = currentStats.MaxHealth;
-            healthText.text = Mathf.CeilToInt(health).ToString();
+            CurrentHealth = currentStats.MaxHealth;
+            healthText.text = Mathf.CeilToInt(CurrentHealth).ToString();
             UpdateHealthbar();
         }
 
@@ -218,5 +193,35 @@ namespace Gameplay.Player
         public Transform Transform => transform;
         public float HealthbarOffsetY => healthbarOffsetY;
         public float HealthbarWidth => healthbarWidth;
+        
+#if UNITY_EDITOR
+        public bool Immune => GodMode || hitbox.Immune;
+#else
+        public bool Immune => hitbox.Immune;
+#endif
+        public float Armor => currentStats.Armor;
+
+        public float CurrentHealth { get; set; } = 0;
+
+
+        public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
+            bool piercing = false, AttackEffect effect = null)
+        {
+            Die(true);
+        }
+
+        public void OnHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
+            bool piercing = false, AttackEffect effect = null)
+        {
+            hitbox.Hit();
+        }
+        
+        public void OnBeforeHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
+            bool piercing = false, AttackEffect effect = null)
+        {
+            PlayerAudioController.Instance.PlayHit();
+            movement.Knockback(position, knockback);
+            UpdateHealthbar();
+        }
     }
 }

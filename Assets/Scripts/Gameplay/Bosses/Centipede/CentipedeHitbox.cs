@@ -2,6 +2,7 @@
 using Definitions;
 using Gameplay.Player;
 using UnityEngine;
+using Util.Interfaces;
 
 namespace Gameplay.Bosses.Centipede
 {
@@ -21,11 +22,12 @@ namespace Gameplay.Bosses.Centipede
         private void OnTriggerEnter2D(Collider2D col)
         {
             if (col.gameObject.TryGetComponent(out PlayerHitbox _))
-                PlayerManager.Instance.Damage(CentipedeBoss.ContactDamage, transform.position,
-                    CentipedeDefinitions.Knockback);
-            else Fragment.Damage(
-                PlayerManager.PlayerStats.AttackDamage,
-                effect: PlayerAttack.CurrentAttackEffect);
+                ((IDamageable)PlayerManager.Instance).Damage(CentipedeBoss.ContactDamage, transform.position,
+                    CentipedeDefinitions.Knockback, 0, default);
+            else
+                ((IDamageable)Fragment).Damage(
+                PlayerManager.PlayerStats.AttackDamage, default, 0, 
+                0, default, false, PlayerAttack.CurrentAttackEffect);
         }
 
         public void Hit() => StartCoroutine(ImmunityRoutine());
