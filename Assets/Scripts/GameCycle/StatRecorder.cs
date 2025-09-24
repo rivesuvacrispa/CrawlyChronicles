@@ -1,23 +1,27 @@
 ﻿using System.Text;
 using Gameplay.Breeding;
+using Gameplay.Enemies.Enemies;
 using Gameplay.Genes;
+using Gameplay.Player;
+using Timeline;
 using UI;
 using UI.Menus;
 using UnityEngine;
+using Util.Interfaces;
 
 namespace GameCycle
 {
     public class StatRecorder : MonoBehaviour
     {
-        public static int daysSurvived;
-        public static float damageDealt;
-        public static int enemyKills;
-        public static int respawns;
-        public static int eggsLaid;
-        public static int eggsLost;
-        public static int timesBreed;
-        public static int genesCollected;
-        public static int timesMutated;
+        private static int daysSurvived;
+        private static float damageDealt;
+        private static int enemyKills;
+        private static int respawns;
+        private static int eggsLaid;
+        private static int eggsLost;
+        private static int timesBreed;
+        private static int genesCollected;
+        private static int timesMutated;
 
         private void OnEnable()
         {
@@ -26,6 +30,12 @@ namespace GameCycle
             GeneDrop.OnPickedUp += OnGenePickup;
             BreedingManager.OnBecomePregnant += OnBecomePregnant;
             BreedingManager.OnEggsLaid += OnEggsLaid;
+            PlayerManager.OnPlayerRespawned += OnPlayerRespawned;
+            TimeManager.OnDayStart += OnDayStart;
+            AntEggStealer.OnEggStolen += OnEggStolen;
+            IDamageable.OnDamageTaken += OnDamageTaken;
+            MutationMenu.OnMutationClick += OnMutationClick;
+            EggBed.OnEggReturned += OnEggReturn;
         }
 
         private void OnDisable()
@@ -34,6 +44,13 @@ namespace GameCycle
             
             GeneDrop.OnPickedUp -= OnGenePickup;
             BreedingManager.OnBecomePregnant -= OnBecomePregnant;
+            BreedingManager.OnEggsLaid -= OnEggsLaid;
+            PlayerManager.OnPlayerRespawned -= OnPlayerRespawned;
+            TimeManager.OnDayStart -= OnDayStart;
+            AntEggStealer.OnEggStolen -= OnEggStolen;
+            IDamageable.OnDamageTaken -= OnDamageTaken;
+            MutationMenu.OnMutationClick -= OnMutationClick;
+            EggBed.OnEggReturned -= OnEggReturn;
         }
 
         private void ResetStats()
@@ -64,9 +81,23 @@ namespace GameCycle
             return sb.ToString();
         }
 
+
         private void OnGenePickup(GeneType type, int amount) => genesCollected += amount;
 
         private void OnBecomePregnant() => timesBreed++;
+
         private void OnEggsLaid(int amount) => eggsLaid += amount;
+
+        private void OnPlayerRespawned() => respawns++;
+
+        private void OnDayStart(int daycounter) => daysSurvived++;
+
+        private void OnEggStolen() => eggsLost++;
+
+        private void OnDamageTaken(float damage) => damageDealt += damage;
+
+        private void OnMutationClick() => timesMutated++;
+
+        private void OnEggReturn() => eggsLost--;
     }
 }

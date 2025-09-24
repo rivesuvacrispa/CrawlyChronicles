@@ -113,7 +113,6 @@ namespace Gameplay.Breeding
         
         public void BecomePregnant(TrioGene genes, MutationData mutationData)
         {
-            StatRecorder.timesBreed++;
             OnBecomePregnant?.Invoke();
             CurrentFoodAmount -= CurrentBreedingFoodRequirement;
             eggLayingTimer = pregnancyDuration;

@@ -432,8 +432,8 @@ namespace Gameplay.Bosses.Terrorwing
                 original.PaintDamage();
             }
             
-            StatRecorder.damageDealt += damage;
             currentHealth -= damage;
+            ((IDamageable)this).InvokeDamageTakenEvent(damage);
             
             if (currentHealth <= 0)
                 Die(true);

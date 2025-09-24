@@ -42,6 +42,9 @@ namespace UI.Menus
         private readonly Dictionary<BasicMutation, BasicAbilityButton> basicAbilityButtons = new();
         private Dictionary<BasicMutation, int> current = new();
         private TrioGene rerollCost;
+
+        public delegate void MutationMenuEvent();
+        public static event MutationMenuEvent OnMutationClick;
         
 
 
@@ -67,24 +70,6 @@ namespace UI.Menus
 
         private void CreateMutations()
         {
-            //// Now food can be consumed up to breeding requirement only
-            //// Blue fungi drops genes when food is max
-            //// neutrals change animation when flee dead
-            //// health in percent
-            //// more cooldown on queens fertility
-            //// queens fertility needs food
-            //// autocast particles
-
-            // More neutrals
-            // immune wasp?
-            // enemies become stronger when you mutate? or each day?
-            // immune cockroaches
-            // осы умирают неправильно
-            
-            //?? мухоловка после съедения отключает атаку
-            //// мухоловка агрит нейтралов
-            //// пофиксить яица
-            
             Dictionary<BasicMutation, int> variants = new();
             HashSet<BasicMutation> maxed = new();
             List<BasicMutation> specials = new();
@@ -150,9 +135,9 @@ namespace UI.Menus
 
             genesLeft.SetGene(mutation.GeneType, genesLeft.GetGene(mutation.GeneType) - cost);
             geneDisplay.UpdateTrioText(genesLeft);
-            RefreshAffrodable();
+            RefreshAffordable();
             UpdateRerollButton();
-            StatRecorder.timesMutated++;
+            OnMutationClick?.Invoke();
         }
 
         private void CreateBasicAbilityButton(BasicMutation mutation, int level)
@@ -169,7 +154,7 @@ namespace UI.Menus
         private bool CanAfford(BasicMutation mutation, int level) =>
             genesLeft.GetGene(mutation.GeneType) >= GlobalDefinitions.GetMutationCost(level);
 
-        private void RefreshAffrodable()
+        private void RefreshAffordable()
         {
             foreach (Transform t in newMutationsTransform)
             {

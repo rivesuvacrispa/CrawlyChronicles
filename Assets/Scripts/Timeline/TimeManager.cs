@@ -96,7 +96,6 @@ namespace Timeline
 
         public void StartDay(int startFrom = 0)
         {
-            StatRecorder.daysSurvived++;
             dayCounter++;
             time = startFrom;
             OnDayStart?.Invoke(dayCounter);

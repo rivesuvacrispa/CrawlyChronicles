@@ -81,7 +81,7 @@ namespace Gameplay.Bosses.Centipede
             // make sure that the fragment dies only once
             if (dead || !hitbox.Enabled) return 0;
             damage = ignoreArmor ? damage : PhysicsUtility.CalculateDamage(damage, CentipedeDefinitions.Armor * (int) fragmentType * 0.5f);
-            StatRecorder.damageDealt += damage;
+            ((IDamageable)this).InvokeDamageTakenEvent(damage);
             SetHealth(currentHealth - damage);
             painter.Paint(new Gradient().FastGradient(Color.white, spriteRenderer.color), GlobalDefinitions.EnemyImmunityDuration);
             

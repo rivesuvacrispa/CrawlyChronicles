@@ -108,7 +108,7 @@ namespace Gameplay.Enemies
             }
 
             damage = ignoreArmor ? damage : PhysicsUtility.CalculateDamage(damage, Scriptable.Armor);
-            StatRecorder.damageDealt += damage;
+            ((IDamageable)this).InvokeDamageTakenEvent(damage);
             Debug.Log($"{gameObject.name} damaged for {damage} HP, ignore armor: {ignoreArmor}");
             health -= damage;
             attackDelay = 1f;

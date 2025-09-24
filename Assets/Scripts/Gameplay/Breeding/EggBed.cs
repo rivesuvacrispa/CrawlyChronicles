@@ -27,6 +27,9 @@ namespace Gameplay.Breeding
             ReturnEgg,
         }
         
+        public delegate void EggBedEvent();
+        public static event EggBedEvent OnEggReturned;
+        
         
         
         private void Awake()
@@ -134,7 +137,7 @@ namespace Gameplay.Breeding
             if(interactionState == InteractionState.ReturnEgg)
             {
                 AddEgg(Player.PlayerManager.Instance.HoldingEgg);
-                StatRecorder.eggsLost--;
+                OnEggReturned?.Invoke();
                 Player.PlayerManager.Instance.RemoveEgg();
             }
             else Eat();

@@ -57,6 +57,7 @@ namespace Gameplay.Player
         public static event PlayerEvent OnStatsChanged;
         public delegate void PlayerManagerEvent();
         public static event PlayerManagerEvent OnPlayerKilled;
+        public static event PlayerManagerEvent OnPlayerRespawned;
         
         
         
@@ -181,7 +182,7 @@ namespace Gameplay.Player
         {
             movement.enabled = true;
             attackController.enabled = true;
-            StatRecorder.respawns++;
+            OnPlayerRespawned?.Invoke();
             health = currentStats.MaxHealth;
             UpdateHealthbar();
             TimeManager.OnDayStart += OnDayStart;

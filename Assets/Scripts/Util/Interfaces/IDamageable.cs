@@ -16,5 +16,9 @@ namespace Util.Interfaces
             Color damageColor,
             bool ignoreArmor = false,
             AttackEffect effect = null);
+
+        public delegate void DamageEvent(float damage);
+        public static event DamageEvent OnDamageTaken;
+        public void InvokeDamageTakenEvent(float damage) => OnDamageTaken?.Invoke(damage);
     }
 }

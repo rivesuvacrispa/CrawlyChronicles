@@ -41,7 +41,7 @@ namespace Gameplay.Enemies.Spawners
             if (!hitbox.Enabled) return 0;
             damage = ignoreArmor ? damage : PhysicsUtility.CalculateDamage(damage, armor);
             currentHealth -= damage;
-            StatRecorder.damageDealt += damage;
+            ((IDamageable)this).InvokeDamageTakenEvent(damage);
             healthbar.SetValue(Mathf.Clamp01(currentHealth / maxHealth));
 
             if (currentHealth <= 0)

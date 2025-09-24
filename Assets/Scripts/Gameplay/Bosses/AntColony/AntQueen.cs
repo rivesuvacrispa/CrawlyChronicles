@@ -219,7 +219,7 @@ namespace Gameplay.Bosses.AntColony
             
             damage = ignoreArmor ? damage : PhysicsUtility.CalculateDamage(damage, AntColonyDefinitions.Armor);
             currentHealth -= damage;
-            StatRecorder.damageDealt += damage;
+            ((IDamageable)this).InvokeDamageTakenEvent(damage);
             
             if (currentHealth <= 0)
                 Die();

@@ -10,9 +10,14 @@ namespace Gameplay.Enemies.Enemies
     public class AntEggStealer : Enemy
     {
         [SerializeField] private SpriteRenderer eggSpriteRenderer;
-
+        
         private Egg holdingEgg;
 
+        public delegate void AntEggStealerEvent();
+        public static event AntEggStealerEvent OnEggStolen;
+        
+        
+        
         public override void OnMapEntered()
         {
             if(BreedingManager.TotalEggsAmount == 0) AttackPlayer();
@@ -30,7 +35,7 @@ namespace Gameplay.Enemies.Enemies
             {
                 if(eggBed.RemoveOne(out holdingEgg))
                 {
-                    StatRecorder.eggsLost++;
+                    OnEggStolen?.Invoke();
                     eggSpriteRenderer.enabled = true;
                     stateController.SetState(AIState.Flee);
                 }
