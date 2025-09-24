@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using GameCycle;
 using Gameplay.Player;
-using UI;
 using UI.Menus;
 using UnityEngine;
 using UnityEngine.Localization;
@@ -13,13 +12,14 @@ namespace Timeline
     {
         public static TimeManager Instance { get; private set; }
 
+        [Header("References")]
         [SerializeField] private LocalizedString localizedString;
         [SerializeField] private Text dayText;
         [SerializeField] private Text lifespanText;
+        [Header("Settings")]
         [SerializeField] private int dayDurationInSeconds = 30;
         [SerializeField] private int nightDurationInSeconds = 120;
         [SerializeField] private int playerLifespanInSeconds = 300;
-        [SerializeField] private ParticleSystem fireflyParticles;
 
         private float lifetime;
         private int dayCounter;
@@ -96,7 +96,6 @@ namespace Timeline
 
         public void StartDay(int startFrom = 0)
         {
-            fireflyParticles.Stop();
             StatRecorder.daysSurvived++;
             dayCounter++;
             time = startFrom;
@@ -115,7 +114,6 @@ namespace Timeline
 
         private void StartNight()
         {
-            if(fireflyParticles.gameObject.activeSelf) fireflyParticles.Play();
             OnNightStart?.Invoke(dayCounter);
         }
 
