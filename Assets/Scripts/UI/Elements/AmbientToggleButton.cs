@@ -1,16 +1,18 @@
 ﻿using UI.Util;
-using UnityEngine;
 
 namespace UI.Elements
 {
     public class AmbientToggleButton : ToggleButton
     {
-        [SerializeField] private GameObject ambientGO;
-
+        public delegate void AmbientToggleButtonEvent(bool state);
+        public static event AmbientToggleButtonEvent OnToggled;
+        
+        
+        
         protected override void OnToggle(bool currentState)
         {
             base.OnToggle(currentState);
-            ambientGO.SetActive(currentState);
+            OnToggled?.Invoke(currentState);
         }
     }
 }

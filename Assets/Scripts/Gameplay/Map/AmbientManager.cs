@@ -1,5 +1,6 @@
 ﻿using System;
 using Timeline;
+using UI.Elements;
 using UnityEngine;
 
 namespace Gameplay.Map
@@ -12,6 +13,7 @@ namespace Gameplay.Map
         
         private void OnEnable()
         {
+            AmbientToggleButton.OnToggled += OnAmbientToggled;
             TimeManager.OnDayStart += OnDayStart;
             TimeManager.OnNightStart += OnNightStart;
         }
@@ -29,7 +31,9 @@ namespace Gameplay.Map
 
         private void OnNightStart(int daycounter)
         {
-            fireflyParticles.Play();
+            if (gameObject.activeInHierarchy) fireflyParticles.Play();
         }
+
+        private void OnAmbientToggled(bool state) => gameObject.SetActive(state);
     }
 }

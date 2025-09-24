@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Gameplay.Map;
+using UnityEngine;
 
 namespace Camera
 {
@@ -9,23 +10,19 @@ namespace Camera
         [SerializeField] private float minZoom;
         [SerializeField] private float maxZoom;
         [SerializeField] private float zoomStep;
-        [SerializeField] private Transform minPoint;
-        [SerializeField] private Transform maxPoint;
+
 
         private UnityEngine.Camera cam;
         private Vector3 dragOrigin;
-        private Vector3 minPos;
-        private Vector3 maxPos;
     
         private void Awake()
         {
             cam = GetComponent<UnityEngine.Camera>();
-            minPos = minPoint.transform.position;
-            maxPos = maxPoint.transform.position;
         }
 
         private void Update()
         {
+            
             Vector3 mouseWorldPos = cam.ScreenToWorldPoint(Input.mousePosition);
         
             if (Input.GetMouseButtonDown(2))
@@ -35,6 +32,9 @@ namespace Camera
             {
                 Vector3 diff = dragOrigin - mouseWorldPos;
                 Vector3 camPos = transform.position + diff;
+
+                Vector3 minPos = MapManager.MinPoint.position;
+                Vector3 maxPos = MapManager.MaxPoint.position;
 
                 camPos = new Vector3(
                     Mathf.Clamp( camPos.x, minPos.x, maxPos.x), 

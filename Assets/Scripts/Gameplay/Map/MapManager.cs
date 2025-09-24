@@ -13,8 +13,11 @@ namespace Gameplay.Map
         [SerializeField] private Transform foodSpawnPointsTransform;
         [SerializeField] private Transform mapCenterTransform;
         [SerializeField] private Transform gameObjectsTransform;
+        [SerializeField] private Transform minPoint;
+        [SerializeField] private Transform maxPoint;
         [Header("Settings")]
         [SerializeField] private List<Foodbed> foodbeds;
+        [SerializeField] private float minimapScale;
 
         private static MapManager instance;
         private static readonly List<EnemySpawnLocation> EnemySpawnPoints = new();
@@ -27,11 +30,17 @@ namespace Gameplay.Map
             => (Vector3) Random.insideUnitCircle.normalized * radius + instance.mapCenterTransform.position;
         public static Transform GameObjectsTransform => instance.gameObjectsTransform;
 
+        public static Transform MinPoint => instance.minPoint;
+        public static Transform MaxPoint => instance.maxPoint;
+        public static float MinimapScale => instance.minimapScale;
+        
         
         
         private void Awake()
         {
             instance = this;
+            
+            Debug.Log($"Current Map Manager: [{instance.gameObject.name}]");
             InitEnemySpawnPoints();
             InitFoodSpawnPoints();
             

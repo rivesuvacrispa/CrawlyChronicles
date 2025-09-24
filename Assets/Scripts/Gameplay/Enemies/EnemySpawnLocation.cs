@@ -28,11 +28,13 @@ namespace Gameplay.Enemies
         {
             SpawnPosition = transform.position;
 
+            Debug.Log($"Seeker [{gameObject.name}] started scan");
             seeker.StartPath(SpawnPosition, exitTransform.position, enterPath =>
             {
                 enterPath.Claim(this);
                 EnteringPath = enterPath;
                 Initialized = true;
+                Debug.Log($"Seeker [{gameObject.name}] finished scan");
             });
         }
     }
