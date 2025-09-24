@@ -2,13 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Camera;
-using Gameplay;
 using Gameplay.Breeding;
 using Gameplay.Player;
 using SoundEffects;
 using Timeline;
-using UI;
-using UI.Elements;
 using UI.Menus;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,8 +19,6 @@ namespace GameCycle
         public delegate void EggBedCollectionEvent(List<EggBed> eggBeds);
         public static EggBedCollectionEvent OnEggCollectionRequested;
 
-        [SerializeField] private FollowMovement followMovement;
-        [SerializeField] private EggBedViewer viewer;
         [SerializeField] private GameObject respawnMenuGO;
         [SerializeField] private Text eggBedSelectionText;
         [SerializeField] private GameObject leftArrow;
@@ -34,6 +29,11 @@ namespace GameCycle
         private List<EggBed> eggBeds = new();
         private EggBed selectedEggbed;
 
+        public delegate void RespawnManagerEvent(EggBed eggBed);
+        public static RespawnManagerEvent OnEggbedSelected;
+        
+
+        
         private RespawnManager() => instance = this;
         
         public static void Respawn() => instance.StartRespawn();
@@ -70,7 +70,7 @@ namespace GameCycle
                 
                 if (axis != 0) SelectEggBed(currentEggBedIndex + axis);
                 
-                followMovement.UpdateUnscaled();
+                MainCamera.FollowMovement.UpdateUnscaled();
                 yield return new WaitForSecondsRealtime(0);
             }
         }
@@ -85,8 +85,8 @@ namespace GameCycle
             leftArrow.SetActive(currentEggBedIndex > 0);
             rightArrow.SetActive(currentEggBedIndex < count - 1);
             selectedEggbed = eggBeds[currentEggBedIndex];
-            followMovement.Target = selectedEggbed.Transform;
-            viewer.ShowEggs(selectedEggbed);
+            OnEggbedSelected?.Invoke(selectedEggbed);
+            MainCamera.FollowMovement.Target = selectedEggbed.Transform;
         }
 
         public void GoLeft() => SelectEggBed(currentEggBedIndex - 1);
@@ -96,7 +96,7 @@ namespace GameCycle
         public void SelectEggToRespawn(Egg egg)
         {
             StopAllCoroutines();
-            viewer.Disable();
+            OnEggbedSelected?.Invoke(null);
             respawnMenuGO.SetActive(false);
             MutationMenu.Show(MutationTarget.Egg, egg);
         }
@@ -108,7 +108,7 @@ namespace GameCycle
             BreedingManager.Instance.SetCurrentFoodAmount(0);
             selectedEggbed.RemoveParticular(origin);
             AbilityController.UpdateAbilities(mutated);
-            followMovement.Target = PlayerManager.Instance.Transform;
+            MainCamera.FollowMovement.Target = PlayerManager.Instance.Transform;
             AbilityController.SetUIActive(true);
             TimeManager.Instance.ResetLifespan();
             PlayerManager.Instance.OnRespawn();

@@ -12,6 +12,7 @@ namespace Camera
         private static MainCamera instance;
         
         public static Vector2 WorldMousePos { get; private set; }
+        public static FollowMovement FollowMovement => instance.followMovement;
 
 
         public static void ToggleFreeMode()

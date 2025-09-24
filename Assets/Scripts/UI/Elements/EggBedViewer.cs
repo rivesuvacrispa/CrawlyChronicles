@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using GameCycle;
 using Gameplay.Breeding;
 using UnityEngine;
 
@@ -11,6 +12,8 @@ namespace UI.Elements
         private int maxCount;
         private List<EggBedViewerElement> elements;
 
+        
+        
         private void Awake()
         {
             elements = new List<EggBedViewerElement>();
@@ -18,7 +21,28 @@ namespace UI.Elements
                 elements.Add(t.GetComponent<EggBedViewerElement>());
             maxCount = elements.Count;
         }
-        
+
+        private void OnEnable()
+        {
+            RespawnManager.OnEggbedSelected += OnEggbedSelected;
+        }
+
+        private void OnDisable()
+        {
+            RespawnManager.OnEggbedSelected -= OnEggbedSelected;
+        }
+
+        private void OnEggbedSelected(EggBed eggbed)
+        {
+            if (eggbed is null)
+            {
+                Disable();
+                return;
+            }
+            
+            ShowEggs(eggbed);
+        }
+
         public void ShowEggs(EggBed eggBed)
         {
             transform.localPosition = eggBed.transform.position;
