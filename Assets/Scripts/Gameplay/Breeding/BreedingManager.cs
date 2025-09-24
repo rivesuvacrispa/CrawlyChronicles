@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Definitions;
 using GameCycle;
 using Gameplay.Genes;
+using Gameplay.Map;
 using Gameplay.Mutations;
 using Gameplay.Mutations.Active;
 using Gameplay.Player;
@@ -139,7 +140,7 @@ namespace Gameplay.Breeding
         
         public void LayEggs(Vector2 position, TrioGene genes, MutationData mutationData)
         {
-            var bed = Instantiate(GlobalDefinitions.EggBedPrefab, GlobalDefinitions.GameObjectsTransform);
+            var bed = Instantiate(GlobalDefinitions.EggBedPrefab, MapManager.GameObjectsTransform);
             int amount = Mathf.RoundToInt(Random.Range(Mathf.Clamp(2f + QueensFertility.EggsAmount, 2f, 6f), 6f));
             var eggs = new List<Egg>();
             OnEggsLaid?.Invoke(amount);
@@ -180,7 +181,7 @@ namespace Gameplay.Breeding
         
         private void CreateFirstEggBed()
         {
-            var bed = Instantiate(GlobalDefinitions.EggBedPrefab, GlobalDefinitions.GameObjectsTransform);
+            var bed = Instantiate(GlobalDefinitions.EggBedPrefab, MapManager.GameObjectsTransform);
             int amount = Random.Range(1, 7);
             var eggs = new List<Egg>();
             while (amount > 0)

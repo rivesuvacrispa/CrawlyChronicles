@@ -5,6 +5,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Definitions;
 using GameCycle;
+using Gameplay.Map;
 using Gameplay.Mutations.AttackEffects;
 using Gameplay.Player;
 using UnityEngine;
@@ -225,7 +226,7 @@ namespace Gameplay.Bosses.Terrorwing
 
         private async UniTask BulletHellTask(CancellationToken cancellationToken)
         {
-            await TaskUtility.WaitUntilDistanceReached(rb, GlobalDefinitions.MapCenter, flySpeed * 0.33f, rotationSpeed, 1, cancellationToken: cancellationToken);
+            await TaskUtility.WaitUntilDistanceReached(rb, MapManager.MapCenter, flySpeed * 0.33f, rotationSpeed, 1, cancellationToken: cancellationToken);
             await UniTask.WhenAll(
                 bulletHell.StartBulletHell(3, bulletHellDuration, cancellationToken: cancellationToken),
                 BulletHellAnimationTask(cancellationToken));

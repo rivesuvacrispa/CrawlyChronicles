@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using Definitions;
+using Gameplay.Map;
 using UnityEngine;
 using Util.Interfaces;
 using Random = UnityEngine.Random;
@@ -57,7 +58,7 @@ namespace Gameplay.Bosses.Centipede
         private IEnumerator FleeRoutine()
         {
             CentipedeBoss.Instance.OnFlee -= OnFlee;
-            Vector2 pos = GlobalDefinitions.GetRandomPointAroundMap(100);
+            Vector2 pos = MapManager.GetRandomPointAroundMap(100);
             while (enabled)
             {
                 fragment.Move(pos, speed, CentipedeBoss.FollowRotationSpeed);

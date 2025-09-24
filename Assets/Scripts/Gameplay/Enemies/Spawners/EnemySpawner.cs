@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using Definitions;
+using Gameplay.Map;
 using UI;
 using UI.Menus;
 using UnityEngine;
@@ -38,7 +39,7 @@ namespace Gameplay.Enemies.Spawners
 
         private void Spawn()
         {
-            var enemy = Instantiate(spawner.Enemy, GlobalDefinitions.GameObjectsTransform);
+            var enemy = Instantiate(spawner.Enemy, MapManager.GameObjectsTransform);
             enemy.OnSpawnedBySpawner();
             enemy.transform.position = transform.position;
         }

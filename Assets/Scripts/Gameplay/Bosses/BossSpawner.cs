@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Definitions;
+using Gameplay.Map;
 using Timeline;
 using UI;
 using UI.Menus;
@@ -39,7 +40,7 @@ namespace Gameplay.Bosses
             if (SettingsMenu.SelectedDifficulty.OverallDifficulty is OverallDifficulty.Peaceful)
                 TimeManager.Instance.enabled = false;
             currentBoss = Instantiate(boss);
-            currentBoss.SetLocation(GlobalDefinitions.GetRandomPointAroundMap(15));
+            currentBoss.SetLocation(MapManager.GetRandomPointAroundMap(15));
             currentBoss.OnProviderDestroy += OnProviderDestroy;
         }
         

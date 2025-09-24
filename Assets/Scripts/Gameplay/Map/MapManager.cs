@@ -11,6 +11,8 @@ namespace Gameplay.Map
         [Header("References")]
         [SerializeField] private Transform enemySpawnPointsTransform;
         [SerializeField] private Transform foodSpawnPointsTransform;
+        [SerializeField] private Transform mapCenterTransform;
+        [SerializeField] private Transform gameObjectsTransform;
         [Header("Settings")]
         [SerializeField] private List<Foodbed> foodbeds;
 
@@ -20,7 +22,11 @@ namespace Gameplay.Map
         public delegate void MapManagerEvent();
         public static event MapManagerEvent OnAfterMapLoad;
         public static bool AllSpawnPointsInitialized => EnemySpawnPoints.All(loc => loc.Initialized);
-        
+        public static Transform MapCenter => instance.mapCenterTransform;
+        public static Vector3 GetRandomPointAroundMap(int radius)
+            => (Vector3) Random.insideUnitCircle.normalized * radius + instance.mapCenterTransform.position;
+        public static Transform GameObjectsTransform => instance.gameObjectsTransform;
+
         
         
         private void Awake()

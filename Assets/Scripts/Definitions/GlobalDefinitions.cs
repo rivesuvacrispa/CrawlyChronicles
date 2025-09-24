@@ -2,6 +2,7 @@
 using Gameplay.Breeding;
 using Gameplay.Enemies;
 using Gameplay.Genes;
+using Gameplay.Map;
 using Gameplay.Mutations;
 using Scriptable;
 using UI;
@@ -18,12 +19,10 @@ namespace Definitions
         [Header("Miscs")] 
         [SerializeField] private Volume globalVolume;
         [SerializeField] private Material defaultSpriteMaterial;
-        [SerializeField] private Transform mapCenterTransform;
         [SerializeField] private int mutationCostPerLevel;
         [SerializeField] private string[] romanDigits = new string[10];
         [SerializeField] private Sprite[] eggSprites = new Sprite[6];
         [SerializeField] private Sprite puddleSprite;
-        [SerializeField] private Transform gameObjectsTransform;
         [SerializeField] private Transform worldCanvasTransform;
         [Header("Stats")] 
         [SerializeField] private int eggGeneEntropy;
@@ -55,7 +54,6 @@ namespace Definitions
         private static VolumeProfile globalVolumeProfile;
         
         
-        public static Transform GameObjectsTransform => instance.gameObjectsTransform;
         public static Transform WorldCanvasTransform => instance.worldCanvasTransform;
         public static float DespawnTime => instance.despawnTime;
         public static float WanderingSpeedMultiplier => instance.wanderingSpeedMultiplier;
@@ -76,7 +74,6 @@ namespace Definitions
         public static Color PoisonColor => instance.poisonColor;
         public static Color DeadColor => instance.deadColor;
         public static Gradient DeathGradient => deathGradient;
-        public static Transform MapCenter => instance.mapCenterTransform;
         public static Material DefaultSpriteMaterial => instance.defaultSpriteMaterial;
         public static VolumeProfile GlobalVolumeProfile => globalVolumeProfile;
         
@@ -87,11 +84,6 @@ namespace Definitions
         public static Color GetGeneColor(GeneType geneType) => instance.geneColors[(int) geneType];
         public static int GetMutationCost(int lvl) => (lvl + 1) * instance.mutationCostPerLevel;
 
-        public static Vector3 GetRandomPointAroundMap(int radius)
-            => (Vector3) Random.insideUnitCircle.normalized * radius + instance.mapCenterTransform.position;
-        
-        
-        
         public static void DropGenesRandomly(Vector3 pos, GeneType type, int amount, float radius = 0.75f)
         {
             if (amount > 0) CreateGeneDrop(pos + (Vector3) Random.insideUnitCircle * radius, type, amount);
@@ -99,26 +91,27 @@ namespace Definitions
 
         public static void CreateMutationDrop(Vector3 pos, BasicMutation basicMutation)
         {
-            var drop = Instantiate(instance.mutationDropPrefab, instance.gameObjectsTransform);
+            var drop = Instantiate(instance.mutationDropPrefab, MapManager.GameObjectsTransform);
             drop.transform.position = pos;
             drop.SetData(basicMutation);
         }
         
+        // TODO: should be inside antlion
         public static SandFunnel CreateSandFunnel(Vector2 position)
         {
-            var funnel = Instantiate(instance.sandFunnel, instance.gameObjectsTransform);
+            var funnel = Instantiate(instance.sandFunnel, MapManager.GameObjectsTransform);
             funnel.transform.position = position;
             funnel.enabled = true;
             return funnel;
         }
         
         public static EggDrop CreateEggDrop(Egg egg)
-            => Instantiate(instance.eggDropPrefab, instance.gameObjectsTransform)
+            => Instantiate(instance.eggDropPrefab, MapManager.GameObjectsTransform)
                 .SetEgg(egg);
         
         public static void CreateEggSquash(Vector3 pos)
         {
-            var egg = Instantiate(instance.eggDropPrefab, instance.gameObjectsTransform);
+            var egg = Instantiate(instance.eggDropPrefab, MapManager.GameObjectsTransform);
             egg.Squash();
             egg.transform.position = pos;
         }
@@ -128,7 +121,7 @@ namespace Definitions
                 .SetDataProvider(provider, isStatic, showAlways);
 
         public static void CreateGeneDrop(Vector3 position, GeneType geneType, int amount = 1) =>
-            Instantiate(instance.geneDropPrefab, instance.gameObjectsTransform)
+            Instantiate(instance.geneDropPrefab, MapManager.GameObjectsTransform)
                 .SetData(geneType, amount)
                     .transform.localPosition = position;
 

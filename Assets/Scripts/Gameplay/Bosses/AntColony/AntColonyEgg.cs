@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using Definitions;
 using Gameplay.Enemies;
+using Gameplay.Map;
 using Gameplay.Mutations.AttackEffects;
 using UI;
 using UI.Elements;
@@ -40,7 +41,7 @@ namespace Gameplay.Bosses.AntColony
         {
             yield return new WaitForSeconds(AntColonyDefinitions.EggsHatchTime *
                                             Random.Range(0.95f, 1.05f));
-            var enemy = Instantiate(ToHatch, GlobalDefinitions.GameObjectsTransform);
+            var enemy = Instantiate(ToHatch, MapManager.GameObjectsTransform);
             enemy.OnSpawnedBySpawner();
             enemy.transform.position = transform.position;
             Destroy(gameObject);

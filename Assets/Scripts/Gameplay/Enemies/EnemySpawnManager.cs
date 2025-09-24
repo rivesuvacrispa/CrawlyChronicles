@@ -44,7 +44,7 @@ namespace Gameplay.Enemies
         private void SpawnEnemy(Enemy toSpawn)
         {
             if(BossSpawner.BossAlive) return;
-            Enemy enemy = Instantiate(toSpawn, GlobalDefinitions.GameObjectsTransform);
+            Enemy enemy = Instantiate(toSpawn, MapManager.GameObjectsTransform);
             enemy.gameObject.name = $"{toSpawn.name}#{enemyCounter}";
             var spawnPoint = MapManager.GetRandomSpawnPoint();
             enemy.SpawnLocation = spawnPoint;

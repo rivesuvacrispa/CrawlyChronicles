@@ -15226,6 +15226,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemySpawnPointsTransform: {fileID: 632638884}
   foodSpawnPointsTransform: {fileID: 1720719917}
+  mapCenterTransform: {fileID: 1996403816}
+  gameObjectsTransform: {fileID: 2048845750}
   foodbeds:
   - {fileID: 1317463161264974708, guid: 002af2e5176307749bcb9636f012555e, type: 3}
   - {fileID: -6488629084233672351, guid: 1e9e67d772529b84dbebb68f7402673d, type: 3}

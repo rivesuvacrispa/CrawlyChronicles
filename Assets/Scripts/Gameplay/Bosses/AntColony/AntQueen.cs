@@ -5,6 +5,7 @@ using Cysharp.Threading.Tasks;
 using Definitions;
 using GameCycle;
 using Gameplay.Enemies;
+using Gameplay.Map;
 using Gameplay.Mutations.AttackEffects;
 using Gameplay.Mutations.EntityEffects;
 using Gameplay.Player;
@@ -103,7 +104,7 @@ namespace Gameplay.Bosses.AntColony
                 {
                     DisposeTokenSource(eggLayingCts);
                     eggLayingCts = new CancellationTokenSource();
-                    TaskUtility.StepTowardsWhileReachingDistance(rb, GlobalDefinitions.MapCenter,
+                    TaskUtility.StepTowardsWhileReachingDistance(rb, MapManager.MapCenter,
                         currentMovespeed, currentMovespeed * 3f, 1, eggLayingCts.Token).Forget();
                     await UniTask.WaitUntil(() => !TouchingWalls, cancellationToken: cancellationToken);
                     DisposeTokenSource(eggLayingCts);
@@ -121,7 +122,7 @@ namespace Gameplay.Bosses.AntColony
 
         private void LayEgg()
         {
-            var egg = Instantiate(eggPrefab, GlobalDefinitions.GameObjectsTransform);
+            var egg = Instantiate(eggPrefab, MapManager.GameObjectsTransform);
             var position = eggsTransform.position;
             egg.transform.localPosition = position;
             egg.Rb.AddClampedForceBackwards(transform.position, 
@@ -166,7 +167,7 @@ namespace Gameplay.Bosses.AntColony
         private async UniTask FleeTask(CancellationToken cancellationToken)
         {
             await TaskUtility.MoveUntilFacingAndCloseEnough(rb, null, currentMovespeed, currentMovespeed * 3f,
-                1, cancellationToken, staticTarget: GlobalDefinitions.GetRandomPointAroundMap(20));
+                1, cancellationToken, staticTarget: MapManager.GetRandomPointAroundMap(20));
             Destroy(gameObject);
         }
         

@@ -3,6 +3,7 @@ using Definitions;
 using Gameplay.AI;
 using Gameplay.Breeding;
 using Gameplay.Food;
+using Gameplay.Map;
 using UnityEngine;
 
 namespace Gameplay.Enemies.Enemies
@@ -71,7 +72,7 @@ namespace Gameplay.Enemies.Enemies
             stateController.SetState(AIState.None);
             animator.Play(DiggingAnimHash);
             yield return new WaitForSeconds(Scriptable.DiggingTime);
-            var eggbed = Instantiate(Scriptable.EggBedPrefab, GlobalDefinitions.GameObjectsTransform);
+            var eggbed = Instantiate(Scriptable.EggBedPrefab, MapManager.GameObjectsTransform);
             eggbed.transform.position = rb.position;
             stateController.SetState(AIState.Wander);
             

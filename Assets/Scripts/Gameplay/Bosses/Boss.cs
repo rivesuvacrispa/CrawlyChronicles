@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using Definitions;
 using Gameplay.Genes;
+using Gameplay.Map;
 using Timeline;
 using UI;
 using UI.Menus;
@@ -63,7 +64,7 @@ namespace Gameplay.Bosses
         private void OnDefeat()
         {
             TimeManager.Instance.ResetLifespan();
-            Vector3 pos = GlobalDefinitions.MapCenter.position;
+            Vector3 pos = MapManager.MapCenter.position;
             StartCoroutine(GeneRewardRoutine(pos));
             GlobalDefinitions.CreateMutationDrop(pos, Scriptable.MutationReward);
         }
