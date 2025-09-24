@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Gameplay.Map;
 using Scriptable;
 using UI;
 using UI.Menus;
@@ -12,20 +13,15 @@ namespace Gameplay.Food
     {
         [SerializeField] private int startingFoodAmount;
         [SerializeField] private float foodPerMinute;
-        [SerializeField] private List<Foodbed> foodbeds;
-        [SerializeField] private Transform foodSpawnPointsTransform;
 
         // Depends on difficulty
         private float currentFoodPerMinute;
         
-        private readonly List<FoodSpawnPoint> foodSpawnPoints = new();
 
         
         
         private void Awake()
         {
-            foreach (Transform child in foodSpawnPointsTransform)
-                foodSpawnPoints.Add(child.gameObject.GetComponent<FoodSpawnPoint>());
             SubToEvents();
         }
         
@@ -44,11 +40,8 @@ namespace Gameplay.Food
 
         private void SpawnFood()
         {
-            FoodSpawnPoint spawnpoints = foodSpawnPoints
-                .OrderBy(_ => Random.value)
-                .FirstOrDefault(spawnPoint => spawnPoint.IsEmpty);
-            if (spawnpoints is not null) 
-                spawnpoints.Spawn(GetRandomFood());
+            if (MapManager.TryGetFoodSpawnPoint(out var spawnPoint)) 
+                spawnPoint.Spawn(MapManager.GetRandomFood());
         }
 
         private IEnumerator FoodSpawningRoutine()
@@ -65,10 +58,7 @@ namespace Gameplay.Food
             }
         }
 
-        private Foodbed GetRandomFood() => foodbeds
-            .Where(bed => bed.CanSpawn(Random.value))
-            .OrderBy(_ => Random.value)
-            .First();
+        
 
         private void OnDifficultyChanged(Difficulty difficulty) => currentFoodPerMinute = foodPerMinute * difficulty.FoodSpawnRate;
         

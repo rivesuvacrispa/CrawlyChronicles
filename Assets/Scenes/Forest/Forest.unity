@@ -15225,6 +15225,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemySpawnPointsTransform: {fileID: 632638884}
+  foodSpawnPointsTransform: {fileID: 1720719917}
+  foodbeds:
+  - {fileID: 1317463161264974708, guid: 002af2e5176307749bcb9636f012555e, type: 3}
+  - {fileID: -6488629084233672351, guid: 1e9e67d772529b84dbebb68f7402673d, type: 3}
+  - {fileID: 1232958798674175962, guid: 6c13f5b4d7a0d334e8084dec8c05a506, type: 3}
+  - {fileID: 8855612132003499519, guid: 46b2b052724d1634b891417e9eaa9fa2, type: 3}
 --- !u!1 &1434950521
 GameObject:
   m_ObjectHideFlags: 0
