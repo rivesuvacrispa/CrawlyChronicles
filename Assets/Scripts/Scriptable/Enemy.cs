@@ -1,4 +1,5 @@
 ﻿using Definitions;
+using UI;
 using UnityEngine;
 using Util;
 
@@ -69,14 +70,23 @@ namespace Scriptable
         public int DeadAnimHash { get; private set; }
         public int AttackAnimHash { get; private set; }
 
-        
+
+        public void OnDayChanged(int day)
+        {
+            if (day == 1) return;
+            
+            float mult = SettingsMenu.SelectedDifficulty.EnemiesStrongerPerDay;
+            currentMaxHealth += maxHealth * mult;
+            currentDamage += damage * mult;
+            currentArmor += armor * mult;
+        }
         
         public void OnDifficultyChanged(Difficulty difficulty)
         {
-            float multiplier = difficulty.EnemyStatsMultiplier;
-            currentMaxHealth = maxHealth * multiplier;
-            currentDamage = damage * multiplier;
-            currentArmor = armor * multiplier;
+            float mult = difficulty.EnemyStatsMultiplier;
+            currentMaxHealth = maxHealth * mult;
+            currentDamage = damage * mult;
+            currentArmor = armor * mult;
         }
         
         private void Awake() => Init();

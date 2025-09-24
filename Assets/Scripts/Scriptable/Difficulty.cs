@@ -17,13 +17,15 @@ namespace Scriptable
         [SerializeField, Range(0, 2)] private float enemyStatsMultiplier;
         [SerializeField, Range(0, 2)] private float geneRerollCost;
         [SerializeField, Range(0, 2)] private float breedingCost;
+        [SerializeField, Range(0, 1)] private float enemiesStrongerPerDay;
 
+        public OverallDifficulty OverallDifficulty => difficulty;
         public float EnemySpawnRate => enemySpawnRate;
         public float FoodSpawnRate => foodSpawnRate;
         public float EnemyStatsMultiplier => enemyStatsMultiplier;
         public float GeneRerollCost => geneRerollCost;
         public float BreedingCost => breedingCost;
-        public OverallDifficulty OverallDifficulty => difficulty;
+        public float EnemiesStrongerPerDay => enemiesStrongerPerDay;
 
         private TableEntryReference descriptionReference;
         private TableEntryReference nameReference;
@@ -39,7 +41,8 @@ namespace Scriptable
                 Mathf.RoundToInt((foodSpawnRate - 1) * 100),
                 Mathf.RoundToInt((enemyStatsMultiplier - 1) * 100),
                 Mathf.RoundToInt((geneRerollCost - 1) * 100),
-                Mathf.RoundToInt((breedingCost - 1) * 100)
+                Mathf.RoundToInt((breedingCost - 1) * 100),
+                Mathf.RoundToInt(enemiesStrongerPerDay * 100),
             };
             return LocalizationSettings.StringDatabase.GetLocalizedString(TableReference, descriptionReference, args);
         }

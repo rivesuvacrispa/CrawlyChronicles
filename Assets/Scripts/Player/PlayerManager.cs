@@ -1,4 +1,5 @@
 ﻿using Definitions;
+using DG.Tweening;
 using GameCycle;
 using Gameplay;
 using Gameplay.Breeding;
@@ -28,7 +29,6 @@ namespace Player
         [SerializeField] private PlayerMovement movement;
         [SerializeField] private MainMenu mainMenu;
         [SerializeField] private Text healthText;
-        [SerializeField] private Text statsText;
         [SerializeField] private Healthbar healthbar;
         [SerializeField] private float healthbarOffsetY;
         [SerializeField] private float healthbarWidth;
@@ -45,9 +45,22 @@ namespace Player
         public bool IsHoldingEgg { get; private set; }
         public Egg HoldingEgg { get; private set; }
         public bool AllowInteract => !attackController.IsAttacking;
-        public static PlayerStats PlayerStats => Instance.currentStats;
+        public static PlayerStats PlayerStats
+        {
+            get => Instance.currentStats;
+            private set
+            {
+                Instance.currentStats = value;
+                OnStatsChanged?.Invoke();
+            }
+        }
+
+        public static PlayerStats BaseStats => Instance.baseStats;
         
         private float health;
+
+        public delegate void PlayerEvent();
+        public static event PlayerEvent OnStatsChanged;
         
         
         
@@ -55,7 +68,7 @@ namespace Player
 
         private void Awake()
         {
-            currentStats = baseStats;
+            PlayerStats = baseStats;
             MainMenu.OnResetRequested += OnResetRequested;
         }
         
@@ -79,8 +92,8 @@ namespace Player
 
         public void AddStats(PlayerStats stats)
         {
-            currentStats.AddStats(baseStats, stats);
-            statsText.text = currentStats.Print();
+            currentStats.AddStats(PlayerStats.Minimal, stats);
+            OnStatsChanged?.Invoke();
         }
         
         public void PickEgg(Egg egg)
@@ -196,9 +209,8 @@ namespace Player
         {
             RemoveEgg();
             PlayerMovement.Teleport(new Vector2(15f, 15f));
-            currentStats = baseStats;
+            PlayerStats = baseStats;
             health = currentStats.MaxHealth;
-            statsText.text = currentStats.Print();
             healthText.text = Mathf.CeilToInt(health).ToString();
             UpdateHealthbar();
         }

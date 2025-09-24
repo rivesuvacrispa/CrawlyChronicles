@@ -88,7 +88,18 @@ namespace Player
                 passiveProcRate: -passiveProcRate);
         }
 
-        public static PlayerStats Zero => new();
+        public static PlayerStats Zero = new();
+        
+        public static PlayerStats Minimal = new PlayerStats(
+            movementSpeed: .25f,
+            rotationSpeed: .25f,
+            maxHealth: 1,
+            attackPower: 0.01f,
+            attackDamage: 0.01f,
+            armor: 0,
+            immunityDuration: 0.1f,
+            abilityDamage: float.MinValue,
+            passiveProcRate: 0);
 
         public string Print()
         {

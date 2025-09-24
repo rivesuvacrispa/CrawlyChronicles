@@ -77,11 +77,11 @@ namespace Gameplay.Enemies.Enemies
                 yield return null;
             }
 
-            evadeRoutine = null;
             AttackPlayer();
             EntityWallCollider.enabled = false;
             stateController.ReturnMoveControl();
             StartCoroutine(EvasionCooldown(1.5f));
+            evadeRoutine = null;
         }
 
         private IEnumerator EvasionCooldown(float duration)
@@ -102,7 +102,6 @@ namespace Gameplay.Enemies.Enemies
 
         protected override void OnDayStart(int day)
         {
-            if(fearless) return;
             CancelEvade();
             base.OnDayStart(day);
         }
