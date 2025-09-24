@@ -59,7 +59,7 @@ namespace Gameplay.AI
 
         private IEnumerator Start()
         {            
-            yield return new WaitUntil(() => EnemySpawnLocation.InitializedLocationsAmount == MapManager.SpawnLocationsCount);
+            yield return new WaitUntil(() => MapManager.AllSpawnPointsInitialized);
             SetState(StartingState);
             UpdateMovementSpeed();
             locator.SetRadius(enemy.Scriptable.LocatorRadius);
