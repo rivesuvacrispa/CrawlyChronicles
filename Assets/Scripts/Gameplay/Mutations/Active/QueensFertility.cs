@@ -1,5 +1,5 @@
 ﻿using Gameplay.Breeding;
-using Player;
+using Gameplay.Player;
 using UnityEngine;
 
 namespace Gameplay.Mutations.Active

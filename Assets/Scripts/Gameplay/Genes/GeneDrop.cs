@@ -14,10 +14,14 @@ namespace Gameplay.Genes
         [SerializeField] private GeneType geneType = GeneType.Neutral;
         [SerializeField] private int amount = -1;
 
+        public delegate void GeneDropEvent(GeneType geneType, int amount);
+        public static event GeneDropEvent OnPickedUp;
+        
+        
+        
         protected override void OnPickup()
         {
-            StatRecorder.genesCollected++;
-            BreedingManager.Instance.AddGene(geneType, amount);
+            OnPickedUp?.Invoke(geneType, amount);
         }
         
         

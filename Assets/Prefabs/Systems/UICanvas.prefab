@@ -1588,6 +1588,7 @@ GameObject:
   - component: {fileID: 1730480859967970635}
   - component: {fileID: 5068660631059169727}
   - component: {fileID: 3960839171763782445}
+  - component: {fileID: 3142240366931633318}
   m_Layer: 5
   m_Name: Food
   m_TagString: Untagged
@@ -1653,6 +1654,19 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &3142240366931633318
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2495619669693480084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c2bba7ad65946f58396acbce2bcef86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  foodText: {fileID: 5618640455549632519}
 --- !u!1 &2686458054384829065
 GameObject:
   m_ObjectHideFlags: 0
@@ -2058,6 +2072,7 @@ GameObject:
   - component: {fileID: 2144573228597073995}
   - component: {fileID: 7442899408701099916}
   - component: {fileID: 9165205429657260906}
+  - component: {fileID: 4793033868778845167}
   m_Layer: 5
   m_Name: Eggs
   m_TagString: Untagged
@@ -2123,6 +2138,19 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &4793033868778845167
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3508127112324254151}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20c5f868fba64f2eace4786472ed88d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  text: {fileID: 109367719611685356}
 --- !u!1 &3616280584400846351
 GameObject:
   m_ObjectHideFlags: 0
@@ -3964,7 +3992,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5389695384937996216}
   - component: {fileID: 5389620630775801103}
-  - component: {fileID: 3008265161934826729}
+  - component: {fileID: 6328096095624634378}
   m_Layer: 5
   m_Name: Genes
   m_TagString: Untagged
@@ -4020,7 +4048,7 @@ MonoBehaviour:
   m_ChildScaleWidth: 1
   m_ChildScaleHeight: 1
   m_ReverseArrangement: 0
---- !u!114 &3008265161934826729
+--- !u!114 &6328096095624634378
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4029,7 +4057,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5963121161093694293}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8fdec4a15d394d6b8f29e3447383ae0d, type: 3}
+  m_Script: {fileID: 11500000, guid: 29c5b4bac89942a3a7c44247102fcf09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   geneTexts:
@@ -10737,6 +10765,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7b7bdf40d1d684c43a3e38ac8511e78a, type: 3}
+--- !u!114 &109367719611685356 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3984987083430156193, guid: 7b7bdf40d1d684c43a3e38ac8511e78a, type: 3}
+  m_PrefabInstance: {fileID: 3947697539641675341}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &5518428923529473796 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8817041060047987017, guid: 7b7bdf40d1d684c43a3e38ac8511e78a, type: 3}
@@ -14462,6 +14501,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 8817041060047987017, guid: 7b7bdf40d1d684c43a3e38ac8511e78a, type: 3}
   m_PrefabInstance: {fileID: 8841954864187774886}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &5618640455549632519 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3984987083430156193, guid: 7b7bdf40d1d684c43a3e38ac8511e78a, type: 3}
+  m_PrefabInstance: {fileID: 8841954864187774886}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &8980376641725895676
 PrefabInstance:
   m_ObjectHideFlags: 0

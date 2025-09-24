@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Gameplay.Player;
+using UnityEngine;
 
 namespace Camera
 {
@@ -10,7 +11,7 @@ namespace Camera
 
         private void Start()
         {
-            Target = Player.PlayerManager.Instance.Transform;
+            Target = PlayerManager.Instance.Transform;
         }
 
         private void LateUpdate()

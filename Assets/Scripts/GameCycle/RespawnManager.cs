@@ -4,7 +4,7 @@ using System.Linq;
 using Camera;
 using Gameplay;
 using Gameplay.Breeding;
-using Player;
+using Gameplay.Player;
 using SoundEffects;
 using Timeline;
 using UI;

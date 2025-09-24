@@ -2,7 +2,7 @@
 using UnityEngine.Localization.Settings;
 using UnityEngine.Localization.Tables;
 
-namespace Player
+namespace Gameplay.Player
 {
     [System.Serializable]
     public struct PlayerStats

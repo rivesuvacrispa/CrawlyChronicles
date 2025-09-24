@@ -1,4 +1,4 @@
-﻿using Player;
+﻿using Gameplay.Player;
 using UnityEngine;
 using Util.Interfaces;
 

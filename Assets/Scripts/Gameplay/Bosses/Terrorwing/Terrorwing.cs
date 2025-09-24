@@ -6,7 +6,7 @@ using Cysharp.Threading.Tasks;
 using Definitions;
 using GameCycle;
 using Gameplay.Mutations.AttackEffects;
-using Player;
+using Gameplay.Player;
 using UnityEngine;
 using Util;
 using Util.Interfaces;

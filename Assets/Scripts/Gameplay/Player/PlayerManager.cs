@@ -1,13 +1,10 @@
 ﻿using Definitions;
-using DG.Tweening;
 using GameCycle;
-using Gameplay;
 using Gameplay.Breeding;
 using Gameplay.Interaction;
 using Gameplay.Mutations.AttackEffects;
 using SoundEffects;
 using Timeline;
-using UI;
 using UI.Elements;
 using UI.Menus;
 using UnityEngine;
@@ -15,7 +12,7 @@ using UnityEngine.UI;
 using Util;
 using Util.Interfaces;
 
-namespace Player
+namespace Gameplay.Player
 {
     public class PlayerManager : MonoBehaviour, IDamageable
     {
@@ -38,11 +35,9 @@ namespace Player
         [SerializeField] private AttackController attackController;
         [SerializeField] private PlayerStats baseStats;
         [SerializeField] private PlayerStats currentStats;
-
-        public delegate void PlayerManagerEvent();
-        public static event PlayerManagerEvent OnPlayerKilled;
         
         private readonly int deadHash = Animator.StringToHash("PlayerSpriteDead");
+        private float health;
         
         public bool IsHoldingEgg { get; private set; }
         public Egg HoldingEgg { get; private set; }
@@ -56,13 +51,12 @@ namespace Player
                 OnStatsChanged?.Invoke();
             }
         }
-
         public static PlayerStats BaseStats => Instance.baseStats;
         
-        private float health;
-
         public delegate void PlayerEvent();
         public static event PlayerEvent OnStatsChanged;
+        public delegate void PlayerManagerEvent();
+        public static event PlayerManagerEvent OnPlayerKilled;
         
         
         

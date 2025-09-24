@@ -1,5 +1,5 @@
 ﻿using Gameplay.Breeding;
-using Player;
+using Gameplay.Player;
 using Scriptable;
 using UnityEngine;
 using Util;

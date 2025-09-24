@@ -15174,6 +15174,7 @@ GameObject:
   - component: {fileID: 45504562391346130}
   - component: {fileID: 6983133238829123899}
   - component: {fileID: 4242114928489847295}
+  - component: {fileID: 39333455814678212}
   - component: {fileID: 7588793056088619219}
   - component: {fileID: 876367325270741035}
   - component: {fileID: 307056350300555300}
@@ -15288,6 +15289,20 @@ MonoBehaviour:
   dashDuration: 0.4
   comboRotationSpeed: 60
   comboExpirationTime: 1
+--- !u!114 &39333455814678212
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3088099053033251564}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2da1b43e799d4317bc3dd6909966f782, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 307056350300555300}
+  breedingParticles: {fileID: 4689725044606517559}
 --- !u!70 &7588793056088619219
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

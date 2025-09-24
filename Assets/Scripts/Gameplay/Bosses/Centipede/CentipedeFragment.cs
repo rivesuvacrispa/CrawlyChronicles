@@ -3,7 +3,7 @@ using Definitions;
 using GameCycle;
 using Gameplay.AI.Locators;
 using Gameplay.Mutations.AttackEffects;
-using Player;
+using Gameplay.Player;
 using UI;
 using UI.Elements;
 using UnityEngine;

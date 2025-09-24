@@ -2,7 +2,7 @@
 using Gameplay.AI;
 using Gameplay.Breeding;
 using Gameplay.Food;
-using Player;
+using Gameplay.Player;
 using UnityEngine;
 using Util;
 using Util.Interfaces;

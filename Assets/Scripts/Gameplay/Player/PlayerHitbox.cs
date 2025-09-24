@@ -3,7 +3,7 @@ using UnityEngine;
 using Util;
 using Util.Interfaces;
 
-namespace Player
+namespace Gameplay.Player
 {
     [RequireComponent(typeof(Collider2D))]
     public class PlayerHitbox : MonoBehaviour

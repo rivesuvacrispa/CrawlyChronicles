@@ -1,16 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Gameplay;
 using Gameplay.Breeding;
 using Gameplay.Genes;
 using Gameplay.Mutations;
 using Scriptable;
-using UI;
 using UI.Elements;
 using UI.Menus;
 using UnityEngine;
 
-namespace Player
+namespace Gameplay.Player
 {
     public class AbilityController : MonoBehaviour
     {

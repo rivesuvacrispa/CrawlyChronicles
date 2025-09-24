@@ -1,5 +1,5 @@
 ﻿using Definitions;
-using Player;
+using Gameplay.Player;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Util;

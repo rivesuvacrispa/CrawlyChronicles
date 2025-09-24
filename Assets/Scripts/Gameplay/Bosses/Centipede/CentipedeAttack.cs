@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using Player;
+using Gameplay.Player;
 using UnityEngine;
 
 namespace Gameplay.Bosses.Centipede

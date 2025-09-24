@@ -3,7 +3,7 @@ using Gameplay.Interaction;
 using SoundEffects;
 using UnityEngine;
 
-namespace Player
+namespace Gameplay.Player
 {
     public class AttackController : MonoBehaviour
     {

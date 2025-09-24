@@ -1,7 +1,7 @@
 ﻿using Gameplay;
 using Gameplay.Breeding;
 using Gameplay.Genes;
-using Player;
+using Gameplay.Player;
 using UnityEditor;
 using UnityEngine;
 
@@ -15,7 +15,7 @@ public class BreedingManagerEditor : Editor {
         DrawDefaultInspector();
 
         if (GUILayout.Button ("Lay eggs")) manager
-            .LayEggs(Player.PlayerMovement.Position, 
+            .LayEggs(PlayerMovement.Position, 
                 new TrioGene(999, 999, 999), 
                 AbilityController.GetMutationData());
     }

@@ -1,4 +1,4 @@
-﻿using Player;
+﻿using Gameplay.Player;
 using Timeline;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;

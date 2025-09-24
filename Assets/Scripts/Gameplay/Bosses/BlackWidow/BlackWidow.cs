@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using Player;
+using Gameplay.Player;
 using UnityEditor;
 using UnityEngine;
 using Util;

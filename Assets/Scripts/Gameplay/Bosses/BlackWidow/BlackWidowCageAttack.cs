@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Security.Cryptography;
 using Cysharp.Threading.Tasks;
-using Player;
 using UnityEngine;
 using UnityEngine.Serialization;
 

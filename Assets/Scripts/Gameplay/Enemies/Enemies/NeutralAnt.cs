@@ -22,6 +22,11 @@ namespace Gameplay.Enemies.Enemies
         private delegate void NeutralAntEvent(Vector2 position);
         private static event NeutralAntEvent OnNeutralDamaged;
 
+        public delegate void NeutralAntInteractionEvent();
+
+        public static event NeutralAntInteractionEvent OnInteractionStarted;
+        public static event NeutralAntInteractionEvent OnInteractionEnded;
+
         private static readonly int BreedAnimHash = Animator.StringToHash("NeutralAntBodyBreeding");
         private static readonly int IdleAnimHash = Animator.StringToHash("NeutralAntBodyIdle");
 
@@ -177,7 +182,7 @@ namespace Gameplay.Enemies.Enemies
             breedAnimator.Play(BreedAnimHash);
             animator.Play(Scriptable.IdleAnimHash);
             breedingParticles.Play();
-            BreedingManager.Instance.PlayBreedingAnimation();
+            OnInteractionStarted?.Invoke();
         }
 
         public void OnInteractionStop()
@@ -186,7 +191,7 @@ namespace Gameplay.Enemies.Enemies
             stateController.SetState(AIState.Wander);
             breedingParticles.Stop();
             animator.Play(Scriptable.WalkAnimHash);
-            BreedingManager.Instance.PlayIdleAnimation();
+            OnInteractionEnded?.Invoke();
             if(TimeManager.IsDay) SubEvents();
             else OnNightStart(0);
             if(!CanBreed) stateController.SetState(AIState.Flee);

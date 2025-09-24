@@ -131,24 +131,6 @@ namespace UI.Menus
         private void ResetGame()
         {
             OnResetRequested?.Invoke();
-            CreateFirstEggBed();
-        }
-        
-        private void CreateFirstEggBed()
-        {
-            var bed = Instantiate(GlobalDefinitions.EggBedPrefab, GlobalDefinitions.GameObjectsTransform);
-            int amount = Random.Range(1, 7);
-            var eggs = new List<Egg>();
-            while (amount > 0)
-            {
-                Egg egg = new Egg(TrioGene.Zero, new MutationData());
-                eggs.Add(egg);
-                amount--;
-            }
-
-            StatRecorder.eggsLayed += amount;
-            bed.SetEggs(eggs);
-            bed.transform.position = new Vector3(15, 15, 0);
         }
     }
 }

@@ -5,7 +5,7 @@ using GameCycle;
 using Gameplay.Breeding;
 using Gameplay.Genes;
 using Gameplay.Mutations;
-using Player;
+using Gameplay.Player;
 using Scriptable;
 using UI.Elements;
 using UI.Tooltips;

@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using Definitions;
-using Player;
+using Gameplay.Player;
 using UnityEngine;
 using Util;
 

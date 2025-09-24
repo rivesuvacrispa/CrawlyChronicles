@@ -7,7 +7,7 @@ using GameCycle;
 using Gameplay.Enemies;
 using Gameplay.Mutations.AttackEffects;
 using Gameplay.Mutations.EntityEffects;
-using Player;
+using Gameplay.Player;
 using UnityEngine;
 using Util;
 using Util.Interfaces;

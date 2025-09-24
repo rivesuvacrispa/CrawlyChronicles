@@ -1,6 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using Definitions;
-using Player;
+using Gameplay.Player;
 using SoundEffects;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
@@ -18,6 +19,16 @@ namespace Gameplay.Genes
         private float initialIntensity;
         private Coroutine routine;
 
+        private void OnEnable()
+        {
+            GeneDrop.OnPickedUp += ConsumeGene;
+        }
+
+        private void OnDisable()
+        {
+            GeneDrop.OnPickedUp -= ConsumeGene;
+        }
+
         private void Start()
         {
             light = GetComponent<Light2D>();
@@ -25,10 +36,10 @@ namespace Gameplay.Genes
             initialIntensity = light.intensity;
         }
         
-        public void ConsumeGene(GeneType geneType)
+        public void ConsumeGene(GeneType geneType, int amount)
         {
             Color color = GlobalDefinitions.GetGeneColor(geneType);
-            if(routine is not null) StopCoroutine(routine);
+            if (routine is not null) StopCoroutine(routine);
             routine = StartCoroutine(ConsumingRoutine(color, 0.5f));
             PlayerAudioController.Instance.PlayGenePickup();
         }

@@ -1,9 +1,8 @@
-﻿using System;
-using Player;
+﻿using Gameplay.Player;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace UI.Elements
+namespace UI.Player
 {
     public class PlayerStats : MonoBehaviour 
     {

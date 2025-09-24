@@ -1,4 +1,6 @@
 ﻿using System.Text;
+using Gameplay.Breeding;
+using Gameplay.Genes;
 using UI;
 using UI.Menus;
 using UnityEngine;
@@ -11,23 +13,36 @@ namespace GameCycle
         public static float damageDealt;
         public static int enemyKills;
         public static int respawns;
-        public static int eggsLayed;
+        public static int eggsLaid;
         public static int eggsLost;
         public static int timesBreed;
         public static int genesCollected;
         public static int timesMutated;
 
-        private void Start() => MainMenu.OnResetRequested += ResetStats;
+        private void OnEnable()
+        {
+            MainMenu.OnResetRequested += ResetStats;
+            
+            GeneDrop.OnPickedUp += OnGenePickup;
+            BreedingManager.OnBecomePregnant += OnBecomePregnant;
+            BreedingManager.OnEggsLaid += OnEggsLaid;
+        }
 
-        private void OnDestroy() => MainMenu.OnResetRequested -= ResetStats;
+        private void OnDisable()
+        {
+            MainMenu.OnResetRequested -= ResetStats;
+            
+            GeneDrop.OnPickedUp -= OnGenePickup;
+            BreedingManager.OnBecomePregnant -= OnBecomePregnant;
+        }
 
-        public static void ResetStats()
+        private void ResetStats()
         {
             daysSurvived = 0;
             damageDealt = 0;
             enemyKills = 0;
             respawns = 0;
-            eggsLayed = 0;
+            eggsLaid = 0;
             eggsLost = 0;
             timesBreed = 0;
             genesCollected = 0;
@@ -41,12 +56,17 @@ namespace GameCycle
             sb.Append("Damage dealt").Append(": ").Append(damageDealt.ToString("n2")).Append("\n");
             sb.Append("Enemy kills").Append(": ").Append(enemyKills).Append("\n");
             sb.Append("Respawns").Append(": ").Append(respawns).Append("\n");
-            sb.Append("Eggs layed").Append(": ").Append(eggsLayed).Append("\n");
+            sb.Append("Eggs layed").Append(": ").Append(eggsLaid).Append("\n");
             sb.Append("Eggs lost").Append(": ").Append(eggsLost).Append("\n");
             sb.Append("Times breed").Append(": ").Append(timesBreed).Append("\n");
             sb.Append("Times mutated").Append(": ").Append(timesMutated).Append("\n");
             sb.Append("Genes collected").Append(": ").Append(genesCollected);
             return sb.ToString();
         }
+
+        private void OnGenePickup(GeneType type, int amount) => genesCollected += amount;
+
+        private void OnBecomePregnant() => timesBreed++;
+        private void OnEggsLaid(int amount) => eggsLaid += amount;
     }
 }

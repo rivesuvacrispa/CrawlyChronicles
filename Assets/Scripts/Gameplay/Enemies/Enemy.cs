@@ -7,7 +7,7 @@ using Gameplay.Food;
 using Gameplay.Map;
 using Gameplay.Mutations.AttackEffects;
 using Gameplay.Mutations.EntityEffects;
-using Player;
+using Gameplay.Player;
 using SoundEffects;
 using Timeline;
 using UI;

@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using GameCycle;
-using Player;
+using Gameplay.Player;
 using UI.Elements;
 using UI.Tooltips;
 using UnityEngine;

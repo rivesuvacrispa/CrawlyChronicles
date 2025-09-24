@@ -6,7 +6,7 @@ using SoundEffects;
 using UnityEngine;
 using Util;
 
-namespace Player
+namespace Gameplay.Player
 {
     [RequireComponent(typeof(Collider2D))]
     public class PlayerAttack : MonoBehaviour

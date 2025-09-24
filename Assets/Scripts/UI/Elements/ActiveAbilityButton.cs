@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using Definitions;
 using Gameplay.Mutations;
-using Player;
+using Gameplay.Player;
 using Scriptable;
 using Timeline;
 using UnityEngine;

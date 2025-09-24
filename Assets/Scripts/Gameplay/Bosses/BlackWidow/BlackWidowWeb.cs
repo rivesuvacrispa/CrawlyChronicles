@@ -1,7 +1,7 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using Player;
+using Gameplay.Player;
 using UnityEngine;
 using Util;
 

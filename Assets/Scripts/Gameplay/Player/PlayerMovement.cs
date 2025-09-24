@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using Util;
 
-namespace Player
+namespace Gameplay.Player
 {
     [RequireComponent(typeof(Rigidbody2D))]
     public class PlayerMovement : MonoBehaviour, ILocatorTarget

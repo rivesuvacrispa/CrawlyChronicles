@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using GameCycle;
+using Gameplay.Player;
 using UI;
 using UI.Menus;
 using UnityEngine;
@@ -83,7 +84,7 @@ namespace Timeline
             }
 
             lifespanText.text = "0:00";
-            Player.PlayerManager.Instance.Die(false);
+            PlayerManager.Instance.Die(false);
         }
         
         public void ResetLifespan()

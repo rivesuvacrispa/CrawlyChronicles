@@ -1,5 +1,7 @@
 ﻿
-namespace UI.Elements
+using UI.Elements;
+
+namespace UI.Player
 {
     public class PlayerHealthbar : Healthbar
     {

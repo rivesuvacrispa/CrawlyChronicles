@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Gameplay.Mutations.AttackEffects;
-using Player;
+using Gameplay.Player;
 using UnityEngine;
 using Util.Interfaces;
 

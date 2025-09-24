@@ -1,4 +1,4 @@
-﻿using Player;
+﻿using Gameplay.Player;
 using Scriptable;
 using UI.Elements;
 using UnityEngine;

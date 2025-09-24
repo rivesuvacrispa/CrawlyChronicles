@@ -1,6 +1,6 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
-using Player;
+using Gameplay.Player;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
