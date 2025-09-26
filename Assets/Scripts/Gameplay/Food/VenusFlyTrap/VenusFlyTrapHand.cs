@@ -10,6 +10,7 @@ namespace Gameplay.Food.VenusFlyTrap
 {
     public class VenusFlyTrapHand : MonoBehaviour
     {
+        // TODO: make sprites via Scriptable like Cacti
         [SerializeField] private VenusFlyTrap flyTrap;
         [SerializeField] private Sprite openedSprite;
         [FormerlySerializedAs("catchedSprite")] 

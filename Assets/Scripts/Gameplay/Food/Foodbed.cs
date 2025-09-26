@@ -1,9 +1,12 @@
-﻿using Definitions;
+﻿using System.Security.Cryptography;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using Definitions;
+using DG.Tweening;
 using Gameplay.AI.Locators;
 using Gameplay.Breeding;
 using Gameplay.Genes;
 using Gameplay.Interaction;
-using UI;
 using UI.Menus;
 using UnityEngine;
 using Util.Interfaces;
@@ -13,22 +16,22 @@ namespace Gameplay.Food
     public abstract class Foodbed : MonoBehaviour, ILocatorTarget, IFoodBed, IContinuouslyInteractable, INotificationProvider
     {
         [SerializeField] protected Scriptable.FoodBed scriptable;
-        [SerializeField] private SpriteRenderer spriteRenderer;
-        [SerializeField] private new ParticleSystem particleSystem;
         
         public int Amount { get; protected set; }
-        private Animator animator;
         private bool destructionInvoked;
+        private SpriteRenderer spriteRenderer;
+        private new ParticleSystem particleSystem;
 
         public FoodSpawnPoint FoodSpawnPoint { get; set; }
-        private static readonly int PopoutAnimHash = Animator.StringToHash("FoodbedPopout");
-        private static readonly int PopAnimHash = Animator.StringToHash("FoodbedPop");
+        private const float ANIMATION_DURATION = 0.25f;
 
 
         private void Awake()
         {
             MainMenu.OnResetRequested += OnResetRequested;
-            animator = GetComponent<Animator>();
+            spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+            particleSystem = GetComponentInChildren<ParticleSystem>();
+            transform.localScale = Vector3.zero;
         }
 
         protected virtual void Start()
@@ -38,12 +41,40 @@ namespace Gameplay.Food
             main.startColor = spriteRenderer.color;
             UpdateSprite();
             if(CreateNotification) GlobalDefinitions.CreateNotification(this);
+            PlayPopIn(gameObject.GetCancellationTokenOnDestroy()).Forget();
         }
 
         protected virtual void OnDestroy()
         {
             MainMenu.OnResetRequested -= OnResetRequested;
             if(!destructionInvoked) OnProviderDestroy?.Invoke();
+        }
+
+        private async UniTask PlayPopIn(CancellationToken cancellationToken)
+        {
+            await DOTween.Sequence()
+                .Append(transform.DOScale(Vector3.one * 1.25f, ANIMATION_DURATION * 0.75f))
+                .Append(transform.DOScale(Vector3.one, ANIMATION_DURATION * 0.25f))
+                .AsyncWaitForCompletion().AsUniTask().AttachExternalCancellation(cancellationToken);
+        }
+
+        private async UniTask PlayPopOut(CancellationToken cancellationToken)
+        {
+            await DOTween.Sequence()
+                .Append(transform.DOScale(Vector3.one * 1.25f, ANIMATION_DURATION * 0.25f))
+                .Append(transform.DOScale(Vector3.zero, ANIMATION_DURATION * 0.75f))
+                .AsyncWaitForCompletion().AsUniTask().AttachExternalCancellation(cancellationToken);
+            
+            Destroy(gameObject);
+        }
+        
+        private async UniTask PlayPop(CancellationToken cancellationToken)
+        {
+            await DOTween.Sequence()
+                .Append(transform.DOScale(Vector3.one * 0.75f, ANIMATION_DURATION * 0.2f))
+                .Append(transform.DOScale(Vector3.one * 1.25f, ANIMATION_DURATION * 0.5f))
+                .Append(transform.DOScale(Vector3.one, ANIMATION_DURATION * 0.3f))
+                .AsyncWaitForCompletion().AsUniTask().AttachExternalCancellation(cancellationToken);
         }
         
         public bool Eat()
@@ -53,14 +84,14 @@ namespace Gameplay.Food
             Amount--;
             if (Amount <= 0)
             {
-                animator.Play(PopoutAnimHash);
+                PlayPopOut(gameObject.GetCancellationTokenOnDestroy()).Forget();
                 OnProviderDestroy?.Invoke();
                 destructionInvoked = true;
                 if(FoodSpawnPoint is not null) FoodSpawnPoint.Clear();
             }
             else
             {
-                animator.Play(PopAnimHash);
+                PlayPop(gameObject.GetCancellationTokenOnDestroy()).Forget();
                 OnDataUpdate?.Invoke();
                 UpdateSprite();
             }
@@ -92,7 +123,11 @@ namespace Gameplay.Food
         }
 
         public void OnInteractionStart() => particleSystem.Play();
-        public void OnInteractionStop() => particleSystem.Stop();
+
+        public void OnInteractionStop()
+        {
+        }
+
         public virtual bool CanInteract() => Amount > 0;
         public float InteractionTime => 1f;
         public float PopupDistance => 1.25f;
