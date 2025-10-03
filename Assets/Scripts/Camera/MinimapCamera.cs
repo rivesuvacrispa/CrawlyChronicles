@@ -1,4 +1,5 @@
 ﻿using Gameplay.Map;
+using Scriptable;
 using UnityEngine;
 
 namespace Camera
@@ -22,7 +23,7 @@ namespace Camera
             camera.orthographicSize = MapManager.MinimapScale;
         }
 
-        private void OnAfterMapLoad()
+        private void OnAfterMapLoad(Map _)
         {
             camera.orthographicSize = MapManager.MinimapScale;
         }

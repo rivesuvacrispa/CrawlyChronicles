@@ -23,8 +23,8 @@ namespace Gameplay.AI
         [SerializeField] private Collider2D physicsCollider;
 
         [field: SerializeField] public AIState StartingState { get; set; } = AIState.Enter;
-        
-        private Enemy enemy;
+
+        protected Enemy enemy;
         private CallbackableAIPath aiPath;
         private AIDestinationSetter destinationSetter;
         private float defaultReachDistance;
@@ -34,6 +34,7 @@ namespace Gameplay.AI
         public AIState CurrentState { get; private set; }
         private float speedMultiplier = 1;
         private float currentSpeed = 1;
+        private bool locatorDismissed;
 
         public float SpeedMultiplier
         {
@@ -105,7 +106,7 @@ namespace Gameplay.AI
             StartingState = newState;
         }
 
-        private void SetEnter()
+        protected virtual void SetEnter()
         {
             SetEtherial(true);
             SetDefaultReachDistance();
@@ -195,17 +196,26 @@ namespace Gameplay.AI
         
 
         // Utility
-        private void PickRandomDestination()
+        public bool TryGetRandomPointAround(Vector3 from, int radius, out Vector3 point)
         {
-            var startNode = AstarPath.active.GetNearest(enemy.Position).node;
-            var nodes = PathUtilities.BFS(startNode, enemy.Scriptable.WanderingRadius);
-            if(nodes.Count == 0) return;
-            var randomPoint = PathUtilities.GetPointsOnNodes(nodes, 1)[0];
-            aiPath.destination = randomPoint;
-            aiPath.SearchPath();
+            point = default;
+            var startNode = AstarPath.active.GetNearest(from).node;
+            var nodes = PathUtilities.BFS(startNode, radius);
+            if(nodes.Count == 0) return false;
+            point = PathUtilities.GetPointsOnNodes(nodes, 1)[0];
+            return true;
         }
         
-        private void DoNotRepath() => aiPath.autoRepath.mode = AutoRepathPolicy.Mode.Never;
+        private void PickRandomDestination()
+        {
+            if (TryGetRandomPointAround(transform.position, enemy.Scriptable.WanderingRadius, out Vector3 point))
+            {
+                aiPath.destination = point;
+                aiPath.SearchPath();
+            }
+        }
+
+        protected void DoNotRepath() => aiPath.autoRepath.mode = AutoRepathPolicy.Mode.Never;
         private void AutoRepath() => aiPath.autoRepath.mode = AutoRepathPolicy.Mode.Dynamic;
         private void UpdateMovementSpeed() => aiPath.maxSpeed = currentSpeed * enemy.Scriptable.MovementSpeed * SpeedMultiplier;
 
@@ -243,9 +253,26 @@ namespace Gameplay.AI
 
         private void OnFollowTargetDestroy() => SetState(AIState.Wander);
 
-        private void SetDefaultReachDistance() => aiPath.endReachedDistance = defaultReachDistance;
-        private void DisableLocator() => locator.gameObject.SetActive(false);
-        private void EnableLocator() => locator.gameObject.SetActive(true);
+        protected void SetDefaultReachDistance() => aiPath.endReachedDistance = defaultReachDistance;
+        protected void DisableLocator() => locator.gameObject.SetActive(false);
+        private void EnableLocator()
+        {
+            if (!locatorDismissed)
+                locator.gameObject.SetActive(true);
+        }
+
+        public void DismissLocator()
+        {
+            locatorDismissed = true;
+            DisableLocator();
+        }
+
+        public void UndismissLocator()
+        {
+            locatorDismissed = false;
+            EnableLocator();
+        }
+
         private void OnDestroy()
         {
             locator.OnTargetLocated -= OnLocatorTriggered;

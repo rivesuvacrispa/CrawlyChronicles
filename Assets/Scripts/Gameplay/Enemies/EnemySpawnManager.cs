@@ -19,6 +19,7 @@ namespace Gameplay.Enemies
     {
         [SerializeField] private List<Enemy> neutrals = new();
         [SerializeField] private List<Enemy> enemies = new();
+        [SerializeField] private List<EnemyWave> waves = new();
         [Header("Spawn rates")]
         [SerializeField] private float neutralsPerMinute;
         [SerializeField] private float enemyPerMinute;
@@ -43,7 +44,8 @@ namespace Gameplay.Enemies
 
         private void SpawnEnemy(Enemy toSpawn)
         {
-            if(BossSpawner.BossAlive) return;
+            if(toSpawn is null || BossSpawner.BossAlive) return;
+            
             Enemy enemy = Instantiate(toSpawn, MapManager.GameObjectsTransform);
             enemy.gameObject.name = $"{toSpawn.name}#{enemyCounter}";
             var spawnPoint = MapManager.GetRandomSpawnPoint();
@@ -68,15 +70,22 @@ namespace Gameplay.Enemies
             await UniTask.Delay(TimeSpan.FromSeconds(1f), cancellationToken: cancellationToken);
             
             float delay = 60f / (currentEnemyPerMinute + currentEnemyPerDay * (day - 1));
-            var wave = enemies.Where(enemy => enemy.Scriptable.CanSpawnSinceDay <= day)
+            // var wave = enemies.Where(enemy => enemy.Scriptable.CanSpawnSinceDay <= day)
+            //     .OrderBy(_ => Random.value)
+            //     .Take(Random.Range(2, 5))
+            //     .ToArray();
+            // var len = wave.Length;
+
+            var wave = waves.Where(wave => wave.CanSpawnFromDay <= day)
                 .OrderBy(_ => Random.value)
-                .Take(Random.Range(2, 5))
-                .ToArray();
-            var len = wave.Length;
+                .FirstOrDefault();
+            
+            if (wave is null) return;
+            
             while (!cancellationToken.IsCancellationRequested)
             {
-                var enemy = wave[Random.Range(0, len)];
-                SpawnEnemy(enemy);
+                // var enemy = wave[Random.Range(0, len)];
+                SpawnEnemy(wave.GetRandomEnemy());
                 await UniTask.Delay(TimeSpan.FromSeconds(delay), cancellationToken: cancellationToken);
             }
         }

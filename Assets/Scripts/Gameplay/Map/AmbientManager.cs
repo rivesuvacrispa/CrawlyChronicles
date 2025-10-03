@@ -20,6 +20,7 @@ namespace Gameplay.Map
 
         private void OnDisable()
         {
+            
             TimeManager.OnDayStart -= OnDayStart;
             TimeManager.OnNightStart -= OnNightStart;
         }

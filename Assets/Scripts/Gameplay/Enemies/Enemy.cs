@@ -110,7 +110,7 @@ namespace Gameplay.Enemies
             reckoned = false;
         }
 
-        public void Die()
+        public virtual void Die()
         {
             Debug.Log($"[{gameObject.name}] died, all coroutines are stopped");
             CurrentHealth = 0;

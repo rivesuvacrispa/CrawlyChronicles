@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Definitions;
 using Gameplay.Enemies;
 using Gameplay.Mutations.AttackEffects;
@@ -14,6 +15,7 @@ namespace Gameplay.Player
         [SerializeField] private PlayerMovement movement;
         [SerializeField] private TrailRenderer trailRenderer;
         [SerializeField, Range(0, 1)] private float basicEffectChance;
+        [SerializeField] private ParticleSystem parryParticles;
 
         public delegate void AttackEffectCollectionEvent(List<AttackEffect> effects);
         public static event AttackEffectCollectionEvent OnAttackEffectCollectionRequested;
@@ -36,6 +38,8 @@ namespace Gameplay.Player
                 float force = PlayerManager.PlayerStats.AttackPower;
                 movement.Knockback(point, force);
                 enemy.Reckon(point, force);
+                parryParticles.transform.position = col.contacts.First().point;
+                parryParticles.Play();
             }
         }
 

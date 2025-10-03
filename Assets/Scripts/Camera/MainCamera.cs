@@ -7,19 +7,22 @@ namespace Camera
     {
         [SerializeField] private FollowMovement followMovement;
         [SerializeField] private FreeMovement freeMovement;
+        [SerializeField] private new UnityEngine.Camera camera;
 
-        private UnityEngine.Camera cam;
+        public static UnityEngine.Camera Camera => instance.camera;
         private static MainCamera instance;
         
         public static Vector2 WorldMousePos { get; private set; }
         public static FollowMovement FollowMovement => instance.followMovement;
 
+        
+        
+        private MainCamera() => instance = this;
 
         public static void ToggleFreeMode()
         {
             instance.followMovement.enabled = false;
             instance.freeMovement.enabled = true;
-
         }
 
         public static void ToggleFollowMode()
@@ -31,8 +34,7 @@ namespace Camera
         private void Awake()
         {
             freeMovement.enabled = false;
-            instance = this;
-            cam = GetComponent<UnityEngine.Camera>();
+            camera = GetComponent<UnityEngine.Camera>();
         }
 
         private void Update()
@@ -41,7 +43,7 @@ namespace Camera
                 ToggleFollowMode();
             else if(Input.GetKeyDown(KeyCode.PageUp))
                 ToggleFreeMode();
-            WorldMousePos = cam.ScreenToWorldPoint(Input.mousePosition);
+            WorldMousePos = camera.ScreenToWorldPoint(Input.mousePosition);
         }
     }
 }

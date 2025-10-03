@@ -11,7 +11,7 @@ namespace Gameplay.Enemies.Enemies
     {
         [SerializeField] private SpriteRenderer eggSpriteRenderer;
         
-        private Egg holdingEgg;
+        protected Egg holdingEgg;
 
         public delegate void AntEggStealerEvent();
         public static event AntEggStealerEvent OnEggStolen;
@@ -49,7 +49,7 @@ namespace Gameplay.Enemies.Enemies
 
         protected override void OnDamageTaken()
         {
-            if(holdingEgg is not null) DropEgg();
+            if (holdingEgg is not null) DropEgg();
             AttackPlayer();
         }
 

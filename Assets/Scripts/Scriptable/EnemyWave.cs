@@ -41,16 +41,17 @@ namespace Scriptable
 
         public Gameplay.Enemies.Enemy GetRandomEnemy()
         {
+            if (enemies.Count == 1) return enemies[0].Prefab;
+            
             float step = 0;
             float rnd = Random.value;
             foreach (WaveEnemy e in enemies)
             {
                 step += e.ActualSpawnRate;
-                if(rnd > step) continue;
-                return e.Prefab;
+                if(rnd <= step) return e.Prefab;
             }
 
-            return enemies[Random.Range(0, enemies.Count)].Prefab;
+            return null;
         }
         
         private void OnValidate()

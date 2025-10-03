@@ -8,6 +8,7 @@ namespace Gameplay.Map
 {
     public class MapManager : MonoBehaviour
     {
+        [SerializeField] private Scriptable.Map map;
         [Header("References")]
         [SerializeField] private Transform enemySpawnPointsTransform;
         [SerializeField] private Transform foodSpawnPointsTransform;
@@ -22,7 +23,7 @@ namespace Gameplay.Map
         private static MapManager instance;
         private static readonly List<EnemySpawnLocation> EnemySpawnPoints = new();
         private static readonly List<FoodSpawnPoint> FoodSpawnPoints = new();
-        public delegate void MapManagerEvent();
+        public delegate void MapManagerEvent(Scriptable.Map map);
         public static event MapManagerEvent OnAfterMapLoad;
         public static bool AllSpawnPointsInitialized => EnemySpawnPoints.All(loc => loc.Initialized);
         public static Transform MapCenter => instance.mapCenterTransform;
@@ -33,6 +34,7 @@ namespace Gameplay.Map
         public static Transform MinPoint => instance.minPoint;
         public static Transform MaxPoint => instance.maxPoint;
         public static float MinimapScale => instance.minimapScale;
+        public static Scriptable.Map Map => instance.map;
         
         
         
@@ -44,7 +46,7 @@ namespace Gameplay.Map
             InitEnemySpawnPoints();
             InitFoodSpawnPoints();
             
-            OnAfterMapLoad?.Invoke();
+            OnAfterMapLoad?.Invoke(map);
         }
 
         private void InitEnemySpawnPoints()

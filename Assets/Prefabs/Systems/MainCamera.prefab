@@ -5036,6 +5036,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   followMovement: {fileID: 4564519102342106568}
   freeMovement: {fileID: 7651728803720897388}
+  camera: {fileID: 871497969704319869}
 --- !u!20 &871497969704319869
 Camera:
   m_ObjectHideFlags: 0
@@ -5169,5 +5170,3 @@ MonoBehaviour:
   minZoom: 0
   maxZoom: 0
   zoomStep: 0
-  minPoint: {fileID: 0}
-  maxPoint: {fileID: 0}

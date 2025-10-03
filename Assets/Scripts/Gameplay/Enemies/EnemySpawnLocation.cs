@@ -22,7 +22,7 @@ namespace Gameplay.Enemies
 
         private void OnDisable() => MapManager.OnAfterMapLoad -= OnMapLoad;
 
-        private void OnMapLoad() => Initialized = false;
+        private void OnMapLoad(Scriptable.Map _) => Initialized = false;
 
         private void Awake()
         {

@@ -38,7 +38,7 @@ namespace Util.Interfaces
             damage = piercing ? damage : PhysicsUtility.CalculateDamage(damage, Armor);
 
             CurrentHealth -= damage;
-            
+            Debug.Log($"{((Component)this).gameObject.name} damaged for {damage}, piercing: {piercing}");
             OnDamageTakenGlobal?.Invoke(this, damage);
             OnBeforeHit(damage, position, knockback, stunDuration, damageColor, piercing, effect);
             
