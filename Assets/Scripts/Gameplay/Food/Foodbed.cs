@@ -47,7 +47,7 @@ namespace Gameplay.Food
         protected virtual void OnDestroy()
         {
             MainMenu.OnResetRequested -= OnResetRequested;
-            if(!destructionInvoked) OnProviderDestroy?.Invoke();
+            if(!destructionInvoked) OnProviderDestroy?.Invoke(this);
         }
 
         private async UniTask PlayPopIn(CancellationToken cancellationToken)
@@ -85,7 +85,7 @@ namespace Gameplay.Food
             if (Amount <= 0)
             {
                 PlayPopOut(gameObject.GetCancellationTokenOnDestroy()).Forget();
-                OnProviderDestroy?.Invoke();
+                OnProviderDestroy?.Invoke(this);
                 destructionInvoked = true;
                 if(FoodSpawnPoint is not null) FoodSpawnPoint.Clear();
             }

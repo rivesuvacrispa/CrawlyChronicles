@@ -8,6 +8,7 @@ using UI.Menus;
 using UnityEngine;
 using UnityEngine.UI;
 using Util;
+using Util.Interfaces;
 
 namespace Gameplay.Bosses
 {
@@ -85,15 +86,15 @@ namespace Gameplay.Bosses
         {
             TimeManager.OnNightStart -= OnNightStart;
             TimeManager.OnDayStart -= OnDayStart;
-            OnProviderDestroy();
+            OnProviderDestroy(currentBoss);
         }
 
-        private void OnProviderDestroy()
+        private void OnProviderDestroy(IDestructionEventProvider provider)
         {
             if(currentBoss is null) return;
             if (SettingsMenu.SelectedDifficulty.OverallDifficulty is OverallDifficulty.Peaceful)
                 TimeManager.Instance.StartDay();
-            currentBoss.OnProviderDestroy -= OnProviderDestroy;
+            provider.OnProviderDestroy -= OnProviderDestroy;
             currentBoss = null;
         }
     }

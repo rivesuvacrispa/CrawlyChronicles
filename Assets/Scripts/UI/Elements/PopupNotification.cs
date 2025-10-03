@@ -40,10 +40,10 @@ namespace UI.Elements
 
         private void UpdateText() => popupText.text = provider.NotificationText;
 
-        private void OnProviderDestroy()
+        private void OnProviderDestroy(IDestructionEventProvider target)
         {
             provider.OnDataUpdate -= UpdateText;
-            provider.OnProviderDestroy -= OnProviderDestroy;
+            target.OnProviderDestroy -= OnProviderDestroy;
             provider = null;
             Destroy(gameObject);
         }

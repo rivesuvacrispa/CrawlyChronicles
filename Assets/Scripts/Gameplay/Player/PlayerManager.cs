@@ -166,7 +166,7 @@ namespace Gameplay.Player
 
         private void OnDestroy()
         {
-            OnProviderDestroy?.Invoke();
+            OnProviderDestroy?.Invoke(this);
             TimeManager.OnDayStart -= OnDayStart;
             MainMenu.OnResetRequested -= OnResetRequested;
         }

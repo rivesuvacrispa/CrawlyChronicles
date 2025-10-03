@@ -204,7 +204,7 @@ namespace Gameplay.Breeding
 
         private void OnDestroy()
         {
-            OnProviderDestroy?.Invoke();
+            OnProviderDestroy?.Invoke(this);
             GeneDrop.OnPickedUp -= AddGene;
             MainMenu.OnResetRequested -= OnResetRequested;
             SettingsMenu.OnDifficultyChanged -= OnDifficultyChanged;

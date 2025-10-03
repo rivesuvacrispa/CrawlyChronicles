@@ -49,7 +49,7 @@ namespace Gameplay.Breeding
         private void OnDestroy()
         {
             RespawnManager.OnEggCollectionRequested -= OnEggBedsCollectionRequested;
-            OnProviderDestroy?.Invoke();
+            OnProviderDestroy?.Invoke(this);
             MainMenu.OnResetRequested -= OnResetRequested;
         }
 

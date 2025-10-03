@@ -1,6 +1,7 @@
 ﻿using Camera;
 using UnityEngine;
 using UnityEngine.UI;
+using Util.Interfaces;
 
 namespace Gameplay.Selection
 {
@@ -32,9 +33,9 @@ namespace Gameplay.Selection
 
         private void UpdatePosition() => transform.localPosition = UICamera.Camera.WorldToScreenPoint(selectableObject.Transform.position);
 
-        private void OnProviderDestroy()
+        private void OnProviderDestroy(IDestructionEventProvider target)
         {
-            selectableObject.OnProviderDestroy -= OnProviderDestroy;
+            target.OnProviderDestroy -= OnProviderDestroy;
             Destroy(gameObject);
         }
     }

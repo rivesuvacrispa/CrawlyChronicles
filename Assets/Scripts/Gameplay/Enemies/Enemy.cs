@@ -260,7 +260,7 @@ namespace Gameplay.Enemies
         
         protected virtual void OnDestroy()
         {
-            OnProviderDestroy?.Invoke();
+            OnProviderDestroy?.Invoke(this);
             MainMenu.OnResetRequested -= OnResetRequested;
             UnsubEvents();
         }

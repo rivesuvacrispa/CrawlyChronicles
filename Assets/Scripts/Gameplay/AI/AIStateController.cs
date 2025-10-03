@@ -251,7 +251,7 @@ namespace Gameplay.AI
             currentFollowTarget = null;
         }
 
-        private void OnFollowTargetDestroy() => SetState(AIState.Wander);
+        private void OnFollowTargetDestroy(IDestructionEventProvider provider) => SetState(AIState.Wander);
 
         protected void SetDefaultReachDistance() => aiPath.endReachedDistance = defaultReachDistance;
         protected void DisableLocator() => locator.gameObject.SetActive(false);

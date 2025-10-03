@@ -3,6 +3,7 @@ using Gameplay.AI.Locators;
 using Gameplay.Breeding;
 using Gameplay.Food;
 using UnityEngine;
+using Util.Interfaces;
 
 namespace Gameplay.Enemies.Enemies
 {
@@ -33,9 +34,9 @@ namespace Gameplay.Enemies.Enemies
             stateController.SetState(AIState.Follow, worker, reachDistance: 1f);
         }
 
-        private void OnFollowTargetDestroy()
+        private void OnFollowTargetDestroy(IDestructionEventProvider target)
         {
-            currentFollowTarget.OnProviderDestroy -= OnFollowTargetDestroy;
+            target.OnProviderDestroy -= OnFollowTargetDestroy;
             currentFollowTarget = null;
         }
 

@@ -49,7 +49,7 @@ namespace Gameplay.Bosses.AntColony
         private void OnDestroy()
         {
             GlobalDefinitions.CreateEggSquash(transform.position);
-            OnProviderDestroy?.Invoke();
+            OnProviderDestroy?.Invoke(this);
             MainMenu.OnResetRequested -= OnResetRequested;
         }
 

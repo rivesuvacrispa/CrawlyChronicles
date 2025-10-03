@@ -108,10 +108,10 @@ namespace UI.Elements
             catchImage.color = catchImage.color.WithAlpha(alpha);
         }
 
-        private void OnDamageableDestroy()
+        private void OnDamageableDestroy(IDestructionEventProvider provider)
         {
-            target.OnProviderDestroy -= OnDamageableDestroy;
-            Destroy(gameObject);
+            provider.OnProviderDestroy -= OnDamageableDestroy;
+            if (!Application.isEditor) Destroy(gameObject);
         }
         
         protected void UpdateWidth() => 

@@ -136,7 +136,7 @@ namespace Gameplay.Bosses.Terrorwing
 
         private void OnDestroy()
         {
-            OnProviderDestroy?.Invoke();
+            OnProviderDestroy?.Invoke(this);
             particleCollisionProvider.OnCollision -= OnBulletCollision;
         }
         

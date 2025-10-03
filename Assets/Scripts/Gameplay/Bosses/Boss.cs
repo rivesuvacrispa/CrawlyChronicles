@@ -112,7 +112,7 @@ namespace Gameplay.Bosses
             UnsubFromEvents();
             Bossbar.Instance.Die();
             destructionInvoked = true;
-            OnProviderDestroy?.Invoke();
+            OnProviderDestroy?.Invoke(this);
             return true;
         }
         

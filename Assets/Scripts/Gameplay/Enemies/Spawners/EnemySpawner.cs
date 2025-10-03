@@ -47,7 +47,7 @@ namespace Gameplay.Enemies.Spawners
         private void OnDestroy()
         {
             MainMenu.OnResetRequested -= OnResetRequested;
-            OnProviderDestroy?.Invoke();
+            OnProviderDestroy?.Invoke(this);
         }
 
         private void OnResetRequested() => Destroy(gameObject);

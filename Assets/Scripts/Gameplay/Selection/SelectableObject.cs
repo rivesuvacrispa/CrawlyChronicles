@@ -26,7 +26,7 @@ namespace Gameplay.Selection
         protected virtual void OnDestroy()
         {
             if(Selected) OnUnselected?.Invoke(this);
-            OnProviderDestroy?.Invoke();
+            OnProviderDestroy?.Invoke(this);
         }
 
         public void SetSelected(bool isSelected, SelectableObjectBrowserItem browserItem = null)
