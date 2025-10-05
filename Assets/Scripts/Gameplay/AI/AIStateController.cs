@@ -112,6 +112,9 @@ namespace Gameplay.AI
             SetDefaultReachDistance();
             DisableLocator();
             DoNotRepath();
+            
+            if (enemy.SpawnLocation is null) return;
+            
             destinationSetter.enabled = false;
             aiPath.enabled = true;
             aiPath.SetPath(enemy.SpawnLocation.EnteringPath);
