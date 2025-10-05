@@ -27,6 +27,7 @@ namespace Util.Interfaces
             bool piercing = false,
             AttackEffect effect = null)
         {
+            Struck();
             if (Immune) return 0;
 
             if (damage is float.NaN or 0f)
@@ -67,6 +68,8 @@ namespace Util.Interfaces
         {
             
         }
+        
+        public void Struck() { }
 
         public bool TryBlockDamage(
             float damage,

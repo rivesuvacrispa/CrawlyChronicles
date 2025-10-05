@@ -40,7 +40,7 @@ namespace Gameplay.Mutations.Passive
             particleSystem.Play();
         }
         
-        private void OnStruck(float dmg)
+        private void OnStruck()
         {
             if(Random.value <= GetPassiveProcRate(procRate)) Activate();
         }
@@ -59,13 +59,13 @@ namespace Gameplay.Mutations.Passive
         protected override void OnDisable()
         {
             base.OnDisable();
-            PlayerHitbox.OnStruck -= OnStruck;
+            PlayerManager.OnStruck -= OnStruck;
         }
 
         protected override void OnEnable()
         {
             base.OnEnable();
-            PlayerHitbox.OnStruck += OnStruck;
+            PlayerManager.OnStruck += OnStruck;
         }
         
         public override string GetLevelDescription(int lvl, bool withUpgrade)

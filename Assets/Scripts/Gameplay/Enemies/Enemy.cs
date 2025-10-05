@@ -27,7 +27,7 @@ namespace Gameplay.Enemies
      RequireComponent(typeof(Rigidbody2D)),
      RequireComponent(typeof(AIStateController)),
     RequireComponent(typeof(EffectController))]
-    public abstract class Enemy : MonoBehaviour, IDamageableEnemy, IEnemyAttack, IImpactEffectAffectable
+    public abstract class Enemy : MonoBehaviour, IDamageableEnemy, IImpactEffectAffectable
     {
         [FormerlySerializedAs("Fearless")] 
         [SerializeField] protected bool fearless;
@@ -323,12 +323,6 @@ namespace Gameplay.Enemies
         {
             if(!hitbox.Dead) effectController.AddEffect<T>(data);
         }
-        
-                
-        // IEnemyAttack
-        public Vector3 AttackPosition => transform.position;
-        public float AttackDamage => scriptable.Damage;
-        public float AttackPower => scriptable.AttackPower;
         
 
         // IDamageable

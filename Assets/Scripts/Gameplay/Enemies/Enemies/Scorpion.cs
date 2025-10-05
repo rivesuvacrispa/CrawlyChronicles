@@ -53,8 +53,8 @@ namespace Gameplay.Enemies.Enemies
 
         public override void Die()
         {
-            base.Die();
             tail.gameObject.SetActive(false);
+            base.Die();
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
 using Util;
-using Util.Interfaces;
 
 namespace Gameplay.Player
 {
@@ -15,21 +14,7 @@ namespace Gameplay.Player
         
         public bool BlockColorChange { get; set; }
 
-        public delegate void PlayerHitboxEvent(float damage);
-        public static event PlayerHitboxEvent OnStruck;
         
-        
-        
-        private void OnCollisionEnter2D(Collision2D col)
-        {
-            if (col.gameObject.TryGetComponent(out IEnemyAttack attack))
-            {
-                OnStruck?.Invoke(0);
-                ((IDamageable)PlayerManager.Instance)
-                    .Damage(attack.AttackDamage, attack.AttackPosition, 
-                        attack.AttackPower, 0, default);
-            }
-        }
 
         public void Hit() => StartCoroutine(ImmunityRoutine());
 

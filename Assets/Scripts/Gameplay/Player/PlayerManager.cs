@@ -57,7 +57,8 @@ namespace Gameplay.Player
         public delegate void PlayerManagerEvent();
         public static event PlayerManagerEvent OnPlayerKilled;
         public static event PlayerManagerEvent OnPlayerRespawned;
-        
+        public delegate void PlayerHitboxEvent();
+        public static event PlayerHitboxEvent OnStruck;
         
         
         public PlayerManager() => Instance = this;
@@ -222,6 +223,11 @@ namespace Gameplay.Player
             PlayerAudioController.Instance.PlayHit();
             movement.Knockback(position, knockback);
             UpdateHealthbar();
+        }
+
+        public void Struck()
+        {
+            OnStruck?.Invoke();
         }
     }
 }
