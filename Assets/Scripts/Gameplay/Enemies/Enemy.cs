@@ -1,4 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using Definitions;
 using GameCycle;
 using Gameplay.AI;
@@ -40,14 +43,15 @@ namespace Gameplay.Enemies
         protected Rigidbody2D rb;
         protected AIStateController stateController;
         private Healthbar healthbar;
-        private Coroutine attackRoutine;
         private EffectController effectController;
 
         protected bool spawnedBySpawner;
         private bool stunned;
         private float attackDelay;
         private bool reckoned;
-
+        private bool isAttacking;
+        private CancellationTokenSource attackCancellationTokenSource;
+    
         [field:SerializeField] public EnemySpawnLocation SpawnLocation { get; set; }
         public Scriptable.Enemy Scriptable => scriptable;
         public Vector2 Position => rb.position;
@@ -134,18 +138,18 @@ namespace Gameplay.Enemies
 
         protected void StopAttack()
         {
-            if(attackRoutine is not null) 
-                StopCoroutine(attackRoutine);
+            CancelAttack();
             stateController.ReturnMoveControl();
-            attackRoutine = null;
             attackGO.SetActive(false);
-            if(scriptable.HasAttackAnimation) PlayCrawl();
+            isAttacking = false;
+            if (scriptable.HasAttackAnimation) PlayCrawl();
         }
         
         private void BasicAttack()
         {
-            if(attackRoutine is not null || stunned) return;
-            attackRoutine = StartCoroutine(AttackRoutine());
+            if(isAttacking || stunned) return;
+            attackCancellationTokenSource = new CancellationTokenSource();
+            AttackTask(attackCancellationTokenSource.Token).Forget();
         }
 
         protected virtual void AttackPlayer(float reachDistance = 0)
@@ -159,34 +163,41 @@ namespace Gameplay.Enemies
         
         
         // Routines & utils
-        private IEnumerator AttackRoutine()
+        private async UniTask AttackTask(CancellationToken cancellationToken)
         {
             Debug.Log($"[{gameObject.name}] attacked");
             stateController.TakeMoveControl();
-            
+            isAttacking = true;
+
             float t = attackDelay * 0.5f;
             while (t > 0)
             {
                 if(!rb.freezeRotation) rb.RotateTowardsPosition(PlayerMovement.Position, 5);
                 t -= Time.deltaTime;
-                yield return null;
+                await UniTask.Yield(cancellationToken: cancellationToken);
             }
-            
             audioController.PlayAction(scriptable.AttackAudio);
             attackGO.SetActive(true);
             if(scriptable.HasAttackAnimation) animator.Play(scriptable.AttackAnimHash);
-            var playerPos = PlayerMovement.Position;
-            if(!rb.freezeRotation) rb.RotateTowardsPosition(playerPos, 90);
-            rb.AddClampedForceTowards(playerPos, scriptable.AttackPower, ForceMode2D.Impulse);
             
-            yield return new WaitForSeconds(0.4f);
+            await PerformAttack(cancellationToken);
 
             if(scriptable.HasAttackAnimation) PlayCrawl();
             attackGO.SetActive(false);
             stateController.ReturnMoveControl();
-            yield return new WaitForSeconds(attackDelay * 0.5f);
+            
+            await UniTask.Delay(TimeSpan.FromSeconds(scriptable.AttackCooldown), cancellationToken: cancellationToken);
             attackDelay = scriptable.AttackDelay;
-            attackRoutine = null;
+            isAttacking = false;
+        }
+
+        protected virtual async UniTask PerformAttack(CancellationToken cancellationToken)
+        {
+            var playerPos = PlayerMovement.Position;
+            if(!rb.freezeRotation) rb.RotateTowardsPosition(playerPos, 90);
+            rb.AddClampedForceTowards(playerPos, scriptable.AttackPower, ForceMode2D.Impulse);
+
+            await UniTask.Delay(TimeSpan.FromSeconds(0.4f), cancellationToken: cancellationToken);
         }
         
         private IEnumerator DeathRoutine()
@@ -253,6 +264,13 @@ namespace Gameplay.Enemies
             stateController.ReturnMoveControl();
         }
 
+        private void CancelAttack()
+        {
+            attackCancellationTokenSource?.Cancel();
+            attackCancellationTokenSource?.Dispose();
+            attackCancellationTokenSource = null;
+        }
+
 
         private void ClearEffects() => effectController.ClearAll();
         
@@ -284,7 +302,11 @@ namespace Gameplay.Enemies
 
         private void UnsubEvents() => TimeManager.OnDayStart -= OnDayStart;
 
-        private void OnResetRequested() => Destroy(gameObject);
+        // TODO: REMOVE
+        private void OnResetRequested()
+        {
+            // Destroy(gameObject);
+        }
 
         public void OnSpawnedBySpawner()
         {

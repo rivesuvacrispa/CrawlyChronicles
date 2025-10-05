@@ -9,7 +9,6 @@ namespace Scriptable
     [CreateAssetMenu(menuName = "Scriptable/Enemy")]
     public class Enemy : ScriptableObject
     {
-        [SerializeField] private int canSpawnSinceDay;
         [Header("Utility fields")] 
         [SerializeField] private bool hasAttackAnimation;
         [SerializeField] private string animatorName;
@@ -25,6 +24,7 @@ namespace Scriptable
         [Header("Undepended stats")] 
         [SerializeField] private float attackPower;
         [SerializeField] private float attackDelay = 0.75f;
+        [SerializeField] private float attackCooldown = 0.75f;
         [SerializeField] private float attackDistance = 1;
         [SerializeField] private float movementSpeed;
         [SerializeField] private LocatorRadius locatorRadius;
@@ -38,9 +38,9 @@ namespace Scriptable
         [SerializeField] private AudioClip deathAudio;
         [SerializeField, ShowOnly] private float crawlPitch;
         
-        public int CanSpawnSinceDay => canSpawnSinceDay;
         public float AttackDistance => attackDistance;
         public float AttackDelay => attackDelay;
+        public float AttackCooldown => attackCooldown;
         public Color BodyColor => bodyColor;
         public float HealthbarOffsetY => healthbarOffsetY;
         public float HealthbarWidth => healthbarWidth;
