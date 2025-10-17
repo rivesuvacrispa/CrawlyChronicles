@@ -193,6 +193,7 @@ Transform:
   - {fileID: 2944116110300859018}
   - {fileID: 3662102388219165180}
   - {fileID: 4313237793265977411}
+  - {fileID: 785960595074383650}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1367721013064143186
@@ -218,7 +219,7 @@ MonoBehaviour:
   - {fileID: 296665208053243611, guid: 5850f5dfd2532fd4a8117131ce586293, type: 3}
   - {fileID: 5791994495516304184, guid: c66bb320bf40d8541a833a7d8bcbe237, type: 3}
   - {fileID: 8569129828654399206, guid: 2bddac7f725a92d468ff6dadf54c9bb0, type: 3}
-  enemySpawnPointsTransform: {fileID: 0}
+  waves: []
   neutralsPerMinute: 5
   enemyPerMinute: 8
   enemyPerDayModifier: 5
@@ -237,13 +238,6 @@ MonoBehaviour:
   mutationRerollCost: 0.25
   breedingFoodRequirement: 10
   pregnancyDuration: 5
-  breedingMenu: {fileID: 0}
-  geneDisplay: {fileID: 0}
-  animator: {fileID: 0}
-  breedingParticles: {fileID: 0}
-  geneConsumer: {fileID: 0}
-  totalEggsText: {fileID: 0}
-  foodText: {fileID: 0}
   <TrioGene>k__BackingField:
     trio: 000000000000000000000000
 --- !u!114 &351631042682434398
@@ -260,12 +254,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startingFoodAmount: 2
   foodPerMinute: 3
-  foodbeds:
-  - {fileID: 1317463161264974708, guid: 002af2e5176307749bcb9636f012555e, type: 3}
-  - {fileID: -6488629084233672351, guid: 1e9e67d772529b84dbebb68f7402673d, type: 3}
-  - {fileID: 1232958798674175962, guid: 6c13f5b4d7a0d334e8084dec8c05a506, type: 3}
-  - {fileID: 8855612132003499519, guid: 46b2b052724d1634b891417e9eaa9fa2, type: 3}
-  foodSpawnPointsTransform: {fileID: 0}
 --- !u!114 &545065140663182426
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -280,7 +268,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   globalVolume: {fileID: 0}
   defaultSpriteMaterial: {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
-  mapCenterTransform: {fileID: 0}
   mutationCostPerLevel: 5
   romanDigits:
   - I
@@ -301,7 +288,6 @@ MonoBehaviour:
   - {fileID: -1979080858, guid: ad50a52d29376aa41b1c31b8258c4933, type: 3}
   - {fileID: -1768184750, guid: ad50a52d29376aa41b1c31b8258c4933, type: 3}
   puddleSprite: {fileID: 21300000, guid: c3086972f8a404a47bc239aa5150488a, type: 3}
-  gameObjectsTransform: {fileID: 0}
   worldCanvasTransform: {fileID: 0}
   eggGeneEntropy: 3
   breedingPartnersGeneEntropy: 5
@@ -338,8 +324,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc3310bb5ed64b409c8159ccc54fc748, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  followMovement: {fileID: 0}
-  viewer: {fileID: 0}
   respawnMenuGO: {fileID: 0}
   eggBedSelectionText: {fileID: 0}
   leftArrow: {fileID: 0}
@@ -371,7 +355,6 @@ MonoBehaviour:
   dayDurationInSeconds: 60
   nightDurationInSeconds: 120
   playerLifespanInSeconds: 300
-  fireflyParticles: {fileID: 0}
   references:
     version: 2
     RefIds: []
@@ -725,6 +708,78 @@ MonoBehaviour:
       value: 300
     - difficulty: 2
       value: 400
+--- !u!1 &5443916223384818344
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 785960595074383650}
+  - component: {fileID: 692073219796638008}
+  - component: {fileID: 2400319367458857455}
+  - component: {fileID: 7748280455524426101}
+  m_Layer: 0
+  m_Name: PoolManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &785960595074383650
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5443916223384818344}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8820603034017726712}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &692073219796638008
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5443916223384818344}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdd8fa61a276465b95ed09e4ed02383f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2400319367458857455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5443916223384818344}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c81c1a790f741709635d39daf949510, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 5284204345424624925, guid: d510784cc50fe814a8bca62266773272, type: 3}
+--- !u!114 &7748280455524426101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5443916223384818344}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffa5dc12306e438798a2fa8c5ff292aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 6516815546525395641, guid: e9c1c6d7da9722e43b07593b4c251f43, type: 3}
 --- !u!1 &7979541223099638131
 GameObject:
   m_ObjectHideFlags: 0

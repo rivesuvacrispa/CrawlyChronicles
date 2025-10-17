@@ -1,4 +1,5 @@
 ﻿using Gameplay.Mutations.AttackEffects;
+using Pooling;
 using UnityEngine;
 
 namespace Util.Interfaces
@@ -42,7 +43,8 @@ namespace Util.Interfaces
             Debug.Log($"{((Component)this).gameObject.name} damaged for {damage}, piercing: {piercing}");
             OnDamageTakenGlobal?.Invoke(this, damage);
             OnBeforeHit(damage, position, knockback, stunDuration, damageColor, piercing, effect);
-            
+
+            PoolManager.GetEffect<DamageText>(new DamageTextArguments(Transform.position, damage));
             if (CurrentHealth <= float.Epsilon)
             {
                 OnLethalBlow?.Invoke(this);
