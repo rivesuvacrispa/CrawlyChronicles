@@ -9,26 +9,26 @@ namespace Camera
         [SerializeField] private FreeMovement freeMovement;
         [SerializeField] private new UnityEngine.Camera camera;
 
-        public static UnityEngine.Camera Camera => instance.camera;
-        private static MainCamera instance;
+        public static UnityEngine.Camera Camera => Instance.camera;
+        public static MainCamera Instance { get; private set; }
         
         public static Vector2 WorldMousePos { get; private set; }
-        public static FollowMovement FollowMovement => instance.followMovement;
+        public static FollowMovement FollowMovement => Instance.followMovement;
 
         
         
-        private MainCamera() => instance = this;
+        private MainCamera() => Instance = this;
 
         public static void ToggleFreeMode()
         {
-            instance.followMovement.enabled = false;
-            instance.freeMovement.enabled = true;
+            Instance.followMovement.enabled = false;
+            Instance.freeMovement.enabled = true;
         }
 
         public static void ToggleFollowMode()
         {
-            instance.followMovement.enabled = true;
-            instance.freeMovement.enabled = false;
+            Instance.followMovement.enabled = true;
+            Instance.freeMovement.enabled = false;
         }
         
         private void Awake()

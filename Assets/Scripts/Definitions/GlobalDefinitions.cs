@@ -61,6 +61,7 @@ namespace Definitions
         public static float InteractionDistance => instance.interactionDistance;
         public static int EnemyPhysicsLayerMask { get; private set; }
         public static int EnemyAttackLayerMask { get; private set; }
+        public static int EnemyHitboxLayerMask { get; private set; }
         public static int DefaultLayerMask { get; private set; }
         public static Sprite PuddleSprite => instance.puddleSprite;
         public static Color EggPuddleColor => instance.eggPuddleColor;
@@ -138,6 +139,7 @@ namespace Definitions
             instance = this;
             EnemyPhysicsLayerMask = LayerMask.NameToLayer("EnemyPhysics");
             EnemyAttackLayerMask = LayerMask.NameToLayer("EnemyAttacks");
+            EnemyHitboxLayerMask = LayerMask.NameToLayer("EnemyHitbox");
             DefaultLayerMask = LayerMask.NameToLayer("Default");
             globalVolumeProfile = globalVolume.profile;
             deathGradient = new Gradient();

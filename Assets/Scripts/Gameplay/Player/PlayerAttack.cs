@@ -29,14 +29,13 @@ namespace Gameplay.Player
         
         private void OnCollisionEnter2D(Collision2D col)
         {
-            if (!AttackController.IsInComboDash &&
-                col.collider.gameObject.layer.Equals(GlobalDefinitions.EnemyAttackLayerMask) && 
+            if (col.collider.gameObject.layer.Equals(GlobalDefinitions.EnemyAttackLayerMask) && 
                 col.gameObject.TryGetComponent(out Enemy enemy))
             {
                 PlayerAudioController.Instance.PlayReckoning();
                 Vector2 point = col.contacts[0].point;
                 float force = PlayerManager.PlayerStats.AttackPower;
-                movement.Knockback(point, force);
+                if(!AttackController.IsInComboDash) movement.Knockback(point, force);
                 enemy.Reckon(point, force);
                 parryParticles.transform.position = col.contacts.First().point;
                 parryParticles.Play();
@@ -68,8 +67,15 @@ namespace Gameplay.Player
         public void Enable()
         {
             OnAttackEffectCollectionRequested?.Invoke(effects);
-            if(GetRandomEffect(out var effect)) ApplyEffect(effect);
-            else ResetEffect();
+            AttackEffect guaranteed = effects.FirstOrDefault(e => e.Guaranteed);
+            
+            if (guaranteed is not null) 
+                ApplyEffect(guaranteed);
+            else if (GetRandomEffect(out var effect)) 
+                ApplyEffect(effect);
+            else 
+                ResetEffect();
+            
             IsActive = true;
             gameObject.SetActive(true);
         }
