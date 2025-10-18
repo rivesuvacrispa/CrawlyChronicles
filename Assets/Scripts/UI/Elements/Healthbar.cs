@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 using Util;
@@ -15,7 +16,7 @@ namespace UI.Elements
         [SerializeField] private float catchSpeed;
 
         private IDamageable target;
-        protected Coroutine currentRoutine;
+        private Tween currentTween;
 
 
         public void SetTarget(IDamageable damageable)
@@ -27,13 +28,11 @@ namespace UI.Elements
         
         public void SetValue(float value)
         {
-            Debug.Log($"Healthbar value: {value}");
             mainImage.fillAmount = value;
             SetAlpha(1f);
             UpdatePosition();
             enabled = true;
-            if(currentRoutine is not null) StopCoroutine(currentRoutine);
-            currentRoutine = StartCoroutine(CatchRoutine(value));
+            StartCatch(value);
         }
         
         private void Start()
@@ -55,53 +54,33 @@ namespace UI.Elements
             pos.y += target.HealthbarOffsetY;
             transform.localPosition = pos;
         }
+
+        private void StartCatch(float finalValue)
+        {
+            currentTween?.Kill();
+            currentTween = catchImage.DOFillAmount(finalValue, catchSpeed).SetSpeedBased().OnComplete(() =>
+            {
+                currentTween = null;
+                OnValueCatch(finalValue);
+            });
+        }
         
-        private IEnumerator CatchRoutine(float finalValue)
+        protected virtual void OnValueCatch(float value)
         {
-            while (Mathf.Abs(catchImage.fillAmount - mainImage.fillAmount) > 0.01f)
+            StartFade(value <= float.Epsilon ? 1f : 3f);
+        }
+        
+        protected void StartFade(float duration)
+        {
+            currentTween?.Kill();
+            currentTween = DOTween.To(GetAlpha, SetAlpha, 0f, duration).OnComplete(() =>
             {
-                catchImage.fillAmount = Mathf.MoveTowards(catchImage.fillAmount, mainImage.fillAmount,
-                    catchSpeed * Time.deltaTime);
-                yield return null;
-            }
-
-            catchImage.fillAmount = finalValue;
-
-            OnValueCatched(finalValue);
+                currentTween = null;
+                SetAlpha(0f);
+                enabled = false;
+            });
         }
-
-        protected virtual void OnValueCatched(float value)
-        {
-            currentRoutine = StartCoroutine(value <= float.Epsilon ? DeathRoutine() : FadeRoutine());
-        }
-
-        private IEnumerator DeathRoutine()
-        {
-            float t = 0;
-            while (t < 1f)
-            {
-                SetAlpha(1 - t);   
-                t += Time.deltaTime;
-                yield return null;
-            }
-            SetAlpha(0);
-            enabled = false;
-        }
-
-        protected IEnumerator FadeRoutine()
-        {
-            float t = 0;
-            yield return new WaitForSeconds(2f);
-            while (t < 1f)
-            {
-                SetAlpha(1 - t);
-                t += Time.deltaTime;
-                yield return null;
-            }
-            SetAlpha(0f);
-            enabled = false;
-        }
-
+        
         private void SetAlpha(float alpha)
         {
             bgImage.color = bgImage.color.WithAlpha(alpha * 0.8f);
@@ -109,8 +88,11 @@ namespace UI.Elements
             catchImage.color = catchImage.color.WithAlpha(alpha);
         }
 
+        private float GetAlpha() => mainImage.color.a;
+
         private void OnDamageableDestroy(IDestructionEventProvider provider)
         {
+            currentTween?.Kill();
             provider.OnProviderDestroy -= OnDamageableDestroy;
             if (!Application.isEditor) Destroy(gameObject);
         }

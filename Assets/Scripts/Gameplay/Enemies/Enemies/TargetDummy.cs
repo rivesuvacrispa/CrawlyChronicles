@@ -49,7 +49,6 @@ namespace Gameplay.Enemies.Enemies
 
         private void UpdateHealthbar()
         {
-            Debug.Log($"Update healthbar: {CurrentHealth}/{scriptable.MaxHealth}, val: {Mathf.Clamp01(CurrentHealth / scriptable.MaxHealth)}");
             healthbar.SetValue(Mathf.Clamp01(CurrentHealth / scriptable.MaxHealth));
         }
         

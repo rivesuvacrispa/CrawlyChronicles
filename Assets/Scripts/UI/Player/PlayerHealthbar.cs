@@ -5,9 +5,9 @@ namespace UI.Player
 {
     public class PlayerHealthbar : Healthbar
     {
-        protected override void OnValueCatched(float health)
+        protected override void OnValueCatch(float health)
         {
-            currentRoutine = StartCoroutine(FadeRoutine());
+            StartFade(1f);
         }
     }
 }
