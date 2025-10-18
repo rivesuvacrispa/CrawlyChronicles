@@ -1,4 +1,5 @@
-﻿using Gameplay.Mutations.AttackEffects;
+﻿using Definitions;
+using Gameplay.Mutations.AttackEffects;
 using Pooling;
 using UnityEngine;
 
@@ -33,6 +34,8 @@ namespace Util.Interfaces
 
             if (damage is float.NaN or 0f)
                 damage = float.Epsilon;
+            
+            if (damageColor == default) damageColor = Color.white;
 
             if (TryBlockDamage(damage, position, knockback, stunDuration, damageColor, piercing, effect))
                 return 0;

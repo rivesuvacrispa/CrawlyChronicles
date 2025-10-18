@@ -9,7 +9,7 @@ namespace SoundEffects
 {
     public class AudioController : MonoBehaviour
     {
-        [FormerlySerializedAs("pausable")] [SerializeField] private bool pauseable;
+        [SerializeField] private bool pauseable;
         [SerializeField] protected AudioSource actionSource;
         [SerializeField] protected AudioSource stateSource;
         

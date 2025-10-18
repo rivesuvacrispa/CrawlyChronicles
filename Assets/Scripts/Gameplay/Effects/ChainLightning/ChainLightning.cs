@@ -3,14 +3,13 @@ using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Definitions;
-using Gameplay.Player;
-using SoundEffects;
+using Pooling;
 using UnityEngine;
 using Util.Interfaces;
 using Util.Particles;
 using Random = UnityEngine.Random;
 
-namespace Pooling
+namespace Gameplay.Effects.ChainLightning
 {
     public class ChainLightning : Poolable
     {

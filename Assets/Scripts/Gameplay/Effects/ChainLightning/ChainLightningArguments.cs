@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using Util.Interfaces;
 
-namespace Pooling
+namespace Gameplay.Effects.ChainLightning
 {
     public readonly struct ChainLightningArguments
     {

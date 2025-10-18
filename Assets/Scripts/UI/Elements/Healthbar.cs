@@ -17,6 +17,7 @@ namespace UI.Elements
 
         private IDamageable target;
         private Tween currentTween;
+        private float catchImageAlpha = 1f;
 
 
         public void SetTarget(IDamageable damageable)
@@ -57,6 +58,7 @@ namespace UI.Elements
 
         private void StartCatch(float finalValue)
         {
+            SetCatchImageAlpha(1f);
             currentTween?.Kill();
             currentTween = catchImage.DOFillAmount(finalValue, catchSpeed).SetSpeedBased().OnComplete(() =>
             {
@@ -72,6 +74,7 @@ namespace UI.Elements
         
         protected void StartFade(float duration)
         {
+            SetCatchImageAlpha(0f);
             currentTween?.Kill();
             currentTween = DOTween.To(GetAlpha, SetAlpha, 0f, duration).OnComplete(() =>
             {
@@ -85,6 +88,12 @@ namespace UI.Elements
         {
             bgImage.color = bgImage.color.WithAlpha(alpha * 0.8f);
             mainImage.color = mainImage.color.WithAlpha(alpha);
+            catchImage.color = catchImage.color.WithAlpha(alpha * catchImageAlpha);
+        }
+        
+        private void SetCatchImageAlpha(float alpha)
+        {
+            catchImageAlpha = alpha;
             catchImage.color = catchImage.color.WithAlpha(alpha);
         }
 

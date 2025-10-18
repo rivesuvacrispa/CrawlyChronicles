@@ -19,7 +19,7 @@ namespace Util
             initialColor = spriteRenderer.color;
         }
 
-        public Color Color => spriteRenderer.color;
+        public Color CurrentColor => spriteRenderer.color;
         
         public void Paint(Gradient gradient, float duration)
         {
