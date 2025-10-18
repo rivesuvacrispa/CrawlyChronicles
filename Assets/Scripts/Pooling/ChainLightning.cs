@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Definitions;
+using Gameplay.Player;
+using SoundEffects;
 using UnityEngine;
 using Util.Interfaces;
 using Util.Particles;
@@ -12,16 +15,16 @@ namespace Pooling
     public class ChainLightning : Poolable
     {
         [SerializeField] private new ParticleSystemLineRenderer particleSystem;
-
+        [SerializeField] private AudioSource audioSource;
+        
         private ChainLightningArguments currentArgs;
-        private static readonly Collider[] OverlapResults = new Collider[8];
-        private static readonly IDamageableEnemy[] DamageableEnemies = new IDamageableEnemy[8];
         
         
         
         public override bool OnTakenFromPool(object data)
         {
             if (data is not ChainLightningArguments args) return false;
+            // transform.position = Vector3.zero;
             currentArgs = args;
             Activate();
             return base.OnTakenFromPool(data);
@@ -30,50 +33,57 @@ namespace Pooling
         private void Activate()
         {
             DamageTarget();
-            IDamageable target = CreateArc();
-
             CancellationToken cancellationToken = gameObject.GetCancellationTokenOnDestroy();
-            
-            if (target is not null && currentArgs.currentJump < currentArgs.maxNumberOfJumps)
+
+            if (currentArgs.currentJump < currentArgs.maxNumberOfJumps && TryCreateArc(out IDamageable target))
                 PropagateTask(target, cancellationToken).Forget();
 
             PoolTask(cancellationToken).Forget();
         }
 
-        private IDamageable CreateArc()
+        private bool TryCreateArc(out IDamageable target)
         {
-            var size = Physics.OverlapSphereNonAlloc(
-                transform.position, 
-                currentArgs.chainRange, 
-                OverlapResults, 
-                layerMask: GlobalDefinitions.EnemyPhysicsLayerMask);
-
-            int damageables = 0;
-            for (var i = 0; i < size; i++)
+            target = null;
+            var cols = Physics2D.OverlapCircleAll(currentArgs.position, currentArgs.chainRange, layerMask: GlobalDefinitions.EnemyPhysicsLayerMask);
+            
+            foreach (Collider2D col in cols.OrderBy((_) => Random.value))
             {
-                if (!OverlapResults[i].TryGetComponent(out IDamageableEnemy damageableEnemy) ||
-                    damageableEnemy.Equals(currentArgs.currentTarget)) continue;
-                
-                DamageableEnemies[damageables] = damageableEnemy;
-                damageables++;
+                if (!col.TryGetComponent(out IDamageableEnemy damageableEnemy) ||
+                    damageableEnemy.Equals(currentArgs.currentTarget) ||
+                    damageableEnemy.Immune) continue;
+
+                target = damageableEnemy;
+                break;
+            }
+            
+            if (target is null)
+            {
+                particleSystem.PlayOnAwake = false;
+                audioSource.playOnAwake = false;
+                return false;
             }
 
-            if (damageables == 0) return null;
-
-            IDamageable target = DamageableEnemies[Random.Range(0, damageables)];
-
-            Vector3 fromPos = transform.position;
-            Vector3 toPos = target.Transform.position;
+            particleSystem.PlayOnAwake = true;
+            audioSource.playOnAwake = true;
+            audioSource.pitch = Random.Range(1, 1.2f);
+            
+            Vector3 fromPos = transform.TransformPoint(currentArgs.position);
+            Vector3 toPos = transform.TransformPoint(target.Transform.position);
             float distance = Vector2.Distance(fromPos, toPos);
-            int steps = Mathf.RoundToInt(distance / 0.5f);
+            
+            int steps = Mathf.RoundToInt(distance / 0.25f);
             Vector3[] positions = new Vector3[steps + 2];
             positions[0] = fromPos;
             positions[steps + 1] = toPos;
-            for (int i = 1; i < steps; i++) 
-                positions[i] = Vector3.MoveTowards(fromPos, toPos, i / distance);
+            Vector3 current = fromPos;
+            for (int i = 1; i <= steps; i++)
+            {
+                current = Vector3.MoveTowards(current, toPos, 0.25f);
+                positions[i] = current;
+            }
 
             particleSystem.Play(positions);
-            return target;
+            return true;
         }
 
         private void DamageTarget()
@@ -90,18 +100,20 @@ namespace Pooling
 
         private async UniTask PropagateTask(IDamageable damageable, CancellationToken cancellationToken)
         {
-            await UniTask.Delay(TimeSpan.FromSeconds(0.1f), cancellationToken: cancellationToken);
+            await UniTask.Delay(TimeSpan.FromSeconds(0.2f), cancellationToken: cancellationToken);
             PropagateChain(damageable);
         }
 
         private void PropagateChain(IDamageable damageable)
         {
+            var targetPos = damageable.Transform.position;
             PoolManager.GetEffect<ChainLightning>(new ChainLightningArguments(
                 currentArgs.damage * 0.75f, 
                 currentArgs.chainRange, 
                 currentArgs.maxNumberOfJumps, 
                 damageable, 
-                currentArgs.currentJump + 1), damageable.Transform.position);
+                currentArgs.currentJump + 1,
+                targetPos));
         }
     }
 }

@@ -59,9 +59,10 @@ namespace Definitions
         public static float WanderingSpeedMultiplier => instance.wanderingSpeedMultiplier;
         public static float FleeingSpeedMultiplier => instance.fleeingSpeedMultiplier;
         public static float InteractionDistance => instance.interactionDistance;
-        public static int EnemyPhysicsLayerMask { get; private set; }
-        public static int EnemyAttackLayerMask { get; private set; }
-        public static int EnemyHitboxLayerMask { get; private set; }
+        public static int EnemyPhysicsLayer { get; private set; }
+        public static LayerMask EnemyPhysicsLayerMask { get; private set; }
+        public static int EnemyAttackLayer { get; private set; }
+        public static int EnemyHitboxLayer { get; private set; }
         public static int DefaultLayerMask { get; private set; }
         public static Sprite PuddleSprite => instance.puddleSprite;
         public static Color EggPuddleColor => instance.eggPuddleColor;
@@ -137,10 +138,13 @@ namespace Definitions
         private void Awake()
         {
             instance = this;
-            EnemyPhysicsLayerMask = LayerMask.NameToLayer("EnemyPhysics");
-            EnemyAttackLayerMask = LayerMask.NameToLayer("EnemyAttacks");
-            EnemyHitboxLayerMask = LayerMask.NameToLayer("EnemyHitbox");
+            EnemyPhysicsLayer = LayerMask.NameToLayer("EnemyPhysics");
+            EnemyAttackLayer = LayerMask.NameToLayer("EnemyAttacks");
+            EnemyHitboxLayer = LayerMask.NameToLayer("EnemyHitbox");
             DefaultLayerMask = LayerMask.NameToLayer("Default");
+
+            EnemyPhysicsLayerMask = LayerMask.GetMask("EnemyPhysics");
+            
             globalVolumeProfile = globalVolume.profile;
             deathGradient = new Gradient();
             deathGradient.SetKeys(

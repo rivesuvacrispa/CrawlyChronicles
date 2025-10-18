@@ -29,7 +29,7 @@ namespace Gameplay.Player
         
         private void OnCollisionEnter2D(Collision2D col)
         {
-            if (col.collider.gameObject.layer.Equals(GlobalDefinitions.EnemyAttackLayerMask) && 
+            if (col.collider.gameObject.layer.Equals(GlobalDefinitions.EnemyAttackLayer) && 
                 col.gameObject.TryGetComponent(out Enemy enemy))
             {
                 PlayerAudioController.Instance.PlayReckoning();

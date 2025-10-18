@@ -41,7 +41,7 @@ namespace Gameplay.Breeding
 
         private void OnCollisionEnter2D(Collision2D col)
         {
-            if(immune || !col.gameObject.layer.Equals(GlobalDefinitions.EnemyPhysicsLayerMask)) return;
+            if(immune || !col.gameObject.layer.Equals(GlobalDefinitions.EnemyPhysicsLayer)) return;
             Squash();
         }
 

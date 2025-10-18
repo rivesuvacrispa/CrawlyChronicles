@@ -52,9 +52,10 @@ namespace Gameplay.Mutations.Passive
         private void OnImpact(IImpactable impactable, float _)
         {
             if (impactable is not IDamageable damageable) return;
-            
+
+            var targetPos = damageable.Transform.position;
             PoolManager.GetEffect<ChainLightning>(new ChainLightningArguments(
-                damage, chainRange, maxNumberOfJumps, damageable, 0), damageable.Transform.position);
+                damage, chainRange, maxNumberOfJumps, damageable, 0, targetPos));
         }
 
         private void OnAttackEffectCollectionRequested(List<AttackEffect> effects)

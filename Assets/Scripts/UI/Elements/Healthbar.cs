@@ -27,6 +27,7 @@ namespace UI.Elements
         
         public void SetValue(float value)
         {
+            Debug.Log($"Healthbar value: {value}");
             mainImage.fillAmount = value;
             SetAlpha(1f);
             UpdatePosition();

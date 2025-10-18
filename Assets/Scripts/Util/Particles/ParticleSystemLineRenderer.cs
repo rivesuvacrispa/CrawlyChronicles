@@ -1,4 +1,5 @@
-﻿using Camera;
+﻿using System;
+using Camera;
 using UnityEngine;
 
 namespace Util.Particles
@@ -11,14 +12,19 @@ namespace Util.Particles
         private Mesh m;
         public ParticleSystem ParticleSystem => particleSystem;
         public bool IsPlaying => particleSystem.isPlaying;
-        
+        public bool PlayOnAwake { get; set; }
         
 
         public void Stop()
         {
             particleSystem.Stop();
         }
-        
+
+        private void OnEnable()
+        {
+            if (PlayOnAwake) particleSystem.Play();
+        }
+
         public void Play(Vector3[] positions)
         {
             lineRenderer.positionCount = positions.Length;
@@ -41,15 +47,10 @@ namespace Util.Particles
             shapeModule.shapeType = ParticleSystemShapeType.Mesh;
 
             var emissionModule = particleSystem.emission;
-            emissionModule.SetBurst(0, new ParticleSystem.Burst(0, m.triangles.Length + 2));
+            
+            emissionModule.SetBurst(0, new ParticleSystem.Burst(0, m.triangles.Length / 3 + 2));
             
             particleSystem.Play();
-        }
-
-        private void OnDrawGizmos()
-        {
-            Gizmos.color = Color.blue;
-            Gizmos.DrawMesh(m);
         }
     }
 }

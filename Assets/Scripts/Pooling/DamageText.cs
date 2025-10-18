@@ -32,7 +32,7 @@ namespace Pooling
 
         private async UniTask AnimationTask(CancellationToken cancellationToken)
         {
-            await text.DOColor(text.color.WithAlpha(0f), 0.9f)
+            await text.DOColor(text.color.WithAlpha(0f), 1.1f)
                 .AsyncWaitForCompletion()
                 .AsUniTask()
                 .AttachExternalCancellation(cancellationToken);
