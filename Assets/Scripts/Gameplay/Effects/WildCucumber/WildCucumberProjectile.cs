@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Camera;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Gameplay.Mutations;
@@ -85,6 +86,13 @@ namespace Gameplay.Effects.WildCucumber
                 c.attachedRigidbody.AddForce( (c.transform.position - transform.position).normalized *
                                               args.knockback,ForceMode2D.Impulse );
             }
+            
+            MainCamera.Instance.Shake(
+                1 - Mathf.Clamp01(
+                    Vector2.Distance(
+                        transform.position, 
+                        MainCamera.Instance.transform.position) 
+                    / 5f));
         }
 
         private void HideBody()

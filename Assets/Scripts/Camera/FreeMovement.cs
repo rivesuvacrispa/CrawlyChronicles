@@ -3,27 +3,22 @@ using UnityEngine;
 
 namespace Camera
 {
-    [RequireComponent(typeof(UnityEngine.Camera))]
     public class FreeMovement : MonoBehaviour
     {
-        [SerializeField] private UnityEngine.Camera uiCam;
+        [SerializeField] private UnityEngine.Camera uiCamera;
+        [SerializeField] private UnityEngine.Camera camera;
         [SerializeField] private float minZoom;
         [SerializeField] private float maxZoom;
         [SerializeField] private float zoomStep;
-
-
-        private UnityEngine.Camera cam;
+        
         private Vector3 dragOrigin;
     
-        private void Awake()
-        {
-            cam = GetComponent<UnityEngine.Camera>();
-        }
+        
 
         private void Update()
         {
             
-            Vector3 mouseWorldPos = cam.ScreenToWorldPoint(Input.mousePosition);
+            Vector3 mouseWorldPos = camera.ScreenToWorldPoint(Input.mousePosition);
         
             if (Input.GetMouseButtonDown(2))
                 dragOrigin = mouseWorldPos;
@@ -47,9 +42,9 @@ namespace Camera
             float wheel = Input.GetAxis("Mouse ScrollWheel");
             if (wheel != 0f)
             {
-                float size = Mathf.Clamp(cam.orthographicSize + wheel * zoomStep * -1, minZoom, maxZoom);
-                cam.orthographicSize = size;
-                uiCam.orthographicSize = size;
+                float size = Mathf.Clamp(camera.orthographicSize + wheel * zoomStep * -1, minZoom, maxZoom);
+                camera.orthographicSize = size;
+                uiCamera.orthographicSize = size;
             }
         }
     }

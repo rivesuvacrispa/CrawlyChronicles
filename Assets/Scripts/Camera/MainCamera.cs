@@ -1,8 +1,8 @@
-﻿using UnityEngine;
+﻿using DG.Tweening;
+using UnityEngine;
 
 namespace Camera
 {
-    [RequireComponent(typeof(UnityEngine.Camera))]
     public class MainCamera : MonoBehaviour
     {
         [SerializeField] private FollowMovement followMovement;
@@ -45,5 +45,7 @@ namespace Camera
                 ToggleFreeMode();
             WorldMousePos = camera.ScreenToWorldPoint(Input.mousePosition);
         }
+
+        public void Shake(float strength) => transform.DOShakePosition(0.5f, 0.075f * Mathf.Clamp01(strength), 30);
     }
 }

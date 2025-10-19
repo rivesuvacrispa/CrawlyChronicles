@@ -60767,7 +60767,7 @@ MonoBehaviour:
     movementSpeed: 0
     rotationSpeed: 0
     maxHealth: 0
-    attackPower: 2
+    attackPower: 0.5
     attackDamage: 5
     armor: 0
     immunityDuration: 0
