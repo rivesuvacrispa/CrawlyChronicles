@@ -15,7 +15,6 @@ namespace Gameplay.Mutations
         public BasicMutation Scriptable => scriptable;
         public BasicAbilityButton Button { get; set; }
         public int Level => level;
-        public bool Learned { get; private set; }
 
 
         protected static float GetPassiveProcRate(float proc) => proc * PlayerManager.PlayerStats.PassiveProcRate;
@@ -43,13 +42,11 @@ namespace Gameplay.Mutations
 
         protected virtual void OnDisable()
         {
-            Learned = false;
             Button.SetActive(false);
         }
 
         protected virtual void OnEnable()
         {
-            Learned = true;
             Button.SetActive(true);
         }
 

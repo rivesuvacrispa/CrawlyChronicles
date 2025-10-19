@@ -45,8 +45,12 @@ namespace Gameplay.Mutations.Passive
             if (Application.isPlaying)
 #endif
             {
-                ClearFlies();
-                SpawnFlies();
+
+                if (enabled)
+                {
+                    ClearFlies();
+                    SpawnFlies();
+                }
 #if UNITY_EDITOR
             }
 #endif
@@ -68,6 +72,18 @@ namespace Gameplay.Mutations.Passive
             foreach (Fly fly in flies) 
                 fly.Pool();
             flies.Clear();
+        }
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            SpawnFlies();
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            ClearFlies();
         }
     }
 }

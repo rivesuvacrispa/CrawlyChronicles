@@ -19,22 +19,25 @@ namespace Gameplay.Player
         [SerializeField] private BasicAbilityButton basicAbilityPrefab;
         [SerializeField] private Transform activeButtonsTransform;
         [SerializeField] private Transform basicButtonsTransform;
-        [SerializeField] private List<BasicAbility> allAbilities = new();
-
+        
+        private List<BasicAbility> allAbilities = new();
         private AbilityController() => instance = this;
-        private static readonly Dictionary<BasicMutation, BasicAbility> abilitiesDict = new();
+        private static readonly Dictionary<BasicMutation, BasicAbility> AbilitiesDict = new();
 
+        
+        
         private void Awake()
         {
             MainMenu.OnResetRequested += OnResetRequested;
+            allAbilities = gameObject.GetComponentsInChildren<BasicAbility>().ToList();
         }
 
         public static string GetAbilityLevelDescription(BasicMutation mutation, int lvl, bool withUpgrade) 
-            => abilitiesDict[mutation].GetLevelDescription(lvl, withUpgrade);
+            => AbilitiesDict[mutation].GetLevelDescription(lvl, withUpgrade);
 
         public void CreateUIElement(BasicAbility ability)
         {
-            abilitiesDict[ability.Scriptable] = ability;
+            AbilitiesDict[ability.Scriptable] = ability;
             if (ability is ActiveAbility activeAbility)
                 Instantiate(abilityButtonPrefab, activeButtonsTransform)
                     .SetAbility(activeAbility);
@@ -51,7 +54,7 @@ namespace Gameplay.Player
             {
                 var scriptable = ability.Scriptable;
                 bool hasAbility = eggAbilities.ContainsKey(scriptable);
-                ability.gameObject.SetActive(hasAbility);
+                ability.gameObject.SetActive(hasAbility || (PlayerManager.Instance.GodMode && ability.isActiveAndEnabled));
                 if (hasAbility)
                 {
                     ability.SetLevel(eggAbilities[scriptable], true);
@@ -62,7 +65,7 @@ namespace Gameplay.Player
         public static MutationData GetMutationData()
         {
             MutationData data = new MutationData();
-            foreach (var basicAbility in instance.allAbilities.Where(basicAbility => basicAbility.Learned))
+            foreach (var basicAbility in instance.allAbilities.Where(basicAbility => basicAbility.enabled))
                 data.Add(basicAbility.Scriptable, basicAbility.Level);
             return data;
         }

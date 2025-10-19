@@ -31,7 +31,7 @@ namespace Gameplay.Enemies.Spawners
             => ((IDamageable) spawner).Damage(
                 PlayerManager.PlayerStats.AttackDamage,
                 default, 0, 0, default, false,
-                PlayerAttack.CurrentAttackEffect);
+                effects: PlayerAttack.CurrentAttackEffects);
         
         public void Hit() => StartCoroutine(ImmunityRoutine());
 

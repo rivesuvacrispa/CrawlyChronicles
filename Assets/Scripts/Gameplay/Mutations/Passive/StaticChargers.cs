@@ -41,7 +41,7 @@ namespace Gameplay.Mutations.Passive
         
         protected override void Start()
         {
-            attackEffect = new AttackEffect(effectGradient, OnImpact, true);
+            attackEffect = new AttackEffect(effectGradient, OnImpact);
             base.Start();
         }
 

@@ -8,7 +8,7 @@ namespace Gameplay.Mutations.EntityEffects
     {
         protected EntityEffectData Data { get; private set; }
         protected int Duration { get; set; }
-        protected IImpactEffectAffectable Target { get; set; }
+        protected IEffectAffectable Target { get; set; }
         
         private Coroutine tickRoutine;
 
@@ -17,7 +17,7 @@ namespace Gameplay.Mutations.EntityEffects
         protected abstract void Tick();
         protected abstract void OnRemoved();
 
-        public EntityEffect SetTarget(IImpactEffectAffectable target)
+        public EntityEffect SetTarget(IEffectAffectable target)
         {
             Target = target;
             return this;

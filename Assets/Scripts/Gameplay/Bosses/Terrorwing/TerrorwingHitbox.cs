@@ -24,8 +24,10 @@ namespace Gameplay.Bosses.Terrorwing
         {
             if(!ContactDamage(col)) 
                 terrorwingClone.Damage(
-                    PlayerManager.PlayerStats.AttackDamage,
-                    effect: PlayerAttack.CurrentAttackEffect);
+                    PlayerManager.PlayerStats.AttackDamage, 
+                    PlayerManager.Instance.transform.position, 0f, 0f, 
+                    default, false,
+                    effects: PlayerAttack.CurrentAttackEffects);
         }
 
         private bool ContactDamage(Collider2D col)

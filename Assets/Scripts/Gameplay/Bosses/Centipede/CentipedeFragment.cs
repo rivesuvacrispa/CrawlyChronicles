@@ -2,7 +2,6 @@
 using Definitions;
 using GameCycle;
 using Gameplay.AI.Locators;
-using Gameplay.Mutations.AttackEffects;
 using Gameplay.Player;
 using UI;
 using UI.Elements;
@@ -230,20 +229,20 @@ namespace Gameplay.Bosses.Centipede
         public float CurrentHealth { get; set; }
         
         public void OnBeforeHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false, AttackEffect effect = null)
+            bool piercing = false)
         {
             UpdateHealthBar();
         }
 
         public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false, AttackEffect effect = null)
+            bool piercing = false)
         {
             Bossbar.Instance.Damage(damage + CurrentHealth);
             DieFromAttack();
         }
 
         public void OnHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false, AttackEffect effect = null)
+            bool piercing = false)
         {
             hitbox.Hit();
             Bossbar.Instance.Damage(damage);

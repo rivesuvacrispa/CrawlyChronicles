@@ -5244,7 +5244,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   movement: {fileID: 6983133238829123899}
   trailRenderer: {fileID: 4018306051927203253}
-  basicEffectChance: 0.33333334
   parryParticles: {fileID: 8718600790341747388}
 --- !u!1 &846585081890956888
 GameObject:
@@ -40330,8 +40329,8 @@ MonoBehaviour:
   seedsAmountLvl10: 15
   seedsDamageLvl1: 0.49
   seedsDamageLvl10: 3
-  knockbackLvl1: 0.01
-  knockbackLvl10: 5
+  knockbackLvl1: 1.5
+  knockbackLvl10: 3.5
   projectilePowerLv1: 5
   projectilePowerLv10: 10
   decayTime: 10
@@ -45649,23 +45648,6 @@ MonoBehaviour:
   basicAbilityPrefab: {fileID: 6751962458857041776, guid: 10457bc4480c6cc458a9ffe017590e9b, type: 3}
   activeButtonsTransform: {fileID: 0}
   basicButtonsTransform: {fileID: 0}
-  allAbilities:
-  - {fileID: 6579440865081987411}
-  - {fileID: 1871749621575353459}
-  - {fileID: 804098563170670623}
-  - {fileID: 6324311874393759860}
-  - {fileID: 6964277929183999660}
-  - {fileID: 4239004822918174763}
-  - {fileID: 1983936979021389240}
-  - {fileID: 4449928160693787111}
-  - {fileID: 1264774111996438854}
-  - {fileID: 2056719657694248823}
-  - {fileID: 6459489680629897401}
-  - {fileID: 1616196661716902433}
-  - {fileID: 3811895321112411915}
-  - {fileID: 1920349943510155961}
-  - {fileID: 5801552347951632113}
-  - {fileID: 8098779335802864900}
 --- !u!1 &7450714908605826538
 GameObject:
   m_ObjectHideFlags: 0
@@ -50947,8 +50929,6 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 3
     m_NumAlphaKeys: 2
-  cooldownLvl1: 3
-  cooldownLvl10: 1
   lifestealLvl1: 0.5
   lifestealLvl10: 2
 --- !u!1 &8576348064832527908

@@ -1,5 +1,4 @@
 ﻿using GameCycle;
-using Gameplay.Mutations.AttackEffects;
 using UI;
 using UI.Elements;
 using UnityEngine;
@@ -38,20 +37,20 @@ namespace Gameplay.Enemies.Spawners
         
 
         public void OnBeforeHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false, AttackEffect effect = null)
+            bool piercing = false)
         {
             UpdateHealthbar();
         }
 
         public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false, AttackEffect effect = null)
+            bool piercing = false)
         {
             OnDeath?.Invoke(this);
             Destroy(gameObject);
         }
 
         public void OnHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false, AttackEffect effect = null)
+            bool piercing = false)
         {
             hitbox.Hit();
         }

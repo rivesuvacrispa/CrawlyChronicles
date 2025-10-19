@@ -27,7 +27,7 @@ namespace Gameplay.Bosses.Centipede
             else
                 ((IDamageable)Fragment).Damage(
                 PlayerManager.PlayerStats.AttackDamage, default, 0, 
-                0, default, false, PlayerAttack.CurrentAttackEffect);
+                0, default, false, PlayerAttack.CurrentAttackEffects);
         }
 
         public void Hit() => StartCoroutine(ImmunityRoutine());

@@ -14,7 +14,6 @@ namespace Gameplay.Player
     {
         [SerializeField] private PlayerMovement movement;
         [SerializeField] private TrailRenderer trailRenderer;
-        [SerializeField, Range(0, 1)] private float basicEffectChance;
         [SerializeField] private ParticleSystem parryParticles;
 
         public delegate void AttackEffectCollectionEvent(List<AttackEffect> effects);
@@ -22,7 +21,7 @@ namespace Gameplay.Player
 
         private readonly List<AttackEffect> effects = new();
         public bool IsActive { get; private set; }
-        public static AttackEffect CurrentAttackEffect { get; private set;  }
+        public static readonly List<AttackEffect> CurrentAttackEffects = new();
         private readonly Gradient defaultGradient = new Gradient().FastGradient(Color.white, Color.white);
         
         
@@ -42,40 +41,29 @@ namespace Gameplay.Player
             }
         }
 
-        private bool GetRandomEffect(out AttackEffect effect)
-        {
-            effect = null;
-            if (effects.Count == 0 ||
-                Random.value > basicEffectChance * PlayerManager.PlayerStats.PassiveProcRate) 
-                return false;
-            effect = effects[Random.Range(0, effects.Count)];
-            return true;
-        }
-
         private void ApplyEffect(AttackEffect effect)
         {
             trailRenderer.colorGradient = effect.Color;
-            CurrentAttackEffect = effect;
         }
 
-        private void ResetEffect()
+        private void ResetEffects()
         {
             trailRenderer.colorGradient = defaultGradient;
-            CurrentAttackEffect = null;
+            CurrentAttackEffects.Clear();
         }
         
         public void Enable()
         {
             OnAttackEffectCollectionRequested?.Invoke(effects);
-            AttackEffect guaranteed = effects.FirstOrDefault(e => e.Guaranteed);
-            
-            if (guaranteed is not null) 
-                ApplyEffect(guaranteed);
-            else if (GetRandomEffect(out var effect)) 
-                ApplyEffect(effect);
-            else 
-                ResetEffect();
-            
+
+            ResetEffects();
+
+            if (effects.Count > 0)
+            {
+                CurrentAttackEffects.AddRange(effects);
+                ApplyEffect(CurrentAttackEffects.OrderBy(_ => Random.value).First());
+            }
+
             IsActive = true;
             gameObject.SetActive(true);
         }

@@ -129,6 +129,7 @@ namespace Gameplay.Effects.Fly
         public override void OnPool()
         {
             DropTarget(false);
+            DisposeCts();
             base.OnPool();
         }
 

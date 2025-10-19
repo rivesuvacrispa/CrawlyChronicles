@@ -2,7 +2,6 @@
 using Definitions;
 using Gameplay.Enemies;
 using Gameplay.Map;
-using Gameplay.Mutations.AttackEffects;
 using UI;
 using UI.Elements;
 using UI.Menus;
@@ -68,20 +67,20 @@ namespace Gameplay.Bosses.AntColony
         public float CurrentHealth { get; set; }
 
         public void OnBeforeHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false, AttackEffect effect = null)
+            bool piercing = false)
         {
             healthbar.SetValue(Mathf.Clamp01(CurrentHealth / maxHealth));
         }
 
         public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false, AttackEffect effect = null)
+            bool piercing = false)
         {
             Destroy(gameObject);
             hitbox.Die();
         }
 
         public void OnHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false, AttackEffect effect = null)
+            bool piercing = false)
         {
             hitbox.Hit();
         }

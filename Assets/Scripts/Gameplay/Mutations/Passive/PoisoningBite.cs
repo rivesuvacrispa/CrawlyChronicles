@@ -27,7 +27,7 @@ namespace Gameplay.Mutations.Passive
         
         protected override void Start()
         {
-            attackEffect = new AttackEffect(effectGradient, OnImpact, false);
+            attackEffect = new AttackEffect(effectGradient, OnImpact);
             base.Start();
         }
 
@@ -43,7 +43,7 @@ namespace Gameplay.Mutations.Passive
 
         private void OnImpact(IImpactable impactable, float _)
         {
-            if(impactable is IImpactEffectAffectable affectable)
+            if(impactable is IEffectAffectable affectable)
                 affectable.AddEffect<PoisonEntityEffect>(effectData);
         }
 

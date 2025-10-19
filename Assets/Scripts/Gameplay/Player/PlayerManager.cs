@@ -2,7 +2,6 @@
 using GameCycle;
 using Gameplay.Breeding;
 using Gameplay.Interaction;
-using Gameplay.Mutations.AttackEffects;
 using SoundEffects;
 using Timeline;
 using UI.Elements;
@@ -209,19 +208,19 @@ namespace Gameplay.Player
 
 
         public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false, AttackEffect effect = null)
+            bool piercing = false)
         {
             Die(true);
         }
 
         public void OnHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false, AttackEffect effect = null)
+            bool piercing = false)
         {
             hitbox.Hit();
         }
         
         public void OnBeforeHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false, AttackEffect effect = null)
+            bool piercing = false)
         {
             PlayerAudioController.Instance.PlayHit();
             movement.Knockback(position, knockback);

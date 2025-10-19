@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Gameplay.Map;
-using Gameplay.Mutations.AttackEffects;
 using Gameplay.Player;
 using UnityEngine;
 using Util;
@@ -420,13 +419,13 @@ namespace Gameplay.Bosses.Terrorwing
         public float CurrentHealth { get; set; }
         
         public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false, AttackEffect effect = null)
+            bool piercing = false)
         {
             Die(true);
         }
 
         public void OnHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false, AttackEffect effect = null)
+            bool piercing = false)
         {
             Bossbar.Instance.Damage(damage);
         }

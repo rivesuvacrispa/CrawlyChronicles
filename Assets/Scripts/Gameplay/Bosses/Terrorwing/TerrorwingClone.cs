@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Definitions;
@@ -173,31 +174,30 @@ namespace Gameplay.Bosses.Terrorwing
         public float Armor => 0;
         public float CurrentHealth { get; set; }
 
-        public float Damage(
-            float damage, 
-            Vector3 position = default, 
-            float knockback = 0f, 
-            float stunDuration = 0f, 
-            Color damageColor = default,
+        public float Damage(float damage,
+            Vector3 position,
+            float knockback,
+            float stunDuration,
+            Color damageColor,
             bool piercing = false,
-            AttackEffect effect = null)
+            List<AttackEffect> effects = null)
         {
             if(hitbox.Immune) return 0;
             if(rb.simulated) hitbox.Hit();
             PaintDamage();
             if(original) ((IDamageable)terrorwing).Damage(
-                damage, position, knockback, stunDuration, damageColor, piercing, effect);
+                damage, position, knockback, stunDuration, damageColor, piercing, effects);
             return damage;
         }
 
         public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false, AttackEffect effect = null)
+            bool piercing = false)
         {
             
         }
 
         public void OnHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false, AttackEffect effect = null)
+            bool piercing = false)
         {
             
         }

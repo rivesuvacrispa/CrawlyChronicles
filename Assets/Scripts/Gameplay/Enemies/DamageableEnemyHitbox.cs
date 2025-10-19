@@ -37,7 +37,7 @@ namespace Gameplay.Enemies
                 PlayerManager.PlayerStats.AttackPower,
                 0.35f, 
                 Color.white,
-                effect: PlayerAttack.CurrentAttackEffect);
+                effects: PlayerAttack.CurrentAttackEffects);
         }
         
         public void Enable()

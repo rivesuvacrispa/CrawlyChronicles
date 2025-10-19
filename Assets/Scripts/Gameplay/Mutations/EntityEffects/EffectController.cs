@@ -5,12 +5,12 @@ namespace Gameplay.Mutations.EntityEffects
 {
     public class EffectController : MonoBehaviour
     {
-        private IImpactEffectAffectable target;
+        private IEffectAffectable target;
         private GameObject effectsGO;
 
         private void Awake()
         {
-            target = GetComponent<IImpactEffectAffectable>();
+            target = GetComponent<IEffectAffectable>();
             effectsGO = new GameObject("Effects");
             effectsGO.transform.SetParent(transform);
         }

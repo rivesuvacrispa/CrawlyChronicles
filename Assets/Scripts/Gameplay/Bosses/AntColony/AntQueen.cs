@@ -6,7 +6,6 @@ using Definitions;
 using GameCycle;
 using Gameplay.Enemies;
 using Gameplay.Map;
-using Gameplay.Mutations.AttackEffects;
 using Gameplay.Mutations.EntityEffects;
 using Gameplay.Player;
 using UnityEngine;
@@ -16,7 +15,7 @@ using Random = UnityEngine.Random;
 
 namespace Gameplay.Bosses.AntColony
 {
-    public class AntQueen : Boss, IDamageableEnemy, IEnemyAttack, IImpactEffectAffectable
+    public class AntQueen : Boss, IDamageableEnemy, IEnemyAttack, IEffectAffectable
     {
         [Header("Refs")] 
         [SerializeField] private EffectController effectController;
@@ -212,12 +211,9 @@ namespace Gameplay.Bosses.AntColony
         public float AttackPower => 5;
         
         
-        // IImpactEffectAffectable
-        public void AddEffect<T>(EntityEffectData data) where T : EntityEffect
-        {
-            if(!hitbox.Dead) effectController.AddEffect<T>(data);
-        }
-
+        // IEffectAffectable
+        public EffectController EffectController => effectController;
+        public bool CanApplyEffect => !hitbox.Dead;
         
         // IDamageableEnemy
         public Transform Transform => transform;
@@ -229,13 +225,13 @@ namespace Gameplay.Bosses.AntColony
         public float CurrentHealth { get; set; }
 
         public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false, AttackEffect effect = null)
+            bool piercing = false)
         {
             Die();
         }
 
         public void OnHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false, AttackEffect effect = null)
+            bool piercing = false)
         {
             hitbox.Hit();
             Bossbar.Instance.Damage(damage);

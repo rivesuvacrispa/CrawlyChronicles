@@ -1,4 +1,5 @@
-﻿using Definitions;
+﻿using System.Collections.Generic;
+using Definitions;
 using Gameplay.Mutations.AttackEffects;
 using Pooling;
 using UnityEngine;
@@ -23,14 +24,13 @@ namespace Util.Interfaces
         public float Armor { get; }
         public float CurrentHealth { get; set; }
 
-        public float Damage(
-            float damage,
+        public float Damage(float damage,
             Vector3 position,
             float knockback,
             float stunDuration,
             Color damageColor,
             bool piercing = false,
-            AttackEffect effect = null)
+            List<AttackEffect> effects = null)
         {
             Struck();
             if (Immune) return 0;
@@ -40,7 +40,7 @@ namespace Util.Interfaces
             
             if (damageColor == default) damageColor = Color.white;
 
-            if (TryBlockDamage(damage, position, knockback, stunDuration, damageColor, piercing, effect))
+            if (TryBlockDamage(damage, position, knockback, stunDuration, damageColor, piercing))
                 return 0;
             
             damage = piercing ? damage : PhysicsUtility.CalculateDamage(damage, Armor);
@@ -48,62 +48,61 @@ namespace Util.Interfaces
             CurrentHealth -= damage;
             Debug.Log($"{((Component)this).gameObject.name} damaged for {damage}, piercing: {piercing}");
             OnDamageTakenGlobal?.Invoke(this, damage);
-            OnBeforeHit(damage, position, knockback, stunDuration, damageColor, piercing, effect);
+            OnBeforeHit(damage, position, knockback, stunDuration, damageColor, piercing);
 
             PoolManager.GetEffect<DamageText>(new DamageTextArguments(Transform.position, damage));
             if (CurrentHealth <= float.Epsilon)
             {
                 OnLethalBlowGlobal?.Invoke(this);
-                OnLethalHit(damage, position, knockback, stunDuration, damageColor, piercing, effect);
+                OnLethalHit(damage, position, knockback, stunDuration, damageColor, piercing);
             }
             else
-                OnHit(damage, position, knockback, stunDuration, damageColor, piercing, effect);
-            
-            if (effect is not null && this is IImpactable impactable)
-                effect.Impact(impactable, damage);
+            {
+                if (effects is not null && this is IImpactable impactable)
+                {
+                    foreach (AttackEffect effect in effects)
+                    {
+                        effect.Impact(impactable, damage);
+                    }
+                }
+                
+                OnHit(damage, position, knockback, stunDuration, damageColor, piercing);
+            }
 
             return damage;
         }
 
-        public void OnBeforeHit(
-            float damage,
+        public void OnBeforeHit(float damage,
             Vector3 position,
             float knockback,
             float stunDuration,
             Color damageColor,
-            bool piercing = false,
-            AttackEffect effect = null)
+            bool piercing = false)
         {
             
         }
         
         public void Struck() { }
 
-        public bool TryBlockDamage(
-            float damage,
+        public bool TryBlockDamage(float damage,
             Vector3 position,
             float knockback,
             float stunDuration,
             Color damageColor,
-            bool piercing = false,
-            AttackEffect effect = null) => false;
+            bool piercing = false) => false;
 
-        public void OnLethalHit(
-            float damage,
+        public void OnLethalHit(float damage,
             Vector3 position,
             float knockback,
             float stunDuration,
             Color damageColor,
-            bool piercing = false,
-            AttackEffect effect = null);
+            bool piercing = false);
 
-        public void OnHit(
-            float damage,
+        public void OnHit(float damage,
             Vector3 position,
             float knockback,
             float stunDuration,
             Color damageColor,
-            bool piercing = false,
-            AttackEffect effect = null);
+            bool piercing = false);
     }
 }

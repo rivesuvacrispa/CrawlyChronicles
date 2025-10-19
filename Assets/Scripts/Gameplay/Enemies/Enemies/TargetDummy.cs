@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using Definitions;
-using Gameplay.Mutations.AttackEffects;
 using Gameplay.Mutations.EntityEffects;
 using SoundEffects;
 using UI.Elements;
@@ -11,7 +10,7 @@ using Util.Interfaces;
 
 namespace Gameplay.Enemies.Enemies
 {
-    public class TargetDummy : MonoBehaviour, IDamageableEnemy, IImpactEffectAffectable
+    public class TargetDummy : MonoBehaviour, IDamageableEnemy, IEffectAffectable
     {
         [SerializeField] private BodyPainter bodyPainter;
         [SerializeField] private AudioController audioController;
@@ -55,7 +54,7 @@ namespace Gameplay.Enemies.Enemies
         }
         
         public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false, AttackEffect effect = null)
+            bool piercing = false)
         {
             Die();
         }
@@ -67,13 +66,13 @@ namespace Gameplay.Enemies.Enemies
         }
         
         public void OnBeforeHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false, AttackEffect effect = null)
+            bool piercing = false)
         {
             UpdateHealthbar();
         }
 
         public void OnHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false, AttackEffect effect = null)
+            bool piercing = false)
         {
             hitbox.Hit();
             audioController.PlayAction(scriptable.HitAudio, pitch: SoundUtility.GetRandomPitchTwoSided(0.15f));
@@ -83,15 +82,15 @@ namespace Gameplay.Enemies.Enemies
                 Knockback(position, knockback);
             }
         }
-
-        public void AddEffect<T>(EntityEffectData data) where T : EntityEffect
-        {
-            if(!hitbox.Dead) effectController.AddEffect<T>(data);
-        }
-
+        
         private void OnDestroy()
         {
             OnProviderDestroy?.Invoke(this);
         }
+
+        
+        // IEffectAffectable
+        public EffectController EffectController => effectController;
+        public bool CanApplyEffect => !hitbox.Dead;
     }
 }

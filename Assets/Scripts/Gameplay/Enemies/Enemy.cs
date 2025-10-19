@@ -8,7 +8,6 @@ using Gameplay.AI;
 using Gameplay.Breeding;
 using Gameplay.Food;
 using Gameplay.Map;
-using Gameplay.Mutations.AttackEffects;
 using Gameplay.Mutations.EntityEffects;
 using Gameplay.Player;
 using SoundEffects;
@@ -27,7 +26,7 @@ namespace Gameplay.Enemies
      RequireComponent(typeof(Rigidbody2D)),
      RequireComponent(typeof(AIStateController)),
     RequireComponent(typeof(EffectController))]
-    public abstract class Enemy : MonoBehaviour, IDamageableEnemy, IImpactEffectAffectable
+    public abstract class Enemy : MonoBehaviour, IDamageableEnemy, IEffectAffectable
     {
         [FormerlySerializedAs("Fearless")] 
         [SerializeField] protected bool fearless;
@@ -319,12 +318,10 @@ namespace Gameplay.Enemies
         }
         
         
+        // IEffectAffectable
+        public EffectController EffectController => effectController;
+        public bool CanApplyEffect => !hitbox.Dead;
         
-        // IImpactEffectAffectable
-        public void AddEffect<T>(EntityEffectData data) where T : EntityEffect
-        {
-            if(!hitbox.Dead) effectController.AddEffect<T>(data);
-        }
         
 
         // IDamageable
@@ -338,7 +335,7 @@ namespace Gameplay.Enemies
         public float CurrentHealth { get; set; }
         
         public bool TryBlockDamage(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false, AttackEffect effect = null)
+            bool piercing = false)
         {
             if (piercing || !reckoned) return false;
             reckoned = false;
@@ -347,7 +344,7 @@ namespace Gameplay.Enemies
         }
 
         public void OnBeforeHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false, AttackEffect effect = null)
+            bool piercing = false)
         {
             attackDelay = 1f;
             StopAttack();
@@ -356,13 +353,13 @@ namespace Gameplay.Enemies
         }
 
         public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false, AttackEffect effect = null)
+            bool piercing = false)
         {
             Die();
         }
 
         public void OnHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false, AttackEffect effect = null)
+            bool piercing = false)
         {
             hitbox.Hit();
             audioController.PlayAction(scriptable.HitAudio, pitch: SoundUtility.GetRandomPitchTwoSided(0.15f));
