@@ -13,8 +13,11 @@ namespace Util.Interfaces
         public delegate void GlobalDamageEvent(IDamageable damageable, float damage);
         public static event GlobalDamageEvent OnDamageTakenGlobal;
 
+        public delegate void GlobalDeathEvent(IDamageable damageable);
+        public static event GlobalDeathEvent OnLethalBlowGlobal;
+        
         public delegate void DeathEvent(IDamageable damageable);
-        public static event DeathEvent OnLethalBlow;
+        public event DeathEvent OnDeath;
 
         public bool Immune { get; }
         public float Armor { get; }
@@ -50,7 +53,7 @@ namespace Util.Interfaces
             PoolManager.GetEffect<DamageText>(new DamageTextArguments(Transform.position, damage));
             if (CurrentHealth <= float.Epsilon)
             {
-                OnLethalBlow?.Invoke(this);
+                OnLethalBlowGlobal?.Invoke(this);
                 OnLethalHit(damage, position, knockback, stunDuration, damageColor, piercing, effect);
             }
             else

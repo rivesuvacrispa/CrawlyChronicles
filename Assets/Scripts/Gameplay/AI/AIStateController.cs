@@ -32,9 +32,13 @@ namespace Gameplay.AI
         
         
         public AIState CurrentState { get; private set; }
+        public bool Etherial { get; private set; }
         private float speedMultiplier = 1;
         private float currentSpeed = 1;
         private bool locatorDismissed;
+
+        public delegate void StateControllerEvent(AIStateController controller);
+        public event StateControllerEvent OnBecomeEtherial;
 
         public float SpeedMultiplier
         {
@@ -46,6 +50,8 @@ namespace Gameplay.AI
             }
         }
 
+        
+        
         private void Awake()
         {
             enemy = GetComponent<Enemy>();
@@ -187,9 +193,11 @@ namespace Gameplay.AI
         public void SetEtherial(bool isEtherial)
         {
             Debug.Log($"[{gameObject.name}] Set Etherial <{isEtherial}>");
+            Etherial = isEtherial;
             physicsCollider.enabled = !isEtherial;
-            if(isEtherial) hitbox.Disable();
+            if (isEtherial) hitbox.Disable();
             else hitbox.Enable();
+            OnBecomeEtherial?.Invoke(this);
         }
         
         public void TakeMoveControl() => aiPath.canMove = false;

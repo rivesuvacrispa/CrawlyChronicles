@@ -29,6 +29,7 @@ namespace Gameplay.Enemies.Spawners
         public float HealthbarOffsetY => -0.5f;
         public float HealthbarWidth => 100;
 
+        public event IDamageable.DeathEvent OnDeath;
         public bool Immune => !hitbox.Enabled;
         public float Armor => armor;
         public float CurrentHealth { get; set; }
@@ -45,6 +46,7 @@ namespace Gameplay.Enemies.Spawners
         public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
             bool piercing = false, AttackEffect effect = null)
         {
+            OnDeath?.Invoke(this);
             Destroy(gameObject);
         }
 

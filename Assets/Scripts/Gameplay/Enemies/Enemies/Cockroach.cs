@@ -27,7 +27,7 @@ namespace Gameplay.Enemies.Enemies
             AttackController.OnAttackStart += OnPlayerAttack;
         }
 
-        public override void OnMapEntered() => stateController.SetState(AIState.Wander);
+        public override void OnMapEntered() => StateController.SetState(AIState.Wander);
 
         public override void OnPlayerLocated()
         {
@@ -57,11 +57,11 @@ namespace Gameplay.Enemies.Enemies
         private IEnumerator EvadeRoutine(Vector2 direction, float duration)
         {
             EntityWallCollider.enabled = true;
-            stateController.SetState(AIState.None);
+            StateController.SetState(AIState.None);
             float t = duration;
             while (t > 0)
             {
-                stateController.TakeMoveControl();
+                StateController.TakeMoveControl();
                 rb.RotateTowardsPosition(direction, 10);
                 t -= Time.deltaTime;
                 yield return null;
@@ -70,7 +70,7 @@ namespace Gameplay.Enemies.Enemies
             t = evadeDuration;
             while (t > 0)
             {
-                stateController.TakeMoveControl();
+                StateController.TakeMoveControl();
                 rb.AddClampedForceBackwards(PlayerMovement.Position, evadeSpeed, ForceMode2D.Force);
                 rb.RotateTowardsPosition(rb.position + rb.linearVelocity, 10);
                 t -= Time.deltaTime;
@@ -79,7 +79,7 @@ namespace Gameplay.Enemies.Enemies
 
             AttackPlayer();
             EntityWallCollider.enabled = false;
-            stateController.ReturnMoveControl();
+            StateController.ReturnMoveControl();
             StartCoroutine(EvasionCooldown(1.5f));
             evadeRoutine = null;
         }
@@ -95,7 +95,7 @@ namespace Gameplay.Enemies.Enemies
         {
             if(evadeRoutine is null) return; 
             StopCoroutine(evadeRoutine);
-            stateController.ReturnMoveControl();
+            StateController.ReturnMoveControl();
             evadeRoutine = null;
             EntityWallCollider.enabled = false;
         }
@@ -118,7 +118,7 @@ namespace Gameplay.Enemies.Enemies
         public void OnWallCollisionEnter()
         {
             CancelEvade();
-            stateController.SetState(AIState.Wander);
+            StateController.SetState(AIState.Wander);
             StartCoroutine(EvasionCooldown(5f));
         }
 

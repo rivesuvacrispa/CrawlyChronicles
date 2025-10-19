@@ -88,7 +88,7 @@ namespace Gameplay.Effects.ChainLightning
         private void DamageTarget()
         {
             currentArgs.currentTarget.Damage(
-                currentArgs.damage, transform.position, 0f, 1f, default);
+                currentArgs.damage, transform.position, 0f, currentArgs.stunDuration, default);
         }
 
         private async UniTask PoolTask(CancellationToken cancellationToken)
@@ -107,12 +107,14 @@ namespace Gameplay.Effects.ChainLightning
         {
             var targetPos = damageable.Transform.position;
             PoolManager.GetEffect<ChainLightning>(new ChainLightningArguments(
-                currentArgs.damage * 0.75f, 
+                currentArgs.damage * currentArgs.dmgReduction, 
                 currentArgs.chainRange, 
                 currentArgs.maxNumberOfJumps, 
                 damageable, 
                 currentArgs.currentJump + 1,
-                targetPos));
+                targetPos,
+                currentArgs.stunDuration,
+                currentArgs.dmgReduction));
         }
     }
 }

@@ -22,7 +22,7 @@ namespace Gameplay.Enemies.Enemies
         
         public override void OnMapEntered()
         {
-            stateController.SetState(AIState.Follow, 
+            StateController.SetState(AIState.Follow, 
                 onTargetReach: StartFunneling,
                 reachDistance: 3.5f);
         }
@@ -65,8 +65,8 @@ namespace Gameplay.Enemies.Enemies
         private IEnumerator FunnelingRoutine(float duration)
         {
             if(funnel is null) funnel = GlobalDefinitions.CreateSandFunnel(transform.position);
-            stateController.SetState(AIState.None);
-            stateController.TakeMoveControl();
+            StateController.SetState(AIState.None);
+            StateController.TakeMoveControl();
             float stageDuraton = duration / 4;
             animator.Play(Dig0AnimHash);
             yield return new WaitForSeconds(stageDuraton);
@@ -77,7 +77,7 @@ namespace Gameplay.Enemies.Enemies
             animator.speed = 1 / stageDuraton;
             animator.Play(Dig3AnimHash);
             yield return new WaitForSeconds(stageDuraton * 7 / 11f);
-            stateController.SetEtherial(true);
+            StateController.SetEtherial(true);
             yield return new WaitForSeconds(stageDuraton * 4 / 11f);
             animator.speed = 1;
             animator.Play(DiggedAnimHash);

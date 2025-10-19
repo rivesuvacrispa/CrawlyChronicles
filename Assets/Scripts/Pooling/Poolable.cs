@@ -21,7 +21,7 @@ namespace Pooling
             return true;
         }
 
-        protected void Pool()
+        public void Pool()
         {
             ObjectPool?.Pool(this);
         }

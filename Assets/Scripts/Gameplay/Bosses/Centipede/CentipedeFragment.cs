@@ -72,10 +72,12 @@ namespace Gameplay.Bosses.Centipede
             CurrentHealth = 0;
             UpdateHealthBar();
             DieFromAttack();
+            OnDeath?.Invoke(this);
         }
         
         private void DieFromAttack()
         {
+            OnDeath?.Invoke(this);
             dead = true;
             hitbox.Die();
             
@@ -222,6 +224,7 @@ namespace Gameplay.Bosses.Centipede
         public Transform Transform => transform;
         public float HealthbarOffsetY => -0.5f;
         public float HealthbarWidth => 80;
+        public event IDamageable.DeathEvent OnDeath;
         public bool Immune => dead || !hitbox.Enabled;
         public float Armor => CentipedeDefinitions.Armor * (int) fragmentType * 0.5f;
         public float CurrentHealth { get; set; }

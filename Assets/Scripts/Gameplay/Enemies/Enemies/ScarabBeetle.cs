@@ -11,7 +11,7 @@ namespace Gameplay.Enemies.Enemies
     {
         public override void OnMapEntered()
         {
-            stateController.SetState(AIState.Wander);
+            StateController.SetState(AIState.Wander);
         }
 
         public override void OnPlayerLocated()
@@ -21,8 +21,8 @@ namespace Gameplay.Enemies.Enemies
 
         private IEnumerator DefenseRoutine(float duration)
         {
-            stateController.TakeMoveControl();
-            stateController.SetState(AIState.None);
+            StateController.TakeMoveControl();
+            StateController.SetState(AIState.None);
             float t = duration;
             while (t > 0)
             {
@@ -30,8 +30,8 @@ namespace Gameplay.Enemies.Enemies
                 t -= Time.deltaTime;
                 yield return null;
             }
-            stateController.ReturnMoveControl();
-            stateController.SetState(AIState.Wander);
+            StateController.ReturnMoveControl();
+            StateController.SetState(AIState.Wander);
         }
 
         public override void OnEggsLocated(EggBed eggBed) { }

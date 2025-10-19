@@ -51,7 +51,7 @@ namespace Gameplay.Enemies.Enemies
 
         public override void OnMapEntered()
         {
-            stateController.SetState(AIState.Wander);
+            StateController.SetState(AIState.Wander);
         }
 
         public override void OnPlayerLocated()
@@ -77,7 +77,7 @@ namespace Gameplay.Enemies.Enemies
         public override void OnFoodLocated(Foodbed foodBed)
         {
             if (!hungry || foodBed is Ghostcap) return;
-            stateController.SetState(AIState.Follow, 
+            StateController.SetState(AIState.Follow, 
                 followTarget: foodBed,
                 () => {
                     if (foodBed.Eat())
@@ -87,7 +87,7 @@ namespace Gameplay.Enemies.Enemies
                     }
                     
                     StartCoroutine(HungerRoutine());
-                    stateController.SetState(AIState.Wander);
+                    StateController.SetState(AIState.Wander);
                 });
         }
 
@@ -98,7 +98,7 @@ namespace Gameplay.Enemies.Enemies
         
         private IEnumerator InterestRoutine()
         {
-            stateController.TakeMoveControl();
+            StateController.TakeMoveControl();
             animator.Play(Scriptable.IdleAnimHash);
 
             float t = 0;
@@ -109,16 +109,16 @@ namespace Gameplay.Enemies.Enemies
                 yield return null;
             }
             
-            stateController.ReturnMoveControl();
+            StateController.ReturnMoveControl();
             interestRoutine = null;
-            stateController.SetState(AIState.Wander);
+            StateController.SetState(AIState.Wander);
             animator.Play(Scriptable.WalkAnimHash);
         }
 
         private void StopInterest()
         {
             if(interestRoutine is not null) StopCoroutine(interestRoutine);
-            stateController.ReturnMoveControl();
+            StateController.ReturnMoveControl();
             animator.Play(Scriptable.WalkAnimHash);
         }
 
@@ -133,14 +133,14 @@ namespace Gameplay.Enemies.Enemies
             StopInterest();
             if(hitbox.Dead)             
                 animator.Play(Scriptable.IdleAnimHash);
-            stateController.SetEtherial(true);
+            StateController.SetEtherial(true);
             CanBreed = false;
-            stateController.SetState(AIState.Flee);
+            StateController.SetState(AIState.Flee);
         }
 
         private void OnNeutralDamage(Vector2 pos)
         {
-            if(Vector2.Distance(rb.position, pos) > 7.5f || stateController.CurrentState == AIState.Enter) return;
+            if(Vector2.Distance(rb.position, pos) > 7.5f || StateController.CurrentState == AIState.Enter) return;
             StopInterest();
             aggressive = true;
             minimapIcon.color = Color.red;
@@ -176,7 +176,7 @@ namespace Gameplay.Enemies.Enemies
         public void OnInteractionStart()
         {
             UnsubEvents();
-            stateController.SetState(AIState.None);
+            StateController.SetState(AIState.None);
             StopInterest();
             rb.RotateTowardsPosition(Player.PlayerMovement.Position, 360);
             breedAnimator.Play(BreedAnimHash);
@@ -188,13 +188,13 @@ namespace Gameplay.Enemies.Enemies
         public void OnInteractionStop()
         {
             breedAnimator.Play(IdleAnimHash);
-            stateController.SetState(AIState.Wander);
+            StateController.SetState(AIState.Wander);
             breedingParticles.Stop();
             animator.Play(Scriptable.WalkAnimHash);
             OnInteractionEnded?.Invoke();
             if(TimeManager.IsDay) SubEvents();
             else OnNightStart(0);
-            if(!CanBreed) stateController.SetState(AIState.Flee);
+            if(!CanBreed) StateController.SetState(AIState.Flee);
         }
 
         public float InteractionTime => 3f;

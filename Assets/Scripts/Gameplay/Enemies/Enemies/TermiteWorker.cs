@@ -17,8 +17,8 @@ namespace Gameplay.Enemies.Enemies
         
         public override void OnMapEntered()
         {
-            stateController.DismissLocator();
-            stateController.SetState(AIState.Wander);
+            StateController.DismissLocator();
+            StateController.SetState(AIState.Wander);
             EnableLocateTask(gameObject.GetCancellationTokenOnDestroy()).Forget();
         }
 
@@ -26,7 +26,7 @@ namespace Gameplay.Enemies.Enemies
         {
             await UniTask.Delay(TimeSpan.FromSeconds(4 + Random.value * 2), cancellationToken: cancellationToken);
 
-            stateController.UndismissLocator();
+            StateController.UndismissLocator();
         }
 
         public override void OnEggsLocated(EggBed eggBed)
@@ -42,14 +42,14 @@ namespace Gameplay.Enemies.Enemies
         {
             if (holdingFood || holdingEgg is not null) return;
             
-            stateController.SetState(AIState.Follow, 
+            StateController.SetState(AIState.Follow, 
                 followTarget: foodBed,
                 onTargetReach: () =>
                 {
                     if (foodBed.Eat())
                         PickupFood();
                     else
-                        stateController.SetState(AIState.Wander);
+                        StateController.SetState(AIState.Wander);
                 },
                 reachDistance: 1f);
         }
@@ -58,7 +58,7 @@ namespace Gameplay.Enemies.Enemies
         {
             holdingFood = true;
             foodRenderer.enabled = true;
-            stateController.SetState(AIState.Flee);
+            StateController.SetState(AIState.Flee);
         }
 
         protected override void OnDamageTaken()

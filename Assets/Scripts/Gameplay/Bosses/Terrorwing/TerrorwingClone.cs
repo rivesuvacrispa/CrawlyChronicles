@@ -137,6 +137,7 @@ namespace Gameplay.Bosses.Terrorwing
         private void OnDestroy()
         {
             OnProviderDestroy?.Invoke(this);
+            OnDeath?.Invoke(this);
             particleCollisionProvider.OnCollision -= OnBulletCollision;
         }
         
@@ -167,6 +168,7 @@ namespace Gameplay.Bosses.Terrorwing
         public Transform Transform => transform;
         public float HealthbarOffsetY => 0;
         public float HealthbarWidth => 0;
+        public event IDamageable.DeathEvent OnDeath;
         public bool Immune => hitbox.Immune;
         public float Armor => 0;
         public float CurrentHealth { get; set; }

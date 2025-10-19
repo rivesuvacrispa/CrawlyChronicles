@@ -33,7 +33,7 @@ namespace Gameplay.Enemies.Enemies
 
         public override void OnMapEntered()
         {
-            stateController.SetState(AIState.Wander);
+            StateController.SetState(AIState.Wander);
             StartCoroutine(DiggingCooldown(Scriptable.DiggingCooldown));
         }
 
@@ -59,22 +59,22 @@ namespace Gameplay.Enemies.Enemies
             while (enabled)
             {
                 yield return new WaitForSeconds(duration * Random.Range(0.8f, 1.2f));
-                if(diggingRoutine is null && stateController.CurrentState == AIState.Wander)
+                if(diggingRoutine is null && StateController.CurrentState == AIState.Wander)
                     diggingRoutine = StartCoroutine(DiggingRoutine());
                 yield return new WaitForSeconds(Scriptable.DiggingTime);
-                yield return new WaitUntil(() => stateController.CurrentState == AIState.Wander);
+                yield return new WaitUntil(() => StateController.CurrentState == AIState.Wander);
             }
         }
 
         private IEnumerator DiggingRoutine()
         {
             dirtParticles.Play();
-            stateController.SetState(AIState.None);
+            StateController.SetState(AIState.None);
             animator.Play(DiggingAnimHash);
             yield return new WaitForSeconds(Scriptable.DiggingTime);
             var eggbed = Instantiate(Scriptable.EggBedPrefab, MapManager.GameObjectsTransform);
             eggbed.transform.position = rb.position;
-            stateController.SetState(AIState.Wander);
+            StateController.SetState(AIState.Wander);
             
             CancelDigging();
         }

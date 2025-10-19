@@ -25,6 +25,7 @@ namespace Gameplay.Enemies.Enemies
         public Transform Transform => transform;
         public float HealthbarOffsetY => scriptable.HealthbarOffsetY;
         public float HealthbarWidth => scriptable.HealthbarWidth;
+        public event IDamageable.DeathEvent OnDeath;
         public bool Immune => hitbox.Immune;
         public float Armor => scriptable.Armor;
         public float CurrentHealth { get; set; }
@@ -43,6 +44,7 @@ namespace Gameplay.Enemies.Enemies
 
         private void Die()
         {
+            OnDeath?.Invoke(this);
             audioController.PlayAction(scriptable.DeathAudio, pitch: SoundUtility.GetRandomPitchTwoSided(0.15f));
             Start();
         }

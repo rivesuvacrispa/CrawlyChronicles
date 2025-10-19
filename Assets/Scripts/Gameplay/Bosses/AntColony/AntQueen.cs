@@ -133,6 +133,7 @@ namespace Gameplay.Bosses.AntColony
         protected override void Die()
         {
             base.Die();
+            OnDeath?.Invoke(this);
             effectController.ClearAll();
             hitbox.Die();
             DisposeTokenSource(cts);
@@ -222,6 +223,7 @@ namespace Gameplay.Bosses.AntColony
         public Transform Transform => transform;
         public float HealthbarOffsetY => 0;
         public float HealthbarWidth => 0;
+        public event IDamageable.DeathEvent OnDeath;
         public bool Immune => hitbox.Immune;
         public float Armor => AntColonyDefinitions.Armor;
         public float CurrentHealth { get; set; }

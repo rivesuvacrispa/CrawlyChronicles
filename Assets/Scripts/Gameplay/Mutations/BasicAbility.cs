@@ -19,7 +19,7 @@ namespace Gameplay.Mutations
 
 
         protected static float GetPassiveProcRate(float proc) => proc * PlayerManager.PlayerStats.PassiveProcRate;
-        protected static float GetAbilityDamage(float damage) => damage + damage * PlayerManager.PlayerStats.AbilityDamage;
+        public static float GetAbilityDamage(float damage) => damage + damage * PlayerManager.PlayerStats.AbilityDamage;
 
         private void Awake() => abilityController.CreateUIElement(this);
 
@@ -34,6 +34,7 @@ namespace Gameplay.Mutations
         }
 
         protected static float LerpLevel(float from, float to, int lvl) => Mathf.Lerp(from, to, lvl / 9f);
+        protected static int LerpLevel(int from, int to, int lvl) => Mathf.RoundToInt(Mathf.Lerp(from, to, lvl / 9f));
         
         public virtual void OnLevelChanged(int lvl)
         {

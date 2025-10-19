@@ -34,7 +34,7 @@ namespace GameCycle
             TimeManager.OnDayStart += OnDayStart;
             AntEggStealer.OnEggStolen += OnEggStolen;
             IDamageable.OnDamageTakenGlobal += DamageTakenGlobal;
-            IDamageable.OnLethalBlow += OnLethalBlow;
+            IDamageable.OnLethalBlowGlobal += LethalBlowGlobal;
             MutationMenu.OnMutationClick += OnMutationClick;
             EggBed.OnEggReturned += OnEggReturn;
         }
@@ -50,7 +50,7 @@ namespace GameCycle
             TimeManager.OnDayStart -= OnDayStart;
             AntEggStealer.OnEggStolen -= OnEggStolen;
             IDamageable.OnDamageTakenGlobal -= DamageTakenGlobal;
-            IDamageable.OnLethalBlow -= OnLethalBlow;
+            IDamageable.OnLethalBlowGlobal -= LethalBlowGlobal;
             MutationMenu.OnMutationClick -= OnMutationClick;
             EggBed.OnEggReturned -= OnEggReturn;
         }
@@ -105,6 +105,6 @@ namespace GameCycle
 
         private void OnEggReturn() => eggsLost--;
 
-        private void OnLethalBlow(IDamageable damageable) => enemyKills++;
+        private void LethalBlowGlobal(IDamageable damageable) => enemyKills++;
     }
 }

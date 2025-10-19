@@ -48,6 +48,7 @@ namespace Gameplay.Bosses.AntColony
 
         private void OnDestroy()
         {
+            OnDeath?.Invoke(this);
             GlobalDefinitions.CreateEggSquash(transform.position);
             OnProviderDestroy?.Invoke(this);
             MainMenu.OnResetRequested -= OnResetRequested;
@@ -61,6 +62,7 @@ namespace Gameplay.Bosses.AntColony
         public Transform Transform => transform;
         public float HealthbarOffsetY => -0.25f;
         public float HealthbarWidth => 80f;
+        public event IDamageable.DeathEvent OnDeath;
         public bool Immune => hitbox.Immune;
         public float Armor => 0;
         public float CurrentHealth { get; set; }

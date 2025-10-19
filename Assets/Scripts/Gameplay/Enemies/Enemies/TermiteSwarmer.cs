@@ -59,11 +59,11 @@ namespace Gameplay.Enemies.Enemies
 
         public override void OnMapEntered()
         {
-            if (!((TermiteSwarmerStateController)stateController).CanPlayFlightAnimation)
+            if (!((TermiteSwarmerStateController)StateController).CanPlayFlightAnimation)
             {
                 spriteRenderer.enabled = true;
-                stateController.SetState(AIState.Wander);
-                stateController.UndismissLocator();
+                StateController.SetState(AIState.Wander);
+                StateController.UndismissLocator();
                 return;
             }
 
@@ -72,10 +72,10 @@ namespace Gameplay.Enemies.Enemies
 
         private void PlayFlightAnimation()
         {
-            stateController.DismissLocator();
-            stateController.SetState(AIState.None);
-            stateController.SetEtherial(true);
-            stateController.TakeMoveControl();
+            StateController.DismissLocator();
+            StateController.SetState(AIState.None);
+            StateController.SetEtherial(true);
+            StateController.TakeMoveControl();
             spriteRenderer.color = spriteRenderer.color.WithAlpha(0f);
             spriteRenderer.enabled = true;
 
@@ -88,10 +88,10 @@ namespace Gameplay.Enemies.Enemies
             spriteRenderer.DOColor(spriteRenderer.color.WithAlpha(1f), 2f);
             transform.DOMove(transform.position - offset, 2f).SetEase(Ease.OutQuad).OnComplete(() =>
             {
-                stateController.SetState(AIState.Wander);
-                stateController.SetEtherial(false);
-                stateController.ReturnMoveControl();
-                stateController.UndismissLocator();
+                StateController.SetState(AIState.Wander);
+                StateController.SetEtherial(false);
+                StateController.ReturnMoveControl();
+                StateController.UndismissLocator();
                 PlayCrawl();
                 spriteRenderer.flipX = false;
                 transform.localRotation = Quaternion.AngleAxis(Random.value * 360, Vector3.forward);
@@ -113,7 +113,7 @@ namespace Gameplay.Enemies.Enemies
             BreedTarget = swarmer;
             BreedTarget.OnProviderDestroy += OnFollowTargetDestroy;
             
-            stateController.SetState(AIState.Follow, swarmer, () =>
+            StateController.SetState(AIState.Follow, swarmer, () =>
             {
                 StartBreeding(swarmer).Forget();
             }, 1f);
@@ -125,11 +125,11 @@ namespace Gameplay.Enemies.Enemies
 
             Breeding = true;
             swarmer.StartBreeding(this).Forget();
-            stateController.SetState(AIState.None);
+            StateController.SetState(AIState.None);
             swarmer.OnBreedingInterrupt += OnPartnerInterrupt;
             breedingParticles.Play();
             
-            stateController.TakeMoveControl();
+            StateController.TakeMoveControl();
             currentTween = transform.DORotate(Vector3.forward * 360, 1f, RotateMode.LocalAxisAdd).SetLoops(3);
             await UniTask.Delay(TimeSpan.FromSeconds(3f));
             StopBreeding(true);
@@ -140,11 +140,11 @@ namespace Gameplay.Enemies.Enemies
             if (!Breeding) return;
 
             currentTween?.Kill();
-            stateController.ReturnMoveControl();
+            StateController.ReturnMoveControl();
             BreedTarget = null;
             breedingParticles.Stop();
             Breeding = false;
-            stateController.SetState(AIState.Wander);
+            StateController.SetState(AIState.Wander);
             BreedOnCooldown = true;
             CanBreedTask().Forget();
         }
@@ -155,14 +155,14 @@ namespace Gameplay.Enemies.Enemies
                 cancellationToken: gameObject.GetCancellationTokenOnDestroy());
             
             BreedOnCooldown = false;
-            stateController.SetState(AIState.Wander);
+            StateController.SetState(AIState.Wander);
         }
 
         private void OnPartnerInterrupt(TermiteSwarmer actor)
         {
             actor.OnBreedingInterrupt += OnPartnerInterrupt;
             StopBreeding(false);
-            stateController.SetState(AIState.Wander);
+            StateController.SetState(AIState.Wander);
         }
 
         public override void OnPlayerLocated()

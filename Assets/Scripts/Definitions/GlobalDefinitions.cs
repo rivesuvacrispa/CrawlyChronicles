@@ -61,6 +61,7 @@ namespace Definitions
         public static float InteractionDistance => instance.interactionDistance;
         public static int EnemyPhysicsLayer { get; private set; }
         public static LayerMask EnemyPhysicsLayerMask { get; private set; }
+        public static ContactFilter2D EnemyPhysicsContactFilter { get; private set; }
         public static int EnemyAttackLayer { get; private set; }
         public static int EnemyHitboxLayer { get; private set; }
         public static int DefaultLayerMask { get; private set; }
@@ -142,9 +143,14 @@ namespace Definitions
             EnemyAttackLayer = LayerMask.NameToLayer("EnemyAttacks");
             EnemyHitboxLayer = LayerMask.NameToLayer("EnemyHitbox");
             DefaultLayerMask = LayerMask.NameToLayer("Default");
-
+            
             EnemyPhysicsLayerMask = LayerMask.GetMask("EnemyPhysics");
             
+            EnemyPhysicsContactFilter = new ContactFilter2D
+            {
+                layerMask = EnemyPhysicsLayerMask
+            };
+
             globalVolumeProfile = globalVolume.profile;
             deathGradient = new Gradient();
             deathGradient.SetKeys(

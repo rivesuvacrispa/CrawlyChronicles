@@ -33,11 +33,12 @@ namespace Gameplay.Player
         [SerializeField] private float healthbarWidth;
         [SerializeField] private SpriteRenderer eggSpriteRenderer;
         [SerializeField] private AttackController attackController;
+        [SerializeField] private Collider2D col;
         [SerializeField] private PlayerStats baseStats;
         [SerializeField] private PlayerStats currentStats;
-        
-        private readonly int deadHash = Animator.StringToHash("PlayerSpriteDead");
 
+        private readonly int deadHash = Animator.StringToHash("PlayerSpriteDead");
+        public Collider2D Collider => col;
         public bool IsHoldingEgg { get; private set; }
         public Egg HoldingEgg { get; private set; }
         public bool AllowInteract => !attackController.IsAttacking;
@@ -139,6 +140,7 @@ namespace Gameplay.Player
         public void Die(bool invokeDeathEvent)
         {
             if(invokeDeathEvent) OnPlayerKilled?.Invoke();
+            OnDeath?.Invoke(this);
             movement.enabled = false;
             spriteAnimator.Play(deadHash);
             DeathCounter.StopCounter();
@@ -194,7 +196,8 @@ namespace Gameplay.Player
         public Transform Transform => transform;
         public float HealthbarOffsetY => healthbarOffsetY;
         public float HealthbarWidth => healthbarWidth;
-        
+        public event IDamageable.DeathEvent OnDeath;
+
 #if UNITY_EDITOR
         public bool Immune => GodMode || hitbox.Immune;
 #else

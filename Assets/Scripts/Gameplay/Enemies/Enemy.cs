@@ -41,7 +41,7 @@ namespace Gameplay.Enemies
 
         protected Animator animator;
         protected Rigidbody2D rb;
-        protected AIStateController stateController;
+        public AIStateController StateController { get; private set; }
         private Healthbar healthbar;
         private EffectController effectController;
 
@@ -55,7 +55,7 @@ namespace Gameplay.Enemies
         [field:SerializeField] public EnemySpawnLocation SpawnLocation { get; set; }
         public Scriptable.Enemy Scriptable => scriptable;
         public Vector2 Position => rb.position;
-        public void SetMovementSpeed(float speed) => stateController.SpeedMultiplier = speed;
+        public void SetMovementSpeed(float speed) => StateController.SpeedMultiplier = speed;
 
         
         
@@ -72,7 +72,7 @@ namespace Gameplay.Enemies
         {
             animator = GetComponent<Animator>();
             rb = GetComponent<Rigidbody2D>();
-            stateController = GetComponent<AIStateController>();
+            StateController = GetComponent<AIStateController>();
             effectController = GetComponent<EffectController>();
         }
         
@@ -123,7 +123,7 @@ namespace Gameplay.Enemies
             minimapIcon.enabled = false;
             StopAllCoroutines();
             attackGO.SetActive(false);
-            stateController.SetState(AIState.None);
+            StateController.SetState(AIState.None);
             spriteRenderer.sortingLayerName = "Ground";
             spriteRenderer.sortingOrder = 0;
             rb.rotation = 0;
@@ -134,12 +134,13 @@ namespace Gameplay.Enemies
             GlobalDefinitions.CreateRandomGeneDrop(Position);
             StartCoroutine(DeathRoutine());
             UnsubEvents();
+            OnDeath?.Invoke(this);
         }
 
         protected void StopAttack()
         {
             CancelAttack();
-            stateController.ReturnMoveControl();
+            StateController.ReturnMoveControl();
             attackGO.SetActive(false);
             isAttacking = false;
             if (scriptable.HasAttackAnimation) PlayCrawl();
@@ -155,7 +156,7 @@ namespace Gameplay.Enemies
         protected virtual void AttackPlayer(float reachDistance = 0)
         {
             if (reachDistance == 0) reachDistance = scriptable.AttackDistance;
-            stateController.SetState(AIState.Follow, 
+            StateController.SetState(AIState.Follow, 
                 onTargetReach: BasicAttack,
                 reachDistance: reachDistance);
         } 
@@ -166,7 +167,7 @@ namespace Gameplay.Enemies
         private async UniTask AttackTask(CancellationToken cancellationToken)
         {
             Debug.Log($"[{gameObject.name}] attacked");
-            stateController.TakeMoveControl();
+            StateController.TakeMoveControl();
             isAttacking = true;
 
             float t = attackDelay * 0.5f;
@@ -184,7 +185,7 @@ namespace Gameplay.Enemies
 
             if(scriptable.HasAttackAnimation) PlayCrawl();
             attackGO.SetActive(false);
-            stateController.ReturnMoveControl();
+            StateController.ReturnMoveControl();
             
             await UniTask.Delay(TimeSpan.FromSeconds(scriptable.AttackCooldown), cancellationToken: cancellationToken);
             attackDelay = scriptable.AttackDelay;
@@ -222,13 +223,13 @@ namespace Gameplay.Enemies
             float t = duration;
             while (t > 0)
             {
-                stateController.TakeMoveControl();
+                StateController.TakeMoveControl();
                 stunned = true;
                 t -= Time.deltaTime;
                 yield return null;
             }
             
-            stateController.ReturnMoveControl();
+            StateController.ReturnMoveControl();
             PlayCrawl();
             stunned = false;
             OnStunEnd();
@@ -256,12 +257,12 @@ namespace Gameplay.Enemies
             float t = duration;
             while (t > 0)
             {
-                stateController.TakeMoveControl();
+                StateController.TakeMoveControl();
                 t -= Time.deltaTime;
                 yield return null;
             }
             
-            stateController.ReturnMoveControl();
+            StateController.ReturnMoveControl();
         }
 
         private void CancelAttack()
@@ -290,9 +291,9 @@ namespace Gameplay.Enemies
             PlayCrawl();
             StopAttack();
             ClearEffects();
-            stateController.ReturnMoveControl();
-            stateController.SetEtherial(true);
-            stateController.SetState(AIState.Flee);
+            StateController.ReturnMoveControl();
+            StateController.SetEtherial(true);
+            StateController.SetState(AIState.Flee);
         }
         
         private void SubEvents()
@@ -313,7 +314,7 @@ namespace Gameplay.Enemies
         {
             spawnedBySpawner = true;
             SpawnLocation = MapManager.GetRandomSpawnPoint();
-            stateController.StartingState = AIState.Wander;
+            StateController.StartingState = AIState.Wander;
             if (TimeManager.IsDay) fearless = true;
         }
         
@@ -331,7 +332,8 @@ namespace Gameplay.Enemies
         public Transform Transform => transform;
         public float HealthbarOffsetY => scriptable.HealthbarOffsetY;
         public float HealthbarWidth => scriptable.HealthbarWidth;
-        public bool Immune => hitbox.Immune;
+        public event IDamageable.DeathEvent OnDeath;
+        public bool Immune => hitbox.Immune || StateController.Etherial;
         public float Armor => Scriptable.Armor;
         public float CurrentHealth { get; set; }
         

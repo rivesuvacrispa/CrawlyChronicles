@@ -16,7 +16,7 @@ namespace Gameplay.Enemies.Enemies
         
         public override void OnMapEntered()
         {
-            stateController.SetState(AIState.Wander);
+            StateController.SetState(AIState.Wander);
         }
 
         public override void OnPlayerLocated()

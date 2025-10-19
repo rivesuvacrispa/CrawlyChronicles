@@ -31,7 +31,7 @@ namespace Gameplay.Enemies.Enemies
             currentFollowTarget = worker;
             currentFollowTarget.OnProviderDestroy += OnFollowTargetDestroy;
             
-            stateController.SetState(AIState.Follow, worker, reachDistance: 1f);
+            StateController.SetState(AIState.Follow, worker, reachDistance: 1f);
         }
 
         private void OnFollowTargetDestroy(IDestructionEventProvider target)
@@ -42,7 +42,7 @@ namespace Gameplay.Enemies.Enemies
 
         public override void OnMapEntered()
         {
-            stateController.SetState(AIState.Wander);
+            StateController.SetState(AIState.Wander);
         }
 
         public override void OnPlayerLocated()

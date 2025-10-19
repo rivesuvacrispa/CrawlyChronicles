@@ -21,7 +21,7 @@ namespace Gameplay.Enemies.Enemies
         public override void OnMapEntered()
         {
             if(BreedingManager.TotalEggsAmount == 0) AttackPlayer();
-            else stateController.SetState(AIState.Wander);
+            else StateController.SetState(AIState.Wander);
         }
 
         public override void OnPlayerLocated()
@@ -31,15 +31,15 @@ namespace Gameplay.Enemies.Enemies
 
         public override void OnEggsLocated(EggBed eggBed)
         {
-            stateController.SetState(AIState.Follow, eggBed, () =>
+            StateController.SetState(AIState.Follow, eggBed, () =>
             {
                 if(eggBed.RemoveOne(out holdingEgg))
                 {
                     OnEggStolen?.Invoke();
                     eggSpriteRenderer.enabled = true;
-                    stateController.SetState(AIState.Flee);
+                    StateController.SetState(AIState.Flee);
                 }
-                else stateController.SetState(AIState.Wander);
+                else StateController.SetState(AIState.Wander);
             }, reachDistance: 0.5f);
         }
 

@@ -11,8 +11,10 @@ namespace Gameplay.Effects.ChainLightning
         public readonly IDamageable currentTarget;
         public readonly int currentJump;
         public readonly Vector3 position;
+        public readonly float stunDuration;
+        public readonly float dmgReduction;
 
-        public ChainLightningArguments(float damage, float chainRange, float maxNumberOfJumps, IDamageable currentTarget, int currentJump, Vector3 position)
+        public ChainLightningArguments(float damage, float chainRange, float maxNumberOfJumps, IDamageable currentTarget, int currentJump, Vector3 position, float stunDuration, float dmgReduction)
         {
             this.damage = damage;
             this.chainRange = chainRange;
@@ -20,6 +22,8 @@ namespace Gameplay.Effects.ChainLightning
             this.currentTarget = currentTarget;
             this.currentJump = currentJump;
             this.position = position;
+            this.stunDuration = stunDuration;
+            this.dmgReduction = dmgReduction;
         }
     }
 }

@@ -35,7 +35,7 @@ namespace Gameplay.Enemies.Enemies
         public override void OnFoodLocated(Foodbed foodBed)
         {
             if(!hungry) return;
-            stateController.SetState(AIState.Follow, 
+            StateController.SetState(AIState.Follow, 
                 followTarget: foodBed,
                 onTargetReach: () =>
                 {
@@ -46,7 +46,7 @@ namespace Gameplay.Enemies.Enemies
                         StartCoroutine(HungerRoutine());
                     }
                     
-                    stateController.SetState(AIState.Wander);
+                    StateController.SetState(AIState.Wander);
                 },
                 reachDistance: 1.3f);
         }
@@ -82,36 +82,36 @@ namespace Gameplay.Enemies.Enemies
 
         private IEnumerator DiggingInRoutine()
         {
-            stateController.CancelCallback();
-            stateController.TakeMoveControl();
+            StateController.CancelCallback();
+            StateController.TakeMoveControl();
             animator.Play(DiggingInAnimHash);
             yield return new WaitForSeconds(9 / 11f);
             minimapIcon.gameObject.SetActive(false);
             digged = true;
             diggingRoutine = null;
-            stateController.SetEtherial(true);
+            StateController.SetEtherial(true);
             dirtParticles.Play();
-            stateController.ReturnMoveControl();
+            StateController.ReturnMoveControl();
             if (TimeManager.IsDay)
                 StartCoroutine(FleeRoutine());
             else
             {
-                stateController.SetState(AIState.Wander);
+                StateController.SetState(AIState.Wander);
                 DigOut(Random.Range(5f, 8f));
             }
         }
 
         private IEnumerator DiggingOutRoutine()
         {
-            stateController.TakeMoveControl();
+            StateController.TakeMoveControl();
             animator.Play(DiggingOutAnimHash);
             dirtParticles.Stop();
             yield return new WaitForSeconds(2 / 11f);
             minimapIcon.gameObject.SetActive(true);
             digged = false;
-            stateController.SetEtherial(false);
+            StateController.SetEtherial(false);
             yield return new WaitForSeconds(9 / 11f);
-            stateController.ReturnMoveControl();
+            StateController.ReturnMoveControl();
             diggingRoutine = null;
             if (TimeManager.IsDay)
                 StartCoroutine(FleeRoutine());
@@ -140,7 +140,7 @@ namespace Gameplay.Enemies.Enemies
         
         private IEnumerator FleeRoutine()
         {
-            stateController.SetEtherial(true);
+            StateController.SetEtherial(true);
             if(digDelayRoutine is not null) StopCoroutine(digDelayRoutine);
             DigIn(0f);
             yield return new WaitForSeconds(2f);
