@@ -4,7 +4,6 @@ using Gameplay.Enemies.Enemies;
 using Gameplay.Genes;
 using Gameplay.Player;
 using Timeline;
-using UI;
 using UI.Menus;
 using UnityEngine;
 using Util.Interfaces;

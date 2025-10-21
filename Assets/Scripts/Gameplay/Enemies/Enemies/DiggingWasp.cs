@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using Definitions;
 using Gameplay.AI;
 using Gameplay.Breeding;
 using Gameplay.Food;
@@ -48,7 +47,7 @@ namespace Gameplay.Enemies.Enemies
             SetAggro(true);
         }
 
-        protected override void OnDamageTaken()
+        protected override void DamageTaken()
         {
             CancelDigging();
             AttackPlayer();

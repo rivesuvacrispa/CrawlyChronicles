@@ -1,5 +1,4 @@
-﻿using System;
-using Gameplay.Breeding;
+﻿using Gameplay.Breeding;
 using Gameplay.Enemies.Enemies;
 using UnityEngine;
 

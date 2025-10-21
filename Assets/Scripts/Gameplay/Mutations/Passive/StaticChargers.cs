@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using Gameplay.Effects;
 using Gameplay.Effects.ChainLightning;
 using Gameplay.Mutations.AttackEffects;
-using Gameplay.Mutations.EntityEffects.Poison;
 using Gameplay.Player;
 using Pooling;
 using UnityEngine;

@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using Definitions;
 using Gameplay.Map;
-using UI;
 using UI.Menus;
 using UnityEngine;
 using Util.Interfaces;

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections;
-using Definitions;
+﻿using Definitions;
 using Gameplay.Mutations.EntityEffects;
 using SoundEffects;
-using UI.Elements;
 using UnityEngine;
 using Util;
 using Util.Interfaces;
@@ -25,32 +22,22 @@ namespace Gameplay.Enemies.Enemies
         public float HealthbarOffsetY => scriptable.HealthbarOffsetY;
         public float HealthbarWidth => scriptable.HealthbarWidth;
         public event IDamageable.DeathEvent OnDeath;
+        public event IDamageable.DamageEvent OnDamageTaken;
         public bool Immune => hitbox.Immune;
         public float Armor => scriptable.Armor;
         public float CurrentHealth { get; set; }
-        private Healthbar healthbar;
+        public float MaxHealth => scriptable.MaxHealth;
 
-        private void Awake()
-        {
-            healthbar = HealthbarPool.Instance.Create(this);
-        }
 
         private void Start()
         {
             CurrentHealth = scriptable.MaxHealth;
-            UpdateHealthbar();
         }
 
         private void Die()
         {
-            OnDeath?.Invoke(this);
             audioController.PlayAction(scriptable.DeathAudio, pitch: SoundUtility.GetRandomPitchTwoSided(0.15f));
             Start();
-        }
-
-        private void UpdateHealthbar()
-        {
-            healthbar.SetValue(Mathf.Clamp01(CurrentHealth / scriptable.MaxHealth));
         }
         
         public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
@@ -68,7 +55,7 @@ namespace Gameplay.Enemies.Enemies
         public void OnBeforeHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
             bool piercing = false)
         {
-            UpdateHealthbar();
+            OnDamageTaken?.Invoke(this, damage);
         }
 
         public void OnHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,

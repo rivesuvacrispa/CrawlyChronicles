@@ -3,7 +3,6 @@ using Definitions;
 using Gameplay.Genes;
 using Gameplay.Map;
 using Timeline;
-using UI;
 using UI.Menus;
 using UnityEngine;
 using Util;

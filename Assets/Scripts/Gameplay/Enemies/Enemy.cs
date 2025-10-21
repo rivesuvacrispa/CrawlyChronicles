@@ -3,7 +3,6 @@ using System.Collections;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Definitions;
-using GameCycle;
 using Gameplay.AI;
 using Gameplay.Breeding;
 using Gameplay.Food;
@@ -12,8 +11,6 @@ using Gameplay.Mutations.EntityEffects;
 using Gameplay.Player;
 using SoundEffects;
 using Timeline;
-using UI;
-using UI.Elements;
 using UI.Menus;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -41,7 +38,6 @@ namespace Gameplay.Enemies
         protected Animator animator;
         protected Rigidbody2D rb;
         public AIStateController StateController { get; private set; }
-        private Healthbar healthbar;
         private EffectController effectController;
 
         protected bool spawnedBySpawner;
@@ -65,7 +61,7 @@ namespace Gameplay.Enemies
 
         public abstract void OnFoodLocated(Foodbed foodBed);
 
-        protected abstract void OnDamageTaken();
+        protected abstract void DamageTaken();
 
         protected void Awake()
         {
@@ -81,14 +77,8 @@ namespace Gameplay.Enemies
             CurrentHealth = scriptable.MaxHealth;
             attackDelay = scriptable.AttackDelay;
             spriteRenderer.color = scriptable.BodyColor;
-            healthbar = HealthbarPool.Instance.Create(this);
             PlayCrawl();
             SubEvents();
-        }
-        
-        private void UpdateHealthbar()
-        {
-            healthbar.SetValue(Mathf.Clamp01(CurrentHealth / scriptable.MaxHealth));
         }
 
         private void Knockback(Vector2 attacker, float force, float duration)
@@ -330,10 +320,12 @@ namespace Gameplay.Enemies
         public float HealthbarOffsetY => scriptable.HealthbarOffsetY;
         public float HealthbarWidth => scriptable.HealthbarWidth;
         public event IDamageable.DeathEvent OnDeath;
+        public event IDamageable.DamageEvent OnDamageTaken;
         public bool Immune => hitbox.Immune || StateController.Etherial;
         public float Armor => Scriptable.Armor;
         public float CurrentHealth { get; set; }
-        
+        public float MaxHealth => Scriptable.MaxHealth;
+
         public bool TryBlockDamage(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
             bool piercing = false)
         {
@@ -346,10 +338,10 @@ namespace Gameplay.Enemies
         public void OnBeforeHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
             bool piercing = false)
         {
+            OnDamageTaken?.Invoke(this, damage);
             attackDelay = 1f;
             StopAttack();
-            UpdateHealthbar();
-            OnDamageTaken();
+            DamageTaken();
         }
 
         public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,

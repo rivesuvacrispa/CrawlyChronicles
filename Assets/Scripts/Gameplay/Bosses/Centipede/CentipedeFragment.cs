@@ -1,10 +1,7 @@
 ﻿using System.Collections;
 using Definitions;
-using GameCycle;
 using Gameplay.AI.Locators;
 using Gameplay.Player;
-using UI;
-using UI.Elements;
 using UnityEngine;
 using Util;
 using Util.Interfaces;
@@ -24,7 +21,6 @@ namespace Gameplay.Bosses.Centipede
         private CentipedeFragment backFragment;
         private SpriteRenderer spriteRenderer;
         private Rigidbody2D rb;
-        private Healthbar healthbar;
         private BodyPainter painter;
         private CentipedeHitbox hitbox;
 
@@ -51,14 +47,8 @@ namespace Gameplay.Bosses.Centipede
         private void Start()
         {
             CurrentHealth = MaxHealth;
-            healthbar = HealthbarPool.Instance.Create(this);
         }
-
-        private void UpdateHealthBar()
-        {
-            healthbar.SetValue(Mathf.Clamp01(CurrentHealth / MaxHealth));
-        }
-
+        
         private void FixedUpdate()
         {
             if(frontFragment is null) return;
@@ -69,7 +59,7 @@ namespace Gameplay.Bosses.Centipede
         {
             Bossbar.Instance.Damage(CurrentHealth);
             CurrentHealth = 0;
-            UpdateHealthBar();
+            OnDamageTaken?.Invoke(this, 0);
             DieFromAttack();
             OnDeath?.Invoke(this);
         }
@@ -224,6 +214,7 @@ namespace Gameplay.Bosses.Centipede
         public float HealthbarOffsetY => -0.5f;
         public float HealthbarWidth => 80;
         public event IDamageable.DeathEvent OnDeath;
+        public event IDamageable.DamageEvent OnDamageTaken;
         public bool Immune => dead || !hitbox.Enabled;
         public float Armor => CentipedeDefinitions.Armor * (int) fragmentType * 0.5f;
         public float CurrentHealth { get; set; }
@@ -231,7 +222,7 @@ namespace Gameplay.Bosses.Centipede
         public void OnBeforeHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
             bool piercing = false)
         {
-            UpdateHealthBar();
+            OnDamageTaken?.Invoke(this, damage);
         }
 
         public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,

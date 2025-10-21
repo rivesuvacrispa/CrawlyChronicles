@@ -1,6 +1,4 @@
 ﻿using Definitions;
-using GameCycle;
-using Gameplay.Breeding;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using Util;

@@ -1,5 +1,4 @@
-﻿using System;
-using Gameplay.Map;
+﻿using Gameplay.Map;
 using Pathfinding;
 using UnityEngine;
 

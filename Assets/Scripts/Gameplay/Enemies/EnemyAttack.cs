@@ -1,5 +1,4 @@
-﻿using System;
-using Gameplay.Player;
+﻿using Gameplay.Player;
 using UnityEngine;
 using Util.Interfaces;
 
@@ -12,8 +11,6 @@ namespace Gameplay.Enemies
         
         private void OnCollisionEnter2D(Collision2D col)
         {
-            Debug.Log($"ATTACK Collided, GO: {col.gameObject.name}");
-
             if (col.gameObject.TryGetComponent(out PlayerManager playerManager))
             {
                 // OnStruck?.Invoke(0);

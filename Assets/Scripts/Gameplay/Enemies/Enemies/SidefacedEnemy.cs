@@ -17,7 +17,7 @@ namespace Gameplay.Enemies.Enemies
         public abstract override void OnEggsLocated(EggBed eggBed);
 
         public abstract override void OnFoodLocated(Foodbed foodBed);
-        protected abstract override void OnDamageTaken();
+        protected abstract override void DamageTaken();
         
         private void LateUpdate()
         {

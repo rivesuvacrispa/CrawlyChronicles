@@ -1,5 +1,4 @@
-﻿using System.Text;
-using Definitions;
+﻿using Definitions;
 using UnityEngine;
 
 namespace Util

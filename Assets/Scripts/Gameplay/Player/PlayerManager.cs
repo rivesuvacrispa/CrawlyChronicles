@@ -1,14 +1,13 @@
 ﻿using Definitions;
 using GameCycle;
 using Gameplay.Breeding;
+using Gameplay.Effects.Healthbars;
 using Gameplay.Interaction;
 using SoundEffects;
 using Timeline;
-using UI.Elements;
 using UI.Menus;
 using UnityEngine;
 using UnityEngine.UI;
-using Util;
 using Util.Interfaces;
 
 namespace Gameplay.Player
@@ -71,7 +70,7 @@ namespace Gameplay.Player
         
         private void Start()
         {
-            healthbar.SetTarget(this);
+            healthbar.SetArgs(new HealthbarArguments(this));
             CurrentHealth = currentStats.MaxHealth;
             UpdateHealthbar();
             TimeManager.OnDayStart += OnDayStart;
@@ -198,6 +197,7 @@ namespace Gameplay.Player
         public event IDamageable.DeathEvent OnDeath;
 
 #if UNITY_EDITOR
+        public event IDamageable.DamageEvent OnDamageTaken;
         public bool Immune => GodMode || hitbox.Immune;
 #else
         public bool Immune => hitbox.Immune;
@@ -205,6 +205,7 @@ namespace Gameplay.Player
         public float Armor => currentStats.Armor;
 
         public float CurrentHealth { get; set; } = 0;
+        public float MaxHealth => currentStats.MaxHealth;
 
 
         public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
@@ -222,6 +223,7 @@ namespace Gameplay.Player
         public void OnBeforeHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
             bool piercing = false)
         {
+            OnDamageTaken?.Invoke(this, damage);
             PlayerAudioController.Instance.PlayHit();
             movement.Knockback(position, knockback);
             UpdateHealthbar();

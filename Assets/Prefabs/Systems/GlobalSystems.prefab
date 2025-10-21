@@ -162,11 +162,11 @@ GameObject:
   m_Component:
   - component: {fileID: 8820603034017726712}
   - component: {fileID: 1367721013064143186}
+  - component: {fileID: 5714227192320303452}
   - component: {fileID: 9061426894664643392}
   - component: {fileID: 351631042682434398}
   - component: {fileID: 545065140663182426}
   - component: {fileID: 411470686552820035}
-  - component: {fileID: 5714227192320303452}
   - component: {fileID: 507978935171422229}
   - component: {fileID: 6320409130233785078}
   - component: {fileID: 1186519297802992040}
@@ -223,6 +223,35 @@ MonoBehaviour:
   neutralsPerMinute: 5
   enemyPerMinute: 6
   enemyPerDayModifier: 5
+--- !u!114 &5714227192320303452
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3043724658974469298}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be97027d2c596ba4ba5f099d053142cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  localizedString:
+    m_TableReference:
+      m_TableCollectionName: GUID:8e97275a86380c143a245ccadb89bcc2
+    m_TableEntryReference:
+      m_KeyId: 13804273664
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  dayText: {fileID: 0}
+  lifespanText: {fileID: 0}
+  dayDurationInSeconds: 60
+  nightDurationInSeconds: 120
+  playerLifespanInSeconds: 300
+  references:
+    version: 2
+    RefIds: []
 --- !u!114 &9061426894664643392
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -329,35 +358,6 @@ MonoBehaviour:
   leftArrow: {fileID: 0}
   rightArrow: {fileID: 0}
   navigatorGO: {fileID: 0}
---- !u!114 &5714227192320303452
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3043724658974469298}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be97027d2c596ba4ba5f099d053142cb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  localizedString:
-    m_TableReference:
-      m_TableCollectionName: GUID:8e97275a86380c143a245ccadb89bcc2
-    m_TableEntryReference:
-      m_KeyId: 13804273664
-      m_Key: 
-    m_FallbackState: 0
-    m_WaitForCompletion: 0
-    m_LocalVariables: []
-  dayText: {fileID: 0}
-  lifespanText: {fileID: 0}
-  dayDurationInSeconds: 60
-  nightDurationInSeconds: 120
-  playerLifespanInSeconds: 300
-  references:
-    version: 2
-    RefIds: []
 --- !u!114 &507978935171422229
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -722,6 +722,7 @@ GameObject:
   - component: {fileID: 7748280455524426101}
   - component: {fileID: 8850994037107274957}
   - component: {fileID: 573986480198590803}
+  - component: {fileID: 3100153574158453939}
   m_Layer: 0
   m_Name: PoolManager
   m_TagString: Untagged
@@ -808,6 +809,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefab: {fileID: 6689767408032290525, guid: 446bb2db3c1401b4ab39c111c2c1f971, type: 3}
+--- !u!114 &3100153574158453939
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5443916223384818344}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7263f37f73864e45b480cf633ad93fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 5317340616677688985, guid: d760a25c08fa8e046a3044405c0308c2, type: 3}
 --- !u!1 &7979541223099638131
 GameObject:
   m_ObjectHideFlags: 0

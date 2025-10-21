@@ -1,5 +1,4 @@
-﻿using System;
-using Timeline;
+﻿using Timeline;
 using UI.Elements;
 using UnityEngine;
 

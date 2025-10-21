@@ -1,7 +1,6 @@
 ﻿using Gameplay.Breeding;
 using Gameplay.Player;
 using Timeline;
-using UI;
 using UI.Menus;
 
 namespace Gameplay.Food.Foodbeds

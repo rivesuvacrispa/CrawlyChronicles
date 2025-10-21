@@ -38,10 +38,20 @@ namespace UI.Elements
             levelText.text = GlobalDefinitions.GetRomanDigit(lvl);
         }
 
-        public void SetActive(bool isActive) => gameObject.SetActive(isActive);
-        
-        
-        
+        public void SetActive(bool isActive)
+        {
+#if UNITY_EDITOR
+            // Suppress annoying errors on editor game window playmode end
+            try
+            {
+                gameObject.SetActive(isActive);
+            } catch {}
+#else
+            gameObject.SetActive(isActive);
+#endif
+        }
+
+
         // IAbilityTooltipProvider
         public BasicMutation TooltipData => Scriptable;
         public int Level => level;

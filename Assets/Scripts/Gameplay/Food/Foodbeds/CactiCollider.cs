@@ -1,6 +1,4 @@
-﻿using Gameplay.Enemies;
-using Gameplay.Player;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Gameplay.Food.Foodbeds
 {

@@ -2,11 +2,12 @@
 using Cysharp.Threading.Tasks;
 using Definitions;
 using DG.Tweening;
+using Pooling;
 using TMPro;
 using UnityEngine;
 using Util;
 
-namespace Pooling
+namespace Gameplay.Effects.DamageText
 {
     public class DamageText : Poolable
     {

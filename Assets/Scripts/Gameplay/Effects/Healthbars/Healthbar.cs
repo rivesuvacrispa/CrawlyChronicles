@@ -1,13 +1,16 @@
-﻿using System.Collections;
+﻿using System.Threading;
+using Cysharp.Threading.Tasks;
+using Definitions;
 using DG.Tweening;
+using Pooling;
 using UnityEngine;
 using UnityEngine.UI;
 using Util;
 using Util.Interfaces;
 
-namespace UI.Elements
+namespace Gameplay.Effects.Healthbars
 {
-    public class Healthbar : MonoBehaviour
+    public class Healthbar : Poolable
     {
         [SerializeField] private float height = 14;
         [SerializeField] private Image bgImage;
@@ -18,24 +21,34 @@ namespace UI.Elements
         private IDamageable target;
         private Tween currentTween;
         private float catchImageAlpha = 1f;
+        private bool stopUpdate;
 
-
-        public void SetTarget(IDamageable damageable)
+        
+        
+        public override void OnFirstInstantiated()
         {
-            target = damageable;
-            damageable.OnProviderDestroy += OnDamageableDestroy;
+            transform.SetParent(GlobalDefinitions.WorldCanvasTransform, true);
+        }
+
+        public void SetArgs(HealthbarArguments args)
+        {
+            target = args.target;
+            target.OnProviderDestroy += OnDamageableDestroy;
+            target.OnDamageTaken += OnTargetDamageTaken;
+            target.OnDeath += OnTargetDeath;
             UpdateWidth();
         }
-        
-        public void SetValue(float value)
+
+        public override bool OnTakenFromPool(object data)
         {
-            mainImage.fillAmount = value;
-            SetAlpha(1f);
-            UpdatePosition();
-            enabled = true;
-            StartCatch(value);
+            if (data is not HealthbarArguments args) return false;
+            
+            SetArgs(args);
+            stopUpdate = false;
+            
+            return base.OnTakenFromPool(data);
         }
-        
+
         private void Start()
         {
             mainImage.fillAmount = 1f;
@@ -44,7 +57,20 @@ namespace UI.Elements
             enabled = false;
         }
 
-        protected virtual void Update() => UpdatePosition();
+        protected virtual void Update()
+        {
+            if (stopUpdate) return;
+            UpdatePosition();
+        }
+
+        public void SetValue(float value)
+        {
+            mainImage.fillAmount = value;
+            SetAlpha(1f);
+            UpdatePosition();
+            enabled = true;
+            StartCatch(value);
+        }
 
         private void UpdatePosition()
         {
@@ -54,6 +80,26 @@ namespace UI.Elements
             pos.z = 0;
             pos.y += target.HealthbarOffsetY;
             transform.localPosition = pos;
+        }
+
+        private void OnTargetDamageTaken(IDamageable damageable, float damage)
+        {
+            SetValue(Mathf.Clamp01(damageable.CurrentHealth / damageable.MaxHealth));
+        }
+
+        protected virtual void OnTargetDeath(IDamageable damageable)
+        {
+            stopUpdate = true;
+            target.OnProviderDestroy -= OnDamageableDestroy;
+            target.OnDamageTaken -= OnTargetDamageTaken;
+            target.OnDeath -= OnTargetDeath;
+            PoolTask(gameObject.GetCancellationTokenOnDestroy()).Forget();
+        }
+
+        private async UniTask PoolTask(CancellationToken cancellationToken)
+        {
+            await UniTask.WaitUntil(() => currentTween == null, cancellationToken: cancellationToken);
+            Pool();
         }
 
         private void StartCatch(float finalValue)
@@ -101,9 +147,12 @@ namespace UI.Elements
 
         private void OnDamageableDestroy(IDestructionEventProvider provider)
         {
+            stopUpdate = true;
             currentTween?.Kill();
-            provider.OnProviderDestroy -= OnDamageableDestroy;
-            if (!Application.isEditor) Destroy(gameObject);
+            target.OnProviderDestroy += OnDamageableDestroy;
+            target.OnDamageTaken += OnTargetDamageTaken;
+            target.OnDeath += OnTargetDeath;
+            Pool();
         }
         
         protected void UpdateWidth() => 

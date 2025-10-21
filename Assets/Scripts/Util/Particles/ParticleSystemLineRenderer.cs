@@ -1,5 +1,4 @@
-﻿using System;
-using Camera;
+﻿using Camera;
 using UnityEngine;
 
 namespace Util.Particles

@@ -6,7 +6,7 @@ namespace Camera
     public class FreeMovement : MonoBehaviour
     {
         [SerializeField] private UnityEngine.Camera uiCamera;
-        [SerializeField] private UnityEngine.Camera camera;
+        [SerializeField] private new UnityEngine.Camera camera;
         [SerializeField] private float minZoom;
         [SerializeField] private float maxZoom;
         [SerializeField] private float zoomStep;

@@ -2,8 +2,6 @@
 using Definitions;
 using Gameplay.Enemies;
 using Gameplay.Map;
-using UI;
-using UI.Elements;
 using UI.Menus;
 using UnityEngine;
 using Util.Interfaces;
@@ -18,7 +16,6 @@ namespace Gameplay.Bosses.AntColony
         public Enemy ToHatch { get; set; }
 
         private float maxHealth;
-        private Healthbar healthbar;
         
 
         private void Awake()
@@ -30,7 +27,6 @@ namespace Gameplay.Bosses.AntColony
 
         private void Start()
         {
-            healthbar = HealthbarPool.Instance.Create(this);
             StartCoroutine(HatchRoutine());
             MainMenu.OnResetRequested += OnResetRequested;
         }
@@ -62,14 +58,16 @@ namespace Gameplay.Bosses.AntColony
         public float HealthbarOffsetY => -0.25f;
         public float HealthbarWidth => 80f;
         public event IDamageable.DeathEvent OnDeath;
+        public event IDamageable.DamageEvent OnDamageTaken;
         public bool Immune => hitbox.Immune;
         public float Armor => 0;
         public float CurrentHealth { get; set; }
+        public float MaxHealth => AntColonyDefinitions.EggsHealth;
 
         public void OnBeforeHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
             bool piercing = false)
         {
-            healthbar.SetValue(Mathf.Clamp01(CurrentHealth / maxHealth));
+            OnDamageTaken?.Invoke(this, damage);
         }
 
         public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,

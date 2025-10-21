@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Gameplay.Mutations.AttackEffects;
 using Gameplay.Player;
 using UnityEngine;

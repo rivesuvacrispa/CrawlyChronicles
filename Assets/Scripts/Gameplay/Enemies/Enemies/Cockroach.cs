@@ -38,7 +38,7 @@ namespace Gameplay.Enemies.Enemies
 
         public override void OnFoodLocated(Foodbed foodBed) { }
 
-        protected override void OnDamageTaken()
+        protected override void DamageTaken()
         {
             AttackPlayer();
         }

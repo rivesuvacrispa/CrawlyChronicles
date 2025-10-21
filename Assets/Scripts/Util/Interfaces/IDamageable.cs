@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Definitions;
+using Gameplay.Effects.DamageText;
 using Gameplay.Mutations.AttackEffects;
 using Pooling;
 using UnityEngine;
@@ -20,9 +20,13 @@ namespace Util.Interfaces
         public delegate void DeathEvent(IDamageable damageable);
         public event DeathEvent OnDeath;
 
+        public delegate void DamageEvent(IDamageable damageable, float damage);
+        public event DamageEvent OnDamageTaken;
+
         public bool Immune { get; }
         public float Armor { get; }
         public float CurrentHealth { get; set; }
+        public float MaxHealth { get; }
 
         public float Damage(float damage,
             Vector3 position,
@@ -73,10 +77,7 @@ namespace Util.Interfaces
             float knockback,
             float stunDuration,
             Color damageColor,
-            bool piercing = false)
-        {
-            
-        }
+            bool piercing = false);
         
         public void Struck() { }
 

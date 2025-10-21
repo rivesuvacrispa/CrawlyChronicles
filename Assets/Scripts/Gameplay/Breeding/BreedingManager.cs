@@ -1,18 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Definitions;
-using GameCycle;
 using Gameplay.Genes;
 using Gameplay.Map;
 using Gameplay.Mutations;
 using Gameplay.Mutations.Active;
 using Gameplay.Player;
 using Scriptable;
-using UI;
 using UI.Elements;
 using UI.Menus;
 using UnityEngine;
-using UnityEngine.UI;
 using Util.Interfaces;
 using Random = UnityEngine.Random;
 

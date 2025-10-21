@@ -7,7 +7,6 @@ using Gameplay.Food.Foodbeds;
 using Gameplay.Genes;
 using Gameplay.Interaction;
 using Timeline;
-using UI;
 using UI.Menus;
 using UnityEngine;
 using Util;
@@ -91,7 +90,7 @@ namespace Gameplay.Enemies.Enemies
                 });
         }
 
-        protected override void OnDamageTaken()
+        protected override void DamageTaken()
         {
             OnNeutralDamaged?.Invoke(rb.position);
         }

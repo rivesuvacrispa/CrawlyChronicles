@@ -1,9 +1,6 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using Gameplay.Map;
 using Scriptable;
-using UI;
 using UI.Menus;
 using UnityEngine;
 

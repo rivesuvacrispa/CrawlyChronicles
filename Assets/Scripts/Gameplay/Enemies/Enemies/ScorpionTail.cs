@@ -1,8 +1,6 @@
 ﻿using System.Linq;
-using Gameplay.Player;
 using UnityEngine;
 using UnityEngine.Splines;
-using Util;
 
 namespace Gameplay.Enemies.Enemies
 {

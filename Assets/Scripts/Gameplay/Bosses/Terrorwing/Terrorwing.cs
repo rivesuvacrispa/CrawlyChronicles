@@ -414,10 +414,18 @@ namespace Gameplay.Bosses.Terrorwing
         public float HealthbarOffsetY => 0;
         public float HealthbarWidth => 0;
         public event IDamageable.DeathEvent OnDeath;
+        public event IDamageable.DamageEvent OnDamageTaken;
         public bool Immune => false;
         public float Armor => 0;
         public float CurrentHealth { get; set; }
-        
+        public float MaxHealth => TerrorwingDefinitions.MaxHealth;
+
+        public void OnBeforeHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
+            bool piercing = false)
+        {
+            OnDamageTaken?.Invoke(this, damage);
+        }
+
         public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
             bool piercing = false)
         {

@@ -2,10 +2,8 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Gameplay.Player;
-using UnityEditor;
 using UnityEngine;
 using Util;
-using Random = UnityEngine.Random;
 
 namespace Gameplay.Bosses.BlackWidow
 {

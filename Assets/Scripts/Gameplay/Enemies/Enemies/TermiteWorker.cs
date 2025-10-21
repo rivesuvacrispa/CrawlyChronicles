@@ -61,10 +61,10 @@ namespace Gameplay.Enemies.Enemies
             StateController.SetState(AIState.Flee);
         }
 
-        protected override void OnDamageTaken()
+        protected override void DamageTaken()
         {
             if (holdingFood) return;
-            base.OnDamageTaken();
+            base.DamageTaken();
         }
 
         public override void Die()

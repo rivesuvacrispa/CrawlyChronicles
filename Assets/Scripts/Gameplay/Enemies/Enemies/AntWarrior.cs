@@ -23,7 +23,7 @@ namespace Gameplay.Enemies.Enemies
         {
         }
 
-        protected override void OnDamageTaken()
+        protected override void DamageTaken()
         {
         }
     }

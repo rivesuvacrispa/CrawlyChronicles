@@ -1,10 +1,8 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 using Gameplay.AI;
 using Gameplay.Breeding;
 using Gameplay.Food;
-using Gameplay.Player;
 using UnityEngine;
 
 namespace Gameplay.Enemies.Enemies
@@ -34,7 +32,7 @@ namespace Gameplay.Enemies.Enemies
             
         }
 
-        protected override void OnDamageTaken()
+        protected override void DamageTaken()
         {
             
         }

@@ -15083,7 +15083,7 @@ GameObject:
   - component: {fileID: 5427107340282309495}
   - component: {fileID: 130822665146884909}
   - component: {fileID: 1770089386348917789}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: Blood Particles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -35240,7 +35240,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   abilityController: {fileID: 8994099565767064821}
   scriptable: {fileID: 11400000, guid: 979bc83c79413a64d969e6a59186a6bd, type: 2}
-  level: 3
+  level: 0
   effectGradient:
     serializedVersion: 2
     key0: {r: 1, g: 0.5559464, b: 0, a: 1}
@@ -35275,10 +35275,10 @@ MonoBehaviour:
   bloodParticles: {fileID: 130822665146884909}
   attackSource: {fileID: 7694470471798822677}
   hitSource: {fileID: 6732625562307759043}
-  procChanceLvl1: 0.1
-  procChanceLvl10: 0.17
-  damageMultiplierLvl1: 5
-  damageMultiplierLvl10: 30
+  procChanceLvl1: 0.05
+  procChanceLvl10: 0.15
+  damageMultiplierLvl1: 3
+  damageMultiplierLvl10: 20
 --- !u!114 &7694470471798822677
 MonoBehaviour:
   m_ObjectHideFlags: 0

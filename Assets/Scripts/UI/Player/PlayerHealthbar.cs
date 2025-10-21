@@ -1,5 +1,5 @@
-﻿
-using UI.Elements;
+﻿using Gameplay.Effects.Healthbars;
+using Util.Interfaces;
 
 namespace UI.Player
 {
@@ -8,6 +8,11 @@ namespace UI.Player
         protected override void OnValueCatch(float health)
         {
             StartFade(1f);
+        }
+
+        protected override void OnTargetDeath(IDamageable damageable)
+        {
+            
         }
     }
 }

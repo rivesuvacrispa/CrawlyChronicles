@@ -1,6 +1,5 @@
 ﻿using Gameplay.Player;
 using Scriptable;
-using UI;
 using UI.Elements;
 using UnityEngine;
 
@@ -45,7 +44,8 @@ namespace Gameplay.Mutations
 
         protected virtual void OnEnable()
         {
-            Button.SetActive(true);
+            if (Button is not null)
+                Button.SetActive(true);
         }
 
         public virtual string GetLevelDescription(int lvl, bool withUpgrade) => string.Empty;

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Pooling
+namespace Gameplay.Effects.DamageText
 {
     public readonly struct DamageTextArguments
     {

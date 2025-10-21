@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Definitions;
-using GameCycle;
 using Gameplay.Enemies;
 using Gameplay.Map;
 using Gameplay.Mutations.EntityEffects;
@@ -220,9 +219,17 @@ namespace Gameplay.Bosses.AntColony
         public float HealthbarOffsetY => 0;
         public float HealthbarWidth => 0;
         public event IDamageable.DeathEvent OnDeath;
+        public event IDamageable.DamageEvent OnDamageTaken;
         public bool Immune => hitbox.Immune;
         public float Armor => AntColonyDefinitions.Armor;
         public float CurrentHealth { get; set; }
+        public float MaxHealth => AntColonyDefinitions.Health;
+
+        public void OnBeforeHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
+            bool piercing = false)
+        {
+            OnDamageTaken?.Invoke(this, damage);
+        }
 
         public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
             bool piercing = false)

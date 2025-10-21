@@ -1,8 +1,4 @@
-﻿using GameCycle;
-using UI;
-using UI.Elements;
-using UnityEngine;
-using Util;
+﻿using UnityEngine;
 using Util.Interfaces;
 
 namespace Gameplay.Enemies.Spawners
@@ -15,12 +11,10 @@ namespace Gameplay.Enemies.Spawners
 
 
         private EnemySpawnerHitbox hitbox;
-        private Healthbar healthbar;
 
         protected override void Start()
         {
             base.Start();
-            healthbar = HealthbarPool.Instance.Create(this);
             CurrentHealth = maxHealth;
             hitbox = GetComponent<EnemySpawnerHitbox>();
         }
@@ -29,17 +23,18 @@ namespace Gameplay.Enemies.Spawners
         public float HealthbarWidth => 100;
 
         public event IDamageable.DeathEvent OnDeath;
+        public event IDamageable.DamageEvent OnDamageTaken;
         public bool Immune => !hitbox.Enabled;
         public float Armor => armor;
         public float CurrentHealth { get; set; }
-        
-        private void UpdateHealthbar() => healthbar.SetValue(Mathf.Clamp01(CurrentHealth / maxHealth));
+        public float MaxHealth => maxHealth;
+
         
 
         public void OnBeforeHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
             bool piercing = false)
         {
-            UpdateHealthbar();
+            OnDamageTaken?.Invoke(this, damage);
         }
 
         public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,

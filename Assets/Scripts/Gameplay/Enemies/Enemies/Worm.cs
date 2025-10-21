@@ -51,7 +51,7 @@ namespace Gameplay.Enemies.Enemies
                 reachDistance: 1.3f);
         }
 
-        protected override void OnDamageTaken()
+        protected override void DamageTaken()
         {
             InterruptDigging();
             DigIn(3f);

@@ -1,12 +1,6 @@
-﻿using System.Collections.Generic;
-using Definitions;
-using GameCycle;
-using Gameplay.Breeding;
-using Gameplay.Genes;
-using Gameplay.Mutations;
+﻿using GameCycle;
 using UnityEngine;
 using UnityEngine.UI;
-using Random = UnityEngine.Random;
 
 namespace UI.Menus
 {
