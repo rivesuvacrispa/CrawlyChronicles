@@ -58,16 +58,12 @@ namespace Util.Interfaces
             }
             else
             {
-                if (effects is not null && this is IImpactable impactable)
-                {
-                    foreach (AttackEffect effect in effects)
-                    {
-                        effect.Impact(impactable, damage);
-                    }
-                }
-                
                 OnHit(damage, position, knockback, stunDuration, damageColor, piercing);
             }
+            
+            if (effects is not null && this is IImpactable impactable)
+                foreach (AttackEffect effect in effects)
+                    effect.Impact(impactable, damage);
 
             return damage;
         }

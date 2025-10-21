@@ -1,4 +1,5 @@
 ﻿namespace Util.Interfaces
 {
-    public interface IImpactable { }
+    public interface IImpactable : ITransformProvider
+    { }
 }

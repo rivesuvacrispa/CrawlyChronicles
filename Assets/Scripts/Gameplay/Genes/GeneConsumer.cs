@@ -35,8 +35,8 @@ namespace Gameplay.Genes
             light.enabled = false;
             initialIntensity = light.intensity;
         }
-        
-        public void ConsumeGene(GeneType geneType, int amount)
+
+        private void ConsumeGene(GeneType geneType, int amount)
         {
             Color color = GlobalDefinitions.GetGeneColor(geneType);
             if (routine is not null) StopCoroutine(routine);

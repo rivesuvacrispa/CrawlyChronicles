@@ -20,8 +20,6 @@ namespace Gameplay.Mutations
         protected static float GetPassiveProcRate(float proc) => proc * PlayerManager.PlayerStats.PassiveProcRate;
         public static float GetAbilityDamage(float damage) => damage + damage * PlayerManager.PlayerStats.AbilityDamage;
 
-        private void Awake() => abilityController.CreateUIElement(this);
-
         protected virtual void Start() => SetLevel(level, true);
 
         public void SetLevel(int newLevel, bool forceUpdate = false)

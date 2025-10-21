@@ -29,20 +29,23 @@ namespace Gameplay.Player
         private void Awake()
         {
             MainMenu.OnResetRequested += OnResetRequested;
-            allAbilities = gameObject.GetComponentsInChildren<BasicAbility>().ToList();
+            allAbilities = gameObject.GetComponentsInChildren<BasicAbility>(true).ToList();
+            foreach (BasicAbility ability in allAbilities) 
+                CreateButton(ability);
         }
 
         public static string GetAbilityLevelDescription(BasicMutation mutation, int lvl, bool withUpgrade) 
             => AbilitiesDict[mutation].GetLevelDescription(lvl, withUpgrade);
 
-        public void CreateUIElement(BasicAbility ability)
+        private void CreateButton(BasicAbility ability)
         {
             AbilitiesDict[ability.Scriptable] = ability;
-            if (ability is ActiveAbility activeAbility)
-                Instantiate(abilityButtonPrefab, activeButtonsTransform)
-                    .SetAbility(activeAbility);
-            else Instantiate(basicAbilityPrefab, basicButtonsTransform)
-                    .SetAbility(ability);
+            BasicAbilityButton b = ability is ActiveAbility 
+                ? Instantiate(abilityButtonPrefab, activeButtonsTransform) 
+                : Instantiate(basicAbilityPrefab, basicButtonsTransform);
+            
+            b.SetAbility(ability);
+            b.gameObject.SetActive(ability.isActiveAndEnabled);
         }
 
         public static void UpdateAbilities(Egg egg) => instance.UpdateAbilitiesNonStatic(egg);
@@ -65,7 +68,7 @@ namespace Gameplay.Player
         public static MutationData GetMutationData()
         {
             MutationData data = new MutationData();
-            foreach (var basicAbility in instance.allAbilities.Where(basicAbility => basicAbility.enabled))
+            foreach (var basicAbility in instance.allAbilities.Where(basicAbility => basicAbility.isActiveAndEnabled))
                 data.Add(basicAbility.Scriptable, basicAbility.Level);
             return data;
         }

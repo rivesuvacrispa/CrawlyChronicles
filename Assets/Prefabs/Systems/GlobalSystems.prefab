@@ -221,7 +221,7 @@ MonoBehaviour:
   - {fileID: 8569129828654399206, guid: 2bddac7f725a92d468ff6dadf54c9bb0, type: 3}
   waves: []
   neutralsPerMinute: 5
-  enemyPerMinute: 8
+  enemyPerMinute: 6
   enemyPerDayModifier: 5
 --- !u!114 &9061426894664643392
 MonoBehaviour:

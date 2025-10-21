@@ -19,6 +19,9 @@ namespace Gameplay.Player
         public delegate void AttackEffectCollectionEvent(List<AttackEffect> effects);
         public static event AttackEffectCollectionEvent OnAttackEffectCollectionRequested;
 
+        public delegate void AttackEvent();
+        public static AttackEvent OnAttackEnd;
+
         private readonly List<AttackEffect> effects = new();
         public bool IsActive { get; private set; }
         public static readonly List<AttackEffect> CurrentAttackEffects = new();
@@ -36,8 +39,12 @@ namespace Gameplay.Player
                 float force = PlayerManager.PlayerStats.AttackPower;
                 if(!AttackController.IsInComboDash) movement.Knockback(point, force);
                 enemy.Reckon(point, force);
-                parryParticles.transform.position = col.contacts.First().point;
-                parryParticles.Play();
+                
+                if (col.contacts.Length != 0)
+                {
+                    parryParticles.transform.position = col.contacts.First().point;
+                    parryParticles.Play();
+                }
             }
         }
 
@@ -73,6 +80,7 @@ namespace Gameplay.Player
             effects.Clear();
             IsActive = false;
             gameObject.SetActive(false);
+            OnAttackEnd?.Invoke();
         }
     }
 }
