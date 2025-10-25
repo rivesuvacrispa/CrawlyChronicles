@@ -10,9 +10,12 @@ namespace Gameplay.Effects.WildCucumber
         public readonly float knockback;
         public readonly Vector3 direction;
         public readonly float projectilePower;
-        public readonly float decayTime;
+        public readonly float explosionDamage;
+        public readonly float explosionRange;
+        public readonly bool instant;
+        
 
-        public WildCucumberArguments(float explosionChance, int seedsAmount, float seedsDamage, float knockback, Vector3 direction, float projectilePower, float decayTime)
+        public WildCucumberArguments(float explosionChance, int seedsAmount, float seedsDamage, float knockback, Vector3 direction, float projectilePower, float explosionDamage, float explosionRange, bool instant = false)
         {
             this.explosionChance = explosionChance;
             this.seedsAmount = seedsAmount;
@@ -20,7 +23,9 @@ namespace Gameplay.Effects.WildCucumber
             this.knockback = knockback;
             this.direction = direction;
             this.projectilePower = projectilePower;
-            this.decayTime = decayTime;
+            this.explosionDamage = explosionDamage;
+            this.explosionRange = explosionRange;
+            this.instant = instant;
         }
     }
 }

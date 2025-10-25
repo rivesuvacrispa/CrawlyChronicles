@@ -20,7 +20,7 @@ namespace Gameplay.Effects.Fly
         [SerializeField] private Rigidbody2D rb;
         
         private ITransformProvider followTarget;
-        private static readonly List<Collider2D> overlapResults = new(8);
+        private static readonly List<Collider2D> OverlapResults = new(8);
 
         private CancellationTokenSource cts;
         private bool canAttack;
@@ -28,13 +28,13 @@ namespace Gameplay.Effects.Fly
         
         private void FindTarget()
         {
-            overlapResults.Clear();
-            int contacts = Physics2D.OverlapCircle(transform.position, 3f,  GlobalDefinitions.EnemyPhysicsContactFilter, overlapResults);
+            OverlapResults.Clear();
+            int contacts = Physics2D.OverlapCircle(transform.position, 3f,  GlobalDefinitions.EnemyPhysicsContactFilter, OverlapResults);
 
             IDamageableEnemy fallbackEnemy = null;
             for (var i = 0; i < Mathf.Min(contacts, 8); i++)
             {
-                var t = overlapResults[i];
+                var t = OverlapResults[i];
                 if (t.TryGetComponent(out IDamageableEnemy enemy) && !enemy.Immune && enemy is not NeutralAnt)
                 {
                     fallbackEnemy ??= enemy;

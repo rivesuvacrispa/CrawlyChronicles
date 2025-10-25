@@ -58,8 +58,11 @@ namespace Definitions
         public static float FleeingSpeedMultiplier => instance.fleeingSpeedMultiplier;
         public static float InteractionDistance => instance.interactionDistance;
         public static int EnemyPhysicsLayer { get; private set; }
+        public static int PlayerPhysicsLayer { get; private set; }
         public static LayerMask EnemyPhysicsLayerMask { get; private set; }
+        public static LayerMask EnemyAndPlayerPhysicsLayerMask { get; private set; }
         public static ContactFilter2D EnemyPhysicsContactFilter { get; private set; }
+        public static ContactFilter2D EnemyAndPlayerPhysicsContactFilter { get; private set; }
         public static int EnemyAttackLayer { get; private set; }
         public static int EnemyHitboxLayer { get; private set; }
         public static int DefaultLayerMask { get; private set; }
@@ -138,15 +141,22 @@ namespace Definitions
         {
             instance = this;
             EnemyPhysicsLayer = LayerMask.NameToLayer("EnemyPhysics");
+            PlayerPhysicsLayer = LayerMask.NameToLayer("PlayerPhysics");
             EnemyAttackLayer = LayerMask.NameToLayer("EnemyAttacks");
             EnemyHitboxLayer = LayerMask.NameToLayer("EnemyHitbox");
             DefaultLayerMask = LayerMask.NameToLayer("Default");
             
             EnemyPhysicsLayerMask = LayerMask.GetMask("EnemyPhysics");
-            
+
             EnemyPhysicsContactFilter = new ContactFilter2D
             {
                 layerMask = EnemyPhysicsLayerMask
+            };
+
+            EnemyAndPlayerPhysicsLayerMask = LayerMask.GetMask("EnemyPhysics", "PlayerPhysics");
+            EnemyAndPlayerPhysicsContactFilter = new ContactFilter2D
+            {
+                layerMask = EnemyAndPlayerPhysicsLayerMask
             };
 
             globalVolumeProfile = globalVolume.profile;

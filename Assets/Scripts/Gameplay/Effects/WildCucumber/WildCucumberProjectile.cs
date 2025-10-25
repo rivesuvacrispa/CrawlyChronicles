@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using Camera;
 using Cysharp.Threading.Tasks;
+using Definitions;
 using DG.Tweening;
 using Gameplay.Mutations;
 using Gameplay.Player;
 using Pooling;
 using SoundEffects;
+using Timeline;
+using UI.Menus;
 using UnityEngine;
 using Util;
 using Util.Interfaces;
@@ -23,18 +27,28 @@ namespace Gameplay.Effects.WildCucumber
         [SerializeField] private BodyPainter painter;
         [SerializeField] private SimpleAudioSource popSource;
         [SerializeField] private SimpleAudioSource crackSource;
+        private static readonly List<Collider2D> OverlapResults = new(32);
+
 
         private int healthLeft;
         private bool immune;
         private ParticleSystem.Burst burst;
-
         private WildCucumberArguments args;
-
+        private CancellationTokenSource dayCancellationSource;
         
 
-        private void Awake()
+        private void Awake() => burst = particleSystem.emission.GetBurst(0);
+
+        private void OnEnable()
         {
-            burst = particleSystem.emission.GetBurst(0);
+            TimeManager.OnDayStart += OnDayStart;
+            MainMenu.OnResetRequested += OnResetRequested;
+        }
+
+        private void OnDisable()
+        {
+            TimeManager.OnDayStart -= OnDayStart;
+            MainMenu.OnResetRequested -= OnResetRequested;
         }
 
         private void OnCollisionEnter2D(Collision2D col) => Hit();
@@ -72,19 +86,30 @@ namespace Gameplay.Effects.WildCucumber
             immune = false;
         }
 
-        private void Explode()
+        public void Explode()
         {
             particleSystem.Play();
             PoolTask(gameObject.GetCancellationTokenOnDestroy()).Forget();
             popSource.Play(pitch: SoundUtility.GetRandomPitchTwoSided(0.2f));
-            // TODO convert to cached results list
-            var colliders = Physics2D.OverlapCircleAll(transform.position, 1.5f,
-                LayerMask.GetMask("EnemyPhysics", "PlayerPhysics"));
-            foreach (Collider2D c in colliders)
+
+            int contacts = Physics2D.OverlapCircle(transform.position, args.explosionRange, GlobalDefinitions.EnemyAndPlayerPhysicsContactFilter, OverlapResults);
+
+            for (var i = 0; i < Mathf.Min(contacts, 32); i++)
             {
-                if (c.Equals(PlayerManager.Instance.Collider)) continue;
-                c.attachedRigidbody.AddForce( (c.transform.position - transform.position).normalized *
-                                              args.knockback,ForceMode2D.Impulse );
+                var c = OverlapResults[i];
+                
+                if (c.gameObject.layer == GlobalDefinitions.PlayerPhysicsLayer &&
+                    c.Equals(PlayerManager.Instance.Collider))
+                {
+                    continue;
+                }
+                
+                if (c.gameObject.layer == GlobalDefinitions.EnemyPhysicsLayer && 
+                    c.TryGetComponent(out IDamageableEnemy enemy))
+                {
+                    enemy.Damage(BasicAbility.GetAbilityDamage(args.explosionDamage), transform.position,
+                        args.knockback, 0f, default);
+                }
             }
             
             MainCamera.Instance.Shake(
@@ -119,12 +144,14 @@ namespace Gameplay.Effects.WildCucumber
         {
             if (data is not WildCucumberArguments arguments) return false;
 
-            ShowBody();
             args = arguments;
+            if (args.instant) HideBody();
+            else ShowBody();
             healthLeft = 5;
             burst.count = args.seedsAmount;
             particleSystem.emission.SetBurst(0, burst);
-            SpawnTask(gameObject.GetCancellationTokenOnDestroy()).Forget();
+            dayCancellationSource ??= new CancellationTokenSource();
+            SpawnTask(gameObject.GetCancellationTokenOnDestroy()).AttachExternalCancellation(dayCancellationSource.Token).Forget();
             
             return base.OnTakenFromPool(data);
         }
@@ -155,6 +182,27 @@ namespace Gameplay.Effects.WildCucumber
                     0,
                     Color.white,
                     false);
+        }
+
+        private void OnDayStart(int dayCounter)
+        {
+            immune = true;
+            collider.enabled = false;
+            DespawnTask(gameObject.GetCancellationTokenOnDestroy()).Forget();
+            dayCancellationSource?.Cancel();
+            dayCancellationSource?.Dispose();
+            dayCancellationSource = null;
+        }
+
+        private async UniTask DespawnTask(CancellationToken cancellationToken)
+        {
+            await spriteRenderer.DOColor(spriteRenderer.color.WithAlpha(0f), 2f)
+                .AsyncWaitForCompletion().AsUniTask().AttachExternalCancellation(cancellationToken);
+            Pool();
+        }
+        
+        private void OnResetRequested() {
+            Pool();
         }
     }
 }
