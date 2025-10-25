@@ -14,6 +14,9 @@ namespace Gameplay.Genes
 
         public delegate void GeneDropEvent(GeneType geneType, int amount);
         public static event GeneDropEvent OnPickedUp;
+        public delegate GeneType GeneDropReplaceTypeEvent();
+
+        public static GeneDropReplaceTypeEvent OnGeneDropReplaceTypeRequested;
         
         
         
@@ -25,6 +28,9 @@ namespace Gameplay.Genes
         
         public GeneDrop SetData(GeneType newType, int count)
         {
+            GeneType? t = OnGeneDropReplaceTypeRequested?.Invoke();
+            if (t is not null) newType = t.Value;
+            
             amount = count;
             geneType = newType;
             Color geneColor = GlobalDefinitions.GetGeneColor(newType);
