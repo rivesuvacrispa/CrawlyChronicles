@@ -1,5 +1,6 @@
 ﻿using Definitions;
 using Scriptable;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,7 +8,7 @@ namespace UI.Tooltips
 {
     public class MutationAbilityTooltip : AbilityTooltip
     {
-        [SerializeField] private Text costText;
+        [SerializeField] private TMP_Text costText;
         [SerializeField] private Image geneTypeImage;
         [SerializeField] private GameObject costGO;
         

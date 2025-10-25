@@ -1,17 +1,17 @@
 ﻿using System.Collections;
 using GameCycle;
 using Gameplay.Player;
+using TMPro;
 using UI.Elements;
 using UI.Tooltips;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace UI.Menus
 {
     public class PauseMenu : MonoBehaviour
     {
         [SerializeField] private GameObject uiGO;
-        [SerializeField] private Text statsText;
+        [SerializeField] private TMP_Text statsText;
         [SerializeField] private BasicAbilityButton buttonPrefab;
         [SerializeField] private Transform mutationsTransform;
         [SerializeField] private AbilityTooltip tooltip;

@@ -1,6 +1,6 @@
 ﻿using System.Collections;
+using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Timeline
 {
@@ -8,7 +8,7 @@ namespace Timeline
     {
         private static DeathCounter instance;
 
-        [SerializeField] private Text numText;
+        [SerializeField] private TMP_Text numText;
         [SerializeField] private Animator animator;
 
         private readonly int animHash = Animator.StringToHash("DeathCounterPop");

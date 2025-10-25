@@ -4,6 +4,7 @@ using Gameplay.Mutations;
 using Gameplay.Player;
 using Scriptable;
 using Timeline;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Util;
@@ -12,7 +13,7 @@ namespace UI.Elements
 {
     public class ActiveAbilityButton : BasicAbilityButton
     {
-        [SerializeField] private Text hotkeyText;
+        [SerializeField] private TMP_Text hotkeyText;
         [SerializeField] private Image cooldownImage;
         [SerializeField] private ParticleSystem autocastParticles;
 

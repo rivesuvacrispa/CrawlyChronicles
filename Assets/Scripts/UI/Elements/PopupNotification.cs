@@ -1,6 +1,6 @@
 ﻿using Definitions;
+using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using Util.Interfaces;
 
 namespace UI.Elements
@@ -8,7 +8,7 @@ namespace UI.Elements
     public class PopupNotification : MonoBehaviour
     {
         [SerializeField] private Animator animator;
-        [SerializeField] private Text popupText;
+        [SerializeField] private TMP_Text popupText;
 
         private INotificationProvider provider;
         private Vector2 providerStaticPosition;

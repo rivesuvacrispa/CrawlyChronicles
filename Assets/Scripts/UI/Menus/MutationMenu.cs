@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Definitions;
 using GameCycle;
@@ -21,9 +22,9 @@ namespace UI.Menus
 
 
         [Header("Mutations transforms")]
-        [SerializeField] private Transform specialsTransform;
-        [SerializeField] private Transform passivesTransform;
-        [SerializeField] private Transform activesTransform;
+        [SerializeField] private Transform aggressivesTransform;
+        [SerializeField] private Transform defensivesTransform;
+        [SerializeField] private Transform universalsTransform;
 
         [Header("Other refs")]
         [SerializeField] private RespawnManager respawnManager;
@@ -45,10 +46,21 @@ namespace UI.Menus
 
         public delegate void MutationMenuEvent();
         public static event MutationMenuEvent OnMutationClick;
+        private static Dictionary<GeneType, Transform> MutationTypeToTransform { get; set; }
         
 
 
         private MutationMenu() => instance = this;
+
+        private void Awake()
+        {
+            MutationTypeToTransform = new Dictionary<GeneType, Transform>()
+            {
+                { GeneType.Aggressive, aggressivesTransform },
+                { GeneType.Defensive, defensivesTransform },
+                { GeneType.Neutral, universalsTransform },
+            };
+        }
 
         public static void Show(MutationTarget target, Egg egg) => instance.ShowNonStatic(target, egg);
         
@@ -142,8 +154,8 @@ namespace UI.Menus
 
         private void CreateBasicAbilityButton(BasicMutation mutation, int level)
         {
-            Transform t = mutation.Special ? specialsTransform :
-                mutation is ActiveMutation ? activesTransform : passivesTransform;
+            Transform t = MutationTypeToTransform[mutation.GeneType];
+            
             var btn = Instantiate(basicAbilityButtonPrefab, t);
             btn.SetVisuals(mutation);
             btn.UpdateLevelText(level);
@@ -203,9 +215,9 @@ namespace UI.Menus
         // Utils
         private void ClearAll()
         {
-            foreach (Transform t in specialsTransform) Destroy(t.gameObject);
-            foreach (Transform t in passivesTransform) Destroy(t.gameObject);
-            foreach (Transform t in activesTransform) Destroy(t.gameObject);
+            foreach (Transform t in aggressivesTransform) Destroy(t.gameObject);
+            foreach (Transform t in defensivesTransform) Destroy(t.gameObject);
+            foreach (Transform t in universalsTransform) Destroy(t.gameObject);
             foreach (Transform t in newMutationsTransform) Destroy(t.gameObject);
             basicAbilityButtons.Clear();
             current.Clear();

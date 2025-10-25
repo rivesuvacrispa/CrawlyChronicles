@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace UI.Elements
@@ -6,8 +7,8 @@ namespace UI.Elements
     public class InteractionPopup : MonoBehaviour
     {
         [SerializeField] private Animator animator;
-        [SerializeField] private Text buttonText;
-        [SerializeField] private Text actionText;
+        [SerializeField] private TMP_Text buttonText;
+        [SerializeField] private TMP_Text actionText;
         [SerializeField] private Image fillingImage;
 
         private bool isActive;

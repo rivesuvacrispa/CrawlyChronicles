@@ -1,4 +1,5 @@
 ﻿using Scriptable;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Localization;
@@ -9,8 +10,8 @@ namespace UI.Elements
     public class DifficultyButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         [SerializeField] private LocalizedString localizedNameString;
-        [SerializeField] private Text nameText;
-        [SerializeField] private Text descriptionText;
+        [SerializeField] private TMP_Text nameText;
+        [SerializeField] private TMP_Text descriptionText;
         [SerializeField] private DifficultySelectionFrame selectionFrame;
         [SerializeField, Range(-1, 1)] private int position;
         [SerializeField] private Animator animator;

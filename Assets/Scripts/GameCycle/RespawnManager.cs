@@ -6,9 +6,9 @@ using Gameplay.Breeding;
 using Gameplay.Player;
 using SoundEffects;
 using Timeline;
+using TMPro;
 using UI.Menus;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace GameCycle
 {
@@ -20,7 +20,7 @@ namespace GameCycle
         public static EggBedCollectionEvent OnEggCollectionRequested;
 
         [SerializeField] private GameObject respawnMenuGO;
-        [SerializeField] private Text eggBedSelectionText;
+        [SerializeField] private TMP_Text eggBedSelectionText;
         [SerializeField] private GameObject leftArrow;
         [SerializeField] private GameObject rightArrow;
         [SerializeField] private GameObject navigatorGO;

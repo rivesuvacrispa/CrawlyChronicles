@@ -1,4 +1,5 @@
 ﻿using Gameplay.Player;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,7 +7,7 @@ namespace UI.Player
 {
     public class PlayerStats : MonoBehaviour 
     {
-        [SerializeField] private Text statsText;
+        [SerializeField] private TMP_Text statsText;
 
         
         

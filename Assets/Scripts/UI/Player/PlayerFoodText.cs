@@ -1,4 +1,5 @@
 ﻿using Gameplay.Breeding;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,7 +7,7 @@ namespace UI.Player
 {
     public class PlayerFoodText : MonoBehaviour
     {
-        [SerializeField] private Text foodText;
+        [SerializeField] private TMP_Text foodText;
 
         private void OnEnable()
         {

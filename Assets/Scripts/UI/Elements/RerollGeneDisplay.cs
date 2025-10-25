@@ -1,4 +1,5 @@
 ﻿using Gameplay.Genes;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Util;
@@ -12,7 +13,7 @@ namespace UI.Elements
         
         protected override void UpdateGeneText(TrioGene trio, int geneType)
         {
-            Text text = geneTexts[geneType];
+            TMP_Text text = geneTexts[geneType];
             int amount = trio.GetGene(geneType);
             text.text = amount.ToString();
             geneImages[geneType].gameObject.SetActive(amount > 0);

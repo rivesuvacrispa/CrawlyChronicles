@@ -1,6 +1,7 @@
 ﻿using System;
 using Definitions;
 using Scriptable;
+using TMPro;
 using UI.Tooltips;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,7 +13,7 @@ namespace UI.Elements
     {
         [SerializeField] private Image bgImage;
         [SerializeField] private Image icon;
-        [SerializeField] private Text lvlText;
+        [SerializeField] private TMP_Text lvlText;
         [SerializeField] private Button button;
 
         public BasicMutation Scriptable { get; private set; }

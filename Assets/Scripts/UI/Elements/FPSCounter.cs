@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace UI.Elements
@@ -6,7 +7,7 @@ namespace UI.Elements
     public class FPSCounter : MonoBehaviour
     {
         [SerializeField] private float updateInterval = 0.5f;
-        [SerializeField] private Text fpsText;
+        [SerializeField] private TMP_Text fpsText;
         [SerializeField] private Gradient colorGradient;
         
         private float accum;

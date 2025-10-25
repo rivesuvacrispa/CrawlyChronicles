@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace UI.Util
@@ -6,7 +7,7 @@ namespace UI.Util
     [RequireComponent(typeof(Slider))]
     public class SliderValueUpdater : MonoBehaviour
     {
-        [SerializeField] private Text valueText;
+        [SerializeField] private TMP_Text valueText;
         [SerializeField] private bool isPercent;
         
         private void Start()

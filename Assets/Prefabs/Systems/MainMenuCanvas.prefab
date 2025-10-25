@@ -4249,7 +4249,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  m_PixelsPerUnitMultiplier: 1.5
 --- !u!114 &706616411675336453
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4434,7 +4434,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  m_PixelsPerUnitMultiplier: 1.5
 --- !u!114 &2044465991275651773
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4739,7 +4739,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  m_PixelsPerUnitMultiplier: 1.5
 --- !u!114 &4109869446645246753
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10829,7 +10829,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   checkMarkImage: {fileID: 2219150077373928092}
   defaultState: 1
-  ambientGO: {fileID: 0}
 --- !u!114 &2219150077373928092 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 593587692548375075, guid: c0e325e28b281674092a07bdfca3f5c1, type: 3}

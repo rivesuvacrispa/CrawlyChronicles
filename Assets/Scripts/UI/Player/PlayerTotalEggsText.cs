@@ -1,4 +1,5 @@
 ﻿using Gameplay.Breeding;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,7 +7,7 @@ namespace UI.Player
 {
     public class PlayerTotalEggsText : MonoBehaviour
     {
-        [SerializeField] private Text text;
+        [SerializeField] private TMP_Text text;
 
         private void OnEnable()
         {

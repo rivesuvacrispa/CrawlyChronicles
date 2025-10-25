@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using Gameplay.Map;
 using Timeline;
+using TMPro;
 using UI.Menus;
 using UnityEngine;
-using UnityEngine.UI;
 using Util;
 using Util.Interfaces;
 
@@ -14,7 +14,7 @@ namespace Gameplay.Bosses
     {
         [SerializeField] private List<Boss> bosses;
         [SerializeField] private int spawnInterval;
-        [SerializeField] private Text encounterText;
+        [SerializeField] private TMP_Text encounterText;
 
         public static int BossesAmount { get; private set; }
         public static int SpawnInterval { get; private set; }

@@ -1,4 +1,5 @@
 ﻿using GameCycle;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,7 +18,7 @@ namespace UI.Menus
         [SerializeField] private TutorialMenu tutorialMenu;
         [SerializeField] private PauseMenu pauseMenu;
         [SerializeField] private Text gameOverStatsText;
-        [SerializeField] private Text subtitleText;
+        [SerializeField] private TMP_Text subtitleText;
         
         private bool settingsOpenedFromMainMenu;
         
@@ -27,7 +28,7 @@ namespace UI.Menus
         
         private void Start()
         {
-            subtitleText.text = $"{Application.version}\nby RivesUvaCrispa\naka Cpeed4";
+            subtitleText.text = $"{Application.version}\nby RivesUvaCrispa";
 #if UNITY_EDITOR
             if (showOnStartup) ShowMainMenu();
             else ResetGame();

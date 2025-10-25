@@ -5,9 +5,9 @@ using Gameplay.Effects.Healthbars;
 using Gameplay.Interaction;
 using SoundEffects;
 using Timeline;
+using TMPro;
 using UI.Menus;
 using UnityEngine;
-using UnityEngine.UI;
 using Util.Interfaces;
 
 namespace Gameplay.Player
@@ -25,7 +25,7 @@ namespace Gameplay.Player
         [SerializeField] private Animator spriteAnimator;
         [SerializeField] private PlayerMovement movement;
         [SerializeField] private MainMenu mainMenu;
-        [SerializeField] private Text healthText;
+        [SerializeField] private TMP_Text healthText;
         [SerializeField] private Healthbar healthbar;
         [SerializeField] private float healthbarOffsetY;
         [SerializeField] private float healthbarWidth;

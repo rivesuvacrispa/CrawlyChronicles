@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using Gameplay.Player;
+using TMPro;
 using UI.Menus;
 using UnityEngine;
 using UnityEngine.Localization;
-using UnityEngine.UI;
 
 namespace Timeline
 {
@@ -13,8 +13,8 @@ namespace Timeline
 
         [Header("References")]
         [SerializeField] private LocalizedString localizedString;
-        [SerializeField] private Text dayText;
-        [SerializeField] private Text lifespanText;
+        [SerializeField] private TMP_Text dayText;
+        [SerializeField] private TMP_Text lifespanText;
         [Header("Settings")]
         [SerializeField] private int dayDurationInSeconds = 30;
         [SerializeField] private int nightDurationInSeconds = 120;

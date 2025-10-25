@@ -1,5 +1,6 @@
 ﻿using Gameplay.Player;
 using Scriptable;
+using TMPro;
 using UI.Elements;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,8 +11,8 @@ namespace UI.Tooltips
     {
         [SerializeField] protected GameObject rootGO;
         [SerializeField] protected MutationButton button;
-        [SerializeField] protected Text nameText;
-        [SerializeField] protected Text descriptionText;
+        [SerializeField] protected TMP_Text nameText;
+        [SerializeField] protected TMP_Text descriptionText;
 
         
         public virtual void SetTooltip(BasicMutation mutation, int lvl, bool withUpgrade)

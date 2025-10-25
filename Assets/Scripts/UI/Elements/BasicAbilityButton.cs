@@ -1,6 +1,7 @@
 ﻿using Definitions;
 using Gameplay.Mutations;
 using Scriptable;
+using TMPro;
 using UI.Tooltips;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,7 +11,7 @@ namespace UI.Elements
     public class BasicAbilityButton : MonoBehaviour, IAbilityTooltipProvider
     {
         [SerializeField] protected Image icon;
-        [SerializeField] protected Text levelText;
+        [SerializeField] protected TMP_Text levelText;
 
         public BasicMutation Scriptable { get; private set; }
         private int level;
