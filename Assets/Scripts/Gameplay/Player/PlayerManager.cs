@@ -3,6 +3,7 @@ using GameCycle;
 using Gameplay.Breeding;
 using Gameplay.Effects.Healthbars;
 using Gameplay.Interaction;
+using Gameplay.Map;
 using SoundEffects;
 using Timeline;
 using TMPro;
@@ -71,7 +72,7 @@ namespace Gameplay.Player
         private void Awake()
         {
             PlayerStats = baseStats;
-            MainMenu.OnResetRequested += OnResetRequested;
+            MainMenu.OnAfterReset += OnAfterReset;
         }
         
         private void Start()
@@ -94,6 +95,8 @@ namespace Gameplay.Player
 
         public void AddStats(PlayerStats stats)
         {
+            Debug.Log("Added player stats:");
+            Debug.Log(stats.Print());
             currentStats.AddStats(PlayerStats.Minimal, stats);
             OnStatsChanged?.Invoke();
         }
@@ -175,7 +178,7 @@ namespace Gameplay.Player
         {
             OnProviderDestroy?.Invoke(this);
             TimeManager.OnDayStart -= OnDayStart;
-            MainMenu.OnResetRequested -= OnResetRequested;
+            MainMenu.OnAfterReset -= OnAfterReset;
         }
 
         private void OnDayStart(int day)
@@ -184,11 +187,13 @@ namespace Gameplay.Player
             UpdateHealthbar();*/
         }
 
-        private void OnResetRequested()
+        private void OnAfterReset()
         {
+            Debug.Log("PlayerManager OnAfterReset");
             RemoveEgg();
-            PlayerMovement.Teleport(new Vector2(15f, 15f));
+            PlayerMovement.Teleport(MapManager.MapCenter.position);
             PlayerStats = baseStats;
+            OnStatsChanged?.Invoke();
             CurrentHealth = currentStats.MaxHealth;
             healthText.text = Mathf.CeilToInt(CurrentHealth).ToString();
             UpdateHealthbar();

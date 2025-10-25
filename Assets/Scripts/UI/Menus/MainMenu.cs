@@ -25,6 +25,7 @@ namespace UI.Menus
         public delegate void MainMenuEvent();
 
         public static event MainMenuEvent OnResetRequested;
+        public static event MainMenuEvent OnAfterReset;
         
         private void Start()
         {
@@ -126,6 +127,7 @@ namespace UI.Menus
         private void ResetGame()
         {
             OnResetRequested?.Invoke();
+            OnAfterReset?.Invoke();
         }
     }
 }

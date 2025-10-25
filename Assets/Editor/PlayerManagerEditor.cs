@@ -29,9 +29,9 @@ public class PlayerManagerEditor : Editor {
         if (GUILayout.Button("Add Genes"))
         {
             Vector3 pos = manager.transform.position;
-            GlobalDefinitions.DropGenesRandomly(pos, GeneType.Aggressive, 10);
-            GlobalDefinitions.DropGenesRandomly(pos, GeneType.Neutral, 10);
-            GlobalDefinitions.DropGenesRandomly(pos, GeneType.Defensive, 10);
+            GlobalDefinitions.DropGenesRandomly(pos, GeneType.Aggressive, 100);
+            GlobalDefinitions.DropGenesRandomly(pos, GeneType.Neutral, 100);
+            GlobalDefinitions.DropGenesRandomly(pos, GeneType.Defensive, 100);
         }
 
         if (GUILayout.Button("Lay Eggs"))

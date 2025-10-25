@@ -44,7 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea54f15f61af49939a7c4875b11970b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  abilityController: {fileID: 8994099565767064821}
   scriptable: {fileID: 11400000, guid: e3f03c1ea7dbdd847b206dd81260bdc6, type: 2}
   level: 9
   effectGradient:
@@ -5289,7 +5288,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab4541a6b7e44fd78a86fcf5de5e6468, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  abilityController: {fileID: 8994099565767064821}
   scriptable: {fileID: 11400000, guid: 191e85cc536333149a12b080a0d9e631, type: 2}
   level: 0
   damageLvl1: 2
@@ -5341,7 +5339,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c618796e0d0b480785f894212706eeb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  abilityController: {fileID: 8994099565767064821}
   scriptable: {fileID: 11400000, guid: 4cea6e0716897db45861d8d9f040c727, type: 2}
   level: 3
   particleSystem: {fileID: 4864283396784609857}
@@ -10250,7 +10247,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a48612ef0cf411888f12f784a69164a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  abilityController: {fileID: 8994099565767064821}
   scriptable: {fileID: 11400000, guid: f728bd99fbd124f4b9745f3fc2cd5011, type: 2}
   level: 0
   particleSystem: {fileID: 1384206837578790337}
@@ -24930,7 +24926,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1abaf3ae7874f3fab3e67a9ed402ef1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  abilityController: {fileID: 8994099565767064821}
   scriptable: {fileID: 11400000, guid: 9387b3f17a0a9a743922bb70147997de, type: 2}
   level: 0
   playerManager: {fileID: 45504562391346130}
@@ -25131,6 +25126,7 @@ MonoBehaviour:
   healingParticles: {fileID: 6351454208109080765}
   spriteAnimator: {fileID: 6824161234706986927}
   movement: {fileID: 6983133238829123899}
+  sizeManager: {fileID: 0}
   mainMenu: {fileID: 0}
   healthText: {fileID: 0}
   healthbar: {fileID: 0}
@@ -25143,7 +25139,7 @@ MonoBehaviour:
     movementSpeed: 3
     rotationSpeed: 6
     maxHealth: 6
-    attackPower: 1.75
+    attackPower: 1.5
     attackDamage: 1
     armor: 0.5
     immunityDuration: 0.4
@@ -25190,6 +25186,8 @@ MonoBehaviour:
   hitbox: {fileID: 461905994004500634}
   movementComponent: {fileID: 6983133238829123899}
   attack: {fileID: 1811273410705496310}
+  defaultAttackPosition: {x: 0, y: 0, z: 0}
+  comboAttackPosition: {x: 0, y: 0, z: 0}
   dashDuration: 0.4
   comboRotationSpeed: 60
   comboExpirationTime: 1
@@ -25426,7 +25424,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab885d4f14c14d9ba4aa709643a89648, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  abilityController: {fileID: 8994099565767064821}
   scriptable: {fileID: 11400000, guid: 0415620eb7a66d24f9ee49376e8d36fc, type: 2}
   level: 0
   basicParticleSystem: {fileID: 7943787362584103593}
@@ -35238,7 +35235,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64a0b44ddcf846fabc2ec7ee29cfb7e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  abilityController: {fileID: 8994099565767064821}
   scriptable: {fileID: 11400000, guid: 979bc83c79413a64d969e6a59186a6bd, type: 2}
   level: 0
   effectGradient:
@@ -35549,10 +35545,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 425858ae08854905ab1dc28d031a3622, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  abilityController: {fileID: 8994099565767064821}
   scriptable: {fileID: 11400000, guid: 2ed0d7a03092f29449a76c21bd49212e, type: 2}
   level: 0
-  particleSystem: {fileID: 7984979843707469679}
+  basicParticles: {fileID: 0}
+  comboParticles: {fileID: 0}
   amountLvl1: 15
   amountLvl10: 50
   stunLvl1: 1
@@ -40468,7 +40464,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 777de2cbc31c48c69f91591237c68d37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  abilityController: {fileID: 8994099565767064821}
   scriptable: {fileID: 11400000, guid: 1dba019b7c7d1a74dbcba6fd0c5e4a3a, type: 2}
   level: 0
   trailRenderer: {fileID: 6856593982470553212}
@@ -40649,7 +40644,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f72b8521b61c459c898f2b1ebdf8ff7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  abilityController: {fileID: 8994099565767064821}
   scriptable: {fileID: 11400000, guid: 5e77e02e62e61d341ac871e1695c1e4d, type: 2}
   level: 9
   damageLvl1: 0.5
@@ -45506,7 +45500,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6e89591168e48fcaf91959b584ed399, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  abilityController: {fileID: 8994099565767064821}
   scriptable: {fileID: 11400000, guid: af365fdf42f510e4c9bbf0638c0d25a5, type: 2}
   level: 0
   playerManager: {fileID: 45504562391346130}
@@ -50450,7 +50443,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 048a5bf979734e669f8675fc7968c797, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  abilityController: {fileID: 8994099565767064821}
   scriptable: {fileID: 11400000, guid: 8dca0b484501dab4a8b0590357590046, type: 2}
   level: 9
   explosionChanceLv1: 0.05
@@ -50549,7 +50541,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f85edfd9d39c4c91b0463f36e45e8636, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  abilityController: {fileID: 8994099565767064821}
   scriptable: {fileID: 11400000, guid: 7a86055a5af328645a6f5ffc0e0ad71c, type: 2}
   level: 9
   eggsAmountLvl1: 0.5
@@ -55538,7 +55529,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 677ca11966944e8c9a2c2fb17c3b461e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  abilityController: {fileID: 8994099565767064821}
   scriptable: {fileID: 11400000, guid: 59e3a9b5147f3334ab55a48aa06a51da, type: 2}
   level: 0
   particleSystem: {fileID: 3257777584953434977}
@@ -60928,7 +60918,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47b48b85448241a5b89a23b6ed3a819c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  abilityController: {fileID: 8994099565767064821}
   scriptable: {fileID: 11400000, guid: 7d38e75719d5dda44b0a06a2e6532988, type: 2}
   level: 0
   effectGradient:
@@ -61013,7 +61002,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2fe0b8f8c61449649e0c45fb7e145e2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  abilityController: {fileID: 8994099565767064821}
   scriptable: {fileID: 11400000, guid: a50da29d9e763534da3caa32c0576c6e, type: 2}
   level: 0
   particleSystem: {fileID: 6701232430795494426}
@@ -65927,7 +65915,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2cfee72cdb764d89aa9aa4d3c8630287, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  abilityController: {fileID: 8994099565767064821}
   scriptable: {fileID: 11400000, guid: 6370187b9f4fd134ca1e296233acd52e, type: 2}
   level: 0
   effectGradient:
@@ -70917,7 +70904,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9eea76a530d2493e9ee8e4b6adbb685a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  abilityController: {fileID: 8994099565767064821}
   scriptable: {fileID: 11400000, guid: e91bd070a97a69d4eb9a45b825e70d25, type: 2}
   level: 0
   particleSystem: {fileID: 5684879806086520330}
@@ -75780,7 +75766,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1abaf3ae7874f3fab3e67a9ed402ef1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  abilityController: {fileID: 8994099565767064821}
   scriptable: {fileID: 11400000, guid: 6775445020bc7f547ab421d357f1d65f, type: 2}
   level: 0
   playerManager: {fileID: 45504562391346130}
@@ -75858,7 +75843,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1abaf3ae7874f3fab3e67a9ed402ef1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  abilityController: {fileID: 8994099565767064821}
   scriptable: {fileID: 11400000, guid: 04e4b3f84237c304b8e4518b8ee27830, type: 2}
   level: 9
   playerManager: {fileID: 45504562391346130}
