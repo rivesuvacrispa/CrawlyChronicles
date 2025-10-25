@@ -89,7 +89,7 @@ namespace UI.Elements
             cooldown = duration;
             while (cooldown > 0)
             {
-                hotkeyText.text = Mathf.CeilToInt(cooldown).ToString();
+                hotkeyText.text = cooldown.ToString("0.0");
                 cooldownImage.fillAmount = cooldown / duration;
                 cooldown -= Time.deltaTime;
                 yield return null;

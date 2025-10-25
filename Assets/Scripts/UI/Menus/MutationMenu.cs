@@ -21,10 +21,8 @@ namespace UI.Menus
         private static MutationMenu instance;
 
 
-        [Header("Mutations transforms")]
-        [SerializeField] private Transform aggressivesTransform;
-        [SerializeField] private Transform defensivesTransform;
-        [SerializeField] private Transform universalsTransform;
+        [Header("Mutations transforms")] 
+        [SerializeField] private List<Transform> mutationTypeToTransform;
 
         [Header("Other refs")]
         [SerializeField] private RespawnManager respawnManager;
@@ -46,22 +44,11 @@ namespace UI.Menus
 
         public delegate void MutationMenuEvent();
         public static event MutationMenuEvent OnMutationClick;
-        private static Dictionary<GeneType, Transform> MutationTypeToTransform { get; set; }
         
 
 
         private MutationMenu() => instance = this;
-
-        private void Awake()
-        {
-            MutationTypeToTransform = new Dictionary<GeneType, Transform>()
-            {
-                { GeneType.Aggressive, aggressivesTransform },
-                { GeneType.Defensive, defensivesTransform },
-                { GeneType.Neutral, universalsTransform },
-            };
-        }
-
+        
         public static void Show(MutationTarget target, Egg egg) => instance.ShowNonStatic(target, egg);
         
         private void ShowNonStatic(MutationTarget target, Egg egg)
@@ -154,7 +141,7 @@ namespace UI.Menus
 
         private void CreateBasicAbilityButton(BasicMutation mutation, int level)
         {
-            Transform t = MutationTypeToTransform[mutation.GeneType];
+            Transform t = mutationTypeToTransform[(int)mutation.GeneType];
             
             var btn = Instantiate(basicAbilityButtonPrefab, t);
             btn.SetVisuals(mutation);
@@ -215,9 +202,9 @@ namespace UI.Menus
         // Utils
         private void ClearAll()
         {
-            foreach (Transform t in aggressivesTransform) Destroy(t.gameObject);
-            foreach (Transform t in defensivesTransform) Destroy(t.gameObject);
-            foreach (Transform t in universalsTransform) Destroy(t.gameObject);
+            foreach (Transform t in mutationTypeToTransform[0]) Destroy(t.gameObject);
+            foreach (Transform t in mutationTypeToTransform[1]) Destroy(t.gameObject);
+            foreach (Transform t in mutationTypeToTransform[2]) Destroy(t.gameObject);
             foreach (Transform t in newMutationsTransform) Destroy(t.gameObject);
             basicAbilityButtons.Clear();
             current.Clear();

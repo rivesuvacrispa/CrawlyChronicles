@@ -7,7 +7,6 @@ namespace Gameplay.Mutations
 {
     public class BasicAbility : MonoBehaviour
     {
-        [SerializeField] private AbilityController abilityController;
         [SerializeField] protected BasicMutation scriptable;
         [SerializeField, Range(0, 9)] protected int level;
 

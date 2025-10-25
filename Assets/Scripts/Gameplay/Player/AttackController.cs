@@ -11,6 +11,9 @@ namespace Gameplay.Player
         [SerializeField] private PlayerHitbox hitbox;
         [SerializeField] private PlayerMovement movementComponent;
         [SerializeField] private PlayerAttack attack;
+        [SerializeField] private Vector3 defaultAttackPosition;
+        [SerializeField] private Vector3 comboAttackPosition;
+
         [Header("Stats")]
         [SerializeField] private float dashDuration;
         [SerializeField] private float comboRotationSpeed;
@@ -63,6 +66,7 @@ namespace Gameplay.Player
         {
             if (movementComponent.ComboDash(dashDuration * 2, comboRotationSpeed, 
                 () => {
+                    attack.transform.localPosition = defaultAttackPosition;
                     attack.Disable();
                     ExpireCombo();
                     hitbox.Enable();
@@ -75,6 +79,7 @@ namespace Gameplay.Player
                 PlayerAudioController.Instance.PlayCombo();
                 if(comboExpirationRoutine is not null) 
                     StopCoroutine(comboExpirationRoutine);
+                attack.transform.localPosition = comboAttackPosition;
                 attack.Enable();
                 hitbox.Disable();
             }

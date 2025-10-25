@@ -628,7 +628,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.2
+      scalar: 0.1
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -1092,7 +1092,7 @@ ParticleSystem:
     sphericalDirectionAmount: 0
     randomPositionAmount: 0
     radius:
-      value: 0.42
+      value: 0.38
       mode: 0
       spread: 0
       speed:
@@ -1211,7 +1211,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 25
+      scalar: 50
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -1658,9 +1658,9 @@ ParticleSystem:
       maxColor: {r: 1, g: 1, b: 1, a: 1}
       maxGradient:
         serializedVersion: 2
-        key0: {r: 1, g: 1, b: 1, a: 0}
-        key1: {r: 1, g: 0.8920167, b: 0, a: 1}
-        key2: {r: 1, g: 1, b: 1, a: 1}
+        key0: {r: 0.44474387, g: 0.4063784, b: 0, a: 0}
+        key1: {r: 1, g: 0.24863161, b: 0, a: 1}
+        key2: {r: 0.44313726, g: 0.40784314, b: 0, a: 1}
         key3: {r: 1, g: 1, b: 1, a: 0}
         key4: {r: 0, g: 0, b: 0, a: 0}
         key5: {r: 0, g: 0, b: 0, a: 0}
@@ -1683,7 +1683,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
-        m_ColorSpace: -1
+        m_ColorSpace: 0
         m_NumColorKeys: 3
         m_NumAlphaKeys: 4
       minGradient:
@@ -5130,7 +5130,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  - {fileID: 2100000, guid: 88b559a701cfee5478e90c08af7eed90, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5300,11 +5300,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7826090363886631264, guid: 7b7bdf40d1d684c43a3e38ac8511e78a, type: 3}
       propertyPath: m_fontSize
-      value: 36
+      value: 32
       objectReference: {fileID: 0}
     - target: {fileID: 7826090363886631264, guid: 7b7bdf40d1d684c43a3e38ac8511e78a, type: 3}
       propertyPath: m_fontSizeBase
-      value: 36
+      value: 32
+      objectReference: {fileID: 0}
+    - target: {fileID: 7826090363886631264, guid: 7b7bdf40d1d684c43a3e38ac8511e78a, type: 3}
+      propertyPath: m_overflowMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7826090363886631264, guid: 7b7bdf40d1d684c43a3e38ac8511e78a, type: 3}
+      propertyPath: m_TextWrappingMode
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7826090363886631264, guid: 7b7bdf40d1d684c43a3e38ac8511e78a, type: 3}
       propertyPath: m_HorizontalAlignment

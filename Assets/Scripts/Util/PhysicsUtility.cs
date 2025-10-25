@@ -53,7 +53,7 @@ namespace Util
                 => rb.AddForce(
                     (direction - rb.position).normalized * 
                     (Mathf.Clamp(force, 0, GlobalDefinitions.MaxAppliableForce * maxAmplifier) * rb.mass) / 
-                    GlobalDefinitions.PlayerMass, mode);
+                    GlobalDefinitions.UnitMass, mode);
         
         public static void AddClampedForceBackwards
             (this Rigidbody2D rb, 
@@ -62,12 +62,11 @@ namespace Util
             ForceMode2D mode,
             float maxAmplifier = 1) 
                 => rb.AddForce(
-                    -1 *
                     (direction - rb.position).normalized * 
-                    Mathf.Clamp(force, 0, GlobalDefinitions.MaxAppliableForce * maxAmplifier) * 
-                    rb.mass / GlobalDefinitions.PlayerMass, mode);
+                    (-1 * Mathf.Clamp(force, 0, GlobalDefinitions.MaxAppliableForce * maxAmplifier) * rb.mass) 
+                    / GlobalDefinitions.UnitMass, mode);
 
-        public static float GetKnockbackResistance(float playerMass)
-            => Mathf.InverseLerp(0, GlobalDefinitions.PlayerMass * 2, playerMass);
+        public static float GetKnockbackResistance(float mass)
+            => Mathf.InverseLerp(0, GlobalDefinitions.UnitMass * 2, mass);
     }
 }

@@ -3,12 +3,12 @@ using UnityEngine;
 
 namespace Gameplay.Mutations.Stats
 {
-    public class MuscleGrowth : StatsAbility
+    public class Gigantism : StatsAbility
     {
         [SerializeField, Range(1f, 2f)] private float sizeLvl1;
         [SerializeField, Range(1f, 2f)] private float sizeLvl10;
 
-        private float size;
+        private float size = 1f;
 
         public override void OnLevelChanged(int lvl)
         {
@@ -31,7 +31,7 @@ namespace Gameplay.Mutations.Stats
 
         private void UpdateBodySize(float s)
         {
-            PlayerManager.Instance.Transform.localScale = Vector3.one * s;
+            PlayerManager.Instance.SizeManager.SetSize(s);
         }
     }
 }

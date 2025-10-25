@@ -6,7 +6,8 @@ namespace Gameplay.Mutations.Active
 {
     public class BoilingBlast : ActiveAbility
     {
-        [SerializeField] private new ParticleSystem particleSystem;
+        [SerializeField] private ParticleSystem basicParticles;
+        [SerializeField] private ParticleSystem comboParticles;
         [Header("Particles amount")] 
         [SerializeField] private int amountLvl1;
         [SerializeField] private int amountLvl10;
@@ -29,13 +30,16 @@ namespace Gameplay.Mutations.Active
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
-            if(particleSystem.isPlaying) particleSystem.Stop();
+            if(basicParticles.isPlaying) basicParticles.Stop();
             damage = LerpLevel(damageLvl1, damageLvl10, lvl);
             stun = LerpLevel(stunLvl1, stunLvl10, lvl);
             knockback = LerpLevel(knockbackLvl1, knockbackLvl10, lvl);
             
-            var emission = particleSystem.emission;
-            emission.SetBurst(0, new ParticleSystem.Burst(0, LerpLevel(amountLvl1, amountLvl10, lvl)));
+            var emission = basicParticles.emission;
+            float amount = LerpLevel(amountLvl1, amountLvl10, lvl);
+            emission.SetBurst(0, new ParticleSystem.Burst(0, amount));
+            emission = comboParticles.emission;
+            emission.SetBurst(0, new ParticleSystem.Burst(0, amount * 2));
         }
         
         private void OnParticleCollision(GameObject other)
@@ -49,7 +53,14 @@ namespace Gameplay.Mutations.Active
                     Color.white);
         }
         
-        public override void Activate() => particleSystem.Play();
+        public override void Activate()
+        {
+            if (AttackController.IsInComboDash)
+                comboParticles.Play();
+            else
+                basicParticles.Play();
+        }
+
         public override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
         {
             float cd = Scriptable.GetCooldown(lvl);

@@ -46,9 +46,10 @@ namespace Gameplay.Mutations.Active
             var emission = basicParticleSystem.emission;
             var shape = basicParticleSystem.shape;
             shape.angle = LerpLevel(angleLvl1, angleLvl10, lvl);
-            emission.SetBurst(0, new ParticleSystem.Burst(0, LerpLevel(amountLvl1, amountLvl10, lvl)));
+            float amount = LerpLevel(amountLvl1, amountLvl10, lvl);
+            emission.SetBurst(0, new ParticleSystem.Burst(0, amount));
             emission = comboParticleSystem.emission;
-            emission.SetBurst(0, new ParticleSystem.Burst(0, 2 *LerpLevel(amountLvl1, amountLvl10, lvl)));
+            emission.SetBurst(0, new ParticleSystem.Burst(0, amount * 2));
 
         }
 

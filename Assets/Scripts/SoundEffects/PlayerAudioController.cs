@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Gameplay.Player;
+using UnityEngine;
 using Util;
 
 namespace SoundEffects
@@ -20,8 +21,8 @@ namespace SoundEffects
 
         
         
-        public void PlayAttack(int combo) => PlayAction(attackSounds[combo]);
-        public void PlayCombo() => PlayAction(attackSounds[3], true, comboPitch);
+        public void PlayAttack(int combo) => PlayAction(attackSounds[combo], pitch: 1 / PlayerSizeManager.CurrentSize);
+        public void PlayCombo() => PlayAction(attackSounds[3], true, comboPitch / PlayerSizeManager.CurrentSize);
         public void PlayInteract() => PlayAction(interactionSound);
         public void PlayCrawl() => PlayState(crawlSound);
         public void PlayGenePickup() => pool.Play(Instance.genePickupSound, pitch: SoundUtility.GetRandomPitchHigher(0.15f));

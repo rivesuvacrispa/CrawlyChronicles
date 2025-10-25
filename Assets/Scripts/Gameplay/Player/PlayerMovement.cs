@@ -45,7 +45,7 @@ namespace Gameplay.Player
             if (Input.GetMouseButton(1))
             {
                 PlayCrawl();
-                rb.AddForce(transform.up * PlayerManager.PlayerStats.MovementSpeed * MoveSpeedAmplifier);
+                rb.AddForce(transform.up * (PlayerManager.PlayerStats.MovementSpeed * MoveSpeedAmplifier));
             }
             else if (Mathf.Abs(previousRotation - currentRotation) > 1f)
                 PlayCrawl();
@@ -111,7 +111,7 @@ namespace Gameplay.Player
             float t = 0f;
             while (t < duration && Mathf.Abs(rb.rotation - direction) > 10f)
             {
-                rb.RotateTowardsPosition(position, 10);
+                rb.RotateTowardsPosition(position, 10 / PlayerSizeManager.CurrentSize);
                 t += Time.fixedDeltaTime;
                 yield return new WaitForFixedUpdate();
             }
@@ -143,7 +143,7 @@ namespace Gameplay.Player
 
             while (t < duration)
             {
-                rb.rotation += speed;
+                rb.rotation += speed / PlayerSizeManager.CurrentSize;
                 rb.AddClampedForceTowards(
                     MainCamera.WorldMousePos,
                     PlayerManager.PlayerStats.AttackPower * MoveSpeedAmplifier * comboDashSpeedAmplifier,

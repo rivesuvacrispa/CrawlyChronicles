@@ -17,13 +17,17 @@ namespace Gameplay.Player
         public static PlayerManager Instance { get; private set; }
         
 #if UNITY_EDITOR
+        [Header("God Mode")]
         [field:SerializeField] public bool GodMode { get; private set; }
 #endif
         
+        [Header("References")]
+        // TODO: rework redundant references via events
         [SerializeField] private PlayerHitbox hitbox;
         [SerializeField] private ParticleSystem healingParticles;
         [SerializeField] private Animator spriteAnimator;
         [SerializeField] private PlayerMovement movement;
+        [SerializeField] private PlayerSizeManager sizeManager;
         [SerializeField] private MainMenu mainMenu;
         [SerializeField] private TMP_Text healthText;
         [SerializeField] private Healthbar healthbar;
@@ -32,6 +36,7 @@ namespace Gameplay.Player
         [SerializeField] private SpriteRenderer eggSpriteRenderer;
         [SerializeField] private AttackController attackController;
         [SerializeField] private Collider2D col;
+        [Header("Stats")]
         [SerializeField] private PlayerStats baseStats;
         [SerializeField] private PlayerStats currentStats;
 
@@ -40,6 +45,7 @@ namespace Gameplay.Player
         public bool IsHoldingEgg { get; private set; }
         public Egg HoldingEgg { get; private set; }
         public bool AllowInteract => !attackController.IsAttacking;
+        public PlayerSizeManager SizeManager => sizeManager;
         public static PlayerStats PlayerStats
         {
             get => Instance.currentStats;
@@ -49,8 +55,7 @@ namespace Gameplay.Player
                 OnStatsChanged?.Invoke();
             }
         }
-        public static PlayerStats BaseStats => Instance.baseStats;
-        
+
         public delegate void PlayerEvent();
         public static event PlayerEvent OnStatsChanged;
         public delegate void PlayerManagerEvent();
@@ -58,6 +63,7 @@ namespace Gameplay.Player
         public static event PlayerManagerEvent OnPlayerRespawned;
         public delegate void PlayerHitboxEvent();
         public static event PlayerHitboxEvent OnStruck;
+        
         
         
         public PlayerManager() => Instance = this;

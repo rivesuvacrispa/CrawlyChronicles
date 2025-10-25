@@ -46,7 +46,7 @@ namespace Scriptable
         public int WanderingRadius => wanderingRadius;
         public float MovementSpeed => movementSpeed;
         public float LocatorRadius => (int) locatorRadius / 10f;
-        public float Mass => GlobalDefinitions.PlayerMass * playerMass;
+        public float Mass => GlobalDefinitions.UnitMass * playerMass;
         public AudioClip HitAudio => hitAudio;
         public AudioClip AttackAudio => attackAudio;
         public AudioClip CrawlAudio => crawlAudio;
