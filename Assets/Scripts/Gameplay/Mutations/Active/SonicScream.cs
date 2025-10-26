@@ -4,7 +4,7 @@ using Util.Interfaces;
 
 namespace Gameplay.Mutations.Active
 {
-    public class SonicScream : ActiveAbility
+    public class SonicScream : ActiveAbility, IDamageSource
     {
         [SerializeField] private new ParticleSystem particleSystem;
         [Header("Waves amount")] 
@@ -36,16 +36,15 @@ namespace Gameplay.Mutations.Active
             float lifetime = LerpLevel(lifetimeLvl1, lifetimeLvl10, lvl);
             main.startLifetime = new ParticleSystem.MinMaxCurve(lifetime, lifetime + 0.25f);
         }
-        
-        private void OnParticleCollision(GameObject other)
+
+        protected override void OnBulletCollision(IDamageable damageable, int collisionID)
         {
-            if (other.TryGetComponent(out IDamageableEnemy enemy))
-                enemy.Damage(
-                    0,
-                    PlayerMovement.Position,
-                    knockback,
-                    stun,
-                    Color.white);
+            damageable.Damage(new DamageInstance(new DamageSource(this), 
+                0,
+                PlayerMovement.Position,
+                knockback,
+                stun,
+                Color.pink));
         }
         
         public override void Activate() => particleSystem.Play();

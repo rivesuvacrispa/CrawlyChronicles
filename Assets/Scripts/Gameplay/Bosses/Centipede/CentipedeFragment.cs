@@ -9,7 +9,7 @@ using Util.Interfaces;
 namespace Gameplay.Bosses.Centipede
 {
     [RequireComponent(typeof(BodyPainter))]
-    public class CentipedeFragment : MonoBehaviour, IDamageableEnemy
+    public class CentipedeFragment : MonoBehaviour, IDamageableEnemy, IDamageSource
     {
         [SerializeField] private ParticleSystem sprayParticles;
         [SerializeField] private ParticleCollisionProvider particleCollisionProvider;
@@ -178,15 +178,16 @@ namespace Gameplay.Bosses.Centipede
             locator.OnTargetLocated += OnPlayerLocated;
         }
         
-        private void OnBulletCollision(IDamageable damageable)
+        private void OnBulletCollision(IDamageable damageable, int collisionID)
         {
             if (damageable is PlayerManager)
             {
-                damageable.Damage(
-                    CentipedeDefinitions.PoisonDamage, 
+                damageable.Damage(new DamageInstance(
+                    new DamageSource(this, collisionID),
+                    CentipedeDefinitions.PoisonDamage,
                     rb.position,
                     CentipedeDefinitions.Knockback * 0.25f,
-                    0, Color.white, true);
+                    0, Color.white, true));
             }
         }
 
@@ -215,28 +216,26 @@ namespace Gameplay.Bosses.Centipede
         public float HealthbarWidth => 80;
         public event IDamageable.DeathEvent OnDeath;
         public event IDamageable.DamageEvent OnDamageTaken;
-        public bool Immune => dead || !hitbox.Enabled;
+        // TODO:: use immuneToSource from hitbox
+        public bool ImmuneToSource(DamageSource source) => dead || !hitbox.Enabled;
         public float Armor => CentipedeDefinitions.Armor * (int) fragmentType * 0.5f;
         public float CurrentHealth { get; set; }
         
-        public void OnBeforeHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false)
+        public void OnBeforeHit(DamageInstance instance)
         {
-            OnDamageTaken?.Invoke(this, damage);
+            OnDamageTaken?.Invoke(this, instance.Damage);
         }
 
-        public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false)
+        public void OnLethalHit(DamageInstance instance)
         {
-            Bossbar.Instance.Damage(damage + CurrentHealth);
+            Bossbar.Instance.Damage(instance.Damage + CurrentHealth);
             DieFromAttack();
         }
 
-        public void OnHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false)
+        public void OnHit(DamageInstance instance)
         {
             hitbox.Hit();
-            Bossbar.Instance.Damage(damage);
+            Bossbar.Instance.Damage(instance.Damage);
         }
     }
 }

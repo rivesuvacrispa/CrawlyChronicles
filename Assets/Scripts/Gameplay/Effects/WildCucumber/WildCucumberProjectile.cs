@@ -18,7 +18,8 @@ using Random = UnityEngine.Random;
 
 namespace Gameplay.Effects.WildCucumber
 {
-    public class WildCucumberProjectile : Poolable
+    [RequireComponent(typeof(ParticleCollisionProvider))]
+    public class WildCucumberProjectile : Poolable, IDamageSource
     {
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private new Rigidbody2D rigidbody;
@@ -27,8 +28,9 @@ namespace Gameplay.Effects.WildCucumber
         [SerializeField] private BodyPainter painter;
         [SerializeField] private SimpleAudioSource popSource;
         [SerializeField] private SimpleAudioSource crackSource;
-        private static readonly List<Collider2D> OverlapResults = new(32);
 
+        private static readonly List<Collider2D> OverlapResults = new(32);
+        private ParticleCollisionProvider provider;
 
         private int healthLeft;
         private bool immune;
@@ -37,7 +39,17 @@ namespace Gameplay.Effects.WildCucumber
         private CancellationTokenSource dayCancellationSource;
         
 
-        private void Awake() => burst = particleSystem.emission.GetBurst(0);
+        private void Awake()
+        {
+            burst = particleSystem.emission.GetBurst(0);
+            provider = GetComponent<ParticleCollisionProvider>();
+            provider.OnCollision += OnBulletCollision;
+        }
+
+        private void OnDestroy()
+        {
+            provider.OnCollision -= OnBulletCollision;
+        }
 
         private void OnEnable()
         {
@@ -107,8 +119,11 @@ namespace Gameplay.Effects.WildCucumber
                 if (c.gameObject.layer == GlobalDefinitions.EnemyPhysicsLayer && 
                     c.TryGetComponent(out IDamageableEnemy enemy))
                 {
-                    enemy.Damage(BasicAbility.GetAbilityDamage(args.explosionDamage), transform.position,
-                        args.knockback, 0f, default);
+                    enemy.Damage(new DamageInstance(
+                        new DamageSource(this),
+                        BasicAbility.GetAbilityDamage(args.explosionDamage), 
+                        transform.position,
+                        args.knockback));
                 }
             }
             
@@ -172,16 +187,12 @@ namespace Gameplay.Effects.WildCucumber
             collider.enabled = true;
         }
         
-        private void OnParticleCollision(GameObject other)
+        private void OnBulletCollision(IDamageable damageable, int collisionID)
         {
-            if (other.TryGetComponent(out IDamageableEnemy enemy))
-                enemy.Damage(
+            damageable.Damage(new DamageInstance(
+                new DamageSource(this, collisionID),
                     BasicAbility.GetAbilityDamage(args.seedsDamage),
-                    transform.position,
-                    0,
-                    0,
-                    Color.white,
-                    false);
+                    transform.position));
         }
 
         private void OnDayStart(int dayCounter)

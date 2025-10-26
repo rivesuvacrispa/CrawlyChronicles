@@ -321,47 +321,45 @@ namespace Gameplay.Enemies
         public float HealthbarWidth => scriptable.HealthbarWidth;
         public event IDamageable.DeathEvent OnDeath;
         public event IDamageable.DamageEvent OnDamageTaken;
-        public bool Immune => hitbox.Immune || StateController.Etherial;
+        public bool ImmuneToSource(DamageSource source) => hitbox.ImmuneToSource(source) || StateController.Etherial;
         public float Armor => Scriptable.Armor;
         public float CurrentHealth { get; set; }
         public float MaxHealth => Scriptable.MaxHealth;
 
-        public bool TryBlockDamage(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false)
+        public bool TryBlockDamage(DamageInstance instance)
         {
-            if (piercing || !reckoned) return false;
+            if (instance.piercing || !reckoned) return false;
             reckoned = false;
             attackDelay = 0.5f;
             return true;
         }
 
-        public void OnBeforeHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false)
+        public void OnBeforeHit(DamageInstance instance)
         {
-            OnDamageTaken?.Invoke(this, damage);
+            OnDamageTaken?.Invoke(this, instance.Damage);
             attackDelay = 1f;
             StopAttack();
             DamageTaken();
         }
 
-        public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false)
+        public void OnLethalHit(DamageInstance instance)
         {
             Die();
         }
 
-        public void OnHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false)
+        public void OnHit(DamageInstance instance)
         {
-            hitbox.Hit();
+            hitbox.Hit(instance);
             audioController.PlayAction(scriptable.HitAudio, pitch: SoundUtility.GetRandomPitchTwoSided(0.15f));
-            bodyPainter.Paint(new Gradient().FastGradient(damageColor, scriptable.BodyColor), GlobalDefinitions.EnemyImmunityDuration);
-            if (stunDuration > 0) 
-                StartCoroutine(StunRoutine(stunDuration));
-            if (knockback > 0)
+            bodyPainter.Paint(new Gradient().FastGradient(instance.damageColor, scriptable.BodyColor), GlobalDefinitions.EnemyImmunityDuration);
+            
+            if (instance.stunDuration > 0) 
+                StartCoroutine(StunRoutine(instance.stunDuration));
+            
+            if (instance.knockback > 0)
             {
-                float duration = Mathf.Lerp(Mathf.Clamp01(knockback), 0, 0.25f);
-                Knockback(position, knockback, duration);
+                float duration = Mathf.Lerp(Mathf.Clamp01(instance.knockback), 0, 0.25f);
+                Knockback(instance.position, instance.knockback, duration);
             }
         }
     }

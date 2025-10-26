@@ -7,36 +7,25 @@ using Util.Interfaces;
 
 namespace Gameplay.Mutations.Active
 {
-    public class AcidSpray : ActiveAbility
+    public class AcidSpray : ActiveAbility, IDamageSource
     {
         [FormerlySerializedAs("particleSystem")] 
         [SerializeField] private ParticleSystem basicParticleSystem;
         [SerializeField] private ParticleSystem comboParticleSystem;
-        [SerializeField] private ParticleCollisionProvider provider1;
-        [SerializeField] private ParticleCollisionProvider provider2;
         [Header("Particles amount")] 
         [SerializeField] private int amountLvl1;
         [SerializeField] private int amountLvl10;
         [Header("Spray angle")] 
         [SerializeField] private int angleLvl1;
         [SerializeField] private int angleLvl10;
-        [Header("Stun and knockback")] 
-        [SerializeField, Range(0, 1)] private float stunDuration = 0.5f;
-        [SerializeField, Range(0, 10)]  private float knockbackPower = 0.5f;
         [Header("Damage")]
         [SerializeField] private float damageLvl1;
         [SerializeField] private float damageLvl10;
-
         
         private float damage;
 
-        protected override void Start()
-        {
-            base.Start();
-            provider1.OnCollision += OnBulletCollision;
-            provider2.OnCollision += OnBulletCollision;
-        }
-
+        
+        
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
@@ -61,22 +50,14 @@ namespace Gameplay.Mutations.Active
                 basicParticleSystem.Play();
         }
 
-        private void OnBulletCollision(IDamageable damageable)
+        protected override void OnBulletCollision(IDamageable damageable, int collisionID)
         {
             if(damageable is IDamageableEnemy enemy)
-                enemy.Damage(
-                    GetAbilityDamage(damage), 
+                enemy.Damage(new DamageInstance(new DamageSource(this, collisionID),
+                    GetAbilityDamage(damage),
                     PlayerMovement.Position,
-                    knockbackPower, 
-                    stunDuration, 
-                    GlobalDefinitions.PoisonColor, 
-                    piercing: true);
-        }
-
-        private void OnDestroy()
-        {
-            provider1.OnCollision -= OnBulletCollision;
-            provider2.OnCollision -= OnBulletCollision;
+                    damageColor: GlobalDefinitions.PoisonColor,
+                    piercing: true));
         }
 
         public override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
@@ -103,7 +84,7 @@ namespace Gameplay.Mutations.Active
             {
                 cd,          width,             dmg,           amount, 
                 cd - prevCd, width - prevWidth, dmg - prevDmg, amount - prevAmount, 
-                stunDuration, knockbackPower
+                0, 0
             };
         }
     }

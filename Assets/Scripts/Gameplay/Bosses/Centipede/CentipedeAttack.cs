@@ -5,7 +5,7 @@ using Util.Interfaces;
 
 namespace Gameplay.Bosses.Centipede
 {
-    public class CentipedeAttack : MonoBehaviour
+    public class CentipedeAttack : MonoBehaviour, IDamageSource
     {
         private new Collider2D collider;
 
@@ -13,10 +13,11 @@ namespace Gameplay.Bosses.Centipede
 
         private void OnTriggerEnter2D(Collider2D col)
         {
-            if (((IDamageable)PlayerManager.Instance).Damage(
+            if (((IDamageable)PlayerManager.Instance).Damage(new DamageInstance(
+                    new DamageSource(this),
                     CentipedeDefinitions.AttackDamage,
                     transform.position,
-                    CentipedeDefinitions.Knockback, 0, default) == 0)
+                    CentipedeDefinitions.Knockback)) == 0)
             {
                 PlayerManager.Instance.Knockback((Vector2) transform.position + Random.insideUnitCircle.normalized,
                     CentipedeDefinitions.Knockback);

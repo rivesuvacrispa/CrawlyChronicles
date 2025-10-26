@@ -7,7 +7,7 @@ using Util.Interfaces;
 namespace Gameplay.Bosses.Terrorwing
 {
     [RequireComponent(typeof(Collider2D))]
-    public class TerrorwingHitbox : MonoBehaviour
+    public class TerrorwingHitbox : MonoBehaviour, IDamageSource
     {
         [SerializeField] private TerrorwingClone terrorwingClone;
         
@@ -19,15 +19,15 @@ namespace Gameplay.Bosses.Terrorwing
         private void Awake() => hitboxCollider = GetComponent<Collider2D>();
 
         
-        
+        /**
+         * PlayerAttack OR PlayerHitbox x TerrorwingHitbox
+         * PlayerHitbox = damage player
+         * PlayerAttack = damage terrorwing
+         */
         private void OnTriggerEnter2D(Collider2D col)
         {
             if(!ContactDamage(col)) 
-                terrorwingClone.Damage(
-                    PlayerManager.PlayerStats.AttackDamage, 
-                    PlayerManager.Instance.transform.position, 0f, 0f, 
-                    default, false,
-                    effects: PlayerAttack.CurrentAttackEffects);
+                terrorwingClone.Damage(PlayerAttack.CreateDamageInstance());
         }
 
         private bool ContactDamage(Collider2D col)
@@ -35,9 +35,12 @@ namespace Gameplay.Bosses.Terrorwing
             if (col.gameObject.TryGetComponent(out PlayerHitbox _))
             {
                 ((IDamageable)PlayerManager.Instance).Damage(
+                    new DamageInstance(
+                    new DamageSource(this),
                     TerrorwingDefinitions.ContactDamage,
                     transform.position,
-                    5, 0, default);
+                    5));
+                
                 return true;
             }
 

@@ -23,7 +23,7 @@ namespace Gameplay.Enemies.Enemies
         public float HealthbarWidth => scriptable.HealthbarWidth;
         public event IDamageable.DeathEvent OnDeath;
         public event IDamageable.DamageEvent OnDamageTaken;
-        public bool Immune => hitbox.Immune;
+        public bool ImmuneToSource(DamageSource source) => hitbox.ImmuneToSource(source);
         public float Armor => scriptable.Armor;
         public float CurrentHealth { get; set; }
         public float MaxHealth => scriptable.MaxHealth;
@@ -40,8 +40,7 @@ namespace Gameplay.Enemies.Enemies
             Start();
         }
         
-        public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false)
+        public void OnLethalHit(DamageInstance instance)
         {
             Die();
         }
@@ -52,21 +51,19 @@ namespace Gameplay.Enemies.Enemies
             rb.AddClampedForceBackwards(attacker, force * (1 - kbResistance), ForceMode2D.Impulse);
         }
         
-        public void OnBeforeHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false)
+        public void OnBeforeHit(DamageInstance instance)
         {
-            OnDamageTaken?.Invoke(this, damage);
+            OnDamageTaken?.Invoke(this, instance.Damage);
         }
 
-        public void OnHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false)
+        public void OnHit(DamageInstance instance)
         {
-            hitbox.Hit();
+            hitbox.Hit(instance);
             audioController.PlayAction(scriptable.HitAudio, pitch: SoundUtility.GetRandomPitchTwoSided(0.15f));
-            bodyPainter.Paint(new Gradient().FastGradient(damageColor, scriptable.BodyColor), GlobalDefinitions.EnemyImmunityDuration);
-            if (knockback > 0)
+            bodyPainter.Paint(new Gradient().FastGradient(instance.damageColor, scriptable.BodyColor), GlobalDefinitions.EnemyImmunityDuration);
+            if (instance.knockback > 0)
             {
-                Knockback(position, knockback);
+                Knockback(instance.position, instance.knockback);
             }
         }
         

@@ -4,19 +4,25 @@ using Util.Interfaces;
 
 namespace Gameplay.Enemies
 {
-    public class EnemyAttack : MonoBehaviour, IEnemyAttack
+    public class EnemyAttack : MonoBehaviour, IEnemyAttack, IDamageSource
     {
         [SerializeField] private Enemy enemy;
 
-        
+        /***
+         * EnemyAttack x PlayerHitbox
+         * Enemy attack collides with player hitbox
+         * Player takes damage
+         */
         private void OnCollisionEnter2D(Collision2D col)
         {
             if (col.gameObject.TryGetComponent(out PlayerManager playerManager))
             {
-                // OnStruck?.Invoke(0);
                 ((IDamageable)playerManager)
-                    .Damage(AttackDamage, AttackPosition, 
-                        AttackPower, 0, default);
+                    .Damage(new DamageInstance(
+                        new DamageSource(this, col.GetHashCode()),
+                        AttackDamage,
+                        AttackPosition,
+                        AttackPower));
             }
         }
 

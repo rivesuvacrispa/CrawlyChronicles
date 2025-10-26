@@ -4,7 +4,7 @@ using Util.Interfaces;
 
 namespace Gameplay.Mutations.EntityEffects.Poison
 {
-    public class PoisonEntityEffect : EntityEffect
+    public class PoisonEntityEffect : EntityEffect, IDamageSource
     {
         protected override void OnApplied()
         {
@@ -18,13 +18,15 @@ namespace Gameplay.Mutations.EntityEffects.Poison
             if(Target is not IDamageableEnemy enemy) return;
             
             PoisonEffectData data = (PoisonEffectData) Data;
-            enemy.Damage(
+            enemy.Damage(new DamageInstance(
+                new DamageSource(this, TickCounter), 
                 data.Damage, 
                 Player.PlayerMovement.Position, 
                 0.1f,
                 0, 
                 GlobalDefinitions.PoisonColor,
-                true);
+                true)
+                );
         }
 
         protected override void OnRemoved()

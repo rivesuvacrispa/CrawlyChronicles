@@ -16,7 +16,8 @@ namespace Gameplay.Mutations.EntityEffects
         protected abstract void OnApplied();
         protected abstract void Tick();
         protected abstract void OnRemoved();
-
+        protected int TickCounter { get; private set; }
+        
         public EntityEffect SetTarget(IEffectAffectable target)
         {
             Target = target;
@@ -42,6 +43,7 @@ namespace Gameplay.Mutations.EntityEffects
             {
                 yield return new WaitForSeconds(1f);
                 Duration--;
+                TickCounter++;
                 Tick();
             }
 

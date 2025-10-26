@@ -15,7 +15,7 @@ using Random = UnityEngine.Random;
 
 namespace Gameplay.Effects.Fly
 {
-    public class Fly : Poolable
+    public class Fly : Poolable, IDamageSource
     {
         [SerializeField] private Rigidbody2D rb;
         
@@ -32,10 +32,11 @@ namespace Gameplay.Effects.Fly
             int contacts = Physics2D.OverlapCircle(transform.position, 3f,  GlobalDefinitions.EnemyPhysicsContactFilter, OverlapResults);
 
             IDamageableEnemy fallbackEnemy = null;
+            DamageSource source = new DamageSource(this);
             for (var i = 0; i < Mathf.Min(contacts, 8); i++)
             {
                 var t = OverlapResults[i];
-                if (t.TryGetComponent(out IDamageableEnemy enemy) && !enemy.Immune && enemy is not NeutralAnt)
+                if (t.TryGetComponent(out IDamageableEnemy enemy) && !enemy.ImmuneToSource(source) && enemy is not NeutralAnt)
                 {
                     fallbackEnemy ??= enemy;
                     if (Random.value <= 0.25f)
@@ -162,7 +163,7 @@ namespace Gameplay.Effects.Fly
                 float sqrDist = Vector2.SqrMagnitude(currentPos - targetPos);
                 if (canAttack && followTarget is IDamageableEnemy enemy && sqrDist < 0.25f)
                 {
-                    enemy.Damage(args.damage, transform.position, 0f, 0f, default);
+                    enemy.Damage(new DamageInstance(new DamageSource(this), args.damage, transform.position));
                     AttackDelayTask(cancellationToken: cancellationToken).Forget();
                 };
             }

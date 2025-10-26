@@ -24,28 +24,26 @@ namespace Gameplay.Enemies.Spawners
 
         public event IDamageable.DeathEvent OnDeath;
         public event IDamageable.DamageEvent OnDamageTaken;
-        public bool Immune => !hitbox.Enabled;
+        // TODO:: immuneToSource
+        public bool ImmuneToSource(DamageSource source) => !hitbox;
         public float Armor => armor;
         public float CurrentHealth { get; set; }
         public float MaxHealth => maxHealth;
 
         
 
-        public void OnBeforeHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false)
+        public void OnBeforeHit(DamageInstance instance)
         {
-            OnDamageTaken?.Invoke(this, damage);
+            OnDamageTaken?.Invoke(this, instance.Damage);
         }
 
-        public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false)
+        public void OnLethalHit(DamageInstance instance)
         {
             OnDeath?.Invoke(this);
             Destroy(gameObject);
         }
 
-        public void OnHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false)
+        public void OnHit(DamageInstance instance)
         {
             hitbox.Hit();
         }

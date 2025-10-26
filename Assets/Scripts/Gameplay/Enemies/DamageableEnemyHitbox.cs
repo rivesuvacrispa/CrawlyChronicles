@@ -1,4 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using Definitions;
 using Gameplay.Player;
 using UnityEngine;
@@ -13,9 +16,10 @@ namespace Gameplay.Enemies
 
         private new Collider2D collider;
         private IDamageableEnemy enemy;
+        private readonly HashSet<DamageSource> blockedSources = new();
 
         public bool Dead { get; private set; }
-        public bool Immune => !collider.enabled || Dead;
+        public bool ImmuneToSource(DamageSource source) => !collider.enabled || Dead || blockedSources.Contains(source);
 
         private void Awake()
         {
@@ -29,15 +33,14 @@ namespace Gameplay.Enemies
             }
         }
 
+        /***
+         * EnemyHitbox x PlayerAttack
+         * Player attack collides with enemy
+         * Enemy takes damage
+         */
         private void OnCollisionEnter2D(Collision2D _)
         {
-            enemy.Damage(
-                PlayerManager.PlayerStats.AttackDamage,
-                PlayerMovement.Position,
-                PlayerManager.PlayerStats.AttackPower,
-                0.35f, 
-                Color.white,
-                effects: PlayerAttack.CurrentAttackEffects);
+            enemy.Damage(PlayerAttack.CreateDamageInstance());
         }
         
         public void Enable()
@@ -59,13 +62,18 @@ namespace Gameplay.Enemies
             Disable();
         }
 
-        public void Hit() => StartCoroutine(ImmunityRoutine());
+        public void Hit(DamageInstance instance)
+        {
+            ImmunityTask(instance, gameObject.GetCancellationTokenOnDestroy()).Forget();
+        }
 
-        private IEnumerator ImmunityRoutine()
-        { 
-            collider.enabled = false;
-            yield return new WaitForSeconds(GlobalDefinitions.EnemyImmunityDuration);
-            collider.enabled = true;
+        private async UniTask ImmunityTask(DamageInstance instance, CancellationToken cancellationToken)
+        {
+            if (!blockedSources.Add(instance.source)) return;
+            
+            await UniTask.Delay(TimeSpan.FromSeconds(GlobalDefinitions.EnemyImmunityDuration), cancellationToken: cancellationToken);
+
+            blockedSources.Remove(instance.source);
         }
     }
 }

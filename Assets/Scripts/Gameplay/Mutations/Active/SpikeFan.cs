@@ -4,7 +4,7 @@ using Util.Interfaces;
 
 namespace Gameplay.Mutations.Active
 {
-    public class SpikeFan : ActiveAbility
+    public class SpikeFan : ActiveAbility, IDamageSource
     {
         [SerializeField] private new ParticleSystem particleSystem;
         [Header("Particles amount")] 
@@ -34,16 +34,15 @@ namespace Gameplay.Mutations.Active
             emission.rateOverTime = LerpLevel(amountLvl1, amountLvl10, lvl);
             main.duration = LerpLevel(durationLvl1, durationLvl10, lvl);
         }
-        
-        private void OnParticleCollision(GameObject other)
+
+        protected override void OnBulletCollision(IDamageable damageable, int collisionID)
         {
-            if (other.TryGetComponent(out IDamageableEnemy enemy))
-                enemy.Damage(
-                    GetAbilityDamage(damage),
-                    PlayerMovement.Position,
-                    knockbackPower,
-                    stunDuration,
-                    Color.white);
+            damageable.Damage(new DamageInstance(new DamageSource(this, collisionID), 
+                GetAbilityDamage(damage),
+                PlayerMovement.Position,
+                knockbackPower,
+                stunDuration,
+                Color.white));
         }
 
         public override void Activate()

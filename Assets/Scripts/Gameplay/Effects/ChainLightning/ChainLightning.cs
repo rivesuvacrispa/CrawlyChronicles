@@ -11,9 +11,10 @@ using Random = UnityEngine.Random;
 
 namespace Gameplay.Effects.ChainLightning
 {
-    public class ChainLightning : Poolable
+    public class ChainLightning : Poolable, IDamageSource
     {
         [SerializeField] private new ParticleSystemLineRenderer particleSystem;
+        [SerializeField] private ParticleSystem singleTargetParticles;
         [SerializeField] private AudioSource audioSource;
         
         private ChainLightningArguments currentArgs;
@@ -44,12 +45,13 @@ namespace Gameplay.Effects.ChainLightning
         {
             target = null;
             var cols = Physics2D.OverlapCircleAll(currentArgs.position, currentArgs.chainRange, layerMask: GlobalDefinitions.EnemyPhysicsLayerMask);
-            
+
+            DamageSource source = new DamageSource(this);
             foreach (Collider2D col in cols.OrderBy((_) => Random.value))
             {
                 if (!col.TryGetComponent(out IDamageableEnemy damageableEnemy) ||
                     damageableEnemy.Equals(currentArgs.currentTarget) ||
-                    damageableEnemy.Immune) continue;
+                    damageableEnemy.ImmuneToSource(source)) continue;
 
                 target = damageableEnemy;
                 break;
@@ -87,13 +89,21 @@ namespace Gameplay.Effects.ChainLightning
 
         private void DamageTarget()
         {
-            currentArgs.currentTarget.Damage(
-                currentArgs.damage, transform.position, 0f, currentArgs.stunDuration, default);
+            currentArgs.currentTarget.Damage(new DamageInstance(
+                    new DamageSource(this),
+                    currentArgs.damage, 
+                    transform.position, 
+                    stunDuration: currentArgs.stunDuration, 
+                    piercing: true));
         }
 
         private async UniTask PoolTask(CancellationToken cancellationToken)
         {
-            await UniTask.WaitUntil(() => !particleSystem.IsPlaying, cancellationToken: cancellationToken);
+            await UniTask.WaitUntil(() => 
+                    !particleSystem.IsPlaying && 
+                    !singleTargetParticles.isPlaying, 
+                cancellationToken: cancellationToken);
+            
             Pool();
         }
 

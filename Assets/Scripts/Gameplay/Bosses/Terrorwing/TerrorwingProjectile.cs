@@ -5,7 +5,7 @@ using Util.Interfaces;
 
 namespace Gameplay.Bosses.Terrorwing
 {
-    public class TerrorwingProjectile : MonoBehaviour
+    public class TerrorwingProjectile : MonoBehaviour, IDamageSource
     {
         [SerializeField] private ParticleSystem explosion;
         [SerializeField] private Animator animator;
@@ -75,9 +75,10 @@ namespace Gameplay.Bosses.Terrorwing
             {
                 Explode();
                 ((IDamageable)PlayerManager.Instance).Damage(
+                    new DamageInstance(new DamageSource(this, col.GetHashCode()),
                     TerrorwingDefinitions.ExplosionDamage,
-                    transform.position + (Vector3) Random.insideUnitCircle.normalized,
-                    5, 0, default);
+                    transform.position + (Vector3)Random.insideUnitCircle.normalized,
+                    5, 0, default));
             }
         }
     }

@@ -6,7 +6,7 @@ using Util.Interfaces;
 
 namespace Gameplay.Mutations.Passive
 {
-    public class GlowingBlood : BasicAbility
+    public class GlowingBlood : BasicAbility, IDamageSource
     {
         [SerializeField] private new ParticleSystem particleSystem;
         [SerializeField] private new Light2D light;
@@ -35,17 +35,14 @@ namespace Gameplay.Mutations.Passive
             emission.rateOverTime = LerpLevel(amountLvl1, amountLvl10, lvl);
             main.startLifetime = lifetime;
         }
-        
-        private void OnParticleCollision(GameObject other)
+
+        protected override void OnBulletCollision(IDamageable damageable, int collisionID)
         {
-            if (other.TryGetComponent(out IDamageableEnemy enemy))
-                enemy.Damage(
-                    GetAbilityDamage(damage),
-                    PlayerMovement.Position,
-                    0,
-                    0,
-                    Color.white,
-                    true);
+            damageable.Damage(new DamageInstance(
+                new DamageSource(this, collisionID),
+                GetAbilityDamage(damage),
+                PlayerMovement.Position,
+                piercing: true));
         }
 
         protected override void OnEnable()

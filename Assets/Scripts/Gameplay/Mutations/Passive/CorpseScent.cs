@@ -46,7 +46,7 @@ namespace Gameplay.Mutations.Passive
 #endif
             {
 
-                if (enabled)
+                if (isActiveAndEnabled)
                 {
                     ClearFlies();
                     SpawnFlies();

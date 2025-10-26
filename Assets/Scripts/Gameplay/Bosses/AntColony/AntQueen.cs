@@ -220,29 +220,26 @@ namespace Gameplay.Bosses.AntColony
         public float HealthbarWidth => 0;
         public event IDamageable.DeathEvent OnDeath;
         public event IDamageable.DamageEvent OnDamageTaken;
-        public bool Immune => hitbox.Immune;
+        public bool ImmuneToSource(DamageSource source) => hitbox.ImmuneToSource(source);
         public float Armor => AntColonyDefinitions.Armor;
         public float CurrentHealth { get; set; }
         public float MaxHealth => AntColonyDefinitions.Health;
 
-        public void OnBeforeHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false)
+        public void OnBeforeHit(DamageInstance instance)
         {
-            OnDamageTaken?.Invoke(this, damage);
+            OnDamageTaken?.Invoke(this, instance.Damage);
         }
 
-        public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false)
+        public void OnLethalHit(DamageInstance instance)
         {
             Die();
         }
 
-        public void OnHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false)
+        public void OnHit(DamageInstance instance)
         {
-            hitbox.Hit();
-            Bossbar.Instance.Damage(damage);
-            var gradient = new Gradient().FastGradient(damageColor, painters[0].CurrentColor);
+            hitbox.Hit(instance);
+            Bossbar.Instance.Damage(instance.Damage);
+            var gradient = new Gradient().FastGradient(instance.damageColor, painters[0].CurrentColor);
             foreach (BodyPainter painter in painters) 
                 painter.Paint(gradient, GlobalDefinitions.EnemyImmunityDuration);
         }

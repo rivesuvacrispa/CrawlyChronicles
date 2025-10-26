@@ -5,7 +5,7 @@ using Util.Interfaces;
 
 namespace Gameplay.Bosses.BlackWidow
 {
-    public class BlackWidowThreadCollider : MonoBehaviour
+    public class BlackWidowThreadCollider : MonoBehaviour, IDamageSource
     {
         [SerializeField] private BlackWidowThread thread;
         [SerializeField] private bool immune;
@@ -20,8 +20,10 @@ namespace Gameplay.Bosses.BlackWidow
             
             if (col.gameObject.TryGetComponent(out PlayerHitbox _))
             {
-                ((IDamageable)PlayerManager.Instance).Damage(CentipedeBoss.ContactDamage, contactPoint,
-                    CentipedeDefinitions.Knockback, 0, default);
+                ((IDamageable)PlayerManager.Instance).Damage(new DamageInstance(
+                    new DamageSource(this),
+                    CentipedeBoss.ContactDamage, contactPoint,
+                    CentipedeDefinitions.Knockback));
                 
             } else if (!(dead || immune))
             {

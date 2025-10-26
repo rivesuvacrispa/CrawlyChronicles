@@ -209,9 +209,9 @@ namespace Gameplay.Player
 
 #if UNITY_EDITOR
         public event IDamageable.DamageEvent OnDamageTaken;
-        public bool Immune => GodMode || hitbox.Immune;
+        public bool ImmuneToSource(DamageSource source) => GodMode || hitbox.Immune;
 #else
-        public bool Immune => hitbox.Immune;
+        public bool ImmuneToSource(DamageSource source) => hitbox.Immune;
 #endif
         public float Armor => currentStats.Armor;
 
@@ -219,24 +219,21 @@ namespace Gameplay.Player
         public float MaxHealth => currentStats.MaxHealth;
 
 
-        public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false)
+        public void OnLethalHit(DamageInstance instance)
         {
             Die(true);
         }
 
-        public void OnHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false)
+        public void OnHit(DamageInstance instance)
         {
             hitbox.Hit();
         }
         
-        public void OnBeforeHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false)
+        public void OnBeforeHit(DamageInstance instance)
         {
-            OnDamageTaken?.Invoke(this, damage);
+            OnDamageTaken?.Invoke(this, instance.Damage);
             PlayerAudioController.Instance.PlayHit();
-            movement.Knockback(position, knockback);
+            movement.Knockback(instance.position, instance.knockback);
             UpdateHealthbar();
         }
 

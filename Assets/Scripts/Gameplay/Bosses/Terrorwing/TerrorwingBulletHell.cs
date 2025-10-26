@@ -7,7 +7,7 @@ using Util.Interfaces;
 
 namespace Gameplay.Bosses.Terrorwing
 {
-    public class TerrorwingBulletHell : MonoBehaviour
+    public class TerrorwingBulletHell : MonoBehaviour, IDamageSource
     {
         [SerializeField] private ParticleSystem rainParticles;
         [SerializeField] private ParticleSystem waveParticles;
@@ -30,15 +30,15 @@ namespace Gameplay.Bosses.Terrorwing
             collisionProvider3.OnCollision -= OnBulletCollision;
         }
 
-        private void OnBulletCollision(IDamageable damageable)
+        private void OnBulletCollision(IDamageable damageable, int collisionID)
         {
             if (damageable is Player.PlayerManager)
             {
-                damageable.Damage(
+                damageable.Damage(new DamageInstance(new DamageSource(this, collisionID),
                     TerrorwingDefinitions.BulletHellDamage, 
                     transform.position,
-                    2,
-                    0, Color.white, true);
+                    knockback: 2,
+                    piercing: true));
             }
         }
 

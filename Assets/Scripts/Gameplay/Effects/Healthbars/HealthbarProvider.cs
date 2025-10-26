@@ -7,7 +7,7 @@ namespace Gameplay.Effects.Healthbars
     [RequireComponent(typeof(IDamageable))]
     public class HealthbarProvider : MonoBehaviour
     {
-        private void Awake()
+        private void Start()
         {
             IDamageable damageable = gameObject.GetComponent<IDamageable>();
             PoolManager.GetEffect<Healthbar>(new HealthbarArguments(damageable));

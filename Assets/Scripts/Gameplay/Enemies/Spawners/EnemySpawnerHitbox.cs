@@ -27,11 +27,10 @@ namespace Gameplay.Enemies.Spawners
             spawner = GetComponent<DamageableEnemySpawner>();
         }
 
-        private void OnTriggerEnter2D(Collider2D _) 
-            => ((IDamageable) spawner).Damage(
-                PlayerManager.PlayerStats.AttackDamage,
-                default, 0, 0, default, false,
-                effects: PlayerAttack.CurrentAttackEffects);
+        private void OnTriggerEnter2D(Collider2D _)
+        {
+            ((IDamageable) spawner).Damage(PlayerAttack.CreateDamageInstance());
+        }
         
         public void Hit() => StartCoroutine(ImmunityRoutine());
 

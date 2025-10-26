@@ -7,7 +7,7 @@ using Util.Interfaces;
 
 namespace Gameplay.Food.Foodbeds
 {
-    public class Cacti : UniqueFoodbed
+    public class Cacti : UniqueFoodbed, IDamageSource
     {
         [SerializeField] private CactiCollider cactiCollider;
         [SerializeField] private SpriteRenderer spikesRenderer;
@@ -30,7 +30,7 @@ namespace Gameplay.Food.Foodbeds
             if (col.gameObject.TryGetComponent(out Enemy enemy))
                 OnTouchEnemy(enemy);
             else if (col.gameObject.TryGetComponent(out PlayerManager player)) 
-                OnTouchPlayer(player);
+                OnTouchPlayer(player, col);
             
             spikesLeft--;
             UpdateSpikesSprite();
@@ -38,15 +38,16 @@ namespace Gameplay.Food.Foodbeds
             if (spikesLeft == 0) cactiCollider.gameObject.SetActive(false);
         }
 
-        private void OnTouchPlayer(IDamageable player)
+        private void OnTouchPlayer(IDamageable player, Collision2D col)
         {
             player.Damage(
-                Scriptable.ContactDamage, 
-                transform.position, 
-                Scriptable.Knockback, 
-                0f, 
-                default, 
-                true);
+                new DamageInstance(
+                    new DamageSource(this, col.GetHashCode()),
+                    Scriptable.ContactDamage, 
+                    transform.position,
+                    Scriptable.Knockback,
+                    piercing: true
+                ));
         }
 
         private void OnTouchEnemy(Enemy enemy)

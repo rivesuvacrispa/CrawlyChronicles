@@ -7,7 +7,7 @@ using Util.Interfaces;
 namespace Gameplay.Bosses.Centipede
 {
     [RequireComponent(typeof(Collider2D))]
-    public class CentipedeHitbox : MonoBehaviour
+    public class CentipedeHitbox : MonoBehaviour, IDamageSource
     {
         public CentipedeFragment Fragment { get; set; }
         private new Collider2D collider;
@@ -22,12 +22,13 @@ namespace Gameplay.Bosses.Centipede
         private void OnTriggerEnter2D(Collider2D col)
         {
             if (col.gameObject.TryGetComponent(out PlayerHitbox _))
-                ((IDamageable)PlayerManager.Instance).Damage(CentipedeBoss.ContactDamage, transform.position,
-                    CentipedeDefinitions.Knockback, 0, default);
+                ((IDamageable)PlayerManager.Instance).Damage(new DamageInstance(
+                    new DamageSource(this),
+                    CentipedeBoss.ContactDamage, 
+                    transform.position,
+                    CentipedeDefinitions.Knockback));
             else
-                ((IDamageable)Fragment).Damage(
-                PlayerManager.PlayerStats.AttackDamage, default, 0, 
-                0, default, false, PlayerAttack.CurrentAttackEffects);
+                ((IDamageable)Fragment).Damage(PlayerAttack.CreateDamageInstance());
         }
 
         public void Hit() => StartCoroutine(ImmunityRoutine());

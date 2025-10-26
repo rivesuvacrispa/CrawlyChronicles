@@ -12,7 +12,7 @@ using Util.Interfaces;
 
 namespace Gameplay.Bosses.Terrorwing
 {
-    public class TerrorwingClone : MonoBehaviour, IDamageableEnemy
+    public class TerrorwingClone : MonoBehaviour, IDamageableEnemy, IDamageSource
     {
         [SerializeField] private bool original;
 
@@ -142,15 +142,15 @@ namespace Gameplay.Bosses.Terrorwing
             particleCollisionProvider.OnCollision -= OnBulletCollision;
         }
         
-        private void OnBulletCollision(IDamageable damageable)
+        private void OnBulletCollision(IDamageable damageable, int collisionID)
         {
             if (damageable is PlayerManager)
             {
-                damageable.Damage(
-                    TerrorwingDefinitions.BulletHellDamage, 
+                damageable.Damage(new DamageInstance(new DamageSource(this, collisionID),
+                    TerrorwingDefinitions.BulletHellDamage,
                     transform.position,
-                    2,
-                    0, Color.white, true);
+                    knockback: 2,
+                    piercing: true));
             }
         }
 
@@ -171,42 +171,41 @@ namespace Gameplay.Bosses.Terrorwing
         public float HealthbarWidth => 0;
         public event IDamageable.DeathEvent OnDeath;
         public event IDamageable.DamageEvent OnDamageTaken;
-        public bool Immune => hitbox.Immune;
+        public bool ImmuneToSource(DamageSource source) => hitbox.Immune;
         public float Armor => 0;
         public float CurrentHealth { get; set; }
 
         public float MaxHealth => TerrorwingDefinitions.MaxHealth;
 
-        public float Damage(float damage,
-            Vector3 position,
-            float knockback,
-            float stunDuration,
-            Color damageColor,
-            bool piercing = false,
-            List<AttackEffect> effects = null)
+        public float Damage(DamageInstance instance)
         {
             if(hitbox.Immune) return 0;
             if(rb.simulated) hitbox.Hit();
             PaintDamage();
             if(original) ((IDamageable)terrorwing).Damage(
-                damage, position, knockback, stunDuration, damageColor, piercing, effects);
-            return damage;
+                new DamageInstance(new DamageSource(this), 
+                    instance.Damage, 
+                    instance.position, 
+                    instance.knockback, 
+                    instance.stunDuration, 
+                    instance.damageColor, 
+                    instance.piercing, 
+                    instance.effects)
+                );
+            return instance.Damage;
         }
 
-        public void OnBeforeHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false)
+        public void OnBeforeHit(DamageInstance instance)
         {
-            OnDamageTaken?.Invoke(this, damage);
+            OnDamageTaken?.Invoke(this, instance.Damage);
         }
 
-        public void OnLethalHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false)
+        public void OnLethalHit(DamageInstance instance)
         {
             
         }
 
-        public void OnHit(float damage, Vector3 position, float knockback, float stunDuration, Color damageColor,
-            bool piercing = false)
+        public void OnHit(DamageInstance instance)
         {
             
         }

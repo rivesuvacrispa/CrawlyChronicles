@@ -5,7 +5,7 @@ using Random = UnityEngine.Random;
 
 namespace Gameplay.Mutations.Passive
 {
-    public class SpikedCarapace : BasicAbility
+    public class SpikedCarapace : BasicAbility, IDamageSource
     {
         [SerializeField] private new ParticleSystem particleSystem;
         [Header("Trigger chance")]
@@ -44,16 +44,17 @@ namespace Gameplay.Mutations.Passive
         {
             if(Random.value <= GetPassiveProcRate(procRate)) Activate();
         }
-        
-        private void OnParticleCollision(GameObject other)
+
+        protected override void OnBulletCollision(IDamageable damageable, int collisionID)
         {
-            if (other.TryGetComponent(out IDamageableEnemy enemy)) 
-                enemy.Damage(
-                    GetAbilityDamage(damage),
+            damageable.Damage(new DamageInstance(
+                    new DamageSource(this, collisionID),
+                GetAbilityDamage(damage),
                     PlayerMovement.Position,
                     knockbackPower,
                     stunDuration,
-                    Color.white);
+                    Color.white)
+                );
         }
         
         protected override void OnDisable()

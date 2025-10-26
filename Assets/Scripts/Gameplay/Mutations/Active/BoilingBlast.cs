@@ -4,7 +4,7 @@ using Util.Interfaces;
 
 namespace Gameplay.Mutations.Active
 {
-    public class BoilingBlast : ActiveAbility
+    public class BoilingBlast : ActiveAbility, IDamageSource
     {
         [SerializeField] private ParticleSystem basicParticles;
         [SerializeField] private ParticleSystem comboParticles;
@@ -41,18 +41,18 @@ namespace Gameplay.Mutations.Active
             emission = comboParticles.emission;
             emission.SetBurst(0, new ParticleSystem.Burst(0, amount * 2));
         }
-        
-        private void OnParticleCollision(GameObject other)
+
+        protected override void OnBulletCollision(IDamageable damageable, int collisionID)
         {
-            if (other.TryGetComponent(out IDamageableEnemy enemy))
-                enemy.Damage(
+            damageable.Damage(
+                new DamageInstance(new DamageSource(this),
                     GetAbilityDamage(damage),
                     PlayerMovement.Position,
                     knockback,
                     stun,
-                    Color.white);
+                    Color.white));
         }
-        
+
         public override void Activate()
         {
             if (AttackController.IsInComboDash)

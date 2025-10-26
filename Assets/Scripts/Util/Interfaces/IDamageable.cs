@@ -23,83 +23,52 @@ namespace Util.Interfaces
         public delegate void DamageEvent(IDamageable damageable, float damage);
         public event DamageEvent OnDamageTaken;
 
-        public bool Immune { get; }
         public float Armor { get; }
         public float CurrentHealth { get; set; }
         public float MaxHealth { get; }
 
-        public float Damage(float damage,
-            Vector3 position,
-            float knockback,
-            float stunDuration,
-            Color damageColor,
-            bool piercing = false,
-            List<AttackEffect> effects = null)
+        public float Damage(DamageInstance instance)
         {
+            if (ImmuneToSource(instance.source)) return 0;
             Struck();
-            if (Immune) return 0;
 
-            if (damage is float.NaN or 0f)
-                damage = float.Epsilon;
-            
-            if (damageColor == default) damageColor = Color.white;
-
-            if (TryBlockDamage(damage, position, knockback, stunDuration, damageColor, piercing))
+            if (TryBlockDamage(instance))
                 return 0;
-            
-            damage = piercing ? damage : PhysicsUtility.CalculateDamage(damage, Armor);
 
+            float damage = instance.CalculateDamage(Armor);
             CurrentHealth -= damage;
-            Debug.Log($"{((Component)this).gameObject.name} damaged for {damage}, piercing: {piercing}");
+            Debug.Log($"{((Component)this).gameObject.name} damaged for {damage}, piercing: {instance.piercing}");
             OnDamageTakenGlobal?.Invoke(this, damage);
-            OnBeforeHit(damage, position, knockback, stunDuration, damageColor, piercing);
+            OnBeforeHit(instance);
 
             PoolManager.GetEffect<DamageText>(new DamageTextArguments(Transform.position, damage));
             if (CurrentHealth <= float.Epsilon)
             {
                 OnLethalBlowGlobal?.Invoke(this);
-                OnLethalHit(damage, position, knockback, stunDuration, damageColor, piercing);
+                OnLethalHit(instance);
             }
             else
             {
-                OnHit(damage, position, knockback, stunDuration, damageColor, piercing);
+                OnHit(instance);
             }
             
-            if (effects is not null && this is IImpactable impactable)
-                foreach (AttackEffect effect in effects)
+            if (instance.effects is not null && this is IImpactable impactable)
+                foreach (AttackEffect effect in instance.effects)
                     effect.Impact(impactable, damage);
 
             return damage;
         }
 
-        public void OnBeforeHit(float damage,
-            Vector3 position,
-            float knockback,
-            float stunDuration,
-            Color damageColor,
-            bool piercing = false);
+        public bool ImmuneToSource(DamageSource source);
+
+        public void OnBeforeHit(DamageInstance damageInstance);
         
         public void Struck() { }
 
-        public bool TryBlockDamage(float damage,
-            Vector3 position,
-            float knockback,
-            float stunDuration,
-            Color damageColor,
-            bool piercing = false) => false;
+        public bool TryBlockDamage(DamageInstance damageInstance) => false;
 
-        public void OnLethalHit(float damage,
-            Vector3 position,
-            float knockback,
-            float stunDuration,
-            Color damageColor,
-            bool piercing = false);
+        public void OnLethalHit(DamageInstance damageInstance);
 
-        public void OnHit(float damage,
-            Vector3 position,
-            float knockback,
-            float stunDuration,
-            Color damageColor,
-            bool piercing = false);
+        public void OnHit(DamageInstance damageInstance);
     }
 }
