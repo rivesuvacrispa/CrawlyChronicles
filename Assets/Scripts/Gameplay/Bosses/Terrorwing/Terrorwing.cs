@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Gameplay.Enemies;
 using Gameplay.Map;
 using Gameplay.Player;
 using UnityEngine;
@@ -20,7 +21,7 @@ namespace Gameplay.Bosses.Terrorwing
         [SerializeField] private Animator animator;
         [SerializeField] private ParticleSystem deathParticles;
         [SerializeField] private GameObject attackGO;
-        [SerializeField] private TerrorwingHitbox mainHitbox;
+        [SerializeField] private DamageableEnemyHitbox mainHitbox;
         [SerializeField] private TerrorwingProjectile projectilePrefab;
         [SerializeField] private TerrorwingClone original;
         [SerializeField] private TerrorwingClone[] allClones = new TerrorwingClone[4];

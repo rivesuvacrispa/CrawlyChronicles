@@ -26,7 +26,7 @@ namespace Gameplay.Effects.DamageText
 
             text.color = text.color.WithAlpha(1f);
             transform.position = args.position + (Vector3) Random.insideUnitCircle * 0.1f;
-            text.SetText($"{args.damage:0.00}");
+            text.SetText($"{args.damage:0.##}");
             AnimationTask(gameObject.GetCancellationTokenOnDestroy()).Forget();
             return base.OnTakenFromPool(data);
         }

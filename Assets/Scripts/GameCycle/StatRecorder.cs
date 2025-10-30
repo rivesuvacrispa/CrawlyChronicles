@@ -95,9 +95,9 @@ namespace GameCycle
 
         private void OnEggStolen() => eggsLost++;
 
-        private void DamageTakenGlobal(IDamageable damageable, float damage)
+        private void DamageTakenGlobal(IDamageable damageable, DamageInstance instance)
         {
-            if (damageable is IDamageableEnemy) damageDealt += damage;
+            if (damageable is IDamageableEnemy) damageDealt += instance.Damage;
         }
 
         private void OnMutationClick() => timesMutated++;

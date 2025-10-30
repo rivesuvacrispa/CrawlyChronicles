@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Definitions;
+using Gameplay.Enemies;
 using Gameplay.Mutations.AttackEffects;
 using Gameplay.Player;
 using UnityEngine;
@@ -12,12 +13,12 @@ using Util.Interfaces;
 
 namespace Gameplay.Bosses.Terrorwing
 {
-    public class TerrorwingClone : MonoBehaviour, IDamageableEnemy, IDamageSource
+    public class TerrorwingClone : MonoBehaviour, IDamageableEnemy, IDamageSource, IContactDamageProvider
     {
         [SerializeField] private bool original;
 
         [Header("Colliders")]
-        [SerializeField] private TerrorwingHitbox hitbox;
+        [SerializeField] private DamageableEnemyHitbox hitbox;
 
         [Header("Refs")] 
         [SerializeField] private ParticleCollisionProvider particleCollisionProvider;
@@ -171,16 +172,26 @@ namespace Gameplay.Bosses.Terrorwing
         public float HealthbarWidth => 0;
         public event IDamageable.DeathEvent OnDeath;
         public event IDamageable.DamageEvent OnDamageTaken;
-        public bool ImmuneToSource(DamageSource source) => hitbox.Immune;
+        public bool ImmuneToSource(DamageSource source) => hitbox.ImmuneToSource(source);
         public float Armor => 0;
         public float CurrentHealth { get; set; }
 
         public float MaxHealth => TerrorwingDefinitions.MaxHealth;
-
-        public float Damage(DamageInstance instance)
+        
+        public void OnBeforeHit(DamageInstance instance)
         {
-            if(hitbox.Immune) return 0;
-            if(rb.simulated) hitbox.Hit();
+            OnDamageTaken?.Invoke(this, instance.Damage);
+        }
+        
+
+        public void OnLethalHit(DamageInstance instance)
+        {
+            
+        }
+
+        public void OnHit(DamageInstance instance)
+        {
+            if(rb.simulated) hitbox.Hit(instance);
             PaintDamage();
             if(original) ((IDamageable)terrorwing).Damage(
                 new DamageInstance(new DamageSource(this), 
@@ -191,23 +202,15 @@ namespace Gameplay.Bosses.Terrorwing
                     instance.damageColor, 
                     instance.piercing, 
                     instance.effects)
-                );
-            return instance.Damage;
+            );
         }
 
-        public void OnBeforeHit(DamageInstance instance)
-        {
-            OnDamageTaken?.Invoke(this, instance.Damage);
-        }
-
-        public void OnLethalHit(DamageInstance instance)
-        {
-            
-        }
-
-        public void OnHit(DamageInstance instance)
-        {
-            
-        }
+        // I ContactDamageProvider
+        public float ContactDamage => TerrorwingDefinitions.ContactDamage;
+        public Vector3 ContactDamagePosition => transform.position;
+        public float ContactDamageKnockback => 5;
+        public float ContactDamageStunDuration => 0;
+        public Color ContactDamageColor => default;
+        public bool ContactDamagePiercing => true;
     }
 }

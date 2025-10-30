@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using Definitions;
 using Gameplay.AI.Locators;
+using Gameplay.Enemies;
 using Gameplay.Player;
 using UnityEngine;
 using Util;
@@ -9,7 +10,7 @@ using Util.Interfaces;
 namespace Gameplay.Bosses.Centipede
 {
     [RequireComponent(typeof(BodyPainter))]
-    public class CentipedeFragment : MonoBehaviour, IDamageableEnemy, IDamageSource
+    public class CentipedeFragment : MonoBehaviour, IDamageableEnemy, IContactDamageProvider
     {
         [SerializeField] private ParticleSystem sprayParticles;
         [SerializeField] private ParticleCollisionProvider particleCollisionProvider;
@@ -22,10 +23,9 @@ namespace Gameplay.Bosses.Centipede
         private SpriteRenderer spriteRenderer;
         private Rigidbody2D rb;
         private BodyPainter painter;
-        private CentipedeHitbox hitbox;
+        private DamageableEnemyHitbox hitbox;
 
         private Coroutine sprayCooldownRoutine;
-        private bool dead;
         private CentipedeFragmentType fragmentType = CentipedeFragmentType.Body;
         
         public float MaxHealth { get; set; }
@@ -36,8 +36,8 @@ namespace Gameplay.Bosses.Centipede
         
         private void Awake()
         {
-            hitbox = GetComponentInChildren<CentipedeHitbox>();
-            hitbox.Fragment = this;
+            hitbox = GetComponentInChildren<DamageableEnemyHitbox>();
+            // hitbox.Fragment = this;
             spriteRenderer = GetComponent<SpriteRenderer>();
             animator = GetComponent<Animator>();
             rb = GetComponent<Rigidbody2D>();
@@ -67,7 +67,6 @@ namespace Gameplay.Bosses.Centipede
         private void DieFromAttack()
         {
             OnDeath?.Invoke(this);
-            dead = true;
             hitbox.Die();
             
             if (frontFragment is not null)
@@ -217,7 +216,7 @@ namespace Gameplay.Bosses.Centipede
         public event IDamageable.DeathEvent OnDeath;
         public event IDamageable.DamageEvent OnDamageTaken;
         // TODO:: use immuneToSource from hitbox
-        public bool ImmuneToSource(DamageSource source) => dead || !hitbox.Enabled;
+        public bool ImmuneToSource(DamageSource source) => hitbox.ImmuneToSource(source);
         public float Armor => CentipedeDefinitions.Armor * (int) fragmentType * 0.5f;
         public float CurrentHealth { get; set; }
         
@@ -234,8 +233,17 @@ namespace Gameplay.Bosses.Centipede
 
         public void OnHit(DamageInstance instance)
         {
-            hitbox.Hit();
+            hitbox.Hit(instance);
             Bossbar.Instance.Damage(instance.Damage);
         }
+
+        
+        // IContactDamageProvider
+        public float ContactDamage => CentipedeBoss.ContactDamage;
+        public Vector3 ContactDamagePosition => transform.position;
+        public float ContactDamageKnockback => CentipedeDefinitions.Knockback;
+        public float ContactDamageStunDuration => 0;
+        public Color ContactDamageColor => default;
+        public bool ContactDamagePiercing => false;
     }
 }

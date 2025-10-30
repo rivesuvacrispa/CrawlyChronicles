@@ -24,7 +24,7 @@ namespace Gameplay.Effects.ChainLightning
         public override bool OnTakenFromPool(object data)
         {
             if (data is not ChainLightningArguments args) return false;
-            // transform.position = Vector3.zero;
+            singleTargetParticles.transform.position = args.position;
             currentArgs = args;
             Activate();
             return base.OnTakenFromPool(data);

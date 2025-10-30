@@ -11,7 +11,7 @@ namespace Util.Interfaces
         public float HealthbarOffsetY { get; }
         public float HealthbarWidth { get; }
         
-        public delegate void GlobalDamageEvent(IDamageable damageable, float damage);
+        public delegate void GlobalDamageEvent(IDamageable damageable, DamageInstance instance);
         public static event GlobalDamageEvent OnDamageTakenGlobal;
 
         public delegate void GlobalDeathEvent(IDamageable damageable);
@@ -38,7 +38,7 @@ namespace Util.Interfaces
             float damage = instance.CalculateDamage(Armor);
             CurrentHealth -= damage;
             Debug.Log($"{((Component)this).gameObject.name} damaged for {damage}, piercing: {instance.piercing}");
-            OnDamageTakenGlobal?.Invoke(this, damage);
+            OnDamageTakenGlobal?.Invoke(this, instance);
             OnBeforeHit(instance);
 
             PoolManager.GetEffect<DamageText>(new DamageTextArguments(Transform.position, damage));

@@ -1,22 +1,23 @@
-﻿using UnityEngine;
+﻿using Definitions;
+using UnityEngine;
+using Util;
 using Util.Interfaces;
 
 namespace Gameplay.Enemies.Spawners
 {
-    [RequireComponent(typeof(EnemySpawnerHitbox))]
     public class DamageableEnemySpawner : EnemySpawner, IDamageableEnemy
     {
         [SerializeField] private float maxHealth;
         [SerializeField] private float armor;
+        [SerializeField] private DamageableEnemyHitbox hitbox;
+        [SerializeField] private BodyPainter bodyPainter;
 
 
-        private EnemySpawnerHitbox hitbox;
 
         protected override void Start()
         {
             base.Start();
             CurrentHealth = maxHealth;
-            hitbox = GetComponent<EnemySpawnerHitbox>();
         }
         
         public float HealthbarOffsetY => -0.5f;
@@ -24,8 +25,7 @@ namespace Gameplay.Enemies.Spawners
 
         public event IDamageable.DeathEvent OnDeath;
         public event IDamageable.DamageEvent OnDamageTaken;
-        // TODO:: immuneToSource
-        public bool ImmuneToSource(DamageSource source) => !hitbox;
+        public bool ImmuneToSource(DamageSource source) => hitbox.ImmuneToSource(source);
         public float Armor => armor;
         public float CurrentHealth { get; set; }
         public float MaxHealth => maxHealth;
@@ -45,7 +45,9 @@ namespace Gameplay.Enemies.Spawners
 
         public void OnHit(DamageInstance instance)
         {
-            hitbox.Hit();
+            hitbox.Hit(instance);
+            bodyPainter.FadeOut(GlobalDefinitions.EnemyImmunityDuration);
+            // TODO: Audio effect
         }
     }
 }

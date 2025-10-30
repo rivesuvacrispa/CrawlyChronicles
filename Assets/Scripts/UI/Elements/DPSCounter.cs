@@ -39,11 +39,11 @@ namespace UI.Elements
             dpsText.text = $"{currentDPS:0.00} DPS";
         }
 
-        private void OnDamageTakenGlobal(IDamageable damageable, float damage)
+        private void OnDamageTakenGlobal(IDamageable damageable, DamageInstance instance)
         {
             if (damageable is not IDamageableEnemy) return;
             
-            damageDoneSinceLastTick += damage;
+            damageDoneSinceLastTick += instance.Damage;
         }
 
         private async UniTask UpdateTask(CancellationToken cancellationToken)

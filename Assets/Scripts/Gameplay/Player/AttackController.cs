@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System.Threading;
+using Cysharp.Threading.Tasks;
 using Gameplay.Interaction;
 using SoundEffects;
 using UnityEngine;
@@ -10,6 +11,7 @@ namespace Gameplay.Player
         [Header("Refs")]
         [SerializeField] private PlayerHitbox hitbox;
         [SerializeField] private PlayerMovement movementComponent;
+        [SerializeField] private ComboManager comboManager;
         [SerializeField] private PlayerAttack attack;
         [SerializeField] private Vector3 defaultAttackPosition;
         [SerializeField] private Vector3 comboAttackPosition;
@@ -17,13 +19,11 @@ namespace Gameplay.Player
         [Header("Stats")]
         [SerializeField] private float dashDuration;
         [SerializeField] private float comboRotationSpeed;
-        [SerializeField] private float comboExpirationTime;
 
-        private int comboCounter;
         private Coroutine comboExpirationRoutine;
 
-        public delegate void AttackCotrollerEvent();
-        public static event AttackCotrollerEvent OnAttackStart;
+        public delegate void AttackControllerEvent();
+        public static event AttackControllerEvent OnAttackStart;
         
         
         
@@ -32,74 +32,53 @@ namespace Gameplay.Player
 
         private void Update()
         {
-            if (Interactor.Interacting)
+            if (Interactor.Interacting || 
+                !Input.GetMouseButtonDown(0) ||
+                Time.timeScale == 0 ||
+                movementComponent.InAttackDash)
                 return;
-            if (Input.GetMouseButtonDown(0) && Time.timeScale != 0)
-            {
-                if (comboCounter == 3)
-                    ComboAttack();
-                else
-                    Attack();
-            } 
+            
+            // if (comboCounter == 3)
+                // ComboAttack(gameObject.GetCancellationTokenOnDestroy()).Forget();
+            // else
+            Attack(gameObject.GetCancellationTokenOnDestroy()).Forget();
         }
         
-        private void Attack()
+        private async UniTask Attack(CancellationToken cancellationToken)
         {
-            if (movementComponent.Dash(dashDuration, 
-                () => {
-                    attack.Disable();
-                    StartComboExpiration();
-                    hitbox.Enable();
-                }))
-            {
-                OnAttackStart?.Invoke();
-                if(comboExpirationRoutine is not null) 
-                    StopCoroutine(comboExpirationRoutine);
-                PlayerAudioController.Instance.PlayAttack(comboCounter);
-                comboCounter++;
-                attack.Enable();
-                hitbox.Disable();
-            }
+            OnAttackStart?.Invoke();
+            if(comboExpirationRoutine is not null) 
+                StopCoroutine(comboExpirationRoutine);
+            PlayerAudioController.Instance.PlayAttack(0);
+            attack.Enable();
+            hitbox.Disable();
+
+            await movementComponent.Dash(dashDuration, cancellationToken: cancellationToken);
+            
+            attack.Disable();
+            // StartComboExpiration();
+            hitbox.Enable();
         }
 
-        private void ComboAttack()
+        private async UniTask ComboAttack(CancellationToken cancellationToken)
         {
-            if (movementComponent.ComboDash(dashDuration * 2, comboRotationSpeed, 
-                () => {
-                    attack.transform.localPosition = defaultAttackPosition;
-                    attack.Disable();
-                    ExpireCombo();
-                    hitbox.Enable();
-                    PlayerAudioController.Instance.StopAction();
-                    IsInComboDash = false;
-                }))
-            {
-                OnAttackStart?.Invoke();
-                IsInComboDash = true;
-                PlayerAudioController.Instance.PlayCombo();
-                if(comboExpirationRoutine is not null) 
-                    StopCoroutine(comboExpirationRoutine);
-                attack.transform.localPosition = comboAttackPosition;
-                attack.Enable();
-                hitbox.Disable();
-            }
-        }
+            OnAttackStart?.Invoke();
+            IsInComboDash = true;
+            PlayerAudioController.Instance.PlayCombo();
+            if(comboExpirationRoutine is not null) 
+                StopCoroutine(comboExpirationRoutine);
+            attack.transform.localPosition = comboAttackPosition;
+            attack.Enable();
+            hitbox.Disable();
 
-        private void StartComboExpiration()
-        {
-            comboExpirationRoutine = StartCoroutine(ComboExpirationRoutine());
-        }
-
-        public void ExpireCombo()
-        {
-            comboCounter = 0;
-            comboExpirationRoutine = null;
-        }
-
-        private IEnumerator ComboExpirationRoutine()
-        {
-            yield return new WaitForSeconds(comboExpirationTime);
-            ExpireCombo();
+            await movementComponent.ComboDash(dashDuration * 2, comboRotationSpeed, cancellationToken: cancellationToken);
+            
+            attack.transform.localPosition = defaultAttackPosition;
+            attack.Disable();
+            // ExpireCombo();
+            hitbox.Enable();
+            PlayerAudioController.Instance.StopAction();
+            IsInComboDash = false;
         }
     }
 }

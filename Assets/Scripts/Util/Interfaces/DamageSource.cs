@@ -4,7 +4,7 @@ namespace Util.Interfaces
 {
     public readonly struct DamageSource
     {
-        private readonly IDamageSource owner;
+        public readonly IDamageSource owner;
         private readonly int projectileID;
 
         public DamageSource(IDamageSource owner, int projectileID = 0)

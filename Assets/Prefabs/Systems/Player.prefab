@@ -25186,8 +25186,8 @@ MonoBehaviour:
   hitbox: {fileID: 461905994004500634}
   movementComponent: {fileID: 6983133238829123899}
   attack: {fileID: 1811273410705496310}
-  defaultAttackPosition: {x: 0, y: 0, z: 0}
-  comboAttackPosition: {x: 0, y: 0, z: 0}
+  defaultAttackPosition: {x: 0, y: 0.327, z: 0}
+  comboAttackPosition: {x: 0, y: 0.4, z: 0}
   dashDuration: 0.4
   comboRotationSpeed: 60
   comboExpirationTime: 1

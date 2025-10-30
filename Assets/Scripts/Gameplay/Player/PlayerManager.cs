@@ -36,6 +36,7 @@ namespace Gameplay.Player
         [SerializeField] private float healthbarWidth;
         [SerializeField] private SpriteRenderer eggSpriteRenderer;
         [SerializeField] private AttackController attackController;
+        // [SerializeField] private ComboManager comboManager;
         [SerializeField] private Collider2D col;
         [Header("Stats")]
         [SerializeField] private PlayerStats baseStats;
@@ -154,7 +155,7 @@ namespace Gameplay.Player
             TimeManager.OnDayStart -= OnDayStart;
             Interactor.Abort();
             BreedingManager.Instance.Abort();
-            attackController.ExpireCombo();
+            // comboManager.ExpireCombo();
             attackController.enabled = false;
             if(IsHoldingEgg) DropEgg();
             if (RespawnManager.CollectEggBeds() > 0)

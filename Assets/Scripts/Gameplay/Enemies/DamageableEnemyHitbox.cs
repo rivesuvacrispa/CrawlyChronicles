@@ -9,71 +9,81 @@ using Util.Interfaces;
 
 namespace Gameplay.Enemies
 {
-    [RequireComponent(typeof(Collider2D))]
-    public class DamageableEnemyHitbox : MonoBehaviour
+    public class DamageableEnemyHitbox : MonoBehaviour, IDamageSource
     {
         [SerializeField] private Component damagableComponent;
 
-        private new Collider2D collider;
         private IDamageableEnemy enemy;
         private readonly HashSet<DamageSource> blockedSources = new();
 
         public bool Dead { get; private set; }
-        public bool ImmuneToSource(DamageSource source) => !collider.enabled || Dead || blockedSources.Contains(source);
+        public bool ImmuneToSource(DamageSource source) => !isActiveAndEnabled || Dead || blockedSources.Contains(source);
 
         private void Awake()
         {
-            collider = GetComponent<Collider2D>();
             if (damagableComponent is IDamageableEnemy e)
                 enemy = e;
             else
             {
                 Debug.LogError($"Component {damagableComponent.name} is not IDamageableEnemy");
-                enabled = false;
+                gameObject.SetActive(false);
             }
         }
 
         /***
          * EnemyHitbox x PlayerAttack
-         * Player attack collides with enemy
+         * Player attack collides with enemy 
          * Enemy takes damage
          */
-        private void OnCollisionEnter2D(Collision2D _)
+        private void OnCollisionEnter2D(Collision2D col)
+        {
+            enemy.Damage(PlayerAttack.CreateDamageInstance());
+        }
+        
+        /***
+         * EnemyHitbox x PlayerAttack (trigger)
+         * Player attack triggers with enemy
+         * Enemy takes damage
+         */
+        private void OnTriggerEnter2D(Collider2D col)
         {
             enemy.Damage(PlayerAttack.CreateDamageInstance());
         }
         
         public void Enable()
         {
-            StopAllCoroutines();
-            collider.enabled = true;
+            gameObject.SetActive(true);
         }
 
         public void Disable()
         {
-            StopAllCoroutines();
-            collider.enabled = false;
+            gameObject.SetActive(false);
         }
 
         public void Die()
         {
             Dead = true;
-            StopAllCoroutines();
             Disable();
         }
 
         public void Hit(DamageInstance instance)
         {
+            if (!blockedSources.Add(instance.source)) return;
+            
             ImmunityTask(instance, gameObject.GetCancellationTokenOnDestroy()).Forget();
         }
 
         private async UniTask ImmunityTask(DamageInstance instance, CancellationToken cancellationToken)
         {
-            if (!blockedSources.Add(instance.source)) return;
-            
             await UniTask.Delay(TimeSpan.FromSeconds(GlobalDefinitions.EnemyImmunityDuration), cancellationToken: cancellationToken);
-
             blockedSources.Remove(instance.source);
+        }
+
+
+        private void OnValidate()
+        {
+            if (gameObject.TryGetComponent(out IDamageable _))
+                Debug.LogWarning("DamageableEnemyHitbox shouldn't be used on the same object as its wearer. Move it to child gameobject instead");
         }
     }
 }
