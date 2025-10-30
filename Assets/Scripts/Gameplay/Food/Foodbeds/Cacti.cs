@@ -1,6 +1,7 @@
 ﻿
 using Gameplay.Enemies;
 using Gameplay.Player;
+using Hitboxes;
 using Timeline;
 using UnityEngine;
 using Util.Interfaces;

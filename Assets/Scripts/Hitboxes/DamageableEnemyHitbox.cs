@@ -7,9 +7,9 @@ using Gameplay.Player;
 using UnityEngine;
 using Util.Interfaces;
 
-namespace Gameplay.Enemies
+namespace Hitboxes
 {
-    public class DamageableEnemyHitbox : MonoBehaviour, IDamageSource
+    public class DamageableEnemyHitbox : MonoBehaviour, IDamageableHitbox 
     {
         [SerializeField] private Component damagableComponent;
 
@@ -22,14 +22,28 @@ namespace Gameplay.Enemies
         private void Awake()
         {
             if (damagableComponent is IDamageableEnemy e)
+            {
                 enemy = e;
+                enemy.OnDeath += OnTargetDeath;
+            }
             else
             {
                 Debug.LogError($"Component {damagableComponent.name} is not IDamageableEnemy");
                 gameObject.SetActive(false);
             }
+            
+            
+
         }
 
+        private void OnDestroy()
+        {
+            enemy.OnDeath -= OnTargetDeath;
+        }
+
+        // Handle other death cases that are not included in IDamageable
+        private void OnTargetDeath(IDamageable target) => Die();
+        
         /***
          * EnemyHitbox x PlayerAttack
          * Player attack collides with enemy 
@@ -52,6 +66,8 @@ namespace Gameplay.Enemies
         
         public void Enable()
         {
+            if (Dead) return;
+            
             gameObject.SetActive(true);
         }
 
@@ -62,13 +78,15 @@ namespace Gameplay.Enemies
 
         public void Die()
         {
+            if (Dead) return;
+            
             Dead = true;
             Disable();
         }
 
         public void Hit(DamageInstance instance)
         {
-            if (!blockedSources.Add(instance.source)) return;
+            if (Dead || !blockedSources.Add(instance.source)) return;
             
             ImmunityTask(instance, gameObject.GetCancellationTokenOnDestroy()).Forget();
         }
@@ -80,6 +98,7 @@ namespace Gameplay.Enemies
         }
 
 
+        
         private void OnValidate()
         {
             if (gameObject.TryGetComponent(out IDamageable _))

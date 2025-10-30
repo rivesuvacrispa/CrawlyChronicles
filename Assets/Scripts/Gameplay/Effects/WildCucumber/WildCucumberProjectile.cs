@@ -7,6 +7,7 @@ using Definitions;
 using DG.Tweening;
 using Gameplay.Mutations;
 using Gameplay.Player;
+using Hitboxes;
 using Pooling;
 using SoundEffects;
 using Timeline;

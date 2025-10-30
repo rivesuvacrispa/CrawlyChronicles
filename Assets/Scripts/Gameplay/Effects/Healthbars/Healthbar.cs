@@ -2,6 +2,7 @@
 using Cysharp.Threading.Tasks;
 using Definitions;
 using DG.Tweening;
+using Hitboxes;
 using Pooling;
 using UnityEngine;
 using UnityEngine.UI;

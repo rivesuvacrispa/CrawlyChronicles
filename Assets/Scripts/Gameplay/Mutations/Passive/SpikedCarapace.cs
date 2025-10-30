@@ -1,4 +1,5 @@
 ﻿using Gameplay.Player;
+using Hitboxes;
 using UnityEngine;
 using Util.Interfaces;
 using Random = UnityEngine.Random;

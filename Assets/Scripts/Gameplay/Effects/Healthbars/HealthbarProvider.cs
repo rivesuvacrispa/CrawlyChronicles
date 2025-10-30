@@ -1,4 +1,5 @@
-﻿using Pooling;
+﻿using Hitboxes;
+using Pooling;
 using UnityEngine;
 using Util.Interfaces;
 

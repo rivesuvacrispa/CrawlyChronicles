@@ -7,6 +7,7 @@ using Gameplay.Enemies;
 using Gameplay.Food;
 using Gameplay.Food.VenusFlyTrap;
 using Gameplay.Map;
+using Hitboxes;
 using Pathfinding;
 using UnityEngine;
 using Util.Interfaces;

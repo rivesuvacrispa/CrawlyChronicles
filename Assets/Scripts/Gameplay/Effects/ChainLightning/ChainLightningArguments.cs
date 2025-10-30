@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Hitboxes;
+using UnityEngine;
 using Util.Interfaces;
 
 namespace Gameplay.Effects.ChainLightning

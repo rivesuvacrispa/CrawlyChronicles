@@ -7,6 +7,7 @@ using Gameplay.Enemies;
 using Gameplay.Map;
 using Gameplay.Mutations.EntityEffects;
 using Gameplay.Player;
+using Hitboxes;
 using UnityEngine;
 using Util;
 using Util.Interfaces;
@@ -133,7 +134,6 @@ namespace Gameplay.Bosses.AntColony
             base.Die();
             OnDeath?.Invoke(this);
             effectController.ClearAll();
-            hitbox.Die();
             DisposeTokenSource(cts);
             DisposeTokenSource(eggLayingCts);
             eggLayingCts = null;
@@ -220,10 +220,10 @@ namespace Gameplay.Bosses.AntColony
         public float HealthbarWidth => 0;
         public event IDamageable.DeathEvent OnDeath;
         public event IDamageable.DamageEvent OnDamageTaken;
-        public bool ImmuneToSource(DamageSource source) => hitbox.ImmuneToSource(source);
         public float Armor => AntColonyDefinitions.Armor;
         public float CurrentHealth { get; set; }
         public float MaxHealth => AntColonyDefinitions.Health;
+        public IDamageableHitbox Hitbox => hitbox;
 
         public void OnBeforeHit(DamageInstance instance)
         {
@@ -237,7 +237,6 @@ namespace Gameplay.Bosses.AntColony
 
         public void OnHit(DamageInstance instance)
         {
-            hitbox.Hit(instance);
             Bossbar.Instance.Damage(instance.Damage);
             var gradient = new Gradient().FastGradient(instance.damageColor, painters[0].CurrentColor);
             foreach (BodyPainter painter in painters) 

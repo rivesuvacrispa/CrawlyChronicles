@@ -7,7 +7,7 @@ namespace Gameplay.Mutations.Active
 {
     public class Cucumberbardier : ActiveAbility
     {
-        // TODO: explosion damage, ability description & icon
+        // TODO: ability description & icon
         [Header("Spontaneous Explosion Chance")] 
         [SerializeField, Range(0, 1)] protected float explosionChanceLv1;
         [SerializeField, Range(0, 1)] protected float explosionChanceLv10;

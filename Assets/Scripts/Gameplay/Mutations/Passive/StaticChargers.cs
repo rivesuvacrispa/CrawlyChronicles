@@ -2,6 +2,7 @@
 using Gameplay.Effects.ChainLightning;
 using Gameplay.Mutations.AttackEffects;
 using Gameplay.Player;
+using Hitboxes;
 using Pooling;
 using UnityEngine;
 using Util.Interfaces;

@@ -4,6 +4,7 @@ using System.Linq;
 using Definitions;
 using Gameplay.Enemies;
 using Gameplay.Mutations.AttackEffects;
+using Hitboxes;
 using SoundEffects;
 using UnityEngine;
 using Util;

@@ -9,6 +9,7 @@ using Gameplay.Food;
 using Gameplay.Map;
 using Gameplay.Mutations.EntityEffects;
 using Gameplay.Player;
+using Hitboxes;
 using SoundEffects;
 using Timeline;
 using UI.Menus;
@@ -107,7 +108,6 @@ namespace Gameplay.Enemies
         {
             Debug.Log($"[{gameObject.name}] died, all coroutines are stopped");
             CurrentHealth = 0;
-            hitbox.Die();
             ClearEffects();
             minimapIcon.enabled = false;
             StopAllCoroutines();
@@ -293,10 +293,10 @@ namespace Gameplay.Enemies
 
         private void UnsubEvents() => TimeManager.OnDayStart -= OnDayStart;
 
-        // TODO: REMOVE
+
         private void OnResetRequested()
         {
-            // Destroy(gameObject);
+            Destroy(gameObject);
         }
 
         public void OnSpawnedBySpawner()
@@ -321,10 +321,10 @@ namespace Gameplay.Enemies
         public float HealthbarWidth => scriptable.HealthbarWidth;
         public event IDamageable.DeathEvent OnDeath;
         public event IDamageable.DamageEvent OnDamageTaken;
-        public bool ImmuneToSource(DamageSource source) => hitbox.ImmuneToSource(source) || StateController.Etherial;
         public float Armor => Scriptable.Armor;
         public float CurrentHealth { get; set; }
         public float MaxHealth => Scriptable.MaxHealth;
+        public IDamageableHitbox Hitbox => hitbox;
 
         public bool TryBlockDamage(DamageInstance instance)
         {
@@ -349,7 +349,6 @@ namespace Gameplay.Enemies
 
         public void OnHit(DamageInstance instance)
         {
-            hitbox.Hit(instance);
             audioController.PlayAction(scriptable.HitAudio, pitch: SoundUtility.GetRandomPitchTwoSided(0.15f));
             bodyPainter.Paint(new Gradient().FastGradient(instance.damageColor, scriptable.BodyColor), GlobalDefinitions.EnemyImmunityDuration);
             

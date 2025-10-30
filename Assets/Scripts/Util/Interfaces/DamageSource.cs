@@ -1,4 +1,5 @@
 ﻿using System;
+using Hitboxes;
 
 namespace Util.Interfaces
 {

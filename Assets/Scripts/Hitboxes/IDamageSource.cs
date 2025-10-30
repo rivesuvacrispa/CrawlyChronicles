@@ -1,4 +1,4 @@
-﻿namespace Util.Interfaces
+﻿namespace Hitboxes
 {
     public interface IDamageSource
     {

@@ -7,6 +7,7 @@ using Gameplay.AI;
 using Gameplay.Enemies;
 using Gameplay.Enemies.Enemies;
 using Gameplay.Player;
+using Hitboxes;
 using Pooling;
 using UnityEngine;
 using Util;
@@ -36,7 +37,7 @@ namespace Gameplay.Effects.Fly
             for (var i = 0; i < Mathf.Min(contacts, 8); i++)
             {
                 var t = OverlapResults[i];
-                if (t.TryGetComponent(out IDamageableEnemy enemy) && !enemy.ImmuneToSource(source) && enemy is not NeutralAnt)
+                if (t.TryGetComponent(out IDamageableEnemy enemy) && !enemy.Hitbox.ImmuneToSource(source) && enemy is not NeutralAnt)
                 {
                     fallbackEnemy ??= enemy;
                     if (Random.value <= 0.25f)

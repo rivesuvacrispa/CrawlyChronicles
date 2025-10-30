@@ -1,4 +1,5 @@
 ﻿using Gameplay.Player;
+using Hitboxes;
 using UI.Menus;
 using UnityEngine;
 using Util.Interfaces;

@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+using TMPro;
+using UI.Menus;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Gameplay.Bosses
@@ -9,8 +12,8 @@ namespace Gameplay.Bosses
         
         [SerializeField] private GameObject rootGO;
         [SerializeField] private Image fillingImage;
-        [SerializeField] private Text nameText;
-        [SerializeField] private Text healthText;
+        [SerializeField] private TMP_Text nameText;
+        [SerializeField] private TMP_Text healthText;
         [SerializeField] private Gradient gradient;
         [SerializeField] private Animator animator;
 
@@ -22,6 +25,11 @@ namespace Gameplay.Bosses
         
         private Bossbar() => Instance = this;
 
+        private void Awake() => MainMenu.OnResetRequested += OnResetRequested;
+        private void OnDestroy() => MainMenu.OnResetRequested -= OnResetRequested;
+
+        private void OnResetRequested() => rootGO.SetActive(false);
+
         public void SetName(string bossName) => nameText.text = bossName;
         
         public void SetActive(bool state)
@@ -32,7 +40,7 @@ namespace Gameplay.Bosses
                 rootGO.SetActive(true);
                 animator.Play(IntroAnimHash);
             }
-            else animator.Play(OutroAnimHash);
+            else if (isActiveAndEnabled) animator.Play(OutroAnimHash);
         }
 
         public void AddMaxHealth(float hp)

@@ -1,5 +1,6 @@
 ﻿using Definitions;
 using Gameplay.Mutations.EntityEffects;
+using Hitboxes;
 using SoundEffects;
 using UnityEngine;
 using Util;
@@ -23,10 +24,10 @@ namespace Gameplay.Enemies.Enemies
         public float HealthbarWidth => scriptable.HealthbarWidth;
         public event IDamageable.DeathEvent OnDeath;
         public event IDamageable.DamageEvent OnDamageTaken;
-        public bool ImmuneToSource(DamageSource source) => hitbox.ImmuneToSource(source);
         public float Armor => scriptable.Armor;
         public float CurrentHealth { get; set; }
         public float MaxHealth => scriptable.MaxHealth;
+        public IDamageableHitbox Hitbox => hitbox;
 
 
         private void Start()
@@ -58,7 +59,6 @@ namespace Gameplay.Enemies.Enemies
 
         public void OnHit(DamageInstance instance)
         {
-            hitbox.Hit(instance);
             audioController.PlayAction(scriptable.HitAudio, pitch: SoundUtility.GetRandomPitchTwoSided(0.15f));
             bodyPainter.Paint(new Gradient().FastGradient(instance.damageColor, scriptable.BodyColor), GlobalDefinitions.EnemyImmunityDuration);
             if (instance.knockback > 0)

@@ -1,4 +1,5 @@
 ﻿using Definitions;
+using Hitboxes;
 using UnityEngine;
 using Util;
 using Util.Interfaces;
@@ -25,12 +26,11 @@ namespace Gameplay.Enemies.Spawners
 
         public event IDamageable.DeathEvent OnDeath;
         public event IDamageable.DamageEvent OnDamageTaken;
-        public bool ImmuneToSource(DamageSource source) => hitbox.ImmuneToSource(source);
         public float Armor => armor;
         public float CurrentHealth { get; set; }
         public float MaxHealth => maxHealth;
+        public IDamageableHitbox Hitbox => hitbox;
 
-        
 
         public void OnBeforeHit(DamageInstance instance)
         {
@@ -45,7 +45,6 @@ namespace Gameplay.Enemies.Spawners
 
         public void OnHit(DamageInstance instance)
         {
-            hitbox.Hit(instance);
             bodyPainter.FadeOut(GlobalDefinitions.EnemyImmunityDuration);
             // TODO: Audio effect
         }

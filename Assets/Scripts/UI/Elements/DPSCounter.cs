@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Hitboxes;
 using TMPro;
 using UnityEngine;
 using Util.Interfaces;

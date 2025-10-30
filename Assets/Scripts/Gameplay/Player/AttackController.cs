@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 using Gameplay.Interaction;
+using Hitboxes;
 using SoundEffects;
 using UnityEngine;
 

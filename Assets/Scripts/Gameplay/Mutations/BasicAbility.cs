@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Gameplay.Player;
+using Hitboxes;
 using Scriptable;
 using UI.Elements;
 using UnityEngine;

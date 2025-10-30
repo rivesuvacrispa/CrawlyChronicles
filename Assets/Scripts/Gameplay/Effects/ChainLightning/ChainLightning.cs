@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Definitions;
+using Hitboxes;
 using Pooling;
 using UnityEngine;
 using Util.Interfaces;
@@ -51,7 +52,7 @@ namespace Gameplay.Effects.ChainLightning
             {
                 if (!col.TryGetComponent(out IDamageableEnemy damageableEnemy) ||
                     damageableEnemy.Equals(currentArgs.currentTarget) ||
-                    damageableEnemy.ImmuneToSource(source)) continue;
+                    damageableEnemy.Hitbox.ImmuneToSource(source)) continue;
 
                 target = damageableEnemy;
                 break;

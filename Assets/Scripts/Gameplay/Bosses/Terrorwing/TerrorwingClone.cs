@@ -6,6 +6,7 @@ using Definitions;
 using Gameplay.Enemies;
 using Gameplay.Mutations.AttackEffects;
 using Gameplay.Player;
+using Hitboxes;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using Util;
@@ -114,11 +115,11 @@ namespace Gameplay.Bosses.Terrorwing
         
         public async UniTask Die(CancellationToken cancellationToken = default, bool fromPlayer = true)
         {
-            hitbox.Die();
             bodyParticles1.Stop();
             bodyParticles2.Stop();
             SetTrailsActive(false);
             ResetColor(fromPlayer ? default : new Color(0, 0, 0, 0.01f));
+            OnDeath?.Invoke(this);
 
             if(fromPlayer)
             {
@@ -172,12 +173,12 @@ namespace Gameplay.Bosses.Terrorwing
         public float HealthbarWidth => 0;
         public event IDamageable.DeathEvent OnDeath;
         public event IDamageable.DamageEvent OnDamageTaken;
-        public bool ImmuneToSource(DamageSource source) => hitbox.ImmuneToSource(source);
         public float Armor => 0;
         public float CurrentHealth { get; set; }
 
         public float MaxHealth => TerrorwingDefinitions.MaxHealth;
-        
+        public IDamageableHitbox Hitbox => hitbox;
+
         public void OnBeforeHit(DamageInstance instance)
         {
             OnDamageTaken?.Invoke(this, instance.Damage);
@@ -191,7 +192,7 @@ namespace Gameplay.Bosses.Terrorwing
 
         public void OnHit(DamageInstance instance)
         {
-            if(rb.simulated) hitbox.Hit(instance);
+            // if(rb.simulated) hitbox.Hit(instance);
             PaintDamage();
             if(original) ((IDamageable)terrorwing).Damage(
                 new DamageInstance(new DamageSource(this), 

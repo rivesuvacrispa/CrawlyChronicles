@@ -1,5 +1,6 @@
 ﻿using Definitions;
 using Gameplay.Player;
+using Hitboxes;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Util;

@@ -4,6 +4,7 @@ using Gameplay.Breeding;
 using Gameplay.Effects.Healthbars;
 using Gameplay.Interaction;
 using Gameplay.Map;
+using Hitboxes;
 using SoundEffects;
 using Timeline;
 using TMPro;
@@ -210,7 +211,6 @@ namespace Gameplay.Player
 
 #if UNITY_EDITOR
         public event IDamageable.DamageEvent OnDamageTaken;
-        public bool ImmuneToSource(DamageSource source) => GodMode || hitbox.Immune;
 #else
         public bool ImmuneToSource(DamageSource source) => hitbox.Immune;
 #endif
@@ -218,6 +218,7 @@ namespace Gameplay.Player
 
         public float CurrentHealth { get; set; } = 0;
         public float MaxHealth => currentStats.MaxHealth;
+        public IDamageableHitbox Hitbox => hitbox;
 
 
         public void OnLethalHit(DamageInstance instance)
@@ -227,7 +228,6 @@ namespace Gameplay.Player
 
         public void OnHit(DamageInstance instance)
         {
-            hitbox.Hit();
         }
         
         public void OnBeforeHit(DamageInstance instance)

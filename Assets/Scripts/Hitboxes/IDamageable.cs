@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using Gameplay.Effects.DamageText;
+﻿using Gameplay.Effects.DamageText;
 using Gameplay.Mutations.AttackEffects;
 using Pooling;
 using UnityEngine;
+using Util.Interfaces;
 
-namespace Util.Interfaces
+namespace Hitboxes
 {
     public interface IDamageable : ITransformProvider
     {
@@ -26,10 +26,11 @@ namespace Util.Interfaces
         public float Armor { get; }
         public float CurrentHealth { get; set; }
         public float MaxHealth { get; }
+        public IDamageableHitbox Hitbox { get; }
 
         public float Damage(DamageInstance instance)
         {
-            if (ImmuneToSource(instance.source)) return 0;
+            if (Hitbox.ImmuneToSource(instance.source)) return 0;
             Struck();
 
             if (TryBlockDamage(instance))
@@ -46,10 +47,12 @@ namespace Util.Interfaces
             {
                 OnLethalBlowGlobal?.Invoke(this);
                 OnLethalHit(instance);
+                Hitbox.Die();
             }
             else
             {
                 OnHit(instance);
+                Hitbox.Hit(instance);
             }
             
             if (instance.effects is not null && this is IImpactable impactable)
@@ -58,8 +61,6 @@ namespace Util.Interfaces
 
             return damage;
         }
-
-        public bool ImmuneToSource(DamageSource source);
 
         public void OnBeforeHit(DamageInstance damageInstance);
         

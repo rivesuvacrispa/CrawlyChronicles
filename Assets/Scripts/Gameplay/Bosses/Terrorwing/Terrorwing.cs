@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using Gameplay.Enemies;
 using Gameplay.Map;
 using Gameplay.Player;
+using Hitboxes;
 using UnityEngine;
 using Util;
 using Util.Interfaces;
@@ -94,7 +94,6 @@ namespace Gameplay.Bosses.Terrorwing
         {
             if (base.InvokeDestructionEvent())
             {
-                mainHitbox.Die();
                 attackGO.SetActive(false);
                 return true;
             }
@@ -416,10 +415,10 @@ namespace Gameplay.Bosses.Terrorwing
         public float HealthbarWidth => 0;
         public event IDamageable.DeathEvent OnDeath;
         public event IDamageable.DamageEvent OnDamageTaken;
-        public bool ImmuneToSource(DamageSource source) => false;
         public float Armor => 0;
         public float CurrentHealth { get; set; }
         public float MaxHealth => TerrorwingDefinitions.MaxHealth;
+        public IDamageableHitbox Hitbox => mainHitbox;
 
         public void OnBeforeHit(DamageInstance instance)
         {

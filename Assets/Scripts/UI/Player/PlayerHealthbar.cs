@@ -1,4 +1,5 @@
 ﻿using Gameplay.Effects.Healthbars;
+using Hitboxes;
 using Util.Interfaces;
 
 namespace UI.Player

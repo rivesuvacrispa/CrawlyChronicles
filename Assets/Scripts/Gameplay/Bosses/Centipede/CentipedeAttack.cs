@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using Gameplay.Player;
+using Hitboxes;
 using UnityEngine;
 using Util.Interfaces;
 

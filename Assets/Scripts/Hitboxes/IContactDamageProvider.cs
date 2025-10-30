@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
-using Util.Interfaces;
 
-namespace Gameplay.Enemies
+namespace Hitboxes
 {
     public interface IContactDamageProvider : IDamageSource
     {

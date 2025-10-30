@@ -3,6 +3,7 @@ using Gameplay.Breeding;
 using Gameplay.Enemies.Enemies;
 using Gameplay.Genes;
 using Gameplay.Player;
+using Hitboxes;
 using Timeline;
 using UI.Menus;
 using UnityEngine;

@@ -2,6 +2,7 @@
 using Definitions;
 using Gameplay.Enemies;
 using Gameplay.Map;
+using Hitboxes;
 using UI.Menus;
 using UnityEngine;
 using Util.Interfaces;
@@ -59,10 +60,10 @@ namespace Gameplay.Bosses.AntColony
         public float HealthbarWidth => 80f;
         public event IDamageable.DeathEvent OnDeath;
         public event IDamageable.DamageEvent OnDamageTaken;
-        public bool ImmuneToSource(DamageSource source) => hitbox.ImmuneToSource(source);
         public float Armor => 0;
         public float CurrentHealth { get; set; }
         public float MaxHealth => AntColonyDefinitions.EggsHealth;
+        public IDamageableHitbox Hitbox => hitbox;
 
         public void OnBeforeHit(DamageInstance instance)
         {
@@ -72,12 +73,10 @@ namespace Gameplay.Bosses.AntColony
         public void OnLethalHit(DamageInstance instance)
         {
             Destroy(gameObject);
-            hitbox.Die();
         }
 
         public void OnHit(DamageInstance instance)
         {
-            hitbox.Hit(instance);
         }
     }
 }

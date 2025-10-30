@@ -1,5 +1,6 @@
 ﻿using Definitions;
 using Gameplay.Enemies;
+using Hitboxes;
 using Util.Interfaces;
 
 namespace Gameplay.Mutations.EntityEffects.Poison

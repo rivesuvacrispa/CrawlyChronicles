@@ -4,6 +4,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Gameplay.Mutations.AttackEffects;
 using Gameplay.Player;
+using Hitboxes;
 using SoundEffects;
 using UnityEngine;
 using Util.Interfaces;

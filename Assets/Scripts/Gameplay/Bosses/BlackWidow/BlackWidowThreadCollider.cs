@@ -1,5 +1,6 @@
 ﻿using Gameplay.Bosses.Centipede;
 using Gameplay.Player;
+using Hitboxes;
 using UnityEngine;
 using Util.Interfaces;
 

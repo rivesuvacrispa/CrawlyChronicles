@@ -3,6 +3,7 @@ using Definitions;
 using Gameplay.AI.Locators;
 using Gameplay.Enemies;
 using Gameplay.Player;
+using Hitboxes;
 using UnityEngine;
 using Util;
 using Util.Interfaces;
@@ -27,17 +28,17 @@ namespace Gameplay.Bosses.Centipede
 
         private Coroutine sprayCooldownRoutine;
         private CentipedeFragmentType fragmentType = CentipedeFragmentType.Body;
-        
+
         public float MaxHealth { get; set; }
+        public IDamageableHitbox Hitbox => hitbox;
         private bool First => frontFragment is null;
         private bool Last => backFragment is null;
-        
-        
-        
+        private Color fragmentColor;
+
+
         private void Awake()
         {
             hitbox = GetComponentInChildren<DamageableEnemyHitbox>();
-            // hitbox.Fragment = this;
             spriteRenderer = GetComponent<SpriteRenderer>();
             animator = GetComponent<Animator>();
             rb = GetComponent<Rigidbody2D>();
@@ -48,13 +49,13 @@ namespace Gameplay.Bosses.Centipede
         {
             CurrentHealth = MaxHealth;
         }
-        
+
         private void FixedUpdate()
         {
-            if(frontFragment is null) return;
+            if (frontFragment is null) return;
             Move(frontFragment.transform.position, 100, 30);
         }
-        
+
         private void DieFromDestruction()
         {
             Bossbar.Instance.Damage(CurrentHealth);
@@ -63,12 +64,11 @@ namespace Gameplay.Bosses.Centipede
             DieFromAttack();
             OnDeath?.Invoke(this);
         }
-        
+
         private void DieFromAttack()
         {
             OnDeath?.Invoke(this);
-            hitbox.Die();
-            
+
             if (frontFragment is not null)
             {
                 frontFragment.backFragment = null;
@@ -86,15 +86,15 @@ namespace Gameplay.Bosses.Centipede
                 else
                     backFragment.gameObject.AddComponent(typeof(CentipedeHead));
             }
-            
+
             CentipedeBoss.Instance.OnFragmentDeath();
             StartCoroutine(DespawnRoutine());
         }
 
         private IEnumerator DespawnRoutine()
         {
-            if(gameObject.TryGetComponent(out CentipedeHead head)) Destroy(head);
-            if(sprayCooldownRoutine is not null) StopCoroutine(sprayCooldownRoutine);
+            if (gameObject.TryGetComponent(out CentipedeHead head)) Destroy(head);
+            if (sprayCooldownRoutine is not null) StopCoroutine(sprayCooldownRoutine);
             sprayParticles.gameObject.SetActive(false);
             locator.gameObject.SetActive(false);
             attackGO.SetActive(false);
@@ -112,29 +112,31 @@ namespace Gameplay.Bosses.Centipede
                 rb.angularVelocity = 720f;
                 rb.angularDamping = 2f;
             }
+
             yield return new WaitForSeconds(6f);
             painter.FadeOut(2f);
             yield return new WaitForSeconds(2.1f);
             Destroy(gameObject);
         }
 
-        public void CreateFragment(int posFromTail, int length) 
+        public void CreateFragment(int posFromTail, int length)
             => StartCoroutine(CreateFragmentRoutine(posFromTail, length));
 
         private IEnumerator CreateFragmentRoutine(int posFromTail, int length)
         {
             gameObject.name = $"{gameObject.name}_{posFromTail}";
             yield return new WaitForSeconds(0.1f);
-            CentipedeFragment fragment = Instantiate(CentipedeDefinitions.FragmentPrefab).GetComponent<CentipedeFragment>();
+            CentipedeFragment fragment =
+                Instantiate(CentipedeDefinitions.FragmentPrefab).GetComponent<CentipedeFragment>();
             backFragment = fragment;
             fragment.frontFragment = this;
             fragment.transform.position = transform.position;
             fragment.transform.SetParent(CentipedeBoss.Instance.transform);
             fragment.MaxHealth = MaxHealth;
-            fragment.UpdateColor((float) posFromTail / length);
+            fragment.UpdateColor((float)posFromTail / length);
             Bossbar.Instance.AddMaxHealth(CentipedeDefinitions.FragmentHealth);
             if (posFromTail == 1) fragment.gameObject.AddComponent(typeof(CentipedeTail));
-            else if(posFromTail != 0) fragment.CreateFragment(posFromTail - 1, length);
+            else if (posFromTail != 0) fragment.CreateFragment(posFromTail - 1, length);
         }
 
         public void Move(Vector2 target, float maxSpeed, float rotationSpeed)
@@ -145,8 +147,7 @@ namespace Gameplay.Bosses.Centipede
 
             float speed = CentipedeDefinitions.FragmentSpeed * distance;
             if (speed > maxSpeed) speed = maxSpeed;
-            rb.linearVelocity = distance < CentipedeDefinitions.FollowRadius ?
-                Vector2.zero : transform.up * speed;
+            rb.linearVelocity = distance < CentipedeDefinitions.FollowRadius ? Vector2.zero : transform.up * speed;
         }
 
         public void PlayAnimation(int hash) => animator.Play(hash);
@@ -168,7 +169,11 @@ namespace Gameplay.Bosses.Centipede
             fragmentType = CentipedeFragmentType.Tail;
         }
 
-        public void UpdateColor(float value) => spriteRenderer.color = CentipedeDefinitions.GetFragmentColor(value);
+        public void UpdateColor(float value)
+        {
+            fragmentColor = CentipedeDefinitions.GetFragmentColor(value);
+            spriteRenderer.color = fragmentColor;
+        }
 
         private IEnumerator SprayCooldownRoutine()
         {
@@ -176,7 +181,7 @@ namespace Gameplay.Bosses.Centipede
             yield return new WaitForSeconds(5f);
             locator.OnTargetLocated += OnPlayerLocated;
         }
-        
+
         private void OnBulletCollision(IDamageable damageable, int collisionID)
         {
             if (damageable is PlayerManager)
@@ -192,7 +197,7 @@ namespace Gameplay.Bosses.Centipede
 
         private void OnPlayerLocated(ILocatorTarget target)
         {
-            if(target is PlayerMovement)
+            if (target is PlayerMovement)
             {
                 sprayCooldownRoutine = StartCoroutine(SprayCooldownRoutine());
                 sprayParticles.Play();
@@ -205,8 +210,7 @@ namespace Gameplay.Bosses.Centipede
             particleCollisionProvider.OnCollision -= OnBulletCollision;
             locator.OnTargetLocated -= OnPlayerLocated;
         }
-        
-        
+
 
         // IDamageable
         public event IDestructionEventProvider.DestructionProviderEvent OnProviderDestroy;
@@ -214,12 +218,12 @@ namespace Gameplay.Bosses.Centipede
         public float HealthbarOffsetY => -0.5f;
         public float HealthbarWidth => 80;
         public event IDamageable.DeathEvent OnDeath;
+
         public event IDamageable.DamageEvent OnDamageTaken;
-        // TODO:: use immuneToSource from hitbox
-        public bool ImmuneToSource(DamageSource source) => hitbox.ImmuneToSource(source);
-        public float Armor => CentipedeDefinitions.Armor * (int) fragmentType * 0.5f;
+
+        public float Armor => CentipedeDefinitions.Armor * (int)fragmentType * 0.5f;
         public float CurrentHealth { get; set; }
-        
+
         public void OnBeforeHit(DamageInstance instance)
         {
             OnDamageTaken?.Invoke(this, instance.Damage);
@@ -227,17 +231,19 @@ namespace Gameplay.Bosses.Centipede
 
         public void OnLethalHit(DamageInstance instance)
         {
+            OnDeath?.Invoke(this);
             Bossbar.Instance.Damage(instance.Damage + CurrentHealth);
             DieFromAttack();
         }
 
         public void OnHit(DamageInstance instance)
         {
-            hitbox.Hit(instance);
+            painter.Paint(new Gradient().FastGradient(instance.damageColor, fragmentColor),
+                GlobalDefinitions.EnemyImmunityDuration);
             Bossbar.Instance.Damage(instance.Damage);
         }
 
-        
+
         // IContactDamageProvider
         public float ContactDamage => CentipedeBoss.ContactDamage;
         public Vector3 ContactDamagePosition => transform.position;

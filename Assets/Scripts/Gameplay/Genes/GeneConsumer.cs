@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using Definitions;
 using Gameplay.Player;
+using Hitboxes;
 using SoundEffects;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
@@ -45,7 +46,6 @@ namespace Gameplay.Genes
 
         private IEnumerator ConsumingRoutine(Color color, float duration)
         {
-            hitbox.BlockColorChange = true;
             light.intensity = initialIntensity;
             light.color = color;
             light.enabled = true;
@@ -74,7 +74,6 @@ namespace Gameplay.Genes
                 yield return null;
             }
 
-            hitbox.BlockColorChange = false;
             light.enabled = false;
             spriteRenderer.color = normalSpriteColor;
             routine = null;

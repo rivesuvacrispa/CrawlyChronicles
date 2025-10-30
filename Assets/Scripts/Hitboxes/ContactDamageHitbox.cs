@@ -1,10 +1,9 @@
-﻿using System;
-using Gameplay.Bosses.Terrorwing;
+﻿using Gameplay.Enemies;
 using Gameplay.Player;
 using UnityEngine;
 using Util.Interfaces;
 
-namespace Gameplay.Enemies
+namespace Hitboxes
 {
     public class ContactDamageHitbox : MonoBehaviour
     {
