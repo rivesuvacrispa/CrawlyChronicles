@@ -19,6 +19,7 @@ namespace UI.Elements
         public BasicMutation Scriptable { get; private set; }
         public Action<BasicMutation, int> OnClick { get; set; }
         public int Lvl { get; private set; }
+        private bool unavailable;
         
         public void SetMutation(BasicMutation mutation, int lvl)
         {
@@ -30,8 +31,15 @@ namespace UI.Elements
             lvlText.text = GlobalDefinitions.GetRomanDigit(Lvl);
         }
 
+        public void SetUnavailable()
+        {
+            unavailable = true;
+        }
+        
         public void SetAffordable(bool isAffordable)
         {
+            if (unavailable) isAffordable = false;
+            
             bgImage.color = bgImage.color.WithAlpha(isAffordable ? 0.5f : 0.1f);
             icon.color = icon.color.WithAlpha(isAffordable ? 1f : 0.1f);
             lvlText.color = lvlText.color.WithAlpha(isAffordable ? 1f : 0.1f);

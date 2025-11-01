@@ -19,7 +19,6 @@ namespace Gameplay.Breeding
     {
         public static BreedingManager Instance { get; private set; }
         [Header("Definitions")]
-        [SerializeField] private float mutationRerollCost;
         [SerializeField] private int breedingFoodRequirement;
         [SerializeField] private int pregnancyDuration = 5;
 
@@ -27,15 +26,15 @@ namespace Gameplay.Breeding
         private static int eggLayingTimer;
         private Coroutine eggLayRoutine;
         
-        private float currentMutationRerollCost;
         public int CurrentFoodAmount { get; private set; }
         public int CurrentBreedingFoodRequirement { get; private set; }
 
         public static int TotalEggsAmount { get; private set; }
         [field:SerializeField] public TrioGene TrioGene { get; private set; } = TrioGene.Zero;
         public bool CanBreed => CurrentFoodAmount >= CurrentBreedingFoodRequirement && eggLayingTimer == 0;
-        public float MutationRerollCost => currentMutationRerollCost;
 
+        public delegate void GeneAddEvent(GeneType geneType, int amount);
+        public static event GeneAddEvent OnBeforeGenePickup;
         public delegate void TrioGeneEvent(TrioGene gene);
         public static event TrioGeneEvent OnTrioGeneChange;
         public delegate void EggsAmountEvent(int amount);
@@ -81,9 +80,17 @@ namespace Gameplay.Breeding
             TotalEggsAmount = newAmount;
             OnTotalEggsChanged?.Invoke(TotalEggsAmount);
         }
-        
-        private void AddGene(GeneType geneType, int amount)
+
+        private void OnGenePickup(GeneType geneType, int amount)
         {
+            AddGene(geneType, amount, true);
+        }
+
+        public void AddGeneDirectly(GeneType geneType, int amount) => AddGene(geneType, amount, false);
+        
+        private void AddGene(GeneType geneType, int amount, bool invokeOnBefore)
+        {
+            if (invokeOnBefore) OnBeforeGenePickup?.Invoke(geneType, amount);
             TrioGene.AddGene(geneType, amount);
             OnTrioGeneChange?.Invoke(TrioGene);
         }
@@ -170,7 +177,6 @@ namespace Gameplay.Breeding
         
         private void OnDifficultyChanged(Difficulty difficulty)
         {
-            currentMutationRerollCost = mutationRerollCost * difficulty.GeneRerollCost;
             CurrentBreedingFoodRequirement = Mathf.FloorToInt(breedingFoodRequirement * difficulty.BreedingCost);
             OnFoodChanged?.Invoke(CurrentFoodAmount, CurrentBreedingFoodRequirement);
         }
@@ -194,7 +200,7 @@ namespace Gameplay.Breeding
 
         private void SubToEvents()
         {
-            GeneDrop.OnPickedUp += AddGene;
+            GeneDrop.OnPickedUp += OnGenePickup;
             MainMenu.OnResetRequested += OnResetRequested;
             SettingsMenu.OnDifficultyChanged += OnDifficultyChanged;
         }
@@ -202,7 +208,7 @@ namespace Gameplay.Breeding
         private void OnDestroy()
         {
             OnProviderDestroy?.Invoke(this);
-            GeneDrop.OnPickedUp -= AddGene;
+            GeneDrop.OnPickedUp -= OnGenePickup;
             MainMenu.OnResetRequested -= OnResetRequested;
             SettingsMenu.OnDifficultyChanged -= OnDifficultyChanged;
         }

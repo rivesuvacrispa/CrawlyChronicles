@@ -83,7 +83,7 @@ namespace Gameplay.Effects.Healthbars
             transform.localPosition = pos;
         }
 
-        private void OnTargetDamageTaken(IDamageable damageable, float damage)
+        private void OnTargetDamageTaken(IDamageable damageable, DamageInstance instance)
         {
             SetValue(Mathf.Clamp01(damageable.CurrentHealth / damageable.MaxHealth));
         }

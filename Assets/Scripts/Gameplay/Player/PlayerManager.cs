@@ -148,6 +148,15 @@ namespace Gameplay.Player
         
         public void Die(bool invokeDeathEvent)
         {
+#if UNITY_EDITOR
+            if (GodMode)
+            {
+                CurrentHealth = currentStats.MaxHealth;
+                UpdateHealthbar();
+                return;
+            }
+#endif
+            
             if(invokeDeathEvent) OnPlayerKilled?.Invoke();
             OnDeath?.Invoke(this);
             movement.enabled = false;
@@ -232,7 +241,7 @@ namespace Gameplay.Player
         
         public void OnBeforeHit(DamageInstance instance)
         {
-            OnDamageTaken?.Invoke(this, instance.Damage);
+            OnDamageTaken?.Invoke(this, instance);
             PlayerAudioController.Instance.PlayHit();
             movement.Knockback(instance.position, instance.knockback);
             UpdateHealthbar();

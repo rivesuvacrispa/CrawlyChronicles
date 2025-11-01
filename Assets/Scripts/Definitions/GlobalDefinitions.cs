@@ -17,7 +17,6 @@ namespace Definitions
         [Header("Miscs")] 
         [SerializeField] private Volume globalVolume;
         [SerializeField] private Material defaultSpriteMaterial;
-        [SerializeField] private int mutationCostPerLevel;
         [SerializeField] private string[] romanDigits = new string[10];
         [SerializeField] private Sprite[] eggSprites = new Sprite[6];
         [SerializeField] private Sprite puddleSprite;
@@ -86,7 +85,17 @@ namespace Definitions
         public static string GetRomanDigit(int digit) => instance.romanDigits[digit];
         public static Sprite GetEggsBedSprite(int eggsAmount) => instance.eggSprites[Mathf.Clamp(eggsAmount - 1, 0, 5)];
         public static Color GetGeneColor(GeneType geneType) => instance.geneColors[(int) geneType];
-        public static int GetMutationCost(int lvl) => (lvl + 1) * instance.mutationCostPerLevel;
+        public static int GetMutationCost(int lvl)
+        {
+            lvl += 1;
+            return lvl switch
+            {
+                <= 3 => lvl * 10,
+                <= 7 => 50 * (lvl - 3),
+                <= 10 => 100 * (lvl - 5),
+                _ => 0
+            };
+        }
 
         public static void DropGenesRandomly(Vector3 pos, GeneType type, int amount, float radius = 0.75f)
         {

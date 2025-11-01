@@ -1,20 +1,41 @@
 ﻿using Gameplay.Player;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.Localization;
 
 namespace UI.Player
 {
     public class PlayerStats : MonoBehaviour 
     {
         [SerializeField] private TMP_Text statsText;
+        [SerializeField] private LocalizedString localizedString;
 
+        private object[] currentArgs;
         
         
-        private void OnEnable() => PlayerManager.OnStatsChanged += OnPlayerStatsChanged;
+        private void UpdateText(string value)
+        {
+            localizedString.Arguments = PlayerManager.PlayerStats.GetStringArguments();
+            statsText.text = value;
+        }
 
-        private void OnDisable() => PlayerManager.OnStatsChanged -= OnPlayerStatsChanged;
+        private void OnEnable()
+        {
+            localizedString.StringChanged += UpdateText;
+            PlayerManager.OnStatsChanged += OnPlayerStatsChanged;
+        }
 
-        private void OnPlayerStatsChanged() => statsText.text = PlayerManager.PlayerStats.Print();
+        private void OnDisable()
+        {
+            localizedString.StringChanged -= UpdateText;
+            PlayerManager.OnStatsChanged -= OnPlayerStatsChanged;
+        }
+
+        private void OnPlayerStatsChanged()
+        {
+            currentArgs = PlayerManager.PlayerStats.GetStringArguments();
+            localizedString.Arguments = currentArgs;
+            statsText.text = PlayerManager.PlayerStats.Print(currentArgs);
+        }
     }
 }

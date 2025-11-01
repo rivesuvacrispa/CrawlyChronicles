@@ -1,4 +1,6 @@
-﻿using GameCycle;
+﻿using System;
+using System.Threading;
+using GameCycle;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -26,7 +28,15 @@ namespace UI.Menus
 
         public static event MainMenuEvent OnResetRequested;
         public static event MainMenuEvent OnAfterReset;
-        
+        private static CancellationTokenSource cancellationTokenSource;
+        public static CancellationToken CancellationTokenOnReset => cancellationTokenSource.Token;
+
+
+        private void Awake()
+        {
+            cancellationTokenSource ??= new CancellationTokenSource();
+        }
+
         private void Start()
         {
             subtitleText.text = $"{Application.version}\nby RivesUvaCrispa";
@@ -126,6 +136,9 @@ namespace UI.Menus
         
         private void ResetGame()
         {
+            cancellationTokenSource?.Cancel();
+            cancellationTokenSource?.Dispose();
+            cancellationTokenSource = new CancellationTokenSource();
             OnResetRequested?.Invoke();
             OnAfterReset?.Invoke();
         }

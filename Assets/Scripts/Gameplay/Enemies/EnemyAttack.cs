@@ -5,7 +5,7 @@ using Util.Interfaces;
 
 namespace Gameplay.Enemies
 {
-    public class EnemyAttack : MonoBehaviour, IEnemyAttack, IDamageSource
+    public class EnemyAttack : MonoBehaviour, IEnemyAttack
     {
         [SerializeField] private Enemy enemy;
 
@@ -20,7 +20,7 @@ namespace Gameplay.Enemies
             {
                 ((IDamageable)playerManager)
                     .Damage(new DamageInstance(
-                        new DamageSource(this, col.GetHashCode()),
+                        new DamageSource(enemy, col.GetHashCode()),
                         AttackDamage,
                         AttackPosition,
                         AttackPower));

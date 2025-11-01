@@ -20,7 +20,7 @@ namespace Hitboxes
         public delegate void DeathEvent(IDamageable damageable);
         public event DeathEvent OnDeath;
 
-        public delegate void DamageEvent(IDamageable damageable, float damage);
+        public delegate void DamageEvent(IDamageable damageable, DamageInstance instance);
         public event DamageEvent OnDamageTaken;
 
         public float Armor { get; }

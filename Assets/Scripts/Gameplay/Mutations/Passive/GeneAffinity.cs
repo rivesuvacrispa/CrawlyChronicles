@@ -1,38 +1,49 @@
-﻿using Gameplay.Genes;
+﻿using Gameplay.Breeding;
+using Gameplay.Genes;
+using Gameplay.Mutations.Stats;
 using UnityEngine;
 
 namespace Gameplay.Mutations.Passive
 {
-    public class GeneAffinity : BasicAbility
+    public class GeneAffinity : StatsAbility
     {
         [SerializeField] private GeneType geneType;
-        [SerializeField, Range(0f, 1f)] private float conversionChanceLvl1;
-        [SerializeField, Range(0f, 1f)] private float conversionChanceLvl10;
+        [Header("Bonus Chance")]
+        [SerializeField, Range(0.01f, 1f)] private float bonusChanceLvl1;
+        [SerializeField, Range(0.01f, 1f)] private float bonusChanceLvl10;
         
-        private float conversionChance;
+        private float bonusChance;
 
 
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
-            conversionChance = LerpLevel(conversionChanceLvl1, conversionChanceLvl10, lvl);
+            bonusChance = LerpLevel(bonusChanceLvl1, bonusChanceLvl10, lvl);
         }
 
         protected override void OnEnable()
         {
             base.OnEnable();
-            GeneDrop.OnGeneDropReplaceTypeRequested += OnGeneDropReplaceTypeRequested;
+            BreedingManager.OnBeforeGenePickup += OnBeforeGenePickup;
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            GeneDrop.OnGeneDropReplaceTypeRequested -= OnGeneDropReplaceTypeRequested;
+            BreedingManager.OnBeforeGenePickup -= OnBeforeGenePickup;
         }
 
-        private GeneType OnGeneDropReplaceTypeRequested()
+        private void OnBeforeGenePickup(GeneType gType, int amount)
         {
-            return Random.value <= conversionChance ? geneType : default;
+            if (amount == 0) return;
+            
+            int bonus = 0;
+            for (int i = 0; i < amount; i++)
+                if (Random.value <= bonusChance)
+                    bonus++;
+            
+            if (bonus > 0)
+                BreedingManager.Instance.AddGeneDirectly(geneType, bonus);
         }
     }
 }

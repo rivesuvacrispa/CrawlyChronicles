@@ -24,7 +24,7 @@ namespace Gameplay.Enemies
      RequireComponent(typeof(Rigidbody2D)),
      RequireComponent(typeof(AIStateController)),
     RequireComponent(typeof(EffectController))]
-    public abstract class Enemy : MonoBehaviour, IDamageableEnemy, IEffectAffectable
+    public abstract class Enemy : MonoBehaviour, IDamageableEnemy, IEffectAffectable, IDamageSource
     {
         [FormerlySerializedAs("Fearless")] 
         [SerializeField] protected bool fearless;
@@ -336,7 +336,7 @@ namespace Gameplay.Enemies
 
         public void OnBeforeHit(DamageInstance instance)
         {
-            OnDamageTaken?.Invoke(this, instance.Damage);
+            OnDamageTaken?.Invoke(this, instance);
             attackDelay = 1f;
             StopAttack();
             DamageTaken();

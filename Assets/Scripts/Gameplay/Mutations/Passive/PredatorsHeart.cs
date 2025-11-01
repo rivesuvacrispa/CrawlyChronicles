@@ -1,15 +1,13 @@
 ﻿using System.Collections;
+using Gameplay.Mutations.Stats;
 using Gameplay.Player;
 using UnityEngine;
 
 namespace Gameplay.Mutations.Passive
 {
-    public class PredatorsHeart : BasicAbility
+    public class PredatorsHeart : StatsAbility
     {
         [SerializeField] private PlayerManager playerManager;
-        [Header("Max health")]
-        [SerializeField] private float healthLvl1;
-        [SerializeField] private float healthLvl10;
 
         [Header("Regen")]
         [SerializeField] private float regenDelay;
@@ -22,9 +20,6 @@ namespace Gameplay.Mutations.Passive
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
-            if(!currentStats.Equals(PlayerStats.Zero) && Application.isPlaying) playerManager.AddStats(currentStats.Negated());
-            currentStats = new PlayerStats(maxHealth: LerpLevel(healthLvl1, healthLvl10, lvl));
-            if(Application.isPlaying) playerManager.AddStats(currentStats);
             currentRegen = LerpLevel(regenLvl1, regenLvl10, lvl);
         }
 
@@ -43,7 +38,7 @@ namespace Gameplay.Mutations.Passive
 
         private IEnumerator RegenerationRoutine()
         {
-            while (gameObject.activeInHierarchy && enabled)
+            while (isActiveAndEnabled)
             {
                 yield return new WaitForSeconds(regenDelay);
                 PlayerManager.Instance.AddHealthPercent(currentRegen);
@@ -52,26 +47,23 @@ namespace Gameplay.Mutations.Passive
         
         public override string GetLevelDescription(int lvl, bool withUpgrade)
         {
-            float hp = LerpLevel(healthLvl1, healthLvl10, lvl);
-            float prevhp = hp;
             int regen = (int) (LerpLevel(regenLvl1, regenLvl10, lvl) * 100);
             int prevRegen = regen;
 
             if (lvl > 0 && withUpgrade)
             {
                 var prevLvl = lvl - 1;
-                prevhp = LerpLevel(healthLvl1, healthLvl10, prevLvl);
                 prevRegen = (int) (LerpLevel(regenLvl1, regenLvl10, prevLvl) * 100);
             }
             
             var args = new object[]
             {
-                hp,          regen,
-                hp - prevhp, regen - prevRegen,
+                regen,
+                regen - prevRegen,
                 regenDelay
             };
             
-            return scriptable.GetStatDescription(args);
+            return  scriptable.GetStatDescription(args) + "\n" + base.GetLevelDescription(lvl, withUpgrade);
         }
     }
 }

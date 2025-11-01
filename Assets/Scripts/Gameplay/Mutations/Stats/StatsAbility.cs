@@ -5,7 +5,6 @@ namespace Gameplay.Mutations.Stats
 {
     public class StatsAbility : BasicAbility
     {
-        [SerializeField] private PlayerManager playerManager;
         [SerializeField] private PlayerStats statsLvl1;
         [SerializeField] private PlayerStats statsLvl10;
 
@@ -14,21 +13,21 @@ namespace Gameplay.Mutations.Stats
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
-            if(!current.Equals(PlayerStats.Zero) && Application.isPlaying) playerManager.AddStats(current.Negated());
+            if(!current.Equals(PlayerStats.Zero) && Application.isPlaying) PlayerManager.Instance.AddStats(current.Negated());
             current = PlayerStats.LerpLevel(statsLvl1, statsLvl10, lvl);
-            if(Application.isPlaying) playerManager.AddStats(current);
+            if(Application.isPlaying && isActiveAndEnabled) PlayerManager.Instance.AddStats(current);
         }
 
         protected override void OnEnable()
         {
             base.OnEnable();
             if(current.Equals(PlayerStats.Zero)) return;
-            playerManager.AddStats(current);
+            PlayerManager.Instance.AddStats(current);
         }
         
         protected override void OnDisable()
         {
-            playerManager.AddStats(current.Negated());
+            PlayerManager.Instance.AddStats(current.Negated());
             base.OnDisable();
         }
 

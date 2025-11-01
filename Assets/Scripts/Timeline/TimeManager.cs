@@ -76,7 +76,7 @@ namespace Timeline
             lifetime = startingPoint;
             while (lifetime > 0)
             {
-                lifespanText.text = $"{(int) lifetime / 60:0}:{lifetime % 60:00}";
+                UpdateLifespanText();
                 if(lifetime <= 10) DeathCounter.StartCounter(lifetime);
                 lifetime -= Time.deltaTime;
                 yield return null;
@@ -108,6 +108,19 @@ namespace Timeline
             if (lifespanRoutine is null) 
                 lifespanRoutine = StartCoroutine(LifespanRoutine(lifetime));
             UpdateUI();
+        }
+
+        public void AddLifespan(float amount)
+        {
+            if (lifetime <= 10 && lifetime + amount > 10) DeathCounter.StopCounter();
+            
+            lifetime += amount;
+            UpdateLifespanText();
+        }
+
+        private void UpdateLifespanText()
+        {
+            lifespanText.text = $"{(int) lifetime / 60:0}:{lifetime % 60:00}";
         }
 
         private void StartNight()

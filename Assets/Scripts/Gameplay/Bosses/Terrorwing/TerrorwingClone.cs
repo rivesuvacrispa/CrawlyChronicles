@@ -181,7 +181,7 @@ namespace Gameplay.Bosses.Terrorwing
 
         public void OnBeforeHit(DamageInstance instance)
         {
-            OnDamageTaken?.Invoke(this, instance.Damage);
+            OnDamageTaken?.Invoke(this, instance);
         }
         
 

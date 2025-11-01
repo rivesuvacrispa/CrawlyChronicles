@@ -11,7 +11,6 @@ namespace Gameplay.Genes
     [RequireComponent(typeof(Light2D))]
     public class GeneConsumer : MonoBehaviour
     {
-        [SerializeField] private PlayerHitbox hitbox;
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private Color normalSpriteColor;
         

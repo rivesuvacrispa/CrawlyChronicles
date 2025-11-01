@@ -21,7 +21,7 @@ namespace Gameplay.Mutations
         private ParticleCollisionProvider[] collisionProviders;
 
 
-        private void Awake()
+        protected virtual void Awake()
         {
             collisionProviders = GetComponentsInChildren<ParticleCollisionProvider>();
             foreach (var provider in collisionProviders) 
