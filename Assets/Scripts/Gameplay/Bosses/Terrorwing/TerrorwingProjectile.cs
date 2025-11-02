@@ -31,7 +31,7 @@ namespace Gameplay.Bosses.Terrorwing
         private void Start()
         {
             MainMenu.OnResetRequested += OnResetRequested;
-            if (Target.Equals(Vector2.zero)) Target = PlayerMovement.Position;
+            if (Target.Equals(Vector2.zero)) Target = PlayerPhysicsBody.Position;
             Vector2 pos = transform.position;
             RotateTowardsTarget(Target - pos, 360);
         }

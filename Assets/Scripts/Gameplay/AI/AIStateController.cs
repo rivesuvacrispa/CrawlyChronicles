@@ -7,6 +7,7 @@ using Gameplay.Enemies;
 using Gameplay.Food;
 using Gameplay.Food.VenusFlyTrap;
 using Gameplay.Map;
+using Gameplay.Player;
 using Hitboxes;
 using Pathfinding;
 using UnityEngine;
@@ -60,9 +61,24 @@ namespace Gameplay.AI
             destinationSetter = GetComponent<AIDestinationSetter>();
 
             locator.OnTargetLocated += OnLocatorTriggered;
+            PlayerLocatorBody.OnDisabled += OnPlayerBecomeInvisible;
             aiPath.enabled = false;
             destinationSetter.enabled = false;
             defaultReachDistance = aiPath.endReachedDistance;
+        }
+
+        private void OnDestroy()
+        {
+            locator.OnTargetLocated -= OnLocatorTriggered;
+            PlayerLocatorBody.OnDisabled -= OnPlayerBecomeInvisible;
+            if(currentFollowTarget is not null)
+                currentFollowTarget.OnProviderDestroy -= OnFollowTargetDestroy;
+        }
+
+        private void OnPlayerBecomeInvisible()
+        {
+            if (CurrentState is AIState.Follow && currentFollowTarget.Equals(PlayerManager.Instance))
+                SetState(AIState.Wander);
         }
 
         private IEnumerator Start()
@@ -145,11 +161,12 @@ namespace Gameplay.AI
             aiPath.Callback = () => Destroy(gameObject);
         }
 
+        // TODO: why is this IEnumerator?
         private IEnumerator SetFollow(ITransformProvider target, Action onTargetReach, float reachDistance)
         {
             // yield return new WaitForEndOfFrame();
             aiPath.endReachedDistance = reachDistance.Equals(float.NaN) ? defaultReachDistance : reachDistance;
-            target ??= Player.PlayerManager.Instance;
+            target ??= PlayerManager.Instance;
             currentFollowTarget = target;
             DisableLocator();
             AutoRepath();
@@ -208,9 +225,10 @@ namespace Gameplay.AI
         
 
         // Utility
-        public bool TryGetRandomPointAround(Vector3 from, int radius, out Vector3 point)
+        protected bool TryGetRandomPointAround(Vector3 from, int radius, out Vector3 point)
         {
             point = default;
+            if (AstarPath.active is null) return false;
             var startNode = AstarPath.active.GetNearest(from).node;
             var nodes = PathUtilities.BFS(startNode, radius);
             if(nodes.Count == 0) return false;
@@ -247,10 +265,10 @@ namespace Gameplay.AI
                 case EggBed eggBed:
                     enemy.OnEggsLocated(eggBed);
                     break;
-                case Foodbed foodBed and not VenusFlyTrap:
+                case Foodbed foodBed:
                     enemy.OnFoodLocated(foodBed);
                     break;
-                default:
+                case PlayerLocatorBody:
                     enemy.OnPlayerLocated();
                     break;
             }
@@ -283,13 +301,6 @@ namespace Gameplay.AI
         {
             locatorDismissed = false;
             EnableLocator();
-        }
-
-        private void OnDestroy()
-        {
-            locator.OnTargetLocated -= OnLocatorTriggered;
-            if(currentFollowTarget is not null)
-                currentFollowTarget.OnProviderDestroy -= OnFollowTargetDestroy;
         }
     }
 }

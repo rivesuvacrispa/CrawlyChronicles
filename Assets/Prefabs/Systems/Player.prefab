@@ -24928,7 +24928,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scriptable: {fileID: 11400000, guid: 9387b3f17a0a9a743922bb70147997de, type: 2}
   level: 0
-  playerManager: {fileID: 45504562391346130}
   statsLvl1:
     movementSpeed: 0.25
     rotationSpeed: 0.25
@@ -24939,6 +24938,9 @@ MonoBehaviour:
     immunityDuration: 0
     abilityDamage: 0
     passiveProcRate: 0
+    mutagenicity: 0
+    bonusSummonAmount: 0
+    summonDamage: 0
   statsLvl10:
     movementSpeed: 2
     rotationSpeed: 4
@@ -24949,6 +24951,9 @@ MonoBehaviour:
     immunityDuration: 0
     abilityDamage: 0
     passiveProcRate: 0
+    mutagenicity: 0
+    bonusSummonAmount: 0
+    summonDamage: 0
   current:
     movementSpeed: 0.25
     rotationSpeed: 0.25
@@ -24959,6 +24964,9 @@ MonoBehaviour:
     immunityDuration: 0
     abilityDamage: 0
     passiveProcRate: 0
+    mutagenicity: 0
+    bonusSummonAmount: 0
+    summonDamage: 0
 --- !u!1 &2583617828395168463
 GameObject:
   m_ObjectHideFlags: 0
@@ -25110,7 +25118,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8f687f44fb545fd91b5666ac59e1a4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hitbox: {fileID: 461905994004500634}
   spriteRenderer: {fileID: 5871327446538874582}
   normalSpriteColor: {r: 0.08627451, g: 0.08627451, b: 0.08627451, a: 1}
 --- !u!1 &3088099053033251564
@@ -25146,7 +25153,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 15, y: 15, z: 0}
-  m_LocalScale: {x: 1.1, y: 1.1, z: 1.1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4505526070951364491}
@@ -25178,7 +25185,6 @@ MonoBehaviour:
   <GodMode>k__BackingField: 0
   hitbox: {fileID: 461905994004500634}
   healingParticles: {fileID: 6351454208109080765}
-  spriteAnimator: {fileID: 6824161234706986927}
   movement: {fileID: 6983133238829123899}
   sizeManager: {fileID: 0}
   mainMenu: {fileID: 0}
@@ -25199,6 +25205,9 @@ MonoBehaviour:
     immunityDuration: 0.4
     abilityDamage: 0
     passiveProcRate: 1
+    mutagenicity: 0
+    bonusSummonAmount: 0
+    summonDamage: 0
   currentStats:
     movementSpeed: 0
     rotationSpeed: 0
@@ -25209,6 +25218,9 @@ MonoBehaviour:
     immunityDuration: 0
     abilityDamage: 0
     passiveProcRate: 0
+    mutagenicity: 0
+    bonusSummonAmount: 0
+    summonDamage: 0
 --- !u!114 &6983133238829123899
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25221,8 +25233,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f856aa8d69e4674aa89981d3925c04f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rb: {fileID: 0}
   knockbackResistance: 0.5
-  spriteAnimator: {fileID: 6824161234706986927}
   comboDashSpeedAmplifier: 3
 --- !u!114 &4242114928489847295
 MonoBehaviour:
@@ -25237,7 +25249,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hitbox: {fileID: 461905994004500634}
-  movementComponent: {fileID: 6983133238829123899}
   comboManager: {fileID: 0}
   attack: {fileID: 1811273410705496310}
   defaultAttackPosition: {x: 0, y: 0.327, z: 0}
@@ -40687,9 +40698,46 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scriptable: {fileID: 11400000, guid: af365fdf42f510e4c9bbf0638c0d25a5, type: 2}
   level: 0
+  statsLvl1:
+    movementSpeed: 0
+    rotationSpeed: 0
+    maxHealth: 0
+    attackPower: 0
+    attackDamage: 0
+    armor: 0
+    immunityDuration: 0
+    abilityDamage: 0
+    passiveProcRate: 0
+    mutagenicity: 0
+    bonusSummonAmount: 0
+    summonDamage: 0
+  statsLvl10:
+    movementSpeed: 0
+    rotationSpeed: 0
+    maxHealth: 0
+    attackPower: 0
+    attackDamage: 0
+    armor: 0
+    immunityDuration: 0
+    abilityDamage: 0
+    passiveProcRate: 0
+    mutagenicity: 0
+    bonusSummonAmount: 0
+    summonDamage: 0
+  current:
+    movementSpeed: 0
+    rotationSpeed: 0
+    maxHealth: 0
+    attackPower: 0
+    attackDamage: 0
+    armor: 0
+    immunityDuration: 0
+    abilityDamage: 0
+    passiveProcRate: 0
+    mutagenicity: 0
+    bonusSummonAmount: 0
+    summonDamage: 0
   playerManager: {fileID: 45504562391346130}
-  healthLvl1: 3
-  healthLvl10: 10
   regenDelay: 10
   regenLvl1: 0.055555556
   regenLvl10: 0.16666667
@@ -75790,7 +75838,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scriptable: {fileID: 11400000, guid: 6775445020bc7f547ab421d357f1d65f, type: 2}
   level: 0
-  playerManager: {fileID: 45504562391346130}
   statsLvl1:
     movementSpeed: 0
     rotationSpeed: 0
@@ -75801,6 +75848,9 @@ MonoBehaviour:
     immunityDuration: 0
     abilityDamage: 0
     passiveProcRate: 0
+    mutagenicity: 0
+    bonusSummonAmount: 0
+    summonDamage: 0
   statsLvl10:
     movementSpeed: 0
     rotationSpeed: 0
@@ -75811,6 +75861,9 @@ MonoBehaviour:
     immunityDuration: 0
     abilityDamage: 0
     passiveProcRate: 0
+    mutagenicity: 0
+    bonusSummonAmount: 0
+    summonDamage: 0
   current:
     movementSpeed: 0
     rotationSpeed: 0
@@ -75821,6 +75874,9 @@ MonoBehaviour:
     immunityDuration: 0
     abilityDamage: 0
     passiveProcRate: 0
+    mutagenicity: 0
+    bonusSummonAmount: 0
+    summonDamage: 0
 --- !u!1 &9102689280029699577
 GameObject:
   m_ObjectHideFlags: 0
@@ -75867,7 +75923,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scriptable: {fileID: 11400000, guid: 04e4b3f84237c304b8e4518b8ee27830, type: 2}
   level: 9
-  playerManager: {fileID: 45504562391346130}
   statsLvl1:
     movementSpeed: 0
     rotationSpeed: 0
@@ -75878,6 +75933,9 @@ MonoBehaviour:
     immunityDuration: 0.05
     abilityDamage: 0
     passiveProcRate: 0
+    mutagenicity: 0
+    bonusSummonAmount: 0
+    summonDamage: 0
   statsLvl10:
     movementSpeed: 0
     rotationSpeed: 0
@@ -75888,6 +75946,9 @@ MonoBehaviour:
     immunityDuration: 0.35
     abilityDamage: 0
     passiveProcRate: 0
+    mutagenicity: 0
+    bonusSummonAmount: 0
+    summonDamage: 0
   current:
     movementSpeed: 0
     rotationSpeed: 0
@@ -75898,6 +75959,9 @@ MonoBehaviour:
     immunityDuration: 0.35
     abilityDamage: 0
     passiveProcRate: 0
+    mutagenicity: 0
+    bonusSummonAmount: 0
+    summonDamage: 0
 --- !u!1001 &3371749948801097671
 PrefabInstance:
   m_ObjectHideFlags: 0

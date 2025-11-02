@@ -156,7 +156,7 @@ namespace Gameplay.Bosses.Terrorwing
             mainHitbox.Disable();
             animator.Play(AttackAnimHash);
             attackGO.SetActive(true);
-            rb.AddClampedForceTowards(PlayerMovement.Position, swipeAttackSpeed, ForceMode2D.Impulse);
+            rb.AddClampedForceTowards(PlayerPhysicsBody.Position, swipeAttackSpeed, ForceMode2D.Impulse);
             
             await KeepDistanceTask(TerrorwingDefinitions.SwipeAttackDistance, cancellationToken: cancellationToken);
             attackGO.SetActive(false);
@@ -181,7 +181,7 @@ namespace Gameplay.Bosses.Terrorwing
                 var spawner = original.ProjectileSpawners[Random.Range(0, 4)];
                 var projectile = spawner.Spawn(projectilePrefab);
                 var scatter = Random.insideUnitCircle * aimScatter;
-                var target = PlayerMovement.Position + (Vector2) PlayerManager.Instance.Transform.up + scatter;
+                var target = PlayerPhysicsBody.Position + (Vector2) PlayerManager.Instance.Transform.up + scatter;
                 projectile.Target = target;
                 await UniTask.Delay(TimeSpan.FromSeconds(TerrorwingDefinitions.BombardierShootingSpeed),
                     cancellationToken: cancellationToken);
@@ -205,7 +205,7 @@ namespace Gameplay.Bosses.Terrorwing
                 float t = orbitTime * Random.Range(0.8f, 1.2f);
                 while (t > 0)
                 {
-                    Vector2 playerPos = PlayerMovement.Position;
+                    Vector2 playerPos = PlayerPhysicsBody.Position;
                     transform.RotateAround(playerPos, axis, orbitSpeed * Time.deltaTime);
                     // rb.RotateTowardsPosition(playerPos, 360);
                     t -= Time.deltaTime;
@@ -257,7 +257,7 @@ namespace Gameplay.Bosses.Terrorwing
             DisposeTokenSource(illusionsCts);
             rb.simulated = true;
             illusionsCts = null;
-            transform.position = PlayerMovement.Position + Random.insideUnitCircle.normalized * 3;
+            transform.position = PlayerPhysicsBody.Position + Random.insideUnitCircle.normalized * 3;
             SetClonesSimulated(false);
             original.transform.localPosition = Vector3.zero;
             original.transform.localRotation = Quaternion.identity;
@@ -274,7 +274,7 @@ namespace Gameplay.Bosses.Terrorwing
             float angle = 0;
             while (currentPattern == TerrorwingPattern.Illusions)
             {
-                Vector3 playerPos = PlayerMovement.Position;
+                Vector3 playerPos = PlayerPhysicsBody.Position;
                 transform.position = playerPos;
                 for (int i = 0; i < 4; i++)
                 {

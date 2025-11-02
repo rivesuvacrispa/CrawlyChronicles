@@ -42,7 +42,7 @@ namespace Gameplay.Mutations.Passive
             damageable.Damage(new DamageInstance(
                 new DamageSource(this, collisionID),
                 GetAbilityDamage(damage),
-                PlayerMovement.Position,
+                PlayerPhysicsBody.Position,
                 piercing: true));
         }
 

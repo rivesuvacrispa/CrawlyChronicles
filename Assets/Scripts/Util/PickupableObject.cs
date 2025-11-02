@@ -18,7 +18,7 @@ namespace Util
 
         private void Update()
         {
-            Vector2 direction = PlayerMovement.Position - (Vector2) transform.position;
+            Vector2 direction = PlayerPhysicsBody.Position - (Vector2) transform.position;
             float distanceFromPlayer = direction.sqrMagnitude;
             float pickUpDistance = GlobalDefinitions.GenePickupDistance;
             if (distanceFromPlayer <= pickUpDistance)
@@ -33,7 +33,7 @@ namespace Util
             while (distanceFromPlayer >= 0.15f)
             {
                 Vector2 pos = transform.position;
-                Vector2 playerpos = PlayerMovement.Position;
+                Vector2 playerpos = PlayerPhysicsBody.Position;
                 Vector2 direction = playerpos - pos;
                 distanceFromPlayer = direction.sqrMagnitude;
                 transform.position = Vector2.MoveTowards(pos, playerpos,

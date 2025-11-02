@@ -61,7 +61,7 @@ namespace UI.Elements
             if(doNotHide) return;
             // TODO: This def can be rewritten
             Vector2 positionToUse = isStatic ? providerStaticPosition : cachedTransform.position;
-            float distanceToPlayer = (positionToUse - Gameplay.Player.PlayerMovement.Position).sqrMagnitude;
+            float distanceToPlayer = (positionToUse - Gameplay.Player.PlayerPhysicsBody.Position).sqrMagnitude;
             SetActive(distanceToPlayer <= GlobalDefinitions.InteractionDistance);
 
             if (!isStatic) transform.localPosition = cachedTransform.position;

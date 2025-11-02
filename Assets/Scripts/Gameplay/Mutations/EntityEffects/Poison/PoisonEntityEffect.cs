@@ -22,7 +22,7 @@ namespace Gameplay.Mutations.EntityEffects.Poison
             enemy.Damage(new DamageInstance(
                 new DamageSource(this, TickCounter), 
                 data.Damage, 
-                Player.PlayerMovement.Position, 
+                Player.PlayerPhysicsBody.Position, 
                 0.1f,
                 0, 
                 GlobalDefinitions.PoisonColor,

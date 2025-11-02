@@ -144,6 +144,8 @@ namespace Gameplay.Enemies
 
         protected virtual void AttackPlayer(float reachDistance = 0)
         {
+            if (!PlayerLocatorBody.Enabled) return;
+            
             if (reachDistance == 0) reachDistance = scriptable.AttackDistance;
             StateController.SetState(AIState.Follow, 
                 onTargetReach: BasicAttack,
@@ -162,7 +164,7 @@ namespace Gameplay.Enemies
             float t = attackDelay * 0.5f;
             while (t > 0)
             {
-                if(!rb.freezeRotation) rb.RotateTowardsPosition(PlayerMovement.Position, 5);
+                if(!rb.freezeRotation) rb.RotateTowardsPosition(PlayerPhysicsBody.Position, 5);
                 t -= Time.deltaTime;
                 await UniTask.Yield(cancellationToken: cancellationToken);
             }
@@ -183,7 +185,7 @@ namespace Gameplay.Enemies
 
         protected virtual async UniTask PerformAttack(CancellationToken cancellationToken)
         {
-            var playerPos = PlayerMovement.Position;
+            var playerPos = PlayerPhysicsBody.Position;
             if(!rb.freezeRotation) rb.RotateTowardsPosition(playerPos, 90);
             rb.AddClampedForceTowards(playerPos, scriptable.AttackPower, ForceMode2D.Impulse);
 

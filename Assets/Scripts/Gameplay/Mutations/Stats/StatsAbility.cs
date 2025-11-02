@@ -10,24 +10,28 @@ namespace Gameplay.Mutations.Stats
 
         [SerializeField] private PlayerStats current = PlayerStats.Zero;
 
+        protected bool StatsCanBeAdded =>
+            !current.Equals(PlayerStats.Zero) && Application.isPlaying && isActiveAndEnabled;
+
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
-            if(!current.Equals(PlayerStats.Zero) && Application.isPlaying) PlayerManager.Instance.AddStats(current.Negated());
+            if (StatsCanBeAdded) PlayerManager.Instance.AddStats(current.Negated());
             current = PlayerStats.LerpLevel(statsLvl1, statsLvl10, lvl);
-            if(Application.isPlaying && isActiveAndEnabled) PlayerManager.Instance.AddStats(current);
+            if (StatsCanBeAdded) PlayerManager.Instance.AddStats(current);
         }
 
         protected override void OnEnable()
         {
             base.OnEnable();
-            if(current.Equals(PlayerStats.Zero)) return;
-            PlayerManager.Instance.AddStats(current);
+            if (StatsCanBeAdded)
+                PlayerManager.Instance.AddStats(current);
         }
         
         protected override void OnDisable()
         {
-            PlayerManager.Instance.AddStats(current.Negated());
+            if (StatsCanBeAdded)
+                PlayerManager.Instance.AddStats(current.Negated());
             base.OnDisable();
         }
 

@@ -81,7 +81,7 @@ namespace Gameplay.Bosses.AntColony
                     currentMovespeed, currentMovespeed * 3f, attackDistance, cancellationToken);
                 animator.speed = 3;
                 attackGO.SetActive(true);
-                rb.AddClampedForceTowards(Player.PlayerMovement.Position, attackSpeed, ForceMode2D.Impulse);
+                rb.AddClampedForceTowards(Player.PlayerPhysicsBody.Position, attackSpeed, ForceMode2D.Impulse);
                 await UniTask.Delay(TimeSpan.FromSeconds(1f), cancellationToken: cancellationToken);
                 attackGO.SetActive(false);
                 animator.speed = 1;

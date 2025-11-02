@@ -36,7 +36,7 @@ public class PlayerManagerEditor : Editor {
 
         if (GUILayout.Button("Lay Eggs"))
         {
-            BreedingManager.Instance.LayEggs(PlayerMovement.Position, 
+            BreedingManager.Instance.LayEggs(PlayerPhysicsBody.Position, 
                 new TrioGene(999, 999, 999), 
                 AbilityController.GetMutationData());
         }

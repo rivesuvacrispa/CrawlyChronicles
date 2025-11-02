@@ -22,7 +22,6 @@ namespace Gameplay.Mutations.Active
         private float lifespanPerTick;
         private float healthPerTick;
         
-        private CancellationTokenSource cts;
 
 
         public override void OnLevelChanged(int lvl)
@@ -34,13 +33,11 @@ namespace Gameplay.Mutations.Active
 
         public override void Activate()
         {
-            cts?.Cancel();
-            cts?.Dispose();
-            cts = new CancellationTokenSource();
-            RegenerationTask(cts.Token)
-                .AttachExternalCancellation(gameObject.GetCancellationTokenOnDestroy())
-                .AttachExternalCancellation(MainMenu.CancellationTokenOnReset)
-                .Forget();
+            RegenerationTask(
+                    CancellationTokenSource.CreateLinkedTokenSource(
+                        gameObject.GetCancellationTokenOnDestroy(),
+                        MainMenu.CancellationTokenOnReset).Token
+                    ).Forget();
         }
 
         private async UniTask RegenerationTask(CancellationToken cancellationToken)
@@ -51,7 +48,8 @@ namespace Gameplay.Mutations.Active
             {
                 PlayerManager.Instance.AddHealth(healthPerTick);
                 TimeManager.Instance.AddLifespan(lifespanPerTick);
-                await UniTask.Delay(delay, cancellationToken: cancellationToken);
+                bool canceled = await UniTask.Delay(delay, cancellationToken: cancellationToken).SuppressCancellationThrow();
+                if (canceled) break;
             }
             particleSystem.Stop();
         }

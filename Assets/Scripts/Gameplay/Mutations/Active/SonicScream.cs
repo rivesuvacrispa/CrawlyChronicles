@@ -42,7 +42,7 @@ namespace Gameplay.Mutations.Active
         {
             damageable.Damage(new DamageInstance(new DamageSource(this), 
                 0,
-                PlayerMovement.Position,
+                PlayerPhysicsBody.Position,
                 knockback,
                 stun,
                 Color.pink));

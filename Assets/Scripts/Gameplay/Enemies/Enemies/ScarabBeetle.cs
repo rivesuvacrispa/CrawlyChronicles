@@ -26,7 +26,7 @@ namespace Gameplay.Enemies.Enemies
             float t = duration;
             while (t > 0)
             {
-                rb.RotateTowardsPosition(2 * rb.position - Player.PlayerMovement.Position, 5f);
+                rb.RotateTowardsPosition(2 * rb.position - Player.PlayerPhysicsBody.Position, 5f);
                 t -= Time.deltaTime;
                 yield return null;
             }

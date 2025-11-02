@@ -3,6 +3,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Gameplay.Player;
 using Hitboxes;
+using UI.Menus;
 using UnityEngine;
 using Util.Interfaces;
 
@@ -42,7 +43,7 @@ namespace Gameplay.Mutations.Active
             
             // IDK why but this has to be divided by 57 (* 1 / 57)
             ParticleSystem.MinMaxCurve m =
-                new ParticleSystem.MinMaxCurve(PlayerMovement.Rotation * -0.01754385964f);
+                new ParticleSystem.MinMaxCurve(PlayerPhysicsBody.Rotation * -0.01754385964f);
             main.startRotation = m;
             main.startSize = new ParticleSystem.MinMaxCurve(
                 initialParticleSize.constantMin * PlayerSizeManager.CurrentSize,
@@ -84,8 +85,11 @@ namespace Gameplay.Mutations.Active
 
         public override void Activate()
         {
-            ActivateTask(new CancellationTokenSource().Token)
-                .AttachExternalCancellation(gameObject.GetCancellationTokenOnDestroy());
+            ActivateTask(
+                    CancellationTokenSource.CreateLinkedTokenSource(
+                        gameObject.GetCancellationTokenOnDestroy(),
+                        MainMenu.CancellationTokenOnReset).Token
+                    ).Forget();
         }
 
         private async UniTask ActivateTask(CancellationToken cancellationToken)
@@ -94,7 +98,8 @@ namespace Gameplay.Mutations.Active
             particleSystem.Play();
             bonusReflection = LerpLevel(bonusReflectionLvl1, bonusReflectionLvl10, Level);
             
-            await UniTask.Delay(TimeSpan.FromSeconds(activeEffectDuration), cancellationToken: cancellationToken);
+            await UniTask.Delay(TimeSpan.FromSeconds(activeEffectDuration), cancellationToken: cancellationToken)
+                .SuppressCancellationThrow();
             
             bonusReflection = 0f;
             particleSystem.Stop();

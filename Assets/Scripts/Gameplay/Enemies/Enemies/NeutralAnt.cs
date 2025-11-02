@@ -103,7 +103,7 @@ namespace Gameplay.Enemies.Enemies
             float t = 0;
             while (t < 2f)
             {
-                rb.RotateTowardsPosition(Player.PlayerMovement.Position, 5);
+                rb.RotateTowardsPosition(Player.PlayerPhysicsBody.Position, 5);
                 t += Time.deltaTime;
                 yield return null;
             }
@@ -177,7 +177,7 @@ namespace Gameplay.Enemies.Enemies
             UnsubEvents();
             StateController.SetState(AIState.None);
             StopInterest();
-            rb.RotateTowardsPosition(Player.PlayerMovement.Position, 360);
+            rb.RotateTowardsPosition(Player.PlayerPhysicsBody.Position, 360);
             breedAnimator.Play(BreedAnimHash);
             animator.Play(Scriptable.IdleAnimHash);
             breedingParticles.Play();

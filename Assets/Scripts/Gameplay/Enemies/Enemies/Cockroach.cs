@@ -45,7 +45,7 @@ namespace Gameplay.Enemies.Enemies
 
         private void OnPlayerAttack()
         {
-            var playerpos = PlayerMovement.Position;
+            var playerpos = PlayerPhysicsBody.Position;
             var direction = rb.position - playerpos;
             if(!canEvade || evadeRoutine is not null || direction.sqrMagnitude > evadeDistance ||
                !PhysicsUtility.AngleBetween(PlayerManager.Instance.Transform.up, direction, 90)) return;
@@ -71,7 +71,7 @@ namespace Gameplay.Enemies.Enemies
             while (t > 0)
             {
                 StateController.TakeMoveControl();
-                rb.AddClampedForceBackwards(PlayerMovement.Position, evadeSpeed, ForceMode2D.Force);
+                rb.AddClampedForceBackwards(PlayerPhysicsBody.Position, evadeSpeed, ForceMode2D.Force);
                 rb.RotateTowardsPosition(rb.position + rb.linearVelocity, 10);
                 t -= Time.deltaTime;
                 yield return null;

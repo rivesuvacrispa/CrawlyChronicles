@@ -135,7 +135,7 @@ namespace Gameplay.Breeding
                 eggLayingTimer--;
             }
             
-            LayEggs(PlayerMovement.Position, genes, mutationData);
+            LayEggs(PlayerPhysicsBody.Position, genes, mutationData);
             Destroy(popupNotification.gameObject);
             popupNotification = null;
             eggLayRoutine = null;

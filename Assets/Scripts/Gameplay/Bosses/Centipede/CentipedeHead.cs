@@ -67,7 +67,7 @@ namespace Gameplay.Bosses.Centipede
         
         private IEnumerator DistanceRoutine()
         {
-            Vector2 target = Random.insideUnitCircle.normalized * Random.Range(6f, 8f) + Player.PlayerMovement.Position;
+            Vector2 target = Random.insideUnitCircle.normalized * Random.Range(6f, 8f) + Player.PlayerPhysicsBody.Position;
             float distance = float.MaxValue;
 
             while (distance > 3f && enabled)
@@ -83,7 +83,7 @@ namespace Gameplay.Bosses.Centipede
         private IEnumerator AttackRoutine()
         {
             float distance = float.MaxValue;
-            Vector2 target = Player.PlayerMovement.Position;
+            Vector2 target = Player.PlayerPhysicsBody.Position;
             
             while (distance > 1.1f && enabled)
             {
@@ -91,7 +91,7 @@ namespace Gameplay.Bosses.Centipede
                 distance = ((Vector2) transform.position - target).sqrMagnitude;
                 yield return new WaitForFixedUpdate();
                 
-                target = Player.PlayerMovement.Position;
+                target = Player.PlayerPhysicsBody.Position;
             }
 
             yield return new WaitForSeconds(1f);

@@ -161,7 +161,7 @@ namespace UI.Menus
 
         private void OnClick(BasicMutation mutation, int level)
         {
-            // Hide incompatible mutations of clicked one, if such exists
+            // Make incompatible mutations unavailable of clicked one, if such exists
             if (mutation.HasIncompatible)
             {
                 Debug.Log($"Click on {mutation.Name}");

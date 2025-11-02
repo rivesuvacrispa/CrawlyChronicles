@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using Gameplay.Player;
 using UnityEngine;
 using Util;
 
@@ -37,7 +38,7 @@ namespace Gameplay.Enemies
             float dist = (playerPos - pos).sqrMagnitude;
             if(dist > radius) return;
 
-            Player.PlayerMovement.AddForce(PhysicsUtility.GetVelocityBackwards(
+            PlayerPhysicsBody.Rigidbody.AddForce(PhysicsUtility.GetVelocityBackwards(
                 pos, playerPos, currentPower * (1 - dist / radius)));
         }
 

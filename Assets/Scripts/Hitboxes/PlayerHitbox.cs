@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using Gameplay.Player;
 using UnityEngine;
 using Util;
@@ -12,33 +13,36 @@ namespace Hitboxes
         [SerializeField] private BodyPainter bodyPainter;
         [SerializeField] private Gradient immunityGradient;
 
-        private bool immune;
+        private int ImmuneSourceFromDamage => HashCode.Combine(GetHashCode(), 0);
+        private int ImmuneSourceFromEnabled => HashCode.Combine(GetHashCode(), 1);
+        
+        public static readonly MultiSourceState Immune = new();
 
         public void Hit(DamageInstance instance) => StartCoroutine(ImmunityRoutine());
 
         public void Die() { }
 
-        public bool ImmuneToSource(DamageSource source) => immune;
+        public bool ImmuneToSource(DamageSource source) => Immune.State;
 
         private IEnumerator ImmunityRoutine()
         {
-            immune = true;
+            Immune.Vote(ImmuneSourceFromDamage);
             float duration = PlayerManager.PlayerStats.ImmunityDuration;
             bodyPainter.Paint(immunityGradient, duration);
             yield return new WaitForSeconds(duration);
-            immune = false;
+            Immune.Unvote(ImmuneSourceFromDamage);
         }
         
         public void Enable()
         {
             StopAllCoroutines();
-            immune = false;
+            Immune.Unvote(ImmuneSourceFromEnabled);
         }
 
         public void Disable()
         {
             StopAllCoroutines();
-            immune = true;
+            Immune.Vote(ImmuneSourceFromEnabled);
         }
     }
 }

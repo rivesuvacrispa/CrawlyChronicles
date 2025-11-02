@@ -14,13 +14,13 @@ namespace Gameplay.Mutations.Stats
         {
             base.OnLevelChanged(lvl);
             size = LerpLevel(sizeLvl1, sizeLvl10, lvl);
-            UpdateBodySize(size);
+            if (StatsCanBeAdded) UpdateBodySize(size);
         }
 
         protected override void OnEnable()
         {
             base.OnEnable();
-            UpdateBodySize(size);
+            if (StatsCanBeAdded) UpdateBodySize(size);
         }
 
         protected override void OnDisable()

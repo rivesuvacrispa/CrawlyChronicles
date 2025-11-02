@@ -15,7 +15,7 @@ public class BreedingManagerEditor : Editor {
         DrawDefaultInspector();
 
         if (GUILayout.Button ("Lay eggs")) manager
-            .LayEggs(PlayerMovement.Position, 
+            .LayEggs(PlayerPhysicsBody.Position, 
                 new TrioGene(999, 999, 999), 
                 AbilityController.GetMutationData());
     }

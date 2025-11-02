@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Gameplay.Player;
 using SoundEffects;
 using UI.Elements;
 using UnityEngine;
@@ -14,7 +15,8 @@ namespace Gameplay.Interaction
 
         public static bool CanInteract () => interactable is not null &&
                                              interactable.CanInteract() &&
-                                             Player.PlayerManager.Instance.AllowInteract;
+                                             PlayerManager.Instance.AllowInteract &&
+                                             PlayerMovement.CanMove;
         public static bool Interacting { get; private set; }
 
 
@@ -105,7 +107,7 @@ namespace Gameplay.Interaction
         private void UpdatePopup()
         {
             Vector2 interactablePos = interactable.Position;
-            Vector2 pos = interactablePos + (interactablePos - Player.PlayerMovement.Position).normalized *
+            Vector2 pos = interactablePos + (interactablePos - Player.PlayerPhysicsBody.Position).normalized *
                 interactable.PopupDistance;
             popup.transform.position = pos;
             popup.Enable(interactable.ActionTitle, KeyCode.E);

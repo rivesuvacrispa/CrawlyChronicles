@@ -1,5 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using Gameplay.Player;
+using UI.Menus;
 using UnityEngine;
 
 namespace Gameplay.Mutations.Active
@@ -33,12 +37,15 @@ namespace Gameplay.Mutations.Active
 
         public override void Activate()
         {
-            StopAllCoroutines();
             PlayerManager.Instance.AddStats(activeStats.Negated());
-            StartCoroutine(AbilityRoutine());
+            ActivateTask(
+                CancellationTokenSource.CreateLinkedTokenSource(
+                    gameObject.GetCancellationTokenOnDestroy(), 
+                    MainMenu.CancellationTokenOnReset).Token
+                ).Forget();
         }
 
-        private IEnumerator AbilityRoutine()
+        private async UniTask ActivateTask(CancellationToken cancellationToken)
         {
             particleSystem.Play();
             activeStats = new PlayerStats
@@ -46,7 +53,7 @@ namespace Gameplay.Mutations.Active
                 passiveProcRate: procChance);
             PlayerManager.Instance.AddStats(activeStats);
 
-            yield return new WaitForSeconds(duration);
+            await UniTask.Delay(TimeSpan.FromSeconds(duration), cancellationToken: cancellationToken).SuppressCancellationThrow();
 
             PlayerManager.Instance.AddStats(activeStats.Negated());
             activeStats = PlayerStats.Zero;
@@ -56,7 +63,6 @@ namespace Gameplay.Mutations.Active
         protected override void OnDisable()
         {
             base.OnDisable();
-            StopAllCoroutines();
             PlayerManager.Instance.AddStats(activeStats.Negated());
         }
         

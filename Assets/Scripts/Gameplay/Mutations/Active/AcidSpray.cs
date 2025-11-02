@@ -56,7 +56,7 @@ namespace Gameplay.Mutations.Active
             if(damageable is IDamageableEnemy enemy)
                 enemy.Damage(new DamageInstance(new DamageSource(this, collisionID),
                     GetAbilityDamage(damage),
-                    PlayerMovement.Position,
+                    PlayerPhysicsBody.Position,
                     damageColor: GlobalDefinitions.PoisonColor,
                     piercing: true));
         }

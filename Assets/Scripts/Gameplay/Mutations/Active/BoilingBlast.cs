@@ -48,7 +48,7 @@ namespace Gameplay.Mutations.Active
             damageable.Damage(
                 new DamageInstance(new DamageSource(this),
                     GetAbilityDamage(damage),
-                    PlayerMovement.Position,
+                    PlayerPhysicsBody.Position,
                     knockback,
                     stun,
                     Color.white));
