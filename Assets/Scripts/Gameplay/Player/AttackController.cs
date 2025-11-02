@@ -11,7 +11,6 @@ namespace Gameplay.Player
     {
         [Header("Refs")]
         [SerializeField] private PlayerHitbox hitbox;
-        [SerializeField] private PlayerMovement movementComponent;
         [SerializeField] private ComboManager comboManager;
         [SerializeField] private PlayerAttack attack;
         [SerializeField] private Vector3 defaultAttackPosition;
@@ -36,7 +35,8 @@ namespace Gameplay.Player
             if (Interactor.Interacting || 
                 !Input.GetMouseButtonDown(0) ||
                 Time.timeScale == 0 ||
-                movementComponent.InAttackDash)
+                !PlayerMovement.Enabled ||
+                !PlayerMovement.CanMove)
                 return;
             
             // if (comboCounter == 3)
@@ -54,7 +54,7 @@ namespace Gameplay.Player
             attack.Enable();
             hitbox.Disable();
 
-            await movementComponent.Dash(dashDuration, cancellationToken: cancellationToken);
+            await PlayerMovement.Dash(dashDuration, cancellationToken: cancellationToken);
             
             attack.Disable();
             // StartComboExpiration();
@@ -72,7 +72,7 @@ namespace Gameplay.Player
             attack.Enable();
             hitbox.Disable();
 
-            await movementComponent.ComboDash(dashDuration * 2, comboRotationSpeed, cancellationToken: cancellationToken);
+            await PlayerMovement.ComboDash(dashDuration * 2, comboRotationSpeed, cancellationToken: cancellationToken);
             
             attack.transform.localPosition = defaultAttackPosition;
             attack.Disable();

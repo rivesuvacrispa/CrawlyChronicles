@@ -27,7 +27,6 @@ namespace Gameplay.Player
         // TODO: rework redundant references via events
         [SerializeField] private PlayerHitbox hitbox;
         [SerializeField] private ParticleSystem healingParticles;
-        [SerializeField] private Animator spriteAnimator;
         [SerializeField] private PlayerMovement movement;
         [SerializeField] private PlayerSizeManager sizeManager;
         [SerializeField] private MainMenu mainMenu;
@@ -43,7 +42,6 @@ namespace Gameplay.Player
         [SerializeField] private PlayerStats baseStats;
         [SerializeField] private PlayerStats currentStats;
 
-        private readonly int deadHash = Animator.StringToHash("PlayerSpriteDead");
         public Collider2D Collider => col;
         public bool IsHoldingEgg { get; private set; }
         public Egg HoldingEgg { get; private set; }
@@ -123,8 +121,8 @@ namespace Gameplay.Player
         {
             RemoveEgg();
             var egg = GlobalDefinitions.CreateEggDrop(HoldingEgg).transform;
-            egg.position = (Vector3) PlayerMovement.Position + transform.up * 0.35f;
-            egg.rotation = Quaternion.Euler(0, 0, PlayerMovement.Rotation);
+            egg.position = (Vector3) PlayerPhysicsBody.Position + transform.up * 0.35f;
+            egg.rotation = Quaternion.Euler(0, 0, PlayerPhysicsBody.Rotation);
         }
 
         public void AddHealthPercent(float percent) => AddHealth(currentStats.MaxHealth * percent);
@@ -160,7 +158,7 @@ namespace Gameplay.Player
             if(invokeDeathEvent) OnPlayerKilled?.Invoke();
             OnDeath?.Invoke(this);
             movement.enabled = false;
-            spriteAnimator.Play(deadHash);
+            PlayerAnimator.PlayDead();
             DeathCounter.StopCounter();
             TimeManager.OnDayStart -= OnDayStart;
             Interactor.Abort();

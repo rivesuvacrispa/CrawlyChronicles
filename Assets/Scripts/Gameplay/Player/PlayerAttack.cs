@@ -42,7 +42,7 @@ namespace Gameplay.Player
             return new DamageInstance(
                 new DamageSource(instance, attackID),
                 PlayerManager.PlayerStats.AttackDamage,
-                PlayerMovement.Position,
+                PlayerPhysicsBody.Position,
                 PlayerManager.PlayerStats.AttackPower,
                 0.35f,
                 Color.white,

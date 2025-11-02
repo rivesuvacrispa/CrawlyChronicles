@@ -1,43 +1,37 @@
 using System;
-using System.Collections;
 using System.Threading;
 using Camera;
 using Cysharp.Threading.Tasks;
-using Gameplay.AI.Locators;
 using SoundEffects;
 using UnityEngine;
-using UnityEngine.Rendering;
 using Util;
 
 namespace Gameplay.Player
 {
     [RequireComponent(typeof(Rigidbody2D))]
-    public class PlayerMovement : MonoBehaviour, ILocatorTarget
+    public class PlayerMovement : MonoBehaviour
     {
+        private static PlayerMovement instance;
+
+        [SerializeField] private Rigidbody2D rb;
         [SerializeField] private float knockbackResistance = 0.5f;
-        [SerializeField] private Animator spriteAnimator;
         [SerializeField] private float comboDashSpeedAmplifier;
 
-        private readonly int idleHash = Animator.StringToHash("PlayerSpriteIdle");
-        private readonly int walkHash = Animator.StringToHash("PlayerSpriteWalk");
+
         
         private float previousRotation;
-        private CancellationTokenSource knockbackCts;
+        private static CancellationTokenSource knockbackCts;
         
-        private static Rigidbody2D rb;
         public static float MoveSpeedAmplifier { get; set; } = 1;
-        public static Vector2 Position => rb.position;
-        public static float Rotation => rb.rotation;
-
-        public bool InAttackDash { get; private set; }
 
 
+        public static bool CanMove { get; set; } = true;
+        public static bool Enabled => instance.enabled;
 
-        private void Awake()
-        {
-            rb = GetComponent<Rigidbody2D>();
-            // Debug.Log(volume.profile.TryGet(out motionBlur));
-        }
+
+
+        private PlayerMovement() => instance = this;
+   
 
         private void FixedUpdate()
         {
@@ -45,7 +39,7 @@ namespace Gameplay.Player
             float currentRotation = rb.rotation;
             rb.RotateTowardsPosition(mousePos, PlayerManager.PlayerStats.RotationSpeed);
 
-            if (Input.GetMouseButton(1))
+            if (CanMove && Input.GetMouseButton(1))
             {
                 PlayCrawl();
                 rb.AddForce(transform.up * (PlayerManager.PlayerStats.MovementSpeed * MoveSpeedAmplifier));
@@ -61,13 +55,13 @@ namespace Gameplay.Player
         private void PlayCrawl()
         {
             PlayerAudioController.Instance.PlayCrawl();
-            spriteAnimator.Play(walkHash);
+            PlayerAnimator.PlayWalk();
         }
 
         private void PlayIdle()
         {
             PlayerAudioController.Instance.StopState();
-            spriteAnimator.Play(idleHash);
+            PlayerAnimator.PlayIdle();
         }
         
         public void Knockback(Vector2 attacker, float force)
@@ -75,39 +69,41 @@ namespace Gameplay.Player
             rb.AddClampedForceBackwards(attacker, force * (1 - knockbackResistance), ForceMode2D.Impulse);
             CancelKnockback();
             knockbackCts = new CancellationTokenSource();
-            KnockbackTask(knockbackCts.Token)
-                .AttachExternalCancellation(gameObject.GetCancellationTokenOnDestroy())
+            KnockbackTask(
+                CancellationTokenSource.CreateLinkedTokenSource(
+                        knockbackCts.Token, 
+                        gameObject.GetCancellationTokenOnDestroy())
+                    .Token)
                 .Forget();
         }
 
-        public async UniTask Dash(float duration, CancellationToken cancellationToken)
+        public static async UniTask Dash(float duration, CancellationToken cancellationToken)
         {
             CancelKnockback();
             
             Vector2 position = MainCamera.WorldMousePos;
-            float direction = PhysicsUtility.RotationTowards(rb.position, rb.rotation, position, 360);
-            bool facingStraight = Mathf.Abs(rb.rotation - direction) < 30f;
+            float direction = PhysicsUtility.RotationTowards(PlayerPhysicsBody.Rigidbody.position, PlayerPhysicsBody.Rigidbody.rotation, position, 360);
+            bool facingStraight = Mathf.Abs(PlayerPhysicsBody.Rigidbody.rotation - direction) < 30f;
             
             if (facingStraight)
-                await StraightDashTask(position, duration, cancellationToken: cancellationToken);
+                await instance.StraightDashTask(position, duration, cancellationToken: cancellationToken);
             else
-                await SideDashTask(position, direction, duration, cancellationToken: cancellationToken);
+                await instance.SideDashTask(position, direction, duration, cancellationToken: cancellationToken);
 
         }
 
-        public async UniTask ComboDash(float duration, float speed, CancellationToken cancellationToken)
+        public static async UniTask ComboDash(float duration, float speed, CancellationToken cancellationToken)
         {
             CancelKnockback();
 
-            await ComboDashTask(duration, speed, cancellationToken: cancellationToken);
+            await instance.ComboDashTask(duration, speed, cancellationToken: cancellationToken);
         }
 
 
         private async UniTask SideDashTask(Vector2 position, float direction, float duration, CancellationToken cancellationToken)
         {
-            InAttackDash = true;
             enabled = false;
-            spriteAnimator.Play(idleHash);
+            PlayerAnimator.PlayIdle();
             rb.AddClampedForceTowards(position, PlayerManager.PlayerStats.AttackPower * MoveSpeedAmplifier, ForceMode2D.Impulse);
 
             float t = 0f;
@@ -120,25 +116,21 @@ namespace Gameplay.Player
 
             await UniTask.DelayFrame(1, cancellationToken: cancellationToken);
             enabled = true;
-            InAttackDash = false;
         }
 
         private async UniTask StraightDashTask(Vector2 position, float duration, CancellationToken cancellationToken)
         {
-            InAttackDash = true;
             enabled = false;
-            spriteAnimator.Play(idleHash);
+            PlayerAnimator.PlayIdle();
             rb.AddClampedForceTowards(position, PlayerManager.PlayerStats.AttackPower * MoveSpeedAmplifier, ForceMode2D.Impulse);
 
             await UniTask.Delay(TimeSpan.FromSeconds(duration), cancellationToken: cancellationToken);
             await UniTask.DelayFrame(1, cancellationToken: cancellationToken);
             enabled = true;
-            InAttackDash = false;
         }
 
         private async UniTask ComboDashTask(float duration, float speed, CancellationToken cancellationToken)
         {
-            InAttackDash = true;
             enabled = false;
             rb.angularVelocity = speed;
             float t = 0;
@@ -157,7 +149,6 @@ namespace Gameplay.Player
             }
             
             enabled = true;
-            InAttackDash = false;
             rb.angularVelocity = 0;
             rb.RotateTowardsPosition(MainCamera.WorldMousePos, 360);
         }
@@ -169,14 +160,13 @@ namespace Gameplay.Player
             enabled = true;
         }
 
-        private void CancelKnockback()
+        private static void CancelKnockback()
         {
             knockbackCts?.Cancel();
             knockbackCts?.Dispose();
             knockbackCts = null;
         }
 
-        public static void AddForce(Vector2 force) => rb.AddForce(force);
-        public static void Teleport(Vector2 pos) => rb.position = pos;
+        public static void Teleport(Vector2 pos) => PlayerPhysicsBody.Rigidbody.position = pos;
     }
 }
