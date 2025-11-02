@@ -111,10 +111,15 @@ namespace Gameplay.Player
             {
                 rb.RotateTowardsPosition(position, 10 / PlayerSizeManager.CurrentSize);
                 t += Time.fixedDeltaTime;
-                await UniTask.DelayFrame(1, PlayerLoopTiming.FixedUpdate, cancellationToken: cancellationToken);
+                bool cancelled = await UniTask.DelayFrame(1, PlayerLoopTiming.FixedUpdate, cancellationToken: cancellationToken)
+                    .SuppressCancellationThrow();
+                
+                if (cancelled) break;
             }
 
-            await UniTask.DelayFrame(1, cancellationToken: cancellationToken);
+            await UniTask.DelayFrame(1, cancellationToken: cancellationToken)
+                .SuppressCancellationThrow();
+            
             enabled = true;
         }
 
@@ -124,8 +129,12 @@ namespace Gameplay.Player
             PlayerAnimator.PlayIdle();
             rb.AddClampedForceTowards(position, PlayerManager.PlayerStats.AttackPower * MoveSpeedAmplifier, ForceMode2D.Impulse);
 
-            await UniTask.Delay(TimeSpan.FromSeconds(duration), cancellationToken: cancellationToken);
-            await UniTask.DelayFrame(1, cancellationToken: cancellationToken);
+            await UniTask.Delay(TimeSpan.FromSeconds(duration), cancellationToken: cancellationToken)
+                .SuppressCancellationThrow()
+                ;
+            await UniTask.DelayFrame(1, cancellationToken: cancellationToken)
+                .SuppressCancellationThrow();
+            
             enabled = true;
         }
 
@@ -145,7 +154,10 @@ namespace Gameplay.Player
                     maxAmplifier: comboDashSpeedAmplifier);
 
                 t += Time.fixedDeltaTime;
-                await UniTask.DelayFrame(1, PlayerLoopTiming.FixedUpdate, cancellationToken: cancellationToken);
+                bool cancelled = await UniTask.DelayFrame(1, PlayerLoopTiming.FixedUpdate, cancellationToken: cancellationToken)
+                    .SuppressCancellationThrow();
+                
+                if (cancelled) break;
             }
             
             enabled = true;
@@ -156,11 +168,12 @@ namespace Gameplay.Player
         private async UniTask KnockbackTask(CancellationToken cancellationToken)
         {
             enabled = false;
-            await UniTask.Delay(TimeSpan.FromSeconds(0.25f), cancellationToken: cancellationToken);
+            await UniTask.Delay(TimeSpan.FromSeconds(0.25f), cancellationToken: cancellationToken)
+                .SuppressCancellationThrow();
             enabled = true;
         }
 
-        private static void CancelKnockback()
+        public static void CancelKnockback()
         {
             knockbackCts?.Cancel();
             knockbackCts?.Dispose();

@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Gameplay.Interaction;
 using Hitboxes;
@@ -24,11 +25,24 @@ namespace Gameplay.Player
 
         public delegate void AttackControllerEvent();
         public static event AttackControllerEvent OnAttackStart;
-        
-        
-        
+        private static CancellationTokenSource cancellationTokenSource;
+
+
+
         public bool IsAttacking => attack.IsActive;
         public static bool IsInComboDash { get; private set; }
+
+        private void Awake()
+        {
+            cancellationTokenSource = new CancellationTokenSource();
+        }
+
+        public static void CancelAttack()
+        {
+            cancellationTokenSource?.Cancel();
+            cancellationTokenSource?.Dispose();
+            cancellationTokenSource = new CancellationTokenSource();
+        }
 
         private void Update()
         {
@@ -42,7 +56,7 @@ namespace Gameplay.Player
             // if (comboCounter == 3)
                 // ComboAttack(gameObject.GetCancellationTokenOnDestroy()).Forget();
             // else
-            Attack(gameObject.GetCancellationTokenOnDestroy()).Forget();
+            Attack(cancellationTokenSource.Token).Forget();
         }
         
         private async UniTask Attack(CancellationToken cancellationToken)
@@ -54,7 +68,8 @@ namespace Gameplay.Player
             attack.Enable();
             hitbox.Disable();
 
-            await PlayerMovement.Dash(dashDuration, cancellationToken: cancellationToken);
+            await PlayerMovement.Dash(dashDuration, cancellationToken: cancellationToken)
+                .SuppressCancellationThrow();
             
             attack.Disable();
             // StartComboExpiration();
@@ -72,7 +87,8 @@ namespace Gameplay.Player
             attack.Enable();
             hitbox.Disable();
 
-            await PlayerMovement.ComboDash(dashDuration * 2, comboRotationSpeed, cancellationToken: cancellationToken);
+            await PlayerMovement.ComboDash(dashDuration * 2, comboRotationSpeed, cancellationToken: cancellationToken)
+                .SuppressCancellationThrow();
             
             attack.transform.localPosition = defaultAttackPosition;
             attack.Disable();
@@ -80,6 +96,12 @@ namespace Gameplay.Player
             hitbox.Enable();
             PlayerAudioController.Instance.StopAction();
             IsInComboDash = false;
+        }
+
+        private void OnDestroy()
+        {
+            cancellationTokenSource?.Cancel();
+            cancellationTokenSource?.Dispose();
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Gameplay.Interaction;
 using Gameplay.Player;
 using Hitboxes;
 using UI.Menus;
@@ -19,11 +20,7 @@ namespace Gameplay.Mutations.Active
         private int VoteSource => GetHashCode(); 
 
 
-
-        public override bool CanActivate()
-        {
-            return base.CanActivate() && PlayerMovement.CanMove && PlayerMovement.Enabled;
-        }
+        
 
         public override void OnLevelChanged(int lvl)
         {
@@ -42,6 +39,8 @@ namespace Gameplay.Mutations.Active
 
         private async UniTask ActivateTask(CancellationToken cancellationToken)
         {
+            PlayerMovement.CancelKnockback();
+            AttackController.CancelAttack();
             PlayerHitbox.Immune.Vote(VoteSource);
             spriteTransform.gameObject.SetActive(true);
             PlayerMovement.CanMove = false;
@@ -50,10 +49,13 @@ namespace Gameplay.Mutations.Active
             PlayerPhysicsBody.PhysicsCollider.enabled = false;
             PlayerLocatorBody.Enabled = false;
 
-            await UniTask.Delay(TimeSpan.FromSeconds(duration), cancellationToken: cancellationToken)
+            await UniTask.Delay(TimeSpan.FromSeconds(0.5f), cancellationToken: cancellationToken)
+                .SuppressCancellationThrow();
+            PlayerHitbox.Immune.Unvote(VoteSource);
+
+            await UniTask.Delay(TimeSpan.FromSeconds(duration - 0.5f), cancellationToken: cancellationToken)
                 .SuppressCancellationThrow();
 
-            PlayerHitbox.Immune.Unvote(VoteSource);
             spriteTransform.gameObject.SetActive(false);
             PlayerMovement.CanMove = true;
             PlayerAnimator.UnlockState();
