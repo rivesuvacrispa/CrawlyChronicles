@@ -28,7 +28,6 @@ namespace Gameplay.Player
         [SerializeField] private PlayerHitbox hitbox;
         [SerializeField] private ParticleSystem healingParticles;
         [SerializeField] private PlayerMovement movement;
-        [SerializeField] private PlayerSizeManager sizeManager;
         [SerializeField] private MainMenu mainMenu;
         [SerializeField] private TMP_Text healthText;
         [SerializeField] private Healthbar healthbar;
@@ -46,7 +45,6 @@ namespace Gameplay.Player
         public bool IsHoldingEgg { get; private set; }
         public Egg HoldingEgg { get; private set; }
         public bool AllowInteract => !attackController.IsAttacking;
-        public PlayerSizeManager SizeManager => sizeManager;
         public static PlayerStats PlayerStats
         {
             get => Instance.currentStats;

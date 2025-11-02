@@ -31,7 +31,7 @@ namespace Gameplay.Mutations.Stats
 
         private void UpdateBodySize(float s)
         {
-            PlayerManager.Instance.SizeManager.SetSize(s);
+            PlayerSizeManager.SetSize(s);
         }
     }
 }
