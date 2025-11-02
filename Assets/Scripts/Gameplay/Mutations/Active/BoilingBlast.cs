@@ -56,13 +56,14 @@ namespace Gameplay.Mutations.Active
 
         public override void Activate()
         {
+            base.Activate();
             if (AttackController.IsInComboDash)
                 comboParticles.Play();
             else
                 basicParticles.Play();
         }
 
-        public override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
+        protected override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
         {
             float cd = Scriptable.GetCooldown(lvl);
             float prevCd = cd;

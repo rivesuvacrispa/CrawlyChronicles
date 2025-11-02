@@ -40,12 +40,19 @@ namespace Gameplay.Player
         private void CreateButton(BasicAbility ability)
         {
             AbilitiesDict[ability.Scriptable] = ability;
-            BasicAbilityButton b = ability is ActiveAbility 
-                ? Instantiate(abilityButtonPrefab, activeButtonsTransform) 
-                : Instantiate(basicAbilityPrefab, basicButtonsTransform);
-            
-            b.SetAbility(ability);
-            b.gameObject.SetActive(ability.isActiveAndEnabled);
+
+            if (ability is ActiveAbility activeAbility)
+            {
+                var activeAbilityButton = Instantiate(abilityButtonPrefab, activeButtonsTransform);
+                activeAbilityButton.SetAbility(activeAbility);
+                activeAbilityButton.gameObject.SetActive(ability.isActiveAndEnabled);
+            }
+            else
+            {
+                var basicAbilityButton = Instantiate(basicAbilityPrefab, basicButtonsTransform);
+                basicAbilityButton.SetAbility(ability);
+                basicAbilityButton.gameObject.SetActive(ability.isActiveAndEnabled);
+            }
         }
 
         public static void UpdateAbilities(Egg egg) => instance.UpdateAbilitiesNonStatic(egg);

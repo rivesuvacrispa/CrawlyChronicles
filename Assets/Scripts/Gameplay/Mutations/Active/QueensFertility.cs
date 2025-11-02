@@ -20,16 +20,16 @@ namespace Gameplay.Mutations.Active
 
         public override void Activate()
         {
-            if(BreedingManager.Instance.CanBreed)
-                BreedingManager.Instance.BecomePregnant(BreedingManager.Instance.TrioGene, AbilityController.GetMutationData());
+            base.Activate();
+            BreedingManager.Instance.BecomePregnant(BreedingManager.Instance.TrioGene, AbilityController.GetMutationData());
         }
 
         public override bool CanActivate()
         {
-            return BreedingManager.Instance.CanBreed;
+            return base.CanActivate() && BreedingManager.Instance.CanBreed;
         }
 
-        public override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
+        protected override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
         {
             float cd = Scriptable.GetCooldown(lvl);
             float prevCd = cd;

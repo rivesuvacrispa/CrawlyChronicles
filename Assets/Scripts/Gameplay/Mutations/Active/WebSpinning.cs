@@ -4,10 +4,11 @@
     {
         public override void Activate()
         {
-            
+            base.Activate();
+
         }
 
-        public override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
+        protected override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
         {
             return null;
         }

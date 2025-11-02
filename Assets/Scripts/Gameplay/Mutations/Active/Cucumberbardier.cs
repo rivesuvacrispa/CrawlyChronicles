@@ -56,6 +56,7 @@ namespace Gameplay.Mutations.Active
 
         public override void Activate()
         {
+            base.Activate();
             var cucumber = PoolManager.GetEffect<WildCucumberProjectile>(new WildCucumberArguments(
                 explosionChance, seedsAmount, 
                 seedsDamage, knockback, 
@@ -68,7 +69,7 @@ namespace Gameplay.Mutations.Active
                 cucumber.Explode();
         }
 
-        public override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
+        protected override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
         {
             return default;
         }

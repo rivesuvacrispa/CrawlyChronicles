@@ -48,8 +48,13 @@ namespace Gameplay.Mutations.Active
                 Color.pink));
         }
         
-        public override void Activate() => particleSystem.Play();
-        public override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
+        public override void Activate()
+        {
+            base.Activate();
+            particleSystem.Play();
+        }
+
+        protected override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
         {
             float cd = Scriptable.GetCooldown(lvl);
             float prevCd = cd;

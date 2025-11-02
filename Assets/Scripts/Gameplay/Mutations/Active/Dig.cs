@@ -30,6 +30,7 @@ namespace Gameplay.Mutations.Active
 
         public override void Activate()
         {
+            base.Activate();
             ActivateTask(
                 CancellationTokenSource.CreateLinkedTokenSource(
                     gameObject.GetCancellationTokenOnDestroy(), 
@@ -64,7 +65,7 @@ namespace Gameplay.Mutations.Active
             PlayerLocatorBody.Enabled = true;
         }
 
-        public override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
+        protected override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
         {
             return null;
         }

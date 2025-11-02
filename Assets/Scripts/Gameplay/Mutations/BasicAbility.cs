@@ -16,7 +16,7 @@ namespace Gameplay.Mutations
         [SerializeField, Range(0, 9)] protected int level;
 
         public BasicMutation Scriptable => scriptable;
-        public BasicAbilityButton Button { get; set; }
+        public IAbilityButton Button { get; set; }
         public int Level => level;
         private ParticleCollisionProvider[] collisionProviders;
 

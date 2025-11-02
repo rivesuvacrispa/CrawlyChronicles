@@ -33,6 +33,7 @@ namespace Gameplay.Mutations.Active
 
         public override void Activate()
         {
+            base.Activate();
             RegenerationTask(
                     CancellationTokenSource.CreateLinkedTokenSource(
                         gameObject.GetCancellationTokenOnDestroy(),
@@ -54,7 +55,7 @@ namespace Gameplay.Mutations.Active
             particleSystem.Stop();
         }
 
-        public override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
+        protected override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
         {
             return null;
         }

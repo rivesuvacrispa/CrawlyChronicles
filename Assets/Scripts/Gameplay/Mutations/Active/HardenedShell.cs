@@ -37,6 +37,7 @@ namespace Gameplay.Mutations.Active
 
         public override void Activate()
         {
+            base.Activate();
             PlayerManager.Instance.AddStats(activeStats.Negated());
             ActivateTask(
                 CancellationTokenSource.CreateLinkedTokenSource(
@@ -65,8 +66,8 @@ namespace Gameplay.Mutations.Active
             base.OnDisable();
             PlayerManager.Instance.AddStats(activeStats.Negated());
         }
-        
-        public override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
+
+        protected override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
         {
             float cd = Scriptable.GetCooldown(lvl);
             float prevCd = cd;

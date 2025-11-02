@@ -61,7 +61,7 @@ namespace Gameplay.Mutations.Active
         protected override void OnDisable()
         {
             base.OnDisable();
-            PlayerManager.Instance.OnDamageTaken += OnPlayerDamageTaken;
+            PlayerManager.Instance.OnDamageTaken -= OnPlayerDamageTaken;
         }
         
         private void OnPlayerDamageTaken(IDamageable damageable, DamageInstance instance)
@@ -85,6 +85,7 @@ namespace Gameplay.Mutations.Active
 
         public override void Activate()
         {
+            base.Activate();
             ActivateTask(
                     CancellationTokenSource.CreateLinkedTokenSource(
                         gameObject.GetCancellationTokenOnDestroy(),
@@ -106,7 +107,7 @@ namespace Gameplay.Mutations.Active
             main.loop = false;
         }
 
-        public override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
+        protected override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
         {
             return null;
         }

@@ -33,11 +33,13 @@ namespace Gameplay.Mutations.Active
 
         public override void Activate()
         {
+            base.Activate();
             StopAllCoroutines();
             PlayerManager.Instance.AddStats(activeStats.Negated());
             StartCoroutine(AbilityRoutine());
         }
         
+        // TODO: convert to unitask
         private IEnumerator AbilityRoutine()
         {
             trailRenderer.emitting = true;
@@ -62,7 +64,7 @@ namespace Gameplay.Mutations.Active
             PlayerManager.Instance.AddStats(activeStats.Negated());
         }
 
-        public override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
+        protected override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
         {
             float cd = Scriptable.GetCooldown(lvl);
             float prevCd = cd;
