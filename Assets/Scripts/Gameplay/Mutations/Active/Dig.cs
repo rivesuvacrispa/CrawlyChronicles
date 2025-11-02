@@ -43,6 +43,9 @@ namespace Gameplay.Mutations.Active
         {
             if (active)
             {
+                // Suppress autocast so it doesn't automatically dig you out
+                if (auto) return;
+                
                 cancellationTokenSource?.Cancel();
                 cancellationTokenSource?.Dispose();
                 cancellationTokenSource = new CancellationTokenSource();
