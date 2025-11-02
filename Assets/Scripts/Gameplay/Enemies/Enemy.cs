@@ -144,7 +144,11 @@ namespace Gameplay.Enemies
 
         protected virtual void AttackPlayer(float reachDistance = 0)
         {
-            if (!PlayerLocatorBody.Enabled) return;
+            if (!PlayerLocatorBody.Enabled)
+            {
+                StateController.SetState(AIState.Wander);
+                return;
+            }
             
             if (reachDistance == 0) reachDistance = scriptable.AttackDistance;
             StateController.SetState(AIState.Follow, 
