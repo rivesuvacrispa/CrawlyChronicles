@@ -31,9 +31,9 @@ namespace Gameplay.Mutations.Active
             damageBoost = LerpLevel(damageBoostLvl1, damageBoostLvl10, lvl);
         }
 
-        public override void Activate()
+        public override void Activate(bool auto = false)
         {
-            base.Activate();
+            base.Activate(auto);
             StopAllCoroutines();
             PlayerManager.Instance.AddStats(activeStats.Negated());
             StartCoroutine(AbilityRoutine());

@@ -54,9 +54,9 @@ namespace Gameplay.Mutations.Active
             explosionRange = LerpLevel(explosionRangeLvl1, explosionRangeLvl10, lvl);
         }
 
-        public override void Activate()
+        public override void Activate(bool auto = false)
         {
-            base.Activate();
+            base.Activate(auto);
             var cucumber = PoolManager.GetEffect<WildCucumberProjectile>(new WildCucumberArguments(
                 explosionChance, seedsAmount, 
                 seedsDamage, knockback, 

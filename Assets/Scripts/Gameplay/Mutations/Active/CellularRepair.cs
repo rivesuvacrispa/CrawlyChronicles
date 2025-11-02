@@ -31,9 +31,9 @@ namespace Gameplay.Mutations.Active
             lifespanPerTick = LerpLevel(lifespanPerTickLvl1, lifespanPerTickLvl10, lvl);
         }
 
-        public override void Activate()
+        public override void Activate(bool auto = false)
         {
-            base.Activate();
+            base.Activate(auto);
             RegenerationTask(
                     CancellationTokenSource.CreateLinkedTokenSource(
                         gameObject.GetCancellationTokenOnDestroy(),

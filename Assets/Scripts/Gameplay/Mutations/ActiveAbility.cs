@@ -38,24 +38,29 @@ namespace Gameplay.Mutations
                 if (PlayerManager.Instance.GodMode) return;
 #endif
                 
-                if (Autocast && !TimeManager.IsDay && CanActivate()) Activate();
+                if (Autocast && !TimeManager.IsDay && CanActivate()) Activate(true);
                 return;
             }
 
             CurrentCooldown -= Time.deltaTime;
         }
         
-        public virtual void Activate()
+        public virtual void Activate(bool auto = false)
         {
-#if UNITY_EDITOR
-            // Do not set on cooldown in god mode
-            if (PlayerManager.Instance.GodMode) return;
-#endif
             SetOnCooldown();
         }
 
         protected void SetOnCooldown()
         {
+#if UNITY_EDITOR
+            // Do not set on cooldown in god mode
+            if (PlayerManager.Instance.GodMode)
+            {
+                CurrentCooldown = 0;
+                return;
+            };
+#endif
+            
             CurrentCooldown = BaseCooldown;
         }
 

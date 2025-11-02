@@ -17,7 +17,9 @@ namespace Gameplay.Mutations.Active
         [SerializeField, Range(1, 10)] private float durationLvl10;
 
         private float duration;
-        private int VoteSource => GetHashCode(); 
+        private int VoteSource => GetHashCode();
+        private bool active;
+        private CancellationTokenSource cancellationTokenSource;
 
 
         
@@ -28,11 +30,28 @@ namespace Gameplay.Mutations.Active
             duration = LerpLevel(durationLvl1, durationLvl10, lvl);
         }
 
-        public override void Activate()
+
+        protected override void Awake()
         {
-            base.Activate();
+            base.Awake();
+            cancellationTokenSource = new CancellationTokenSource();
+        }
+
+        public override bool CanActivate() => active || CurrentCooldown <= 0;
+
+        public override void Activate(bool auto = false)
+        {
+            if (active)
+            {
+                cancellationTokenSource?.Cancel();
+                cancellationTokenSource?.Dispose();
+                cancellationTokenSource = new CancellationTokenSource();
+                return;
+            }
+            
             ActivateTask(
                 CancellationTokenSource.CreateLinkedTokenSource(
+                    cancellationTokenSource.Token,
                     gameObject.GetCancellationTokenOnDestroy(), 
                     MainMenu.CancellationTokenOnReset).Token
                 ).Forget();
@@ -40,6 +59,7 @@ namespace Gameplay.Mutations.Active
 
         private async UniTask ActivateTask(CancellationToken cancellationToken)
         {
+            active = true;
             PlayerMovement.CancelKnockback();
             AttackController.CancelAttack();
             PlayerHitbox.Immune.Vote(VoteSource);
@@ -57,12 +77,14 @@ namespace Gameplay.Mutations.Active
             await UniTask.Delay(TimeSpan.FromSeconds(duration - 0.5f), cancellationToken: cancellationToken)
                 .SuppressCancellationThrow();
 
+            active = false;
             spriteTransform.gameObject.SetActive(false);
             PlayerMovement.CanMove = true;
             PlayerAnimator.UnlockState();
             PlayerPhysicsBody.ResetConstraints();
             PlayerPhysicsBody.PhysicsCollider.enabled = true;
             PlayerLocatorBody.Enabled = true;
+            SetOnCooldown();
         }
 
         protected override object[] GetDescriptionArguments(int lvl, bool withUpgrade)

@@ -43,9 +43,9 @@ namespace Gameplay.Mutations.Active
 
         }
 
-        public override void Activate()
+        public override void Activate(bool auto = false)
         {
-            base.Activate();
+            base.Activate(auto);
             if (AttackController.IsInComboDash)
                 comboParticleSystem.Play();
             else

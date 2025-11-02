@@ -35,7 +35,7 @@ namespace Gameplay.Mutations.Active
             procChance = LerpLevel(procChanceLvl1, procChanceLvl10, lvl);
         }
 
-        public override void Activate()
+        public override void Activate(bool auto = false)
         {
             base.Activate();
             PlayerManager.Instance.AddStats(activeStats.Negated());

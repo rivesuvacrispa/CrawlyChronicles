@@ -83,9 +83,9 @@ namespace Gameplay.Mutations.Active
             activeEffectDuration = LerpLevel(activeEffectDurationLvl1, activeEffectDurationLvl10, lvl);
         }
 
-        public override void Activate()
+        public override void Activate(bool auto = false)
         {
-            base.Activate();
+            base.Activate(false);
             ActivateTask(
                     CancellationTokenSource.CreateLinkedTokenSource(
                         gameObject.GetCancellationTokenOnDestroy(),
