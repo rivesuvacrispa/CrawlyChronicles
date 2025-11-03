@@ -10,13 +10,13 @@ namespace Gameplay.Mutations.EntityEffects.Poison
         protected override void OnApplied()
         {
             PoisonEffectData data = (PoisonEffectData) Data;
-            if(Target is Enemy enemy)
+            if (Target is Enemy enemy)
                 enemy.SetMovementSpeed(1 - data.Slow);
         }
 
         protected override void Tick()
         {
-            if(Target is not IDamageableEnemy enemy) return;
+            if(Target is not IDamageableEnemy enemy || TickCounter % 4 != 0) return;
             
             PoisonEffectData data = (PoisonEffectData) Data;
             enemy.Damage(new DamageInstance(

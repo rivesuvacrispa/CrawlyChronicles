@@ -26,8 +26,11 @@ namespace Gameplay.Player
 
 
         public static bool CanMove { get; set; } = true;
-        public static bool Enabled => instance.enabled;
-
+        public static bool Enabled
+        {
+            get => instance.enabled;
+            set => instance.enabled = value;
+        }
 
 
         private PlayerMovement() => instance = this;

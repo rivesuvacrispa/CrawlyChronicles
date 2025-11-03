@@ -23,6 +23,12 @@ namespace Gameplay.Mutations.EntityEffects
             effect.Refresh(data);
         }
 
+        public void TryClearEffect<T>() where T : EntityEffect
+        {
+            if (effectsGO.TryGetComponent(out T effect))
+                effect.Cancel();
+        }
+
         public void ClearAll()
         {
             foreach (EntityEffect effect in effectsGO.GetComponents<EntityEffect>()) 

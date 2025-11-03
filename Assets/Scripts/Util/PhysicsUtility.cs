@@ -15,7 +15,7 @@ namespace Util
         public static void RotateTowardsPosition(this Rigidbody2D rb, Vector2 targetPos, float delta) 
             => rb.rotation = RotationTowards(rb.position, rb.rotation, targetPos, delta);
 
-        public static float RotationTowards(Vector2 pos, float rot, Vector2 targetPos, float delta)
+        public static float RotationTowards(Vector2 pos, float rot, Vector2 targetPos, float delta = 360f)
         {
             Vector2 direction = targetPos - pos;
             float angle = direction.GetAngle() - 90f;

@@ -28,7 +28,7 @@ namespace Gameplay.Mutations
                 provider.OnCollision += OnBulletCollision;
         }
 
-        private void OnDestroy()
+        protected virtual void OnDestroy()
         {
             foreach (var provider in collisionProviders) 
                 provider.OnCollision -= OnBulletCollision;

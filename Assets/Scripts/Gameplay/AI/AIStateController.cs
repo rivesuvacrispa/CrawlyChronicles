@@ -32,23 +32,35 @@ namespace Gameplay.AI
         private float defaultReachDistance;
         private ITransformProvider currentFollowTarget;
         
+        public bool Etherial { get; private set; }
+        private float movementSpeedMultiplier = 1f;
+        private float rotationSpeedMultiplier = 1f;
+        private bool locatorDismissed;
         
         public AIState CurrentState { get; private set; }
-        public bool Etherial { get; private set; }
-        private float speedMultiplier = 1;
-        private float currentSpeed = 1;
-        private bool locatorDismissed;
+        public float CurrentMovementSpeed { get; private set; } = 1f;
+        public float CurrentRotationSpeed { get; private set; } = 360f;
 
         public delegate void StateControllerEvent(AIStateController controller);
         public event StateControllerEvent OnBecomeEtherial;
 
-        public float SpeedMultiplier
+        public float MovementSpeedMultiplier
         {
-            get => speedMultiplier;
+            get => movementSpeedMultiplier;
             set
             {
-                speedMultiplier = value;
+                movementSpeedMultiplier = value;
                 UpdateMovementSpeed();
+            }
+        }
+        
+        public float RotationSpeedMultiplier
+        {
+            get => rotationSpeedMultiplier;
+            set
+            {
+                rotationSpeedMultiplier = value;
+                UpdateRotationSpeed();
             }
         }
 
@@ -86,6 +98,7 @@ namespace Gameplay.AI
             yield return new WaitUntil(() => MapManager.AllSpawnPointsInitialized);
             SetState(StartingState);
             UpdateMovementSpeed();
+            UpdateRotationSpeed();
             locator.SetRadius(enemy.Scriptable.LocatorRadius);
         }
 
@@ -170,7 +183,7 @@ namespace Gameplay.AI
             currentFollowTarget = target;
             DisableLocator();
             AutoRepath();
-            currentSpeed = 1;
+            CurrentMovementSpeed = 1;
             UpdateMovementSpeed();
             destinationSetter.enabled = true;
             aiPath.enabled = true;
@@ -195,7 +208,7 @@ namespace Gameplay.AI
             AutoRepath();
             destinationSetter.enabled = false;
             aiPath.enabled = true;
-            currentSpeed = GlobalDefinitions.WanderingSpeedMultiplier;
+            CurrentMovementSpeed = GlobalDefinitions.WanderingSpeedMultiplier;
             UpdateMovementSpeed();
             PickRandomDestination();
             aiPath.Callback = PickRandomDestination;
@@ -203,7 +216,7 @@ namespace Gameplay.AI
 
         private void SetFlee()
         {
-            currentSpeed = GlobalDefinitions.FleeingSpeedMultiplier;
+            CurrentMovementSpeed = GlobalDefinitions.FleeingSpeedMultiplier;
             UpdateMovementSpeed();
             SetState(AIState.Exit);
         }
@@ -247,7 +260,8 @@ namespace Gameplay.AI
 
         protected void DoNotRepath() => aiPath.autoRepath.mode = AutoRepathPolicy.Mode.Never;
         private void AutoRepath() => aiPath.autoRepath.mode = AutoRepathPolicy.Mode.Dynamic;
-        private void UpdateMovementSpeed() => aiPath.maxSpeed = currentSpeed * enemy.Scriptable.MovementSpeed * SpeedMultiplier;
+        private void UpdateMovementSpeed() => aiPath.maxSpeed = CurrentMovementSpeed * enemy.Scriptable.MovementSpeed * MovementSpeedMultiplier;
+        private void UpdateRotationSpeed() => aiPath.rotationSpeed = CurrentRotationSpeed * RotationSpeedMultiplier;
 
         public void CancelCallback() => aiPath.Callback = null;
         

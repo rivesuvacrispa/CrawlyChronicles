@@ -51,10 +51,19 @@ namespace Gameplay.Enemies
         [field:SerializeField] public EnemySpawnLocation SpawnLocation { get; set; }
         public Scriptable.Enemy Scriptable => scriptable;
         public Vector2 Position => rb.position;
-        public void SetMovementSpeed(float speed) => StateController.SpeedMultiplier = speed;
+        public void SetMovementSpeed(float speed)
+        {
+            if (speed < 0) speed = 0;
+            StateController.MovementSpeedMultiplier = speed;
+        }
 
-        
-        
+        public void SetRotationSpeed(float speed)
+        {
+            if (speed <= 0.01) speed = 0.01f;
+            StateController.RotationSpeedMultiplier = speed;
+        }
+
+
         public abstract void OnMapEntered();
         public abstract void OnPlayerLocated();
 
@@ -168,7 +177,12 @@ namespace Gameplay.Enemies
             float t = attackDelay * 0.5f;
             while (t > 0)
             {
-                if(!rb.freezeRotation) rb.RotateTowardsPosition(PlayerPhysicsBody.Position, 5);
+                if(!rb.freezeRotation)
+                    rb.RotateTowardsPosition(
+                        PlayerPhysicsBody.Position,
+                        StateController.CurrentRotationSpeed * Time.deltaTime
+                    );
+                
                 t -= Time.deltaTime;
                 await UniTask.Yield(cancellationToken: cancellationToken);
             }

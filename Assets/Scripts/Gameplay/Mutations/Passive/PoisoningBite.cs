@@ -34,7 +34,7 @@ namespace Gameplay.Mutations.Passive
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
-            int duration = (int) LerpLevel(durationLvl1, durationLvl10, lvl);
+            int duration = LerpLevel(durationLvl1, durationLvl10, lvl);
             effectData = new PoisonEffectData
                 (duration,
                 LerpLevel(slowLvl1, slowLvl10, lvl),

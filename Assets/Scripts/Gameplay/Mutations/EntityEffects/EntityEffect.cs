@@ -1,4 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Util.Interfaces;
 
@@ -9,14 +12,14 @@ namespace Gameplay.Mutations.EntityEffects
         protected EntityEffectData Data { get; private set; }
         protected int Duration { get; set; }
         protected IEffectAffectable Target { get; set; }
-        
-        private Coroutine tickRoutine;
 
+        private TimeSpan tickrate = TimeSpan.FromSeconds(0.25f);
 
         protected abstract void OnApplied();
         protected abstract void Tick();
         protected abstract void OnRemoved();
         protected int TickCounter { get; private set; }
+        protected int refreshedOnTick;
         
         public EntityEffect SetTarget(IEffectAffectable target)
         {
@@ -28,37 +31,44 @@ namespace Gameplay.Mutations.EntityEffects
         {
             Data = data;
             Duration = data.Duration;
-            if (tickRoutine is null)
-            {
-                tickRoutine = StartCoroutine(TickRoutine());
-                OnApplied();
-            }
-        }
-        
-        private IEnumerator TickRoutine()
-        {
-            OnApplied();
-            
-            while (Duration > 0)
-            {
-                yield return new WaitForSeconds(1f);
-                Duration--;
-                TickCounter++;
-                Tick();
-            }
-
-            enabled = false;
-            tickRoutine = null;
-            OnRemoved();
+            enabled = true;
+            refreshedOnTick = TickCounter;
         }
 
         public void Cancel()
         {
             enabled = false;
-            if (tickRoutine is null) return;
-            StopCoroutine(tickRoutine);
-            tickRoutine = null;
+        }
+
+        private async UniTask UpdateTask(CancellationToken cancellationToken)
+        {
+            await UniTask.DelayFrame(1, cancellationToken: cancellationToken);
+            OnApplied();
+
+            while (enabled)
+            {
+                await UniTask.Delay(tickrate, cancellationToken: cancellationToken);
+                
+                if (Duration == 0 && refreshedOnTick != TickCounter)
+                {
+                    enabled = false;
+                }
+                
+                Tick();
+                TickCounter++;
+                Duration--;
+            }
+        }
+
+        private void OnEnable()
+        {
+            UpdateTask(gameObject.GetCancellationTokenOnDestroy()).Forget();
+        }
+
+        private void OnDisable()
+        {
             OnRemoved();
+            TickCounter = 0;
         }
     }
 }

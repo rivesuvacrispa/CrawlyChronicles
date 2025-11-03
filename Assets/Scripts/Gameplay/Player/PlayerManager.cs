@@ -4,6 +4,7 @@ using Gameplay.Breeding;
 using Gameplay.Effects.Healthbars;
 using Gameplay.Interaction;
 using Gameplay.Map;
+using Gameplay.Mutations.EntityEffects;
 using Hitboxes;
 using SoundEffects;
 using Timeline;
@@ -14,7 +15,7 @@ using Util.Interfaces;
 
 namespace Gameplay.Player
 {
-    public class PlayerManager : MonoBehaviour, IDamageable
+    public class PlayerManager : MonoBehaviour, IDamageable, IEffectAffectable
     {
         public static PlayerManager Instance { get; private set; }
         
@@ -37,6 +38,7 @@ namespace Gameplay.Player
         [SerializeField] private AttackController attackController;
         // [SerializeField] private ComboManager comboManager;
         [SerializeField] private Collider2D col;
+        [SerializeField] private EffectController effectController;
         [Header("Stats")]
         [SerializeField] private PlayerStats baseStats;
         [SerializeField] private PlayerStats currentStats;
@@ -247,5 +249,10 @@ namespace Gameplay.Player
         {
             OnStruck?.Invoke();
         }
+
+        
+        // IEffectAffectable
+        public EffectController EffectController => effectController;
+        public bool CanApplyEffect => true;
     }
 }

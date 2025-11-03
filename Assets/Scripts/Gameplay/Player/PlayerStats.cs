@@ -1,11 +1,12 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Localization.Settings;
 using UnityEngine.Localization.Tables;
 
 namespace Gameplay.Player
 {
     [System.Serializable]
-    public struct PlayerStats
+    public struct PlayerStats : IEquatable<PlayerStats>
     {
         [SerializeField] private float movementSpeed;
         [SerializeField] private float rotationSpeed;
@@ -192,5 +193,57 @@ namespace Gameplay.Player
                         summonDmg - (int) (with.summonDamage * 100)
                     });
         }
+
+        public static bool operator ==(PlayerStats a, PlayerStats b) => a.Equals(b);
+        public static bool operator !=(PlayerStats a, PlayerStats b) => !a.Equals(b);
+        
+        public bool Equals(PlayerStats other)
+        {
+            return Mathf.Approximately(movementSpeed,     other.movementSpeed) &&
+                   Mathf.Approximately(rotationSpeed,     other.rotationSpeed) &&
+                   Mathf.Approximately(maxHealth,         other.maxHealth) &&
+                   Mathf.Approximately(attackPower,       other.attackPower) &&
+                   Mathf.Approximately(attackDamage,      other.attackDamage) &&
+                   Mathf.Approximately(armor,             other.armor) &&
+                   Mathf.Approximately(immunityDuration,  other.immunityDuration) &&
+                   Mathf.Approximately(abilityDamage,     other.abilityDamage) &&
+                   Mathf.Approximately(passiveProcRate,   other.passiveProcRate) &&
+                   Mathf.Approximately(mutagenicity,      other.mutagenicity) &&
+                   bonusSummonAmount == other.bonusSummonAmount &&
+                   Mathf.Approximately(summonDamage,      other.summonDamage);
+        }
+
+        // -----------------------------------------------------------------
+        // 3. Object.Equals
+        // -----------------------------------------------------------------
+        public override bool Equals(object obj)
+            => obj is PlayerStats other && Equals(other);
+        
+        private const float HASH_PRECISION = 1000f; // 0.001 granularity
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = 17;
+
+                hash = hash * 23 + RoundForHash(movementSpeed).GetHashCode();
+                hash = hash * 23 + RoundForHash(rotationSpeed).GetHashCode();
+                hash = hash * 23 + RoundForHash(maxHealth).GetHashCode();
+                hash = hash * 23 + RoundForHash(attackPower).GetHashCode();
+                hash = hash * 23 + RoundForHash(attackDamage).GetHashCode();
+                hash = hash * 23 + RoundForHash(armor).GetHashCode();
+                hash = hash * 23 + RoundForHash(immunityDuration).GetHashCode();
+                hash = hash * 23 + RoundForHash(abilityDamage).GetHashCode();
+                hash = hash * 23 + RoundForHash(passiveProcRate).GetHashCode();
+                hash = hash * 23 + RoundForHash(mutagenicity).GetHashCode();
+                hash = hash * 23 + bonusSummonAmount.GetHashCode();
+                hash = hash * 23 + RoundForHash(summonDamage).GetHashCode();
+
+                return hash;
+            }
+        }
+
+        private float RoundForHash(float value) => Mathf.Round(value * HASH_PRECISION) / HASH_PRECISION;
     }
 }
