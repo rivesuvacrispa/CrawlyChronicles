@@ -18,6 +18,7 @@ namespace Gameplay.Mutations.Active
     public class SpinneretGlands : ActiveAbility
     {
         [SerializeField] private ParticleSystem particles;
+        [SerializeField] private ParticleSystem debuffParticles;
 
         [Header("Maximum Simultaneous Web")] 
         [SerializeField, Range(1, 20)] private int maxAmountLvl1;
@@ -46,12 +47,14 @@ namespace Gameplay.Mutations.Active
         private float rotationSpeed;
         public static SlowEffectData DebuffEffectData { get; private set; }
         public static StatEffectData BuffEffectData { get; private set; }
+        public static ParticleSystem DebuffParticles { get; private set; }
 
 
         
         protected override void Awake()
         {
             base.Awake();
+            DebuffParticles = debuffParticles;
             mainModule = particles.main;
             shapeModule = particles.shape;
             MainMenu.OnResetRequested += OnResetRequested;

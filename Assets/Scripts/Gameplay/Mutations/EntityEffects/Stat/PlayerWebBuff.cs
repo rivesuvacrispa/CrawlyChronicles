@@ -1,6 +1,6 @@
 ﻿namespace Gameplay.Mutations.EntityEffects.Stat
 {
-    public class PlayerWebEffect : StatPlayerEffect
+    public class PlayerWebBuff : StatPlayerEffect
     {
         
     }

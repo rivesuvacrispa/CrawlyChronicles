@@ -13,6 +13,7 @@ namespace Gameplay.Mutations.EntityEffects
             target = GetComponent<IEffectAffectable>();
             effectsGO = new GameObject("Effects");
             effectsGO.transform.SetParent(transform);
+            effectsGO.transform.localPosition = Vector3.zero;
         }
 
         public void AddEffect<T>(EntityEffectData data) where T : EntityEffect

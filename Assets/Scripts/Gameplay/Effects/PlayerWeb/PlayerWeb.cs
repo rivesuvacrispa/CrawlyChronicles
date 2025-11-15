@@ -83,9 +83,9 @@ namespace Gameplay.Effects.PlayerWeb
             if (c.TryGetComponent(out IEffectAffectable affectable))
             {
                 if (affectable is Enemy) 
-                    affectable.AddEffect<SlowEntityEffect>(SpinneretGlands.DebuffEffectData);
+                    affectable.AddEffect<PlayerWebDebuff>(SpinneretGlands.DebuffEffectData);
                 else if (affectable.Equals(PlayerManager.Instance)) 
-                    PlayerManager.Instance.EffectController.AddEffect<PlayerWebEffect>(SpinneretGlands.BuffEffectData);
+                    PlayerManager.Instance.EffectController.AddEffect<PlayerWebBuff>(SpinneretGlands.BuffEffectData);
             }
         }
         
