@@ -61,7 +61,7 @@ namespace UI.Menus
         private void OnDestroy() => SettingsMenu.OnDifficultyChanged -= OnDifficultyChanged;
 
         public static void Show(MutationTarget target, Egg egg) => instance.ShowNonStatic(target, egg);
-        
+
         private void ShowNonStatic(MutationTarget target, Egg egg)
         {
             Time.timeScale = 0;
@@ -253,6 +253,38 @@ namespace UI.Menus
         {
             rerollCost = genesLeft.AsRerollCost(currentMutationRerollCost);
             rerollButton.SetCost(rerollCost, genesLeft);
+        }
+
+        public static void BreakRandomMutation() => instance.BreakRandomMutationNonStatic();
+        
+        private void BreakRandomMutationNonStatic()
+        {
+            var candidates = new List<BasicMutation>();
+            
+            foreach (var (mutation, lvl) in current)
+            {
+                if (lvl == 9) continue;
+                candidates.Add(mutation);
+            }
+
+            var candidate = candidates.OrderBy(_ => Random.value).FirstOrDefault();
+            if (candidate is null || 
+                !basicAbilityButtons.TryGetValue(candidate, out BasicAbilityButton b)) return;
+            
+            
+            int downgradedLvl = current[candidate] - 1;
+            current[candidate] = downgradedLvl;
+            
+            Debug.Log($"Mutation {candidate.Name} is broken to lvl {downgradedLvl}");
+
+            if (downgradedLvl == -1)
+            {
+                current.Remove(candidate);
+                basicAbilityButtons.Remove(candidate);
+                b.PlayBreak();
+            }
+            else
+                b.PlayDowngrade(downgradedLvl);
         }
 
 

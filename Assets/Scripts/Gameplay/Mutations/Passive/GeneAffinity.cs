@@ -35,8 +35,6 @@ namespace Gameplay.Mutations.Passive
 
         private void OnBeforeGenePickup(GeneType gType, int amount)
         {
-            if (amount == 0) return;
-            
             int bonus = 0;
             for (int i = 0; i < amount; i++)
                 if (Random.value <= bonusChance)

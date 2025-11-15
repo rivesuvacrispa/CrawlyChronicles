@@ -134,6 +134,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   icon: {fileID: 1886561116591957389}
   levelText: {fileID: 514733704445815949}
+  background: {fileID: 7714401479788560420}
 --- !u!114 &2010914464844024491
 MonoBehaviour:
   m_ObjectHideFlags: 0

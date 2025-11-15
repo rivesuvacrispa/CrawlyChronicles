@@ -83,16 +83,46 @@ namespace Gameplay.Breeding
 
         private void OnGenePickup(GeneType geneType, int amount)
         {
-            AddGene(geneType, amount, true);
+            AddGene(geneType, amount, false);
         }
 
-        public void AddGeneDirectly(GeneType geneType, int amount) => AddGene(geneType, amount, false);
+        public void AddGeneDirectly(GeneType geneType, int amount) => AddGene(geneType, amount, true);
         
-        private void AddGene(GeneType geneType, int amount, bool invokeOnBefore)
+        private void AddGene(GeneType geneType, int amount, bool directly)
         {
-            if (invokeOnBefore) OnBeforeGenePickup?.Invoke(geneType, amount);
+            if (amount == 0) return;
+            
+            if (!directly)
+            {
+                OnBeforeGenePickup?.Invoke(geneType, amount);
+                AddBonusGenes(geneType, amount);
+            }
+            
             TrioGene.AddGene(geneType, amount);
             OnTrioGeneChange?.Invoke(TrioGene);
+        }
+
+        private void AddBonusGenes(GeneType geneType, int amount)
+        {
+            float bonusChance = PlayerManager.PlayerStats.Mutagenicity;
+            if (bonusChance <= 0) return;
+            
+            
+            int bonusAmount = 0;
+            int flatBonus = Mathf.FloorToInt(bonusChance);
+            bonusChance -= flatBonus;
+            
+            for (int i = 0; i < amount; i++)
+            {
+                bonusAmount += flatBonus;
+                if (Random.value <= bonusChance)
+                {
+                    bonusAmount++;
+                }
+            }
+            
+            if (bonusAmount > 0)
+                AddGeneDirectly(geneType, bonusAmount);
         }
 
         public void SetTrioGene(TrioGene trioGene)

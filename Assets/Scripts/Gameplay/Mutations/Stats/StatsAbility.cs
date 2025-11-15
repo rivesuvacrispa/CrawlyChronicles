@@ -8,7 +8,7 @@ namespace Gameplay.Mutations.Stats
         [SerializeField] private PlayerStats statsLvl1;
         [SerializeField] private PlayerStats statsLvl10;
 
-        [SerializeField] private PlayerStats current = PlayerStats.Zero;
+        [SerializeField] protected PlayerStats current = PlayerStats.Zero;
 
         protected bool StatsCanBeAdded =>
             !current.Equals(PlayerStats.Zero) && Application.isPlaying && isActiveAndEnabled;

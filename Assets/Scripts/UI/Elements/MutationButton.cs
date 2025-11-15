@@ -52,7 +52,7 @@ namespace UI.Elements
             foreach (Transform t in transform) 
                 t.gameObject.SetActive(false);
         }
-
+        
 
         // IAbilityTooltipProvider
         public BasicMutation TooltipData => Scriptable;
