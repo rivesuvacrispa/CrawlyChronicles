@@ -1,4 +1,8 @@
-﻿using Definitions;
+﻿using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using Definitions;
+using UI.Menus;
 using UnityEngine;
 
 namespace Util
@@ -41,6 +45,20 @@ namespace Util
             partRb.angularVelocity = 720f;
             partRb.AddForce(Random.insideUnitCircle.normalized * 2f, 
                 ForceMode2D.Impulse);
+        }
+        
+        public static CancellationToken CreateCommonCancellationToken(this GameObject gameObject, params CancellationToken[] tokens)
+        {
+            var commonTokens = new List<CancellationToken>()
+            {
+                gameObject.GetCancellationTokenOnDestroy(),
+                MainMenu.CancellationTokenOnReset
+            };
+            
+            if (tokens.Length != 0)
+                commonTokens.AddRange(tokens);
+            
+            return CancellationTokenSource.CreateLinkedTokenSource(commonTokens.ToArray()).Token;
         }
     }
 }

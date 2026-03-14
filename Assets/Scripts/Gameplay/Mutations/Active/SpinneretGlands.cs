@@ -117,10 +117,7 @@ namespace Gameplay.Mutations.Active
             AttackController.CancelAttack();
             PlayerMovement.CancelKnockback();
                 
-            ActivateTask(CancellationTokenSource.CreateLinkedTokenSource(
-                gameObject.GetCancellationTokenOnDestroy(),
-                MainMenu.CancellationTokenOnReset).Token
-            ).Forget();
+            ActivateTask(CreateCommonCancellationToken()).Forget();
             
             // PlayerPhysicsBody.Rigidbody.Rotat
         }

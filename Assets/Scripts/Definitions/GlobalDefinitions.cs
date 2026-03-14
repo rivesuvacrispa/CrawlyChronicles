@@ -1,9 +1,11 @@
-﻿using Gameplay.Breeding;
+﻿using DG.Tweening;
+using Gameplay.Breeding;
 using Gameplay.Enemies;
 using Gameplay.Genes;
 using Gameplay.Map;
 using Gameplay.Mutations;
 using Scriptable;
+using TMPro;
 using UI.Elements;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -21,6 +23,8 @@ namespace Definitions
         [SerializeField] private Sprite[] eggSprites = new Sprite[6];
         [SerializeField] private Sprite puddleSprite;
         [SerializeField] private Transform worldCanvasTransform;
+        [SerializeField] private TMP_FontAsset bloodyFont;
+        [SerializeField] private Ease damageTextEase;
         [Header("Stats")] 
         [SerializeField] private int eggGeneEntropy;
         [SerializeField] private int breedingPartnersGeneEntropy;
@@ -66,6 +70,8 @@ namespace Definitions
         public static int EnemyHitboxLayer { get; private set; }
         public static int DefaultLayerMask { get; private set; }
         public static Sprite PuddleSprite => instance.puddleSprite;
+        public static TMP_FontAsset BloodyFont => instance.bloodyFont;
+        public static Ease DamageTextEase => instance.damageTextEase;
         public static Color EggPuddleColor => instance.eggPuddleColor;
         public static float GenePickupDistance => instance.genePickupDistance;
         public static int BreedingPartnersGeneEntropy => instance.breedingPartnersGeneEntropy;
@@ -154,17 +160,20 @@ namespace Definitions
             EnemyAttackLayer = LayerMask.NameToLayer("EnemyAttacks");
             EnemyHitboxLayer = LayerMask.NameToLayer("EnemyHitbox");
             DefaultLayerMask = LayerMask.NameToLayer("Default");
-            
-            EnemyPhysicsLayerMask = LayerMask.GetMask("EnemyPhysics");
 
+            EnemyPhysicsLayerMask = LayerMask.GetMask("EnemyPhysics");
             EnemyPhysicsContactFilter = new ContactFilter2D
             {
+                useLayerMask = true,
+                useTriggers = true,
                 layerMask = EnemyPhysicsLayerMask
             };
 
             EnemyAndPlayerPhysicsLayerMask = LayerMask.GetMask("EnemyPhysics", "PlayerPhysics");
             EnemyAndPlayerPhysicsContactFilter = new ContactFilter2D
             {
+                useLayerMask = true,
+                useTriggers = true,
                 layerMask = EnemyAndPlayerPhysicsLayerMask
             };
 

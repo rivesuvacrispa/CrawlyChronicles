@@ -10,10 +10,12 @@ namespace Gameplay.Player
 {
     public class AttackController : MonoBehaviour
     {
+        public static AttackController Instance { get; private set; }
+
+        
         [Header("Refs")]
         [SerializeField] private PlayerHitbox hitbox;
-        [SerializeField] private ComboManager comboManager;
-        [SerializeField] private PlayerAttack attack;
+        [SerializeField] private BasePlayerAttack attack;
         [SerializeField] private Vector3 defaultAttackPosition;
         [SerializeField] private Vector3 comboAttackPosition;
 
@@ -27,11 +29,13 @@ namespace Gameplay.Player
         public static event AttackControllerEvent OnAttackStart;
         private static CancellationTokenSource cancellationTokenSource;
 
-
-
         public bool IsAttacking => attack.IsActive;
         public static bool IsInComboDash { get; private set; }
 
+
+
+        private AttackController() => Instance = this;
+        
         private void Awake()
         {
             cancellationTokenSource = new CancellationTokenSource();
@@ -64,7 +68,6 @@ namespace Gameplay.Player
             OnAttackStart?.Invoke();
             if(comboExpirationRoutine is not null) 
                 StopCoroutine(comboExpirationRoutine);
-            PlayerAudioController.Instance.PlayAttack(0);
             attack.Enable();
             hitbox.Disable();
 
@@ -76,7 +79,7 @@ namespace Gameplay.Player
             hitbox.Enable();
         }
 
-        private async UniTask ComboAttack(CancellationToken cancellationToken)
+        public async UniTask ComboAttack(float duration, CancellationToken cancellationToken)
         {
             OnAttackStart?.Invoke();
             IsInComboDash = true;
@@ -87,7 +90,7 @@ namespace Gameplay.Player
             attack.Enable();
             hitbox.Disable();
 
-            await PlayerMovement.ComboDash(dashDuration * 2, comboRotationSpeed, cancellationToken: cancellationToken)
+            await PlayerMovement.ComboDash(duration, comboRotationSpeed, cancellationToken: cancellationToken)
                 .SuppressCancellationThrow();
             
             attack.transform.localPosition = defaultAttackPosition;

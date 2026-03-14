@@ -34,11 +34,7 @@ namespace Gameplay.Mutations.Active
         public override void Activate(bool auto = false)
         {
             base.Activate(auto);
-            RegenerationTask(
-                    CancellationTokenSource.CreateLinkedTokenSource(
-                        gameObject.GetCancellationTokenOnDestroy(),
-                        MainMenu.CancellationTokenOnReset).Token
-                    ).Forget();
+            RegenerationTask(CreateCommonCancellationToken()).Forget();
         }
 
         private async UniTask RegenerationTask(CancellationToken cancellationToken)

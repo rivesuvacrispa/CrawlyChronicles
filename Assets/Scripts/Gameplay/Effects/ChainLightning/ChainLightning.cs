@@ -104,8 +104,8 @@ namespace Gameplay.Effects.ChainLightning
                     !particleSystem.IsPlaying && 
                     !singleTargetParticles.isPlaying, 
                 cancellationToken: cancellationToken);
-            
-            Pool();
+
+            ((IPoolable)this).Pool();
         }
 
         private async UniTask PropagateTask(IDamageable damageable, CancellationToken cancellationToken)

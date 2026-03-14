@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using Gameplay.Player;
 using Hitboxes;
 using Scriptable;
 using UI.Elements;
+using UI.Menus;
 using UnityEngine;
 using Util;
 using Util.Interfaces;
@@ -74,5 +78,10 @@ namespace Gameplay.Mutations
         }
 
         public virtual string GetLevelDescription(int lvl, bool withUpgrade) => string.Empty;
+
+        protected CancellationToken CreateCommonCancellationToken(params CancellationToken[] tokens)
+        {
+            return gameObject.CreateCommonCancellationToken(tokens);
+        }
     }
 }

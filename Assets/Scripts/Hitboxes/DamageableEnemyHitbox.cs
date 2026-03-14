@@ -16,7 +16,13 @@ namespace Hitboxes
         private IDamageableEnemy enemy;
         private readonly HashSet<DamageSource> blockedSources = new();
 
+        public delegate void EnemyHitboxEvent(IDamageableEnemy enemy, BasePlayerAttack attack, float damage);
+        public static event EnemyHitboxEvent OnCollideWithPlayerAttack;
+        
         public bool Dead { get; private set; }
+        
+        
+        
         public bool ImmuneToSource(DamageSource source) => !isActiveAndEnabled || Dead || blockedSources.Contains(source);
 
         private void Awake()
@@ -31,9 +37,6 @@ namespace Hitboxes
                 Debug.LogError($"Component {damagableComponent.name} is not IDamageableEnemy");
                 gameObject.SetActive(false);
             }
-            
-            
-
         }
 
         private void OnDestroy()
@@ -51,7 +54,11 @@ namespace Hitboxes
          */
         private void OnCollisionEnter2D(Collision2D col)
         {
-            enemy.Damage(PlayerAttack.CreateDamageInstance());
+            if (col.collider.TryGetComponent(out BasePlayerAttack playerAttack))
+            {
+                float damage = enemy.Damage(playerAttack.CreateDamageInstance());
+                OnCollideWithPlayerAttack?.Invoke(enemy, playerAttack, damage);
+            }
         }
         
         /***
@@ -61,7 +68,11 @@ namespace Hitboxes
          */
         private void OnTriggerEnter2D(Collider2D col)
         {
-            enemy.Damage(PlayerAttack.CreateDamageInstance());
+            if (col.TryGetComponent(out BasePlayerAttack playerAttack))
+            {
+                float damage = enemy.Damage(playerAttack.CreateDamageInstance());
+                OnCollideWithPlayerAttack?.Invoke(enemy, playerAttack, damage);
+            }
         }
         
         public void Enable()
@@ -74,6 +85,13 @@ namespace Hitboxes
         public void Disable()
         {
             gameObject.SetActive(false);
+        }
+
+        public void Reset()
+        {
+            blockedSources.Clear();
+            Dead = false;
+            Enable();
         }
 
         public void Die()

@@ -71,13 +71,13 @@ namespace Gameplay.Mutations.Passive
         protected override void OnEnable()
         {
             base.OnEnable();
-            PlayerAttack.OnAttackEffectCollectionRequested += OnAttackEffectCollectionRequested;
+            BasePlayerAttack.OnAttackEffectCollectionRequested += OnAttackEffectCollectionRequested;
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            PlayerAttack.OnAttackEffectCollectionRequested -= OnAttackEffectCollectionRequested;
+            BasePlayerAttack.OnAttackEffectCollectionRequested -= OnAttackEffectCollectionRequested;
         }
     }
 }

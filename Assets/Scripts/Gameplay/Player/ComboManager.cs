@@ -8,7 +8,7 @@ namespace Gameplay.Player
 {
     public class ComboManager : MonoBehaviour
     {
-        [SerializeField] private PlayerAttack playerAttack;
+        [SerializeField] private BasePlayerAttack basePlayerAttack;
         [Header("Stats")]
         [SerializeField] private float comboExpirationTime = 1f;
 
@@ -28,7 +28,7 @@ namespace Gameplay.Player
 
         private void OnGlobalDamageTaken(IDamageable damageable, DamageInstance instance)
         {
-            if (damageable is IDamageableEnemy && instance.source.owner.Equals(playerAttack));
+            if (damageable is IDamageableEnemy && instance.source.owner.Equals(basePlayerAttack));
         }
 
 

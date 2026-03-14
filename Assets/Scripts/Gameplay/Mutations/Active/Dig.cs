@@ -52,12 +52,7 @@ namespace Gameplay.Mutations.Active
                 return;
             }
             
-            ActivateTask(
-                CancellationTokenSource.CreateLinkedTokenSource(
-                    cancellationTokenSource.Token,
-                    gameObject.GetCancellationTokenOnDestroy(), 
-                    MainMenu.CancellationTokenOnReset).Token
-                ).Forget();
+            ActivateTask(CreateCommonCancellationToken(cancellationTokenSource.Token)).Forget();
         }
 
         private async UniTask ActivateTask(CancellationToken cancellationToken)

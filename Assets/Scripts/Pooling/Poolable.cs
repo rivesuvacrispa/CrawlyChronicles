@@ -2,12 +2,13 @@
 
 namespace Pooling
 {
-    public abstract class Poolable : MonoBehaviour
+    public abstract class Poolable : MonoBehaviour, IPoolable
     {
         public IObjectPool ObjectPool { get; set; }
 
 
-        
+        public GameObject GameObject => gameObject;
+
         public virtual void OnPool()
         {
 #if UNITY_EDITOR
@@ -30,11 +31,6 @@ namespace Pooling
         {
             gameObject.SetActive(true);
             return true;
-        }
-
-        public void Pool()
-        {
-            ObjectPool?.Pool(this);
         }
     }
 }

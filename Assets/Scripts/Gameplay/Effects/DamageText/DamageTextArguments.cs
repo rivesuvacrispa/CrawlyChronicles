@@ -1,16 +1,17 @@
 ﻿using UnityEngine;
+using Util.Interfaces;
 
 namespace Gameplay.Effects.DamageText
 {
     public readonly struct DamageTextArguments
     {
-        public readonly float damage;
+        public readonly DamageInstance damageInstance;
         public readonly Vector3 position;
 
-        public DamageTextArguments(Vector3 position, float damage)
+        public DamageTextArguments(Vector3 position, DamageInstance damageInstance)
         {
             this.position = position;
-            this.damage = damage;
+            this.damageInstance = damageInstance;
         }
     }
 }

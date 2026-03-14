@@ -69,7 +69,7 @@ namespace Gameplay.Mutations.Passive
 
         private void ClearFlies()
         {
-            foreach (Fly fly in flies) 
+            foreach (IPoolable fly in flies) 
                 fly.Pool();
             flies.Clear();
         }

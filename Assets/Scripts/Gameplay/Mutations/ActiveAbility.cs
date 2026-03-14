@@ -50,7 +50,7 @@ namespace Gameplay.Mutations
             SetOnCooldown();
         }
 
-        protected void SetOnCooldown()
+        protected void SetOnCooldown(float? cooldown = null)
         {
 #if UNITY_EDITOR
             // Do not set on cooldown in god mode
@@ -61,7 +61,7 @@ namespace Gameplay.Mutations
             };
 #endif
             
-            CurrentCooldown = BaseCooldown;
+            CurrentCooldown = cooldown ?? BaseCooldown;
         }
 
         public virtual bool CanActivate() => CurrentCooldown <= 0;

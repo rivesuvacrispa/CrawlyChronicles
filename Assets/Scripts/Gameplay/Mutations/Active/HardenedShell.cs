@@ -39,11 +39,7 @@ namespace Gameplay.Mutations.Active
         {
             base.Activate();
             PlayerManager.Instance.AddStats(activeStats.Negated());
-            ActivateTask(
-                CancellationTokenSource.CreateLinkedTokenSource(
-                    gameObject.GetCancellationTokenOnDestroy(), 
-                    MainMenu.CancellationTokenOnReset).Token
-                ).Forget();
+            ActivateTask(CreateCommonCancellationToken()).Forget();
         }
 
         private async UniTask ActivateTask(CancellationToken cancellationToken)

@@ -43,7 +43,7 @@ namespace Gameplay.Effects.PlayerWeb
 
         private void OnDestroy() => MainMenu.OnResetRequested -= OnResetRequested;
 
-        private void OnResetRequested() => Pool();
+        private void OnResetRequested() => ((IPoolable)this).Pool();
 
         private void OnTriggerEnter2D(Collider2D c)
         {
@@ -114,7 +114,7 @@ namespace Gameplay.Effects.PlayerWeb
 
         public void PoolWithAnimation()
         {
-            spriteRenderer.DOColor(Color.white.WithAlpha(0f), 0.5f).OnComplete(Pool);
+            spriteRenderer.DOColor(Color.white.WithAlpha(0f), 0.5f).OnComplete(((IPoolable)this).Pool);
         }
 
         public override bool OnTakenFromPool(object data)

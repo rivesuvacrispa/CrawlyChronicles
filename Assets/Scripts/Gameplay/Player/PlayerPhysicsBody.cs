@@ -9,6 +9,7 @@ namespace Gameplay.Player
         public static Collider2D PhysicsCollider { get; private set; }
         public static Vector2 Position => Rigidbody.position;
         public static float Rotation => Rigidbody.rotation;
+        public static Vector3 Forward => Rigidbody.transform.up;
         
         
         

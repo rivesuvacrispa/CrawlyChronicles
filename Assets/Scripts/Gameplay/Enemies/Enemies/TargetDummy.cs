@@ -33,6 +33,7 @@ namespace Gameplay.Enemies.Enemies
         private void Start()
         {
             CurrentHealth = scriptable.MaxHealth;
+            hitbox.Reset();
         }
 
         private void Die()

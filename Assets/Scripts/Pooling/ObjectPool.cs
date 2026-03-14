@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Pooling
 {
-    public abstract class ObjectPool<T>  : MonoBehaviour, IObjectPool where T : Poolable
+    public abstract class ObjectPool<T>  : MonoBehaviour, IObjectPool where T : IPoolable
     {
         [SerializeField] private T prefab;
 
@@ -14,10 +14,10 @@ namespace Pooling
         
         public Type GetPoolableType() => typeof(T);
 
-        public Poolable GetEffectObject(object data, Vector3 position, Quaternion rotation)
+        public IPoolable GetEffectObject(object data, Vector3 position, Quaternion rotation)
         {
             bool popped = objectStack.TryPop(out T pop);
-            T obj = popped ? pop : Instantiate(prefab);
+            T obj = popped ? pop : Instantiate(prefab.GameObject).GetComponent<T>();
             obj.OnFirstInstantiated();
             if (!obj.OnTakenFromPool(data))
             {
@@ -26,9 +26,9 @@ namespace Pooling
             };
             
             if (!position.Equals(default))
-                obj.transform.position = position;
+                obj.GameObject.transform.position = position;
             if (!rotation.Equals(default))
-                obj.transform.rotation = rotation;
+                obj.GameObject.transform.rotation = rotation;
             if (popped) return obj;
             
             obj.ObjectPool = this;
@@ -40,7 +40,7 @@ namespace Pooling
         {
         }
 
-        public void Pool(Poolable effectObject)
+        public void Pool(IPoolable effectObject)
         {
             if(effectObject is not T obj) return;
             objectStack.Push(obj);

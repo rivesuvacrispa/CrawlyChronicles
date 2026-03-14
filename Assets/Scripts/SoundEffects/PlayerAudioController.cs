@@ -19,9 +19,10 @@ namespace SoundEffects
 
         public PlayerAudioController() => Instance = this;
 
-        
+        // TODO: play on pool
         
         public void PlayAttack(int combo) => PlayAction(attackSounds[combo], pitch: 1 / PlayerSizeManager.CurrentSize);
+        public void PlayRandomAttack() => PlayAction(attackSounds[Random.Range(0, 3)], pitch: 1 / PlayerSizeManager.CurrentSize);
         public void PlayCombo() => PlayAction(attackSounds[3], true, comboPitch / PlayerSizeManager.CurrentSize);
         public void PlayInteract() => PlayAction(interactionSound);
         public void PlayCrawl() => PlayState(crawlSound);

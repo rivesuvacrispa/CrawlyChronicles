@@ -42,12 +42,12 @@ namespace Hitboxes
             OnDamageTakenGlobal?.Invoke(this, instance);
             OnBeforeHit(instance);
 
-            PoolManager.GetEffect<DamageText>(new DamageTextArguments(Transform.position, damage));
+            PoolManager.GetEffect<DamageText>(new DamageTextArguments(Transform.position, instance));
             if (CurrentHealth <= float.Epsilon)
             {
                 OnLethalBlowGlobal?.Invoke(this);
-                OnLethalHit(instance);
                 Hitbox.Die();
+                OnLethalHit(instance);
             }
             else
             {
@@ -56,7 +56,8 @@ namespace Hitboxes
             }
             
             if (instance.effects is not null && this is IImpactable impactable)
-                foreach (AttackEffect effect in instance.effects)
+                // Copy effects because the original list may be modified after some impact (example: deadly strike)
+                foreach (AttackEffect effect in instance.effects.ToArray())
                     effect.Impact(impactable, damage);
 
             return damage;

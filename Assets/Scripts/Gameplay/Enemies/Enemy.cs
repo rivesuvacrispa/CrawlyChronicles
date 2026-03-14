@@ -30,7 +30,6 @@ namespace Gameplay.Enemies
         [SerializeField] protected bool fearless;
         [SerializeField] private BodyPainter bodyPainter;
         [SerializeField] private GameObject attackGO;
-        [SerializeField] private AudioController audioController;
         [SerializeField] protected SpriteRenderer minimapIcon;
         [SerializeField] protected SpriteRenderer spriteRenderer;
         [SerializeField] protected DamageableEnemyHitbox hitbox;
@@ -40,6 +39,7 @@ namespace Gameplay.Enemies
         protected Rigidbody2D rb;
         public AIStateController StateController { get; private set; }
         private EffectController effectController;
+        private AudioController audioController;
 
         protected bool spawnedBySpawner;
         private bool stunned;
@@ -79,6 +79,7 @@ namespace Gameplay.Enemies
             rb = GetComponent<Rigidbody2D>();
             StateController = GetComponent<AIStateController>();
             effectController = GetComponent<EffectController>();
+            audioController = GetComponentInChildren<AudioController>();
         }
         
         protected virtual void Start()

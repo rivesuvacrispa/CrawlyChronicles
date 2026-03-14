@@ -4,7 +4,6 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Gameplay.Mutations.AttackEffects;
 using Gameplay.Player;
-using Hitboxes;
 using SoundEffects;
 using UnityEngine;
 using Util.Interfaces;
@@ -28,17 +27,10 @@ namespace Gameplay.Mutations.Passive
 
         private float procChance;
         private float damageMultiplier;
-        private AttackEffect attackEffect;
+        private CancellationTokenSource cancellationTokenSource;
+        
+        
 
-        private PlayerStats addedStats;
-        private bool statsActive;
-        
-        
-        protected override void Start()
-        {
-            attackEffect = new AttackEffect(effectGradient, OnImpact);
-            base.Start();
-        }
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
@@ -52,78 +44,50 @@ namespace Gameplay.Mutations.Passive
             if (Random.value <= procChance)
             {
                 attackSource.Play();
-                effects.Add(attackEffect);
-                AddStats();
+                effects.Add(new DeadlyStrikeAttackEffect(effectGradient, OnImpact,
+                    PlayerManager.PlayerStats.AttackDamage * (damageMultiplier - 1)));
             }
         }
 
         private void OnImpact(IImpactable impactable, float _)
         {
             PlayAnimation(impactable);
-            RemoveStats();
         }
 
         private void PlayAnimation(IImpactable impactable)
         {
-            if (!statsActive) return;
-            
+            cancellationTokenSource?.Cancel();
+            cancellationTokenSource?.Dispose();
+            cancellationTokenSource = new CancellationTokenSource();
+
+            var position = impactable.Transform.position;
+            strikeParticles.transform.position = position;
             strikeParticles.Play();
-            bloodParticles.transform.position = impactable.Transform.position;
+            bloodParticles.transform.position = position;
             bloodParticles.Play();
-            TimeScaleTask(0.25f, gameObject.GetCancellationTokenOnDestroy()).Forget();
+            TimeScaleTask(0.25f, CreateCommonCancellationToken(cancellationTokenSource.Token))
+                .Forget();
             hitSource.Play();
         }
 
         private async UniTask TimeScaleTask(float duration, CancellationToken cancellationToken)
         {
             Time.timeScale = 0.5f;
-            await UniTask.Delay(TimeSpan.FromSeconds(duration), ignoreTimeScale: true, cancellationToken: cancellationToken);
+            await UniTask.Delay(TimeSpan.FromSeconds(duration), ignoreTimeScale: true, cancellationToken: cancellationToken)
+                .SuppressCancellationThrow();
             Time.timeScale = 1f;
         }
-
-
+        
         protected override void OnEnable()
         {
             base.OnEnable();
-            PlayerAttack.OnAttackEffectCollectionRequested += OnAttackEffectCollectionRequested;
-            PlayerAttack.OnAttackEnd += OnPlayerAttackEnd;
-            PlayerManager.Instance.OnDeath += OnPlayerDeath;
+            BasePlayerAttack.OnAttackEffectCollectionRequested += OnAttackEffectCollectionRequested;
         }
         
         protected override void OnDisable()
         {
             base.OnDisable();
-            PlayerAttack.OnAttackEffectCollectionRequested -= OnAttackEffectCollectionRequested;
-            PlayerAttack.OnAttackEnd -= OnPlayerAttackEnd;
-            PlayerManager.Instance.OnDeath -= OnPlayerDeath;
-        }
-
-        private void OnPlayerAttackEnd()
-        {
-            RemoveStats();
-        }
-        
-        private void OnPlayerDeath(IDamageable damageable)
-        {
-            RemoveStats();
-        }
-
-        private void AddStats()
-        {
-            if (statsActive) return;
-            
-            float damageAdded = PlayerManager.PlayerStats.AttackDamage * (damageMultiplier - 1);
-            addedStats = new PlayerStats(attackDamage: damageAdded);
-            PlayerManager.Instance.AddStats(addedStats);
-            statsActive = true;
-        }
-
-        private void RemoveStats()
-        {
-            if (!statsActive) return;
-
-            PlayerManager.Instance.AddStats(addedStats.Negated());
-            statsActive = false;
+            BasePlayerAttack.OnAttackEffectCollectionRequested -= OnAttackEffectCollectionRequested;
         }
     }
 }

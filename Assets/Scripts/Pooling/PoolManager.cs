@@ -20,12 +20,12 @@ namespace Pooling
         public static T GetEffect<T>(
             object data = null,
             Vector3 position = default,
-            Quaternion rotation = default) where T : Poolable
+            Quaternion rotation = default) where T : IPoolable
         {
             return (T)PoolsDict[typeof(T)].GetEffectObject(data, position, rotation);
         }
 
-        public static Poolable GetEffect(
+        public static IPoolable GetEffect(
             Type t, 
             object data = null,
             Vector3 position = default,

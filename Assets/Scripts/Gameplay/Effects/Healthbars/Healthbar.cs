@@ -100,7 +100,7 @@ namespace Gameplay.Effects.Healthbars
         private async UniTask PoolTask(CancellationToken cancellationToken)
         {
             await UniTask.WaitUntil(() => currentTween == null, cancellationToken: cancellationToken);
-            Pool();
+            ((IPoolable)this).Pool();
         }
 
         private void StartCatch(float finalValue)
@@ -153,7 +153,7 @@ namespace Gameplay.Effects.Healthbars
             target.OnProviderDestroy += OnDamageableDestroy;
             target.OnDamageTaken += OnTargetDamageTaken;
             target.OnDeath += OnTargetDeath;
-            Pool();
+            ((IPoolable)this).Pool();
         }
         
         protected void UpdateWidth() => 

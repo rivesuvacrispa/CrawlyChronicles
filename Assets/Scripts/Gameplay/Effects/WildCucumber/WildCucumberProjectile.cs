@@ -153,7 +153,7 @@ namespace Gameplay.Effects.WildCucumber
         private async UniTask PoolTask(CancellationToken cancellationToken)
         {
             await UniTask.WaitUntil(() => !particleSystem.isPlaying, cancellationToken: cancellationToken);
-            Pool();
+            ((IPoolable)this).Pool();
         }
         
         public override bool OnTakenFromPool(object data)
@@ -210,11 +210,11 @@ namespace Gameplay.Effects.WildCucumber
         {
             await spriteRenderer.DOColor(spriteRenderer.color.WithAlpha(0f), 2f)
                 .AsyncWaitForCompletion().AsUniTask().AttachExternalCancellation(cancellationToken);
-            Pool();
+            ((IPoolable)this).Pool();
         }
         
         private void OnResetRequested() {
-            Pool();
+            ((IPoolable)this).Pool();
         }
     }
 }
