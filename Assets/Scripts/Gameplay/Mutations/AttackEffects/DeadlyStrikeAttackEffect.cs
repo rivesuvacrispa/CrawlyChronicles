@@ -13,7 +13,8 @@ namespace Gameplay.Mutations.AttackEffects
         private BasePlayerAttack attack;
 
         private static readonly DamageTextProperties TextProperties = new(
-            new VertexGradient(UnityEngine.Color.yellow, UnityEngine.Color.yellow, UnityEngine.Color.red, UnityEngine.Color.red), GlobalDefinitions.BloodyFont, 3f, 3f
+            new VertexGradient(UnityEngine.Color.yellow, UnityEngine.Color.yellow, UnityEngine.Color.red, UnityEngine.Color.red), 
+            GlobalDefinitions.BloodyFont, 3f, 2.25f
         );
 
 

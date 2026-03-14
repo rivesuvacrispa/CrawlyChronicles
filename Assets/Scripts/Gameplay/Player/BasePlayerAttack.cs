@@ -31,10 +31,21 @@ namespace Gameplay.Player
         private int GetAttackID() => HashCode.Combine(gameObject.GetHashCode(), attackCounter);
         private float currentBonusDamage;
 
+
         
-        
+        private void Awake()
+        {
+            PlayerSizeManager.OnSizeChanged += OnPlayerSizeChanged;
+        }
+
+        private void OnPlayerSizeChanged(float size)
+        {
+            trailRenderer.widthMultiplier = size;
+        }
+
         public DamageInstance CreateDamageInstance()
         {
+            attackCounter++;
             int id = GetAttackID();
             
             return new DamageInstance(
@@ -88,7 +99,6 @@ namespace Gameplay.Player
         
         public void Enable()
         {
-            attackCounter++;
             OnAttackEffectCollectionRequested?.Invoke(effects);
 
             ResetEffects();

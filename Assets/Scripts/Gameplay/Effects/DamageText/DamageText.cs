@@ -17,7 +17,7 @@ namespace Gameplay.Effects.DamageText
         [SerializeField] private TMP_Text text;
 
         private static DamageTextProperties defaultProperties;
-        private float lifetime = 1.1f;
+        private float lifetime = 2f;
 
         private void Awake()
         {
@@ -58,17 +58,30 @@ namespace Gameplay.Effects.DamageText
                 ApplyProperties(changeDamageText.GetDamageTextProperties());
             } else 
                 ApplyDefaultProperties();
-            
-            text.color = text.color.WithAlpha(1f);
+
             transform.position = args.position + (Vector3) Random.insideUnitCircle * 0.1f;
             text.SetText($"{args.damageInstance.Damage:0.##}");
+            
             AnimationTask(gameObject.GetCancellationTokenOnDestroy()).Forget();
             return base.OnTakenFromPool(data);
         }
 
         private async UniTask AnimationTask(CancellationToken cancellationToken)
         {
-            await text.DOColor(text.color.WithAlpha(0f), lifetime)
+            text.color = text.color.WithAlpha(0f);
+            transform.localScale = Vector3.zero;
+
+            float frame1 = lifetime * 0.25f;
+            float frame2 = lifetime * 0.5f;
+            
+            var anim = DOTween.Sequence()
+                .Insert(0, text.DOColor(text.color.WithAlpha(1f), frame1))
+                .Insert(0, transform.DOScale(Vector3.one, frame1))
+
+                .Insert(frame2, text.DOColor(text.color.WithAlpha(0f), frame2))
+                .Insert(frame2, transform.DOScale(Vector3.one, frame2));
+            
+            await anim
                 .SetEase(GlobalDefinitions.DamageTextEase)
                 .AsyncWaitForCompletion()
                 .AsUniTask()

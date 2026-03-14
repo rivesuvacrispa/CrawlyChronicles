@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Gameplay.Effects.Fly;
+using Gameplay.Player;
 using Pooling;
 using UnityEngine;
 
@@ -58,7 +59,7 @@ namespace Gameplay.Mutations.Passive
         
         private void SpawnFlies()
         {
-            for (int i = 0; i < fliesAmount; i++)
+            for (int i = 0; i < fliesAmount + PlayerManager.PlayerStats.BonusSummonAmount; i++)
             {
                 Fly fly = PoolManager.GetEffect<Fly>(
                     new FlyArguments(damage, attackCooldown, flySpeed, rotationSpeed),
