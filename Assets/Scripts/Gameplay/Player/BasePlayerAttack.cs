@@ -19,6 +19,7 @@ namespace Gameplay.Player
     {
         [SerializeField] private BaseAudioSource audioSource;
         [SerializeField] protected TrailRenderer trailRenderer;
+        [SerializeField] protected Gradient defaultGradient = new Gradient().FastGradient(Color.white, Color.white);
 
         public delegate void AttackEffectCollectionEvent(List<AttackEffect> effects);
         public static event AttackEffectCollectionEvent OnAttackEffectCollectionRequested;
@@ -26,10 +27,10 @@ namespace Gameplay.Player
         public bool IsActive { get; private set; }
         private readonly List<AttackEffect> effects = new();
         private readonly List<AttackEffect> currentAttackEffects = new(4);
-        private readonly Gradient defaultGradient = new Gradient().FastGradient(Color.white, Color.white);
         private int attackCounter;
         private int GetAttackID() => HashCode.Combine(gameObject.GetHashCode(), attackCounter);
         private float currentBonusDamage;
+        
 
 
         
@@ -43,9 +44,13 @@ namespace Gameplay.Player
             trailRenderer.widthMultiplier = size;
         }
 
+        protected virtual void ApplyGradient(Gradient g)
+        {
+            trailRenderer.colorGradient = g;
+        }
+
         public DamageInstance CreateDamageInstance()
         {
-            attackCounter++;
             int id = GetAttackID();
             
             return new DamageInstance(
@@ -80,12 +85,12 @@ namespace Gameplay.Player
         private void ApplyRandomEffectTrail()
         {
             var eff = currentAttackEffects.OrderBy(_ => Random.value).FirstOrDefault();
-            trailRenderer.colorGradient = eff is null ? defaultGradient : eff.Color;
+            ApplyGradient(eff is null ? defaultGradient : eff.Color);
         }
 
         private void ResetEffects()
         {
-            trailRenderer.colorGradient = defaultGradient;
+            ApplyGradient(defaultGradient);
             currentAttackEffects.Clear();
         }
 
@@ -97,8 +102,9 @@ namespace Gameplay.Player
                 ApplyRandomEffectTrail();
         }
         
-        public void Enable()
+        public virtual void Enable()
         {
+            attackCounter++;
             OnAttackEffectCollectionRequested?.Invoke(effects);
 
             ResetEffects();
@@ -112,7 +118,7 @@ namespace Gameplay.Player
             audioSource.Play(pitch: 1f / PlayerSizeManager.CurrentSize);
         }
 
-        public void Disable()
+        public virtual void Disable()
         {
             effects.Clear();
             IsActive = false;

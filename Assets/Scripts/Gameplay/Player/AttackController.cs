@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 using Gameplay.Interaction;
 using Hitboxes;
@@ -11,7 +10,6 @@ namespace Gameplay.Player
     public class AttackController : MonoBehaviour
     {
         public static AttackController Instance { get; private set; }
-
         
         [Header("Refs")]
         [SerializeField] private PlayerHitbox hitbox;
@@ -21,7 +19,6 @@ namespace Gameplay.Player
 
         [Header("Stats")]
         [SerializeField] private float dashDuration;
-        [SerializeField] private float comboRotationSpeed;
 
         private Coroutine comboExpirationRoutine;
 
@@ -57,13 +54,11 @@ namespace Gameplay.Player
                 !PlayerMovement.CanMove)
                 return;
             
-            // if (comboCounter == 3)
-                // ComboAttack(gameObject.GetCancellationTokenOnDestroy()).Forget();
-            // else
-            Attack(cancellationTokenSource.Token).Forget();
+            Attack(PlayerManager.PlayerStats.AttackPower * PlayerMovement.MoveSpeedAmplifier,
+                cancellationTokenSource.Token).Forget();
         }
         
-        private async UniTask Attack(CancellationToken cancellationToken)
+        public async UniTask Attack(float force, CancellationToken cancellationToken)
         {
             OnAttackStart?.Invoke();
             if(comboExpirationRoutine is not null) 
@@ -71,7 +66,10 @@ namespace Gameplay.Player
             attack.Enable();
             hitbox.Disable();
 
-            await PlayerMovement.Dash(dashDuration, cancellationToken: cancellationToken)
+            await PlayerMovement.Dash(
+                    dashDuration, 
+                    force,
+                    cancellationToken: cancellationToken)
                 .SuppressCancellationThrow();
             
             attack.Disable();
@@ -79,7 +77,7 @@ namespace Gameplay.Player
             hitbox.Enable();
         }
 
-        public async UniTask ComboAttack(float duration, CancellationToken cancellationToken)
+        public async UniTask WhirlwindAttack(float duration, CancellationToken cancellationToken)
         {
             OnAttackStart?.Invoke();
             IsInComboDash = true;
@@ -90,12 +88,11 @@ namespace Gameplay.Player
             attack.Enable();
             hitbox.Disable();
 
-            await PlayerMovement.ComboDash(duration, comboRotationSpeed, cancellationToken: cancellationToken)
+            await PlayerMovement.ComboDash(duration, cancellationToken: cancellationToken)
                 .SuppressCancellationThrow();
             
             attack.transform.localPosition = defaultAttackPosition;
             attack.Disable();
-            // ExpireCombo();
             hitbox.Enable();
             PlayerAudioController.Instance.StopAction();
             IsInComboDash = false;

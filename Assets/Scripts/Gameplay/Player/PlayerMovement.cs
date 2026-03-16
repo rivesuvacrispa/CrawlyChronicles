@@ -80,7 +80,7 @@ namespace Gameplay.Player
                 .Forget();
         }
 
-        public static async UniTask Dash(float duration, CancellationToken cancellationToken)
+        public static async UniTask Dash(float duration, float force, CancellationToken cancellationToken)
         {
             CancelKnockback();
             
@@ -89,17 +89,17 @@ namespace Gameplay.Player
             bool facingStraight = Mathf.Abs(PlayerPhysicsBody.Rigidbody.rotation - direction) < 30f;
             
             if (facingStraight)
-                await instance.StraightDashTask(position, duration, cancellationToken: cancellationToken);
+                await instance.StraightDashTask(position, duration, force, cancellationToken: cancellationToken);
             else
                 await instance.SideDashTask(position, direction, duration, cancellationToken: cancellationToken);
 
         }
 
-        public static async UniTask ComboDash(float duration, float speed, CancellationToken cancellationToken)
+        public static async UniTask ComboDash(float duration, CancellationToken cancellationToken)
         {
             CancelKnockback();
 
-            await instance.ComboDashTask(duration, speed, cancellationToken: cancellationToken);
+            await instance.ComboDashTask(duration, cancellationToken: cancellationToken);
         }
 
 
@@ -126,11 +126,11 @@ namespace Gameplay.Player
             enabled = true;
         }
 
-        private async UniTask StraightDashTask(Vector2 position, float duration, CancellationToken cancellationToken)
+        private async UniTask StraightDashTask(Vector2 position, float duration, float force, CancellationToken cancellationToken)
         {
             enabled = false;
             PlayerAnimator.PlayIdle();
-            rb.AddClampedForceTowards(position, PlayerManager.PlayerStats.AttackPower * MoveSpeedAmplifier, ForceMode2D.Impulse);
+            rb.AddClampedForceTowards(position, force, ForceMode2D.Impulse);
 
             await UniTask.Delay(TimeSpan.FromSeconds(duration), cancellationToken: cancellationToken)
                 .SuppressCancellationThrow()
@@ -141,15 +141,15 @@ namespace Gameplay.Player
             enabled = true;
         }
 
-        private async UniTask ComboDashTask(float duration, float speed, CancellationToken cancellationToken)
+        private async UniTask ComboDashTask(float duration, CancellationToken cancellationToken)
         {
             enabled = false;
-            rb.angularVelocity = speed;
+            rb.angularVelocity = 60;
             float t = 0;
 
             while (t < duration)
             {
-                rb.rotation += speed / PlayerSizeManager.CurrentSize;
+                rb.rotation += 60f / PlayerSizeManager.CurrentSize;
                 rb.AddClampedForceTowards(
                     MainCamera.WorldMousePos,
                     PlayerManager.PlayerStats.AttackPower * MoveSpeedAmplifier * comboDashSpeedAmplifier,
