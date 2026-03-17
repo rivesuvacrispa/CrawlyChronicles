@@ -10,7 +10,8 @@ namespace Gameplay.Mutations
         public delegate void CooldownEvent(float currentCooldown, float baseCooldown);
         public event CooldownEvent OnCooldownChanged;
         public new ActiveMutation Scriptable => (ActiveMutation) scriptable;
-        public float BaseCooldown => Scriptable.GetCooldown(level);
+        public float BaseCooldown => Scriptable.GetCooldown(level) * (1 - PlayerManager.PlayerStats.CooldownReduction);
+
         public bool Autocast { get; set; }
 
         protected float CurrentCooldown

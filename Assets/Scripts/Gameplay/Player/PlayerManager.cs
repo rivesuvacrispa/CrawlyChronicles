@@ -97,7 +97,7 @@ namespace Gameplay.Player
         {
             Debug.Log("Added player stats:");
             Debug.Log(stats.Print());
-            currentStats.AddStats(PlayerStats.Minimal, stats);
+            currentStats.AddStats(stats);
             OnStatsChanged?.Invoke();
         }
         

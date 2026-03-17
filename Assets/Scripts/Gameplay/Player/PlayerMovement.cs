@@ -87,6 +87,9 @@ namespace Gameplay.Player
             Vector2 position = MainCamera.WorldMousePos;
             float direction = PhysicsUtility.RotationTowards(PlayerPhysicsBody.Rigidbody.position, PlayerPhysicsBody.Rigidbody.rotation, position, 360);
             bool facingStraight = Mathf.Abs(PlayerPhysicsBody.Rigidbody.rotation - direction) < 30f;
+
+            if (duration > 0.5f) 
+                duration = 0.5f;
             
             if (facingStraight)
                 await instance.StraightDashTask(position, duration, force, cancellationToken: cancellationToken);
@@ -133,8 +136,8 @@ namespace Gameplay.Player
             rb.AddClampedForceTowards(position, force, ForceMode2D.Impulse);
 
             await UniTask.Delay(TimeSpan.FromSeconds(duration), cancellationToken: cancellationToken)
-                .SuppressCancellationThrow()
-                ;
+                .SuppressCancellationThrow();
+            
             await UniTask.DelayFrame(1, cancellationToken: cancellationToken)
                 .SuppressCancellationThrow();
             

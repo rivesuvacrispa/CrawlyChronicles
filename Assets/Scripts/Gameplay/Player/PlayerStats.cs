@@ -5,7 +5,7 @@ using UnityEngine.Localization.Tables;
 
 namespace Gameplay.Player
 {
-    [System.Serializable]
+    [Serializable]
     public struct PlayerStats : IEquatable<PlayerStats>
     {
         [SerializeField] private float movementSpeed;
@@ -16,10 +16,12 @@ namespace Gameplay.Player
         [SerializeField] private float armor;
         [SerializeField] private float immunityDuration;
         [SerializeField] private float abilityDamage;
+        [SerializeField] private float cooldownReduction;
         [SerializeField] private float passiveProcRate;
         [SerializeField] private float mutagenicity;
         [SerializeField] private int bonusSummonAmount;
         [SerializeField] private float summonDamage;
+        [SerializeField] private float projectileAmount;
 
         public float MaxHealth => maxHealth;
         public float AttackPower => attackPower;
@@ -33,18 +35,22 @@ namespace Gameplay.Player
         public float Mutagenicity => mutagenicity;
         public int BonusSummonAmount => bonusSummonAmount;
         public float SummonDamage => summonDamage;
+        public float CooldownReduction => cooldownReduction;
+        public float ProjectileAmount => projectileAmount;
+        
 
         private static readonly TableEntryReference PlayerStatsStringReference = "Essentials_PlayerStats";
-        private static readonly TableEntryReference PlayerStatsComparedStringReference = "Essentials_PlayerStatsCompared";
+
+        private static readonly TableEntryReference PlayerStatsComparedStringReference =
+            "Essentials_PlayerStatsCompared";
+
         private static readonly TableReference EssentialsTableReference = "UI_Essentials";
 
 
-        
-        
-        public PlayerStats(float movementSpeed = 0, float rotationSpeed = 0, float maxHealth = 0, 
+        public PlayerStats(float movementSpeed = 0, float rotationSpeed = 0, float maxHealth = 0,
             float attackPower = 0, float attackDamage = 0, float armor = 0, float immunityDuration = 0,
             float abilityDamage = 0, float passiveProcRate = 0, float mutagenicity = 0, int bonusSummonAmount = 0,
-            float summonDamage = 0)
+            float summonDamage = 0, float cooldownReduction = 0, float projectileAmount = 0)
         {
             this.movementSpeed = movementSpeed;
             this.rotationSpeed = rotationSpeed;
@@ -58,10 +64,14 @@ namespace Gameplay.Player
             this.mutagenicity = mutagenicity;
             this.bonusSummonAmount = bonusSummonAmount;
             this.summonDamage = summonDamage;
+            this.cooldownReduction = cooldownReduction;
+            this.projectileAmount = projectileAmount;
         }
 
-        public void AddStats(PlayerStats baseStats, PlayerStats stats)
+        public void AddStats(PlayerStats stats)
         {
+            var baseStats = Minimal;
+            
             movementSpeed = Mathf.Clamp(MovementSpeed + stats.MovementSpeed, baseStats.MovementSpeed, 100);
             rotationSpeed = Mathf.Clamp(RotationSpeed + stats.RotationSpeed, baseStats.RotationSpeed, float.MaxValue);
             maxHealth = Mathf.Clamp(MaxHealth + stats.MaxHealth, baseStats.MaxHealth, float.MaxValue);
@@ -72,26 +82,32 @@ namespace Gameplay.Player
             abilityDamage = Mathf.Clamp(abilityDamage + stats.abilityDamage, baseStats.abilityDamage, float.MaxValue);
             passiveProcRate = Mathf.Clamp(passiveProcRate + stats.passiveProcRate, baseStats.passiveProcRate, 1f);
             mutagenicity = Mathf.Clamp(mutagenicity + stats.mutagenicity, baseStats.mutagenicity, 100);
-            bonusSummonAmount = Mathf.Clamp(bonusSummonAmount + stats.bonusSummonAmount, baseStats.bonusSummonAmount, 100);
+            bonusSummonAmount =
+                Mathf.Clamp(bonusSummonAmount + stats.bonusSummonAmount, baseStats.bonusSummonAmount, 100);
             summonDamage = Mathf.Clamp(summonDamage + stats.summonDamage, baseStats.summonDamage, float.MaxValue);
+            cooldownReduction = Mathf.Clamp(cooldownReduction + stats.cooldownReduction, -1f, 1f);
+            projectileAmount = Mathf.Clamp(projectileAmount + stats.projectileAmount, baseStats.projectileAmount, 100);
         }
 
         public static PlayerStats LerpLevel(PlayerStats lvl1, PlayerStats lvl10, int level)
         {
+            float t = level / 9f;
             return new PlayerStats(
-                movementSpeed: Mathf.Lerp(lvl1.MovementSpeed,lvl10.MovementSpeed,level / 9f),
-                rotationSpeed: Mathf.Lerp(lvl1.RotationSpeed,lvl10.RotationSpeed,level / 9f),
-                maxHealth: Mathf.Lerp(lvl1.MaxHealth,lvl10.MaxHealth,level / 9f),
-                attackPower: Mathf.Lerp(lvl1.AttackPower,lvl10.AttackPower,level / 9f),
-                attackDamage: Mathf.Lerp(lvl1.AttackDamage,lvl10.AttackDamage,level / 9f),
-                armor: Mathf.Lerp(lvl1.Armor,lvl10.Armor,level / 9f),
-                immunityDuration: Mathf.Lerp(lvl1.ImmunityDuration,lvl10.ImmunityDuration,level / 9f),
-                abilityDamage: Mathf.Lerp(lvl1.abilityDamage,lvl10.abilityDamage,level / 9f),
-                passiveProcRate: Mathf.Lerp(lvl1.passiveProcRate,lvl10.passiveProcRate,level / 9f),
-                mutagenicity: Mathf.Lerp(lvl1.mutagenicity,lvl10.mutagenicity,level / 9f),
-                bonusSummonAmount: Mathf.RoundToInt(Mathf.Lerp(lvl1.bonusSummonAmount,lvl10.bonusSummonAmount,level / 9f)),
-                summonDamage: Mathf.Lerp(lvl1.summonDamage,lvl10.summonDamage,level / 9f)
-                );
+                movementSpeed: Mathf.Lerp(lvl1.MovementSpeed, lvl10.MovementSpeed, t),
+                rotationSpeed: Mathf.Lerp(lvl1.RotationSpeed, lvl10.RotationSpeed, t),
+                maxHealth: Mathf.Lerp(lvl1.MaxHealth, lvl10.MaxHealth, t),
+                attackPower: Mathf.Lerp(lvl1.AttackPower, lvl10.AttackPower, t),
+                attackDamage: Mathf.Lerp(lvl1.AttackDamage, lvl10.AttackDamage, t),
+                armor: Mathf.Lerp(lvl1.Armor, lvl10.Armor, t),
+                immunityDuration: Mathf.Lerp(lvl1.ImmunityDuration, lvl10.ImmunityDuration, t),
+                abilityDamage: Mathf.Lerp(lvl1.abilityDamage, lvl10.abilityDamage, t),
+                passiveProcRate: Mathf.Lerp(lvl1.passiveProcRate, lvl10.passiveProcRate, t),
+                mutagenicity: Mathf.Lerp(lvl1.mutagenicity, lvl10.mutagenicity, t),
+                bonusSummonAmount: Mathf.RoundToInt(Mathf.Lerp(lvl1.bonusSummonAmount, lvl10.bonusSummonAmount, t)),
+                summonDamage: Mathf.Lerp(lvl1.summonDamage, lvl10.summonDamage, t),
+                cooldownReduction: Mathf.Lerp(lvl1.cooldownReduction, lvl10.cooldownReduction, t),
+                projectileAmount: Mathf.Lerp(lvl1.projectileAmount, lvl10.projectileAmount, t)
+            );
         }
 
         public PlayerStats Negated()
@@ -108,12 +124,14 @@ namespace Gameplay.Player
                 passiveProcRate: -passiveProcRate,
                 mutagenicity: -mutagenicity,
                 bonusSummonAmount: -bonusSummonAmount,
-                summonDamage: -summonDamage
-                );
+                summonDamage: -summonDamage,
+                cooldownReduction: -cooldownReduction,
+                projectileAmount: -projectileAmount
+            );
         }
 
         public static readonly PlayerStats Zero = new();
-        
+
         public static readonly PlayerStats Minimal = new(
             movementSpeed: 0.1f,
             rotationSpeed: 0.1f,
@@ -126,8 +144,10 @@ namespace Gameplay.Player
             passiveProcRate: 0,
             mutagenicity: 0f,
             bonusSummonAmount: 0,
-            summonDamage: 0f
-            );
+            summonDamage: 0f,
+            cooldownReduction: 0f,
+            projectileAmount: 0f
+        );
 
         public object[] GetStringArguments()
         {
@@ -142,21 +162,29 @@ namespace Gameplay.Player
                 (int)(abilityDamage * 100),
                 (int)(mutagenicity * 100),
                 bonusSummonAmount,
-                (int)(summonDamage * 100)
+                (int)(summonDamage * 100),
+                (int)(cooldownReduction * 100),
+                (int)(projectileAmount * 100),
             };
         }
-        
+
         public string Print(object[] args = null)
         {
             return LocalizationSettings.StringDatabase
-                .GetLocalizedString(EssentialsTableReference, PlayerStatsStringReference, args ?? GetStringArguments());
+                .GetLocalizedString(
+                    EssentialsTableReference,
+                    PlayerStatsStringReference,
+                    args ?? GetStringArguments()
+                );
         }
 
         public string PrintCompared(PlayerStats with)
         {
-            int abilityDmg = (int) (abilityDamage * 100);
-            int summonDmg = (int) (summonDamage * 100);
-            int muta = (int) (mutagenicity * 100);
+            int abilityDmg = (int)(abilityDamage * 100);
+            int summonDmg = (int)(summonDamage * 100);
+            int muta = (int)(mutagenicity * 100);
+            int cooldownRed = (int)(cooldownReduction * 100);
+            int projAmount = (int)(projectileAmount * 100);
             return LocalizationSettings.StringDatabase
                 .GetLocalizedString(EssentialsTableReference, PlayerStatsComparedStringReference,
                     arguments: new object[]
@@ -181,7 +209,7 @@ namespace Gameplay.Player
                         armor - with.armor,
                         // 12
                         abilityDmg,
-                        abilityDmg - (int) (with.abilityDamage * 100),
+                        abilityDmg - (int)(with.abilityDamage * 100),
                         // 14
                         muta,
                         muta - (int)(with.mutagenicity * 100),
@@ -190,27 +218,35 @@ namespace Gameplay.Player
                         bonusSummonAmount - with.bonusSummonAmount,
                         // 18
                         summonDmg,
-                        summonDmg - (int) (with.summonDamage * 100)
+                        summonDmg - (int)(with.summonDamage * 100),
+                        // 20
+                        cooldownRed,
+                        cooldownRed - (int)(with.cooldownReduction * 100),
+                        // 22
+                        projAmount,
+                        projAmount - (int)(with.projectileAmount * 100)
                     });
         }
 
         public static bool operator ==(PlayerStats a, PlayerStats b) => a.Equals(b);
         public static bool operator !=(PlayerStats a, PlayerStats b) => !a.Equals(b);
-        
+
         public bool Equals(PlayerStats other)
         {
-            return Mathf.Approximately(movementSpeed,     other.movementSpeed) &&
-                   Mathf.Approximately(rotationSpeed,     other.rotationSpeed) &&
-                   Mathf.Approximately(maxHealth,         other.maxHealth) &&
-                   Mathf.Approximately(attackPower,       other.attackPower) &&
-                   Mathf.Approximately(attackDamage,      other.attackDamage) &&
-                   Mathf.Approximately(armor,             other.armor) &&
-                   Mathf.Approximately(immunityDuration,  other.immunityDuration) &&
-                   Mathf.Approximately(abilityDamage,     other.abilityDamage) &&
-                   Mathf.Approximately(passiveProcRate,   other.passiveProcRate) &&
-                   Mathf.Approximately(mutagenicity,      other.mutagenicity) &&
+            return Mathf.Approximately(movementSpeed, other.movementSpeed) &&
+                   Mathf.Approximately(rotationSpeed, other.rotationSpeed) &&
+                   Mathf.Approximately(maxHealth, other.maxHealth) &&
+                   Mathf.Approximately(attackPower, other.attackPower) &&
+                   Mathf.Approximately(attackDamage, other.attackDamage) &&
+                   Mathf.Approximately(armor, other.armor) &&
+                   Mathf.Approximately(immunityDuration, other.immunityDuration) &&
+                   Mathf.Approximately(abilityDamage, other.abilityDamage) &&
+                   Mathf.Approximately(passiveProcRate, other.passiveProcRate) &&
+                   Mathf.Approximately(mutagenicity, other.mutagenicity) &&
                    bonusSummonAmount == other.bonusSummonAmount &&
-                   Mathf.Approximately(summonDamage,      other.summonDamage);
+                   Mathf.Approximately(summonDamage, other.summonDamage) &&
+                   Mathf.Approximately(cooldownReduction, other.cooldownReduction) &&
+                   Mathf.Approximately(projectileAmount, other.projectileAmount);
         }
 
         // -----------------------------------------------------------------
@@ -218,7 +254,7 @@ namespace Gameplay.Player
         // -----------------------------------------------------------------
         public override bool Equals(object obj)
             => obj is PlayerStats other && Equals(other);
-        
+
         private const float HASH_PRECISION = 1000f; // 0.001 granularity
 
         public override int GetHashCode()
@@ -239,7 +275,8 @@ namespace Gameplay.Player
                 hash = hash * 23 + RoundForHash(mutagenicity).GetHashCode();
                 hash = hash * 23 + bonusSummonAmount.GetHashCode();
                 hash = hash * 23 + RoundForHash(summonDamage).GetHashCode();
-
+                hash = hash * 23 + RoundForHash(cooldownReduction).GetHashCode();
+                hash = hash * 23 + RoundForHash(projectileAmount).GetHashCode();
                 return hash;
             }
         }

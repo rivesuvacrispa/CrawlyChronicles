@@ -1,17 +1,13 @@
-﻿using System.Collections.Generic;
-using Gameplay.Effects.ChainLightning;
-using Gameplay.Mutations.AttackEffects;
+﻿using Gameplay.Effects.ChainLightning;
 using Gameplay.Player;
 using Hitboxes;
 using Pooling;
 using UnityEngine;
-using Util.Interfaces;
 
 namespace Gameplay.Mutations.Passive
 {
-    public class StaticChargers : BasicAbility
+    public class StaticChargers : ActiveAbility
     {
-        [SerializeField] private Gradient effectGradient;
         [Header("Damage")]
         [SerializeField] private float damageLvl1;
         [SerializeField] private float damageLvl10;        
@@ -29,7 +25,6 @@ namespace Gameplay.Mutations.Passive
         [SerializeField, Range(0, 1)] private float dmgReductionLvl10;
         
         
-        private AttackEffect attackEffect;
         private float damage;
         private float chainRange;
         private int maxNumberOfJumps;
@@ -38,12 +33,6 @@ namespace Gameplay.Mutations.Passive
 
 
         
-        protected override void Start()
-        {
-            attackEffect = new AttackEffect(effectGradient, OnImpact);
-            base.Start();
-        }
-
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
@@ -54,30 +43,24 @@ namespace Gameplay.Mutations.Passive
             dmgReduction = LerpLevel(dmgReductionLvl1, dmgReductionLvl10, lvl);
         }
 
-        private void OnImpact(IImpactable impactable, float _)
+        public override void Activate(bool auto = false)
         {
-            if (impactable is not IDamageable damageable) return;
-
-            var targetPos = damageable.Transform.position;
-            PoolManager.GetEffect<ChainLightning>(new ChainLightningArguments(
-                damage, chainRange, maxNumberOfJumps, damageable, 0, targetPos, stunDuration, dmgReduction));
+            Vector3 pos = PlayerPhysicsBody.Position;
+            if (ChainLightning.TryGetTarget(pos, chainRange, out IDamageableEnemy _))
+            {
+                base.Activate(auto);
+                PoolManager.GetEffect<ChainLightning>(new ChainLightningArguments(
+                    damage, chainRange, maxNumberOfJumps, null, 0, pos, stunDuration, dmgReduction));
+            }
+            else
+            {
+                SetOnCooldown(1f);
+            }
         }
 
-        private void OnAttackEffectCollectionRequested(List<AttackEffect> effects)
+        protected override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
         {
-            effects.Add(attackEffect);
-        }
-
-        protected override void OnEnable()
-        {
-            base.OnEnable();
-            BasePlayerAttack.OnAttackEffectCollectionRequested += OnAttackEffectCollectionRequested;
-        }
-
-        protected override void OnDisable()
-        {
-            base.OnDisable();
-            BasePlayerAttack.OnAttackEffectCollectionRequested -= OnAttackEffectCollectionRequested;
+            return null;
         }
     }
 }

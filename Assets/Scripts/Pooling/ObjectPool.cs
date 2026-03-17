@@ -9,6 +9,7 @@ namespace Pooling
         [SerializeField] private T prefab;
 
         private readonly Stack<T> objectStack = new();
+        private int instanceCounter;
 
         
         
@@ -18,7 +19,14 @@ namespace Pooling
         {
             bool popped = objectStack.TryPop(out T pop);
             T obj = popped ? pop : Instantiate(prefab.GameObject).GetComponent<T>();
-            obj.OnFirstInstantiated();
+            
+            if (!popped)
+            {
+                instanceCounter++;
+                obj.OnFirstInstantiated();
+                obj.GameObject.name += $"{prefab.GameObject.name}_{instanceCounter}";
+            }
+            
             if (!obj.OnTakenFromPool(data))
             {
                 Pool(obj);
@@ -32,12 +40,7 @@ namespace Pooling
             if (popped) return obj;
             
             obj.ObjectPool = this;
-            OnInstantiated(obj);
             return obj; 
-        }
-
-        protected virtual void OnInstantiated(T obj)
-        {
         }
 
         public void Pool(IPoolable effectObject)

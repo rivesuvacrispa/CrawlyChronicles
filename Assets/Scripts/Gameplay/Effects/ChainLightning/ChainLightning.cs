@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -17,11 +18,11 @@ namespace Gameplay.Effects.ChainLightning
         [SerializeField] private new ParticleSystemLineRenderer particleSystem;
         [SerializeField] private ParticleSystem singleTargetParticles;
         [SerializeField] private AudioSource audioSource;
-        
+
         private ChainLightningArguments currentArgs;
-        
-        
-        
+        private static readonly List<Collider2D> Results = new(16);
+
+
         public override bool OnTakenFromPool(object data)
         {
             if (data is not ChainLightningArguments args) return false;
@@ -33,46 +34,74 @@ namespace Gameplay.Effects.ChainLightning
 
         private void Activate()
         {
-            DamageTarget();
-            CancellationToken cancellationToken = gameObject.GetCancellationTokenOnDestroy();
+            Debug.Log($"Lightning instantiated for {gameObject.name}");
 
-            if (currentArgs.currentJump < currentArgs.maxNumberOfJumps && TryCreateArc(out IDamageable target))
-                PropagateTask(target, cancellationToken).Forget();
+            CancellationToken cancellationToken = gameObject.GetCancellationTokenOnDestroy();
+            
+            if (currentArgs.currentJump < currentArgs.maxNumberOfJumps && 
+                TryCreateArc(out IDamageableEnemy target))
+            {
+                Debug.Log($"Arc created for {gameObject.name}");
+                DamageTarget(target);
+
+                if (TryGetTarget(target.Transform.position, currentArgs.chainRange, out IDamageableEnemy nextTarget) &&
+                    !nextTarget.Equals(target))
+                {
+                    PropagateTask(nextTarget, cancellationToken).Forget();
+                }
+            }
 
             PoolTask(cancellationToken).Forget();
         }
 
-        private bool TryCreateArc(out IDamageable target)
+        public static bool TryGetTarget(
+            Vector3 pos,
+            float range,
+            out IDamageableEnemy target)
         {
             target = null;
-            var cols = Physics2D.OverlapCircleAll(currentArgs.position, currentArgs.chainRange, layerMask: GlobalDefinitions.EnemyPhysicsLayerMask);
+            Results.Clear();
+            Physics2D.OverlapCircle(pos, range, GlobalDefinitions.EnemyPhysicsContactFilter, Results);
 
+            var targetCol = Results.Where(col => col.TryGetComponent(out IDamageableEnemy _))
+                .OrderBy(_ => Random.value)
+                .FirstOrDefault();
+
+            if (targetCol is null) return false;
+
+            target = targetCol.GetComponent<IDamageableEnemy>();
+            return true;
+        }
+
+        private bool TryCreateArc(out IDamageableEnemy target)
+        {
+            target = null;
             DamageSource source = new DamageSource(this);
-            foreach (Collider2D col in cols.OrderBy((_) => Random.value))
-            {
-                if (!col.TryGetComponent(out IDamageableEnemy damageableEnemy) ||
-                    damageableEnemy.Equals(currentArgs.currentTarget) ||
-                    damageableEnemy.Hitbox.ImmuneToSource(source)) continue;
 
-                target = damageableEnemy;
-                break;
-            }
-            
-            if (target is null)
+
+            if (!TryGetTarget(
+                    currentArgs.position,
+                    currentArgs.chainRange,
+                    out IDamageableEnemy t
+                ) ||
+                t.Equals(currentArgs.currentTarget) ||
+                t.Hitbox.ImmuneToSource(source))
             {
                 particleSystem.PlayOnAwake = false;
                 audioSource.playOnAwake = false;
                 return false;
             }
 
+            target = t;
+
             particleSystem.PlayOnAwake = true;
             audioSource.playOnAwake = true;
             audioSource.pitch = Random.Range(1, 1.2f);
-            
+
             Vector3 fromPos = transform.TransformPoint(currentArgs.position);
             Vector3 toPos = transform.TransformPoint(target.Transform.position);
             float distance = Vector2.Distance(fromPos, toPos);
-            
+
             int steps = Mathf.RoundToInt(distance / 0.25f);
             Vector3[] positions = new Vector3[steps + 2];
             positions[0] = fromPos;
@@ -88,21 +117,21 @@ namespace Gameplay.Effects.ChainLightning
             return true;
         }
 
-        private void DamageTarget()
+        private void DamageTarget(IDamageableEnemy enemy)
         {
-            currentArgs.currentTarget.Damage(new DamageInstance(
-                    new DamageSource(this),
-                    currentArgs.damage, 
-                    transform.position, 
-                    stunDuration: currentArgs.stunDuration, 
-                    piercing: true));
+            enemy.Damage(new DamageInstance(
+                new DamageSource(this),
+                currentArgs.damage,
+                transform.position,
+                stunDuration: currentArgs.stunDuration,
+                piercing: true));
         }
 
         private async UniTask PoolTask(CancellationToken cancellationToken)
         {
-            await UniTask.WaitUntil(() => 
-                    !particleSystem.IsPlaying && 
-                    !singleTargetParticles.isPlaying, 
+            await UniTask.WaitUntil(() =>
+                    !particleSystem.IsPlaying &&
+                    !singleTargetParticles.isPlaying,
                 cancellationToken: cancellationToken);
 
             ((IPoolable)this).Pool();
@@ -118,10 +147,10 @@ namespace Gameplay.Effects.ChainLightning
         {
             var targetPos = damageable.Transform.position;
             PoolManager.GetEffect<ChainLightning>(new ChainLightningArguments(
-                currentArgs.damage * currentArgs.dmgReduction, 
-                currentArgs.chainRange, 
-                currentArgs.maxNumberOfJumps, 
-                damageable, 
+                currentArgs.damage * currentArgs.dmgReduction,
+                currentArgs.chainRange,
+                currentArgs.maxNumberOfJumps,
+                damageable,
                 currentArgs.currentJump + 1,
                 targetPos,
                 currentArgs.stunDuration,

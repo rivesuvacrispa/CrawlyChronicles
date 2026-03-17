@@ -11,6 +11,7 @@ using UI.Menus;
 using UnityEngine;
 using Util;
 using Util.Interfaces;
+using Random = UnityEngine.Random;
 
 namespace Gameplay.Mutations
 {
@@ -56,7 +57,14 @@ namespace Gameplay.Mutations
             
         }
 
-        protected static float GetPassiveProcRate(float proc) => proc * PlayerManager.PlayerStats.PassiveProcRate;
+        protected static bool TryProc(float baseRate)
+        {
+            float x = PlayerManager.PlayerStats.PassiveProcRate;
+            float powBase = 1 / (1 - baseRate) * -1;
+            float powAmount = (2 * x + 1) * -1;
+            float mapped = Mathf.Pow(powBase, powAmount) + 1;
+            return Random.value < mapped;
+        }
 
         public static float GetAbilityDamage(float damage) => damage + damage * PlayerManager.PlayerStats.AbilityDamage;
         

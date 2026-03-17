@@ -41,7 +41,7 @@ namespace Gameplay.Mutations.Passive
         
         private void OnAttackEffectCollectionRequested(List<AttackEffect> effects)
         {
-            if (Random.value <= procChance)
+            if (TryProc(procChance))
             {
                 attackSource.Play();
                 effects.Add(new DeadlyStrikeAttackEffect(effectGradient, OnImpact,

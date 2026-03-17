@@ -20,7 +20,6 @@ namespace Gameplay.Player
         [Header("Stats")]
         [SerializeField] private float dashDuration;
 
-        private Coroutine comboExpirationRoutine;
 
         public delegate void AttackControllerEvent();
         public static event AttackControllerEvent OnAttackStart;
@@ -61,8 +60,6 @@ namespace Gameplay.Player
         public async UniTask Attack(float force, CancellationToken cancellationToken)
         {
             OnAttackStart?.Invoke();
-            if(comboExpirationRoutine is not null) 
-                StopCoroutine(comboExpirationRoutine);
             attack.Enable();
             hitbox.Disable();
 
@@ -73,7 +70,6 @@ namespace Gameplay.Player
                 .SuppressCancellationThrow();
             
             attack.Disable();
-            // StartComboExpiration();
             hitbox.Enable();
         }
 
@@ -82,8 +78,6 @@ namespace Gameplay.Player
             OnAttackStart?.Invoke();
             IsInComboDash = true;
             PlayerAudioController.Instance.PlayCombo();
-            if(comboExpirationRoutine is not null) 
-                StopCoroutine(comboExpirationRoutine);
             attack.transform.localPosition = comboAttackPosition;
             attack.Enable();
             hitbox.Disable();

@@ -43,7 +43,8 @@ namespace Gameplay.Mutations.Passive
         
         private void OnStruck()
         {
-            if(Random.value <= GetPassiveProcRate(procRate)) Activate();
+            if(TryProc(procRate)) 
+                Activate();
         }
 
         protected override void OnBulletCollision(IDamageable damageable, int collisionID)

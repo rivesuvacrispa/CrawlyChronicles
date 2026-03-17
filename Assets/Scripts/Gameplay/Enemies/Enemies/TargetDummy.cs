@@ -39,6 +39,7 @@ namespace Gameplay.Enemies.Enemies
         private void Die()
         {
             audioController.PlayAction(scriptable.DeathAudio, pitch: SoundUtility.GetRandomPitchTwoSided(0.15f));
+            OnDeath?.Invoke(this);
             Start();
         }
         
