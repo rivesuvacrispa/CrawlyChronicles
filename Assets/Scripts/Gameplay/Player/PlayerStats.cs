@@ -165,7 +165,7 @@ namespace Gameplay.Player
                 (int)(summonDamage * 100),
                 (int)(cooldownReduction * 100),
                 (int)(projectileAmount * 100),
-            };
+            };;
         }
 
         public string Print(object[] args = null)

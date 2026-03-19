@@ -2,11 +2,11 @@
 {
     public class EntityEffectData
     {
-        public int Duration { get; }
+        public int DurationInSeconds { get; }
 
-        public EntityEffectData(int duration)
+        public EntityEffectData(int durationInSecondsInSeconds)
         {
-            Duration = duration;
+            DurationInSeconds = durationInSecondsInSeconds;
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Pooling
         
         public Type GetPoolableType() => typeof(T);
 
-        public IPoolable GetEffectObject(object data, Vector3 position, Quaternion rotation)
+        public IPoolable GetEffectObject(object data, Vector3? position = null, Quaternion? rotation = null)
         {
             bool popped = objectStack.TryPop(out T pop);
             T obj = popped ? pop : Instantiate(prefab.GameObject).GetComponent<T>();
@@ -24,8 +24,14 @@ namespace Pooling
             {
                 instanceCounter++;
                 obj.OnFirstInstantiated();
-                obj.GameObject.name += $"{prefab.GameObject.name}_{instanceCounter}";
+                obj.GameObject.name = $"{prefab.GameObject.name}_{instanceCounter}";
             }
+
+            if (position is not null)
+                obj.GameObject.transform.position = position.Value;
+            
+            if (rotation is not null)
+                obj.GameObject.transform.rotation = rotation.Value;
             
             if (!obj.OnTakenFromPool(data))
             {
@@ -33,10 +39,6 @@ namespace Pooling
                 return null;
             };
             
-            if (!position.Equals(default))
-                obj.GameObject.transform.position = position;
-            if (!rotation.Equals(default))
-                obj.GameObject.transform.rotation = rotation;
             if (popped) return obj;
             
             obj.ObjectPool = this;

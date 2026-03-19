@@ -334,6 +334,7 @@ namespace Gameplay.Bosses.Terrorwing
 
         public void Die(bool fromPlayer)
         {
+            OnUnitDetach?.Invoke();
             died = true;
             OnDeath?.Invoke(this);
             DisposeAll();
@@ -440,5 +441,12 @@ namespace Gameplay.Bosses.Terrorwing
         public Vector3 AttackPosition => transform.position + (Vector3) Random.insideUnitCircle.normalized;
         public float AttackDamage => TerrorwingDefinitions.ContactDamage;
         public float AttackPower => 10;
+        
+        
+        
+        
+        // IUnitTarget
+        public bool CanAggroUnit => !Hitbox.Dead;
+        public event IUnitTarget.UnitTargetEvent OnUnitDetach;
     }
 }

@@ -91,5 +91,11 @@ namespace Gameplay.Mutations
         {
             return gameObject.CreateCommonCancellationToken(tokens);
         }
+
+        public static float CalculateSummonDamage(float baseDamage) =>
+            baseDamage * (1 + PlayerManager.PlayerStats.SummonDamage);
+        
+        public static int CalculateSummonsAmount(int baseAmount) =>
+            baseAmount + PlayerManager.PlayerStats.BonusSummonAmount;
     }
 }

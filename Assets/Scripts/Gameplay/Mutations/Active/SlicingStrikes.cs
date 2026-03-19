@@ -75,7 +75,8 @@ namespace Gameplay.Mutations.Active
                     Vector3 targetPos = e.Transform.position;
                     Vector3 spawnPos = targetPos + (Vector3)Random.insideUnitCircle.normalized * 1.25f;
                     PoolManager.GetEffect<PhantomPlayerAttack>(
-                        new PhantomPlayerAttackArguments(spawnPos, targetPos, bonusDamage)
+                        new PhantomPlayerAttackArguments(targetPos, bonusDamage),
+                        spawnPos
                     );
                 }
 

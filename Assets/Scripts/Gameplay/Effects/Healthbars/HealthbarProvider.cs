@@ -1,7 +1,6 @@
 ﻿using Hitboxes;
 using Pooling;
 using UnityEngine;
-using Util.Interfaces;
 
 namespace Gameplay.Effects.Healthbars
 {
@@ -10,9 +9,13 @@ namespace Gameplay.Effects.Healthbars
     {
         private void Start()
         {
+            ProvideHealthbar();
+        }
+
+        protected void ProvideHealthbar()
+        {
             IDamageable damageable = gameObject.GetComponent<IDamageable>();
             PoolManager.GetEffect<Healthbar>(new HealthbarArguments(damageable));
-            Debug.Log($"Provided healthbar for: {gameObject.name}");
         }
     }
 }

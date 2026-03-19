@@ -1,4 +1,5 @@
-﻿using Gameplay.Effects.DamageText;
+﻿using System.Collections.Generic;
+using Gameplay.Effects.DamageText;
 using Gameplay.Mutations.AttackEffects;
 using Pooling;
 using UnityEngine;
@@ -28,6 +29,20 @@ namespace Hitboxes
         public float MaxHealth { get; }
         public IDamageableHitbox Hitbox { get; }
 
+        public float Damage(
+            DamageSource source,
+            float rawDamage,
+            Vector3 position = default,
+            float knockback = 0f,
+            float stunDuration = 0f,
+            Color damageColor = default,
+            bool piercing = false,
+            List<AttackEffect> effects = null)
+        {
+            return Damage(new DamageInstance(source, rawDamage, position, knockback, stunDuration, damageColor,
+                piercing, effects));
+        }
+        
         public float Damage(DamageInstance instance)
         {
             if (Hitbox.ImmuneToSource(instance.source)) return 0;
@@ -38,7 +53,7 @@ namespace Hitboxes
 
             float damage = instance.CalculateDamage(Armor);
             CurrentHealth -= damage;
-            Debug.Log($"{((Component)this).gameObject.name} damaged for {damage}, piercing: {instance.piercing}");
+            // Debug.Log($"{((Component)this).gameObject.name} damaged for {damage}, piercing: {instance.piercing}");
             OnDamageTakenGlobal?.Invoke(this, instance);
             OnBeforeHit(instance);
 

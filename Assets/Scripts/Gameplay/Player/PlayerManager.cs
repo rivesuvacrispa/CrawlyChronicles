@@ -15,7 +15,7 @@ using Util.Interfaces;
 
 namespace Gameplay.Player
 {
-    public class PlayerManager : MonoBehaviour, IDamageable, IEffectAffectable
+    public class PlayerManager : MonoBehaviour, IDamageable, IEffectAffectable, IUnitTarget
     {
         public static PlayerManager Instance { get; private set; }
         
@@ -36,7 +36,6 @@ namespace Gameplay.Player
         [SerializeField] private float healthbarWidth;
         [SerializeField] private SpriteRenderer eggSpriteRenderer;
         [SerializeField] private AttackController attackController;
-        // [SerializeField] private ComboManager comboManager;
         [SerializeField] private Collider2D col;
         [SerializeField] private EffectController effectController;
         [Header("Stats")]
@@ -157,13 +156,13 @@ namespace Gameplay.Player
             
             if(invokeDeathEvent) OnPlayerKilled?.Invoke();
             OnDeath?.Invoke(this);
+            OnUnitDetach?.Invoke();
             movement.enabled = false;
             PlayerAnimator.PlayDead();
             DeathCounter.StopCounter();
             TimeManager.OnDayStart -= OnDayStart;
             Interactor.Abort();
             BreedingManager.Instance.Abort();
-            // comboManager.ExpireCombo();
             attackController.enabled = false;
             if(IsHoldingEgg) DropEgg();
             if (RespawnManager.CollectEggBeds() > 0)
@@ -254,5 +253,10 @@ namespace Gameplay.Player
         // IEffectAffectable
         public EffectController EffectController => effectController;
         public bool CanApplyEffect => true;
+        
+        
+        // IUnitTarget
+        public bool CanAggroUnit => false;
+        public event IUnitTarget.UnitTargetEvent OnUnitDetach;
     }
 }

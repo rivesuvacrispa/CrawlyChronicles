@@ -6,7 +6,7 @@ namespace Pooling
     public interface IObjectPool
     {
         public Type GetPoolableType();
-        public IPoolable GetEffectObject(object data, Vector3 position, Quaternion rotation);
+        public IPoolable GetEffectObject(object data, Vector3? position = null, Quaternion? rotation = null);
         public void Pool(IPoolable effectObject);
     }
 }

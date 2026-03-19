@@ -2,5 +2,5 @@
 
 namespace Hitboxes
 {
-    public interface IDamageableEnemy : IDamageable, IImpactable { }
+    public interface IDamageableEnemy : IDamageable, IImpactable, IUnitTarget { }
 }

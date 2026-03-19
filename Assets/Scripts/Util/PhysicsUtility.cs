@@ -15,6 +15,10 @@ namespace Util
         public static void RotateTowardsPosition(this Rigidbody2D rb, Vector2 targetPos, float delta) 
             => rb.rotation = RotationTowards(rb.position, rb.rotation, targetPos, delta);
 
+        public static void RotateTowardsPosition(this Transform transform, Vector2 targetPos, float delta) 
+            => transform.rotation = Quaternion.Euler(
+                0, 0, RotationTowards(transform.position, transform.eulerAngles.z, targetPos, delta));
+        
         public static float RotationTowards(Vector2 pos, float rot, Vector2 targetPos, float delta = 360f)
         {
             Vector2 direction = targetPos - pos;

@@ -10,7 +10,7 @@ namespace Gameplay.Mutations.EntityEffects
     public abstract class EntityEffect : MonoBehaviour
     {
         protected EntityEffectData Data { get; private set; }
-        protected int Duration { get; set; }
+        private float DurationInSeconds { get; set; }
         protected IEffectAffectable Target { get; set; }
 
         private TimeSpan tickrate = TimeSpan.FromSeconds(0.25f);
@@ -30,7 +30,7 @@ namespace Gameplay.Mutations.EntityEffects
         public void Refresh(EntityEffectData data)
         {
             Data = data;
-            Duration = data.Duration;
+            DurationInSeconds = data.DurationInSeconds;
             enabled = true;
             refreshedOnTick = TickCounter;
         }
@@ -49,14 +49,14 @@ namespace Gameplay.Mutations.EntityEffects
             {
                 await UniTask.Delay(tickrate, cancellationToken: cancellationToken);
                 
-                if (Duration == 0 && refreshedOnTick != TickCounter)
+                if (DurationInSeconds <= 0 && refreshedOnTick != TickCounter)
                 {
                     enabled = false;
                 }
-                
+
                 Tick();
                 TickCounter++;
-                Duration--;
+                DurationInSeconds -= tickrate.Milliseconds / 1000f;
             }
         }
 

@@ -45,7 +45,7 @@ namespace Hitboxes
         }
 
         // Handle other death cases that are not included in IDamageable
-        private void OnTargetDeath(IDamageable target) => Die();
+        protected virtual void OnTargetDeath(IDamageable target) => Die();
         
         /***
          * EnemyHitbox x PlayerAttack

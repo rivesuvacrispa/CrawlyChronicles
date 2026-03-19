@@ -63,11 +63,13 @@ namespace Gameplay.Bosses.Centipede
             OnDamageTaken?.Invoke(this, new DamageInstance(new DamageSource(this), 0));
             DieFromAttack();
             OnDeath?.Invoke(this);
+            OnUnitDetach?.Invoke();
         }
 
         private void DieFromAttack()
         {
             OnDeath?.Invoke(this);
+            OnUnitDetach?.Invoke();
 
             if (frontFragment is not null)
             {
@@ -251,5 +253,12 @@ namespace Gameplay.Bosses.Centipede
         public float ContactDamageStunDuration => 0;
         public Color ContactDamageColor => default;
         public bool ContactDamagePiercing => false;
+        
+        
+        
+        
+        // IUnitTarget
+        public bool CanAggroUnit => !Hitbox.Dead;
+        public event IUnitTarget.UnitTargetEvent OnUnitDetach;
     }
 }

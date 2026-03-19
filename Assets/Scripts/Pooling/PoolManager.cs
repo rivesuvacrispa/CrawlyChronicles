@@ -24,14 +24,5 @@ namespace Pooling
         {
             return (T)PoolsDict[typeof(T)].GetEffectObject(data, position, rotation);
         }
-
-        public static IPoolable GetEffect(
-            Type t, 
-            object data = null,
-            Vector3 position = default,
-            Quaternion rotation = default)
-        {
-            return PoolsDict[t].GetEffectObject(data, position, rotation);
-        }
     }
 }

@@ -132,6 +132,7 @@ namespace Gameplay.Bosses.AntColony
         protected override void Die()
         {
             base.Die();
+            OnUnitDetach?.Invoke();
             OnDeath?.Invoke(this);
             effectController.ClearAll();
             DisposeTokenSource(cts);
@@ -242,5 +243,11 @@ namespace Gameplay.Bosses.AntColony
             foreach (BodyPainter painter in painters) 
                 painter.Paint(gradient, GlobalDefinitions.EnemyImmunityDuration);
         }
+        
+        
+        
+        // IUnitTarget
+        public bool CanAggroUnit => !Hitbox.Dead;
+        public event IUnitTarget.UnitTargetEvent OnUnitDetach;
     }
 }

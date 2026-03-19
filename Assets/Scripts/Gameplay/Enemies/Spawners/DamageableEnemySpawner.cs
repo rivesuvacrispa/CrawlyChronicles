@@ -41,6 +41,7 @@ namespace Gameplay.Enemies.Spawners
         {
             OnDeath?.Invoke(this);
             Destroy(gameObject);
+            OnUnitDetach?.Invoke();
         }
 
         public void OnHit(DamageInstance instance)
@@ -48,5 +49,12 @@ namespace Gameplay.Enemies.Spawners
             bodyPainter.FadeOut(GlobalDefinitions.EnemyImmunityDuration);
             // TODO: Audio effect
         }
+        
+        
+        
+        
+        // IUnitTarget
+        public bool CanAggroUnit => !Hitbox.Dead;
+        public event IUnitTarget.UnitTargetEvent OnUnitDetach;
     }
 }

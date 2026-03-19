@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Gameplay.Effects.Fly;
 using Gameplay.Player;
 using Pooling;
@@ -30,7 +31,7 @@ namespace Gameplay.Mutations.Passive
         private float flySpeed;
         private float rotationSpeed;
         private int fliesAmount;
-        private static readonly List<Fly> flies = new();
+        private static readonly List<Fly> Flies = new();
 
 
         public override void OnLevelChanged(int lvl)
@@ -46,45 +47,67 @@ namespace Gameplay.Mutations.Passive
             if (Application.isPlaying)
 #endif
             {
-
                 if (isActiveAndEnabled)
                 {
-                    ClearFlies();
-                    SpawnFlies();
+                    SpawnOrDespawnFlies();
                 }
 #if UNITY_EDITOR
             }
 #endif
         }
         
-        private void SpawnFlies()
+        private void SpawnOrDespawnFlies()
         {
-            for (int i = 0; i < fliesAmount + PlayerManager.PlayerStats.BonusSummonAmount; i++)
+            int currentAmount = Flies.Count;
+            int maxAmount = CalculateSummonsAmount(fliesAmount);
+            int changeAmount = maxAmount - currentAmount;
+            if (changeAmount == 0) return;
+            
+            if (changeAmount > 0)
+                for (int i = 0; i < changeAmount; i++)
+                {
+                    Fly fly = PoolManager.GetEffect<Fly>(
+                        new FlyArguments(damage, attackCooldown, flySpeed, rotationSpeed),
+                        position: transform.position + (Vector3)Random.insideUnitCircle * 0.2f);
+                    Flies.Add(fly);
+                }
+
+            else
             {
-                Fly fly = PoolManager.GetEffect<Fly>(
-                    new FlyArguments(damage, attackCooldown, flySpeed, rotationSpeed),
-                    position: transform.position + (Vector3)Random.insideUnitCircle * 0.2f);
-                flies.Add(fly);
+                int removeAmount = changeAmount * -1;
+                for (int i = 0; i < removeAmount; i++)
+                {
+                    IPoolable fly = Flies[i];
+                    fly.Pool();
+                }
+                Flies.RemoveRange(0, removeAmount);
             }
         }
 
         private void ClearFlies()
         {
-            foreach (IPoolable fly in flies) 
+            foreach (IPoolable fly in Flies) 
                 fly.Pool();
-            flies.Clear();
+            Flies.Clear();
         }
 
         protected override void OnEnable()
         {
             base.OnEnable();
-            SpawnFlies();
+            SpawnOrDespawnFlies();
+            PlayerManager.OnStatsChanged += OnPlayerStatsChanged;
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
             ClearFlies();
+            PlayerManager.OnStatsChanged -= OnPlayerStatsChanged;
+        }
+
+        private void OnPlayerStatsChanged()
+        {
+            SpawnOrDespawnFlies();
         }
     }
 }

@@ -30,9 +30,10 @@ namespace Gameplay.Effects.PhantomPlayerAttack
             if (args.bonusDamage > 0)
                 AddBonusDamage(args.bonusDamage);
             
-            transform.position = args.spawnPos;
-            Vector3 finalPos = 2 * args.targetPos - args.spawnPos;
-            Vector3 desiredUp = (args.targetPos - args.spawnPos).normalized;
+            
+            Vector3 spawnPos = transform.position;
+            Vector3 finalPos = 2 * args.targetPos - spawnPos;
+            Vector3 desiredUp = (args.targetPos - spawnPos).normalized;
             transform.rotation = Quaternion.LookRotation(transform.forward, desiredUp);
             
             trailRenderer.Clear();

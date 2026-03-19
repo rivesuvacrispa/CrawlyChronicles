@@ -118,7 +118,7 @@ namespace Gameplay.Enemies
         {
             Debug.Log($"[{gameObject.name}] died, all coroutines are stopped");
             CurrentHealth = 0;
-            ClearEffects();
+
             minimapIcon.enabled = false;
             StopAllCoroutines();
             attackGO.SetActive(false);
@@ -134,6 +134,8 @@ namespace Gameplay.Enemies
             StartCoroutine(DeathRoutine());
             UnsubEvents();
             OnDeath?.Invoke(this);
+            OnUnitDetach?.Invoke();
+            ClearEffects();
         }
 
         protected void StopAttack()
@@ -382,5 +384,12 @@ namespace Gameplay.Enemies
                 Knockback(instance.position, instance.knockback, duration);
             }
         }
+        
+        
+        
+        
+        // IUnitTarget
+        public bool CanAggroUnit => !Hitbox.Dead;
+        public event IUnitTarget.UnitTargetEvent OnUnitDetach;
     }
 }

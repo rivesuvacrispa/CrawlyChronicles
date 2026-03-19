@@ -48,6 +48,7 @@ namespace Gameplay.Bosses.AntColony
             GlobalDefinitions.CreateEggSquash(transform.position);
             OnProviderDestroy?.Invoke(this);
             MainMenu.OnResetRequested -= OnResetRequested;
+            OnUnitDetach?.Invoke();
         }
 
         private void OnResetRequested() => Destroy(gameObject);
@@ -78,5 +79,10 @@ namespace Gameplay.Bosses.AntColony
         public void OnHit(DamageInstance instance)
         {
         }
+
+        
+        // IUnitTarget
+        public bool CanAggroUnit => !Hitbox.Dead;
+        public event IUnitTarget.UnitTargetEvent OnUnitDetach;
     }
 }

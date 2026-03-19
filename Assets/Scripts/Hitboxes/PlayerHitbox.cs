@@ -20,8 +20,12 @@ namespace Hitboxes
 
         public void Hit(DamageInstance instance) => StartCoroutine(ImmunityRoutine());
 
-        public void Die() { }
+        public void Die()
+        {
+            Dead = true;
+        }
 
+        public bool Dead { get; set; }
         public bool ImmuneToSource(DamageSource source) => Immune.State;
 
         private IEnumerator ImmunityRoutine()

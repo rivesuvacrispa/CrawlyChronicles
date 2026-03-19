@@ -139,6 +139,7 @@ namespace Gameplay.Bosses.Terrorwing
 
         private void OnDestroy()
         {
+            OnUnitDetach?.Invoke();
             OnProviderDestroy?.Invoke(this);
             OnDeath?.Invoke(this);
             particleCollisionProvider.OnCollision -= OnBulletCollision;
@@ -213,5 +214,12 @@ namespace Gameplay.Bosses.Terrorwing
         public float ContactDamageStunDuration => 0;
         public Color ContactDamageColor => default;
         public bool ContactDamagePiercing => true;
+        
+        
+        
+        
+        // IUnitTarget
+        public bool CanAggroUnit => false;
+        public event IUnitTarget.UnitTargetEvent OnUnitDetach;
     }
 }

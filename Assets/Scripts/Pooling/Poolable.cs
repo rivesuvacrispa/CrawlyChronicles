@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 namespace Pooling
 {
@@ -31,6 +34,12 @@ namespace Pooling
         {
             gameObject.SetActive(true);
             return true;
+        }
+
+        protected async UniTask PoolTask(float duration, CancellationToken cancellationToken)
+        {
+            await UniTask.Delay(TimeSpan.FromSeconds(duration), cancellationToken: cancellationToken);
+            ((IPoolable)this).Pool();
         }
     }
 }

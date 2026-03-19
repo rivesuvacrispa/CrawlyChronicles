@@ -1,4 +1,5 @@
 ﻿using Definitions;
+using Gameplay.Effects.Healthbars;
 using Gameplay.Mutations.EntityEffects;
 using Hitboxes;
 using SoundEffects;
@@ -16,6 +17,7 @@ namespace Gameplay.Enemies.Enemies
         [SerializeField] private Scriptable.Enemy scriptable;
         [SerializeField] private Rigidbody2D rb;
         [SerializeField] private EffectController effectController;
+        
 
         
         public event IDestructionEventProvider.DestructionProviderEvent OnProviderDestroy;
@@ -39,6 +41,7 @@ namespace Gameplay.Enemies.Enemies
         private void Die()
         {
             audioController.PlayAction(scriptable.DeathAudio, pitch: SoundUtility.GetRandomPitchTwoSided(0.15f));
+            OnUnitDetach?.Invoke();
             OnDeath?.Invoke(this);
             Start();
         }
@@ -78,5 +81,13 @@ namespace Gameplay.Enemies.Enemies
         // IEffectAffectable
         public EffectController EffectController => effectController;
         public bool CanApplyEffect => !hitbox.Dead;
+        
+        
+        
+        
+        
+        // IUnitTarget
+        public bool CanAggroUnit => !Hitbox.Dead;
+        public event IUnitTarget.UnitTargetEvent OnUnitDetach;
     }
 }
