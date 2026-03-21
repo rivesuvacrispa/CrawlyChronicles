@@ -51,13 +51,13 @@ namespace Gameplay.Player
             get => Instance.currentStats;
             private set
             {
+                OnStatsChanged?.Invoke(value - Instance.currentStats);
                 Instance.currentStats = value;
-                OnStatsChanged?.Invoke();
             }
         }
 
-        public delegate void PlayerEvent();
-        public static event PlayerEvent OnStatsChanged;
+        public delegate void PlayerStatsEvent(PlayerStats changes);
+        public static event PlayerStatsEvent OnStatsChanged;
         public delegate void PlayerManagerEvent();
         public static event PlayerManagerEvent OnPlayerKilled;
         public static event PlayerManagerEvent OnPlayerRespawned;
@@ -97,7 +97,7 @@ namespace Gameplay.Player
             Debug.Log("Added player stats:");
             Debug.Log(stats.Print());
             currentStats.AddStats(stats);
-            OnStatsChanged?.Invoke();
+            OnStatsChanged?.Invoke(stats);
         }
         
         public void PickEgg(Egg egg)
@@ -200,8 +200,8 @@ namespace Gameplay.Player
             Debug.Log("PlayerManager OnAfterReset");
             RemoveEgg();
             PlayerMovement.Teleport(MapManager.MapCenter.position);
+            OnStatsChanged?.Invoke(baseStats - PlayerStats);
             PlayerStats = baseStats;
-            OnStatsChanged?.Invoke();
             CurrentHealth = currentStats.MaxHealth;
             healthText.text = Mathf.CeilToInt(CurrentHealth).ToString();
             UpdateHealthbar();

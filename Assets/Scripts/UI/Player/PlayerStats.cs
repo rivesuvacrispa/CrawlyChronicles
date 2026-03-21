@@ -31,7 +31,7 @@ namespace UI.Player
             PlayerManager.OnStatsChanged -= OnPlayerStatsChanged;
         }
 
-        private void OnPlayerStatsChanged()
+        private void OnPlayerStatsChanged(Gameplay.Player.PlayerStats changes)
         {
             currentArgs = PlayerManager.PlayerStats.GetStringArguments();
             localizedString.Arguments = currentArgs;

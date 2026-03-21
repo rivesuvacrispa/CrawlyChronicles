@@ -13,7 +13,7 @@ namespace Hitboxes
     {
         [SerializeField] private Component damagableComponent;
 
-        private IDamageableEnemy enemy;
+        public IDamageableEnemy Enemy { get; private set; }
         private readonly HashSet<DamageSource> blockedSources = new();
 
         public delegate void EnemyHitboxEvent(IDamageableEnemy enemy, BasePlayerAttack attack, float damage);
@@ -29,8 +29,8 @@ namespace Hitboxes
         {
             if (damagableComponent is IDamageableEnemy e)
             {
-                enemy = e;
-                enemy.OnDeath += OnTargetDeath;
+                Enemy = e;
+                Enemy.OnDeath += OnTargetDeath;
             }
             else
             {
@@ -41,7 +41,7 @@ namespace Hitboxes
 
         private void OnDestroy()
         {
-            enemy.OnDeath -= OnTargetDeath;
+            Enemy.OnDeath -= OnTargetDeath;
         }
 
         // Handle other death cases that are not included in IDamageable
@@ -56,8 +56,8 @@ namespace Hitboxes
         {
             if (col.collider.TryGetComponent(out BasePlayerAttack playerAttack))
             {
-                float damage = enemy.Damage(playerAttack.CreateDamageInstance());
-                OnCollideWithPlayerAttack?.Invoke(enemy, playerAttack, damage);
+                float damage = Enemy.Damage(playerAttack.CreateDamageInstance());
+                OnCollideWithPlayerAttack?.Invoke(Enemy, playerAttack, damage);
             }
         }
         
@@ -70,8 +70,8 @@ namespace Hitboxes
         {
             if (col.TryGetComponent(out BasePlayerAttack playerAttack))
             {
-                float damage = enemy.Damage(playerAttack.CreateDamageInstance());
-                OnCollideWithPlayerAttack?.Invoke(enemy, playerAttack, damage);
+                float damage = Enemy.Damage(playerAttack.CreateDamageInstance());
+                OnCollideWithPlayerAttack?.Invoke(Enemy, playerAttack, damage);
             }
         }
         

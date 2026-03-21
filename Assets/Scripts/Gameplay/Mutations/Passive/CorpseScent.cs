@@ -31,7 +31,7 @@ namespace Gameplay.Mutations.Passive
         private float flySpeed;
         private float rotationSpeed;
         private int fliesAmount;
-        private static readonly List<Fly> Flies = new();
+        private readonly List<Fly> flies = new();
 
 
         public override void OnLevelChanged(int lvl)
@@ -58,7 +58,7 @@ namespace Gameplay.Mutations.Passive
         
         private void SpawnOrDespawnFlies()
         {
-            int currentAmount = Flies.Count;
+            int currentAmount = flies.Count;
             int maxAmount = CalculateSummonsAmount(fliesAmount);
             int changeAmount = maxAmount - currentAmount;
             if (changeAmount == 0) return;
@@ -69,7 +69,7 @@ namespace Gameplay.Mutations.Passive
                     Fly fly = PoolManager.GetEffect<Fly>(
                         new FlyArguments(damage, attackCooldown, flySpeed, rotationSpeed),
                         position: transform.position + (Vector3)Random.insideUnitCircle * 0.2f);
-                    Flies.Add(fly);
+                    flies.Add(fly);
                 }
 
             else
@@ -77,18 +77,18 @@ namespace Gameplay.Mutations.Passive
                 int removeAmount = changeAmount * -1;
                 for (int i = 0; i < removeAmount; i++)
                 {
-                    IPoolable fly = Flies[i];
+                    IPoolable fly = flies[i];
                     fly.Pool();
                 }
-                Flies.RemoveRange(0, removeAmount);
+                flies.RemoveRange(0, removeAmount);
             }
         }
 
         private void ClearFlies()
         {
-            foreach (IPoolable fly in Flies) 
+            foreach (IPoolable fly in flies) 
                 fly.Pool();
-            Flies.Clear();
+            flies.Clear();
         }
 
         protected override void OnEnable()
@@ -105,9 +105,10 @@ namespace Gameplay.Mutations.Passive
             PlayerManager.OnStatsChanged -= OnPlayerStatsChanged;
         }
 
-        private void OnPlayerStatsChanged()
+        private void OnPlayerStatsChanged(PlayerStats changes)
         {
-            SpawnOrDespawnFlies();
+            if (changes.BonusSummonAmount != 0)
+                SpawnOrDespawnFlies();
         }
     }
 }

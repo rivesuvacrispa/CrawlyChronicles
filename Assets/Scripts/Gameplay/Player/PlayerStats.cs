@@ -37,7 +37,7 @@ namespace Gameplay.Player
         public float SummonDamage => summonDamage;
         public float CooldownReduction => cooldownReduction;
         public float ProjectileAmount => projectileAmount;
-        
+
 
         private static readonly TableEntryReference PlayerStatsStringReference = "Essentials_PlayerStats";
 
@@ -71,7 +71,7 @@ namespace Gameplay.Player
         public void AddStats(PlayerStats stats)
         {
             var baseStats = Minimal;
-            
+
             movementSpeed = Mathf.Clamp(MovementSpeed + stats.MovementSpeed, baseStats.MovementSpeed, 100);
             rotationSpeed = Mathf.Clamp(RotationSpeed + stats.RotationSpeed, baseStats.RotationSpeed, float.MaxValue);
             maxHealth = Mathf.Clamp(MaxHealth + stats.MaxHealth, baseStats.MaxHealth, float.MaxValue);
@@ -165,7 +165,8 @@ namespace Gameplay.Player
                 (int)(summonDamage * 100),
                 (int)(cooldownReduction * 100),
                 (int)(projectileAmount * 100),
-            };;
+            };
+            ;
         }
 
         public string Print(object[] args = null)
@@ -230,6 +231,41 @@ namespace Gameplay.Player
 
         public static bool operator ==(PlayerStats a, PlayerStats b) => a.Equals(b);
         public static bool operator !=(PlayerStats a, PlayerStats b) => !a.Equals(b);
+
+        public static PlayerStats operator +(PlayerStats a, PlayerStats b) => new(
+            a.movementSpeed + b.movementSpeed,
+            a.rotationSpeed + b.rotationSpeed,
+            a.maxHealth + b.maxHealth,
+            a.attackPower + b.attackPower,
+            a.attackDamage + b.attackDamage,
+            a.armor + b.armor,
+            a.immunityDuration + b.immunityDuration,
+            a.abilityDamage + b.abilityDamage,
+            a.passiveProcRate + b.passiveProcRate,
+            a.mutagenicity + b.mutagenicity,
+            a.bonusSummonAmount + b.bonusSummonAmount,
+            a.summonDamage + b.summonDamage,
+            a.cooldownReduction + b.cooldownReduction,
+            a.projectileAmount + b.projectileAmount
+        );
+
+        public static PlayerStats operator -(PlayerStats a, PlayerStats b) => new(
+            a.movementSpeed - b.movementSpeed,
+            a.rotationSpeed - b.rotationSpeed,
+            a.maxHealth - b.maxHealth,
+            a.attackPower - b.attackPower,
+            a.attackDamage - b.attackDamage,
+            a.armor - b.armor,
+            a.immunityDuration - b.immunityDuration,
+            a.abilityDamage - b.abilityDamage,
+            a.passiveProcRate - b.passiveProcRate,
+            a.mutagenicity - b.mutagenicity,
+            a.bonusSummonAmount - b.bonusSummonAmount,
+            a.summonDamage - b.summonDamage,
+            a.cooldownReduction - b.cooldownReduction,
+            a.projectileAmount - b.projectileAmount
+        );
+
 
         public bool Equals(PlayerStats other)
         {

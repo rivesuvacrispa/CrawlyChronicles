@@ -12,6 +12,7 @@ namespace Pooling
 
         private void Awake()
         {
+            Debug.Log("PoolManager Awake");
             var pools = GetComponentsInChildren<IObjectPool>();
             foreach (IObjectPool pool in pools) 
                 PoolsDict.Add(pool.GetPoolableType(), pool);
