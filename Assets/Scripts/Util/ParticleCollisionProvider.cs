@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Hitboxes;
 using UnityEngine;
-using Util.Interfaces;
 
 namespace Util
 {

@@ -11,6 +11,7 @@ using Timeline;
 using TMPro;
 using UI.Menus;
 using UnityEngine;
+using Util;
 using Util.Interfaces;
 
 namespace Gameplay.Player
@@ -56,6 +57,8 @@ namespace Gameplay.Player
             }
         }
 
+        public delegate void HealthEvent(float health);
+        public static event HealthEvent OnBeforeHealthAdded;
         public delegate void PlayerStatsEvent(PlayerStats changes);
         public static event PlayerStatsEvent OnStatsChanged;
         public delegate void PlayerManagerEvent();
@@ -63,6 +66,8 @@ namespace Gameplay.Player
         public static event PlayerManagerEvent OnPlayerRespawned;
         public delegate void PlayerHitboxEvent();
         public static event PlayerHitboxEvent OnStruck;
+        public delegate void PlayerBlockEvent(MultiSourceState blockState);
+        public static event PlayerBlockEvent OnTryBlockDamage;
         
         
         
@@ -128,6 +133,7 @@ namespace Gameplay.Player
         
         public void AddHealth(float amount)
         {
+            OnBeforeHealthAdded?.Invoke(amount);
             if(CurrentHealth < 0 || CurrentHealth >= currentStats.MaxHealth) return;
             healingParticles.Play();
             CurrentHealth = Mathf.Clamp(CurrentHealth + amount, CurrentHealth, currentStats.MaxHealth);
@@ -209,6 +215,12 @@ namespace Gameplay.Player
 
 
         // IDamageable
+        public bool TryBlockDamage(DamageInstance damageInstance)
+        {
+            MultiSourceState blockState = new MultiSourceState();
+            OnTryBlockDamage?.Invoke(blockState);
+            return blockState.State;
+        }
         public event IDamageable.DestructionProviderEvent OnProviderDestroy;
         public Transform Transform => transform;
         public float HealthbarOffsetY => healthbarOffsetY;

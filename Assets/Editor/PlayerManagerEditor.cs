@@ -3,12 +3,15 @@ using Environment;
 using Gameplay.Breeding;
 using Gameplay.Genes;
 using Gameplay.Player;
+using Hitboxes;
 using UI.Menus;
 using UnityEditor;
 using UnityEngine;
+using Util.Interfaces;
 
 [CustomEditor (typeof (PlayerManager))]
-public class PlayerManagerEditor : Editor {
+public class PlayerManagerEditor : Editor, IDamageSource 
+{
 
     public override void OnInspectorGUI() {
         if (target is not PlayerManager manager) return;
@@ -18,6 +21,11 @@ public class PlayerManagerEditor : Editor {
         if (GUILayout.Button("Kill"))
         {
             manager.Die(false);
+        }
+        
+        if (GUILayout.Button("Damage"))
+        {
+            ((IDamageable)manager).Damage(new DamageSource(this), 1f);
         }
 
         if (GUILayout.Button("Mutate"))
