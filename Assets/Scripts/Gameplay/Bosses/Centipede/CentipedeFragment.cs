@@ -7,6 +7,7 @@ using Hitboxes;
 using UnityEngine;
 using Util;
 using Util.Interfaces;
+using Util.Particles;
 
 namespace Gameplay.Bosses.Centipede
 {

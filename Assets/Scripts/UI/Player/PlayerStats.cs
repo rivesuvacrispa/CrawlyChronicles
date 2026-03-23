@@ -11,24 +11,24 @@ namespace UI.Player
         [SerializeField] private LocalizedString localizedString;
 
         private object[] currentArgs;
-        
-        
-        private void UpdateText(string value)
-        {
-            localizedString.Arguments = PlayerManager.PlayerStats.GetStringArguments();
-            statsText.text = value;
-        }
+
 
         private void OnEnable()
         {
-            localizedString.StringChanged += UpdateText;
+            // localizedString.StringChanged += UpdateText;
             PlayerManager.OnStatsChanged += OnPlayerStatsChanged;
         }
 
         private void OnDisable()
         {
-            localizedString.StringChanged -= UpdateText;
+            // localizedString.StringChanged -= UpdateText;
             PlayerManager.OnStatsChanged -= OnPlayerStatsChanged;
+        }
+
+        private void UpdateText(string value)
+        {
+            localizedString.Arguments = PlayerManager.PlayerStats.GetStringArguments();
+            statsText.text = value;
         }
 
         private void OnPlayerStatsChanged(Gameplay.Player.PlayerStats changes)

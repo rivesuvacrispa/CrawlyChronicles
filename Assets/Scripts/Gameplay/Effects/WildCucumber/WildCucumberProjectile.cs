@@ -15,6 +15,7 @@ using UI.Menus;
 using UnityEngine;
 using Util;
 using Util.Interfaces;
+using Util.Particles;
 using Random = UnityEngine.Random;
 
 namespace Gameplay.Effects.WildCucumber
@@ -122,7 +123,7 @@ namespace Gameplay.Effects.WildCucumber
                 {
                     enemy.Damage(new DamageInstance(
                         new DamageSource(this),
-                        BasicAbility.GetAbilityDamage(args.explosionDamage), 
+                        BasicAbility.CalculateAbilityDamage(args.explosionDamage), 
                         transform.position,
                         args.knockback));
                 }
@@ -192,7 +193,7 @@ namespace Gameplay.Effects.WildCucumber
         {
             damageable.Damage(new DamageInstance(
                 new DamageSource(this, collisionID),
-                    BasicAbility.GetAbilityDamage(args.seedsDamage),
+                    BasicAbility.CalculateAbilityDamage(args.seedsDamage),
                     transform.position));
         }
 

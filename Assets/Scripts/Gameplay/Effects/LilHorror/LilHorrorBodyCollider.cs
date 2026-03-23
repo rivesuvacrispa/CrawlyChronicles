@@ -1,4 +1,5 @@
 ﻿using Gameplay.Enemies.Enemies;
+using Gameplay.Mutations;
 using Gameplay.Mutations.Passive;
 using Hitboxes;
 using UnityEngine;
@@ -11,7 +12,11 @@ namespace Gameplay.Effects.LilHorror
         private void OnTriggerEnter2D(Collider2D col)
         {
             if (col.TryGetComponent(out DamageableEnemyHitbox hitbox) && hitbox.Enemy is not NeutralAnt)
-                hitbox.Enemy.Damage(new DamageSource(this), LegTremor.ContactDamage, transform.position);
+                hitbox.Enemy.Damage(
+                    new DamageSource(this),
+                    BasicAbility.CalculateSummonDamage(LegTremor.ContactDamage),
+                    transform.position
+                );
         }
     }
 }

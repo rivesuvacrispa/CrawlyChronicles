@@ -4,12 +4,13 @@ using Timeline;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using Util.Interfaces;
+using Util.Particles;
 
 namespace Gameplay.Mutations.Passive
 {
     public class GlowingBlood : BasicAbility, IDamageSource
     {
-        [SerializeField] private new ParticleSystem particleSystem;
+        [SerializeField] private new BulletParticleSystem particleSystem;
         [SerializeField] private new Light2D light;
         [Header("Particles amount")] 
         [SerializeField] private int amountLvl1;
@@ -31,17 +32,18 @@ namespace Gameplay.Mutations.Passive
             damage = LerpLevel(damageLvl1, damageLvl10, lvl);
             float lifetime = LerpLevel(lifetimeLvl1, lifetimeLvl10, lvl);
             light.pointLightOuterRadius = lifetime * 3;
-            var emission = particleSystem.emission;
-            var main = particleSystem.main;
-            emission.rateOverTime = LerpLevel(amountLvl1, amountLvl10, lvl);
+            
+            var main = particleSystem.Particles.main;
             main.startLifetime = lifetime;
+            
+            particleSystem.SetBaseAmount(LerpLevel(amountLvl1, amountLvl10, lvl));
         }
 
         protected override void OnBulletCollision(IDamageable damageable, int collisionID)
         {
             damageable.Damage(new DamageInstance(
                 new DamageSource(this, collisionID),
-                GetAbilityDamage(damage),
+                CalculateAbilityDamage(damage),
                 PlayerPhysicsBody.Position,
                 piercing: true));
         }
@@ -58,26 +60,19 @@ namespace Gameplay.Mutations.Passive
         protected override void OnDisable()
         {
             base.OnDisable();
-            UnsubFromEvents();
-        }
-
-        private void OnDestroy() => UnsubFromEvents();
-
-        private void UnsubFromEvents()
-        {
             TimeManager.OnDayStart -= OnDayStart;
             TimeManager.OnNightStart -= OnNightStart;
         }
 
         private void OnDayStart(int _)
         {
-            particleSystem.Stop();
+            particleSystem.Particles.Stop();
             light.enabled = false;
         }
 
         private void OnNightStart(int _)
         {
-            particleSystem.Play();
+            particleSystem.Particles.Play();
             light.enabled = true;
         }
         

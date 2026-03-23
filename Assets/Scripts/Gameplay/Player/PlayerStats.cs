@@ -1,4 +1,5 @@
 ﻿using System;
+using NUnit.Framework.Constraints;
 using UnityEngine;
 using UnityEngine.Localization.Settings;
 using UnityEngine.Localization.Tables;
@@ -22,6 +23,7 @@ namespace Gameplay.Player
         [SerializeField] private int bonusSummonAmount;
         [SerializeField] private float summonDamage;
         [SerializeField] private float projectileAmount;
+        [SerializeField] private float projectileSize;
 
         public float MaxHealth => maxHealth;
         public float AttackPower => attackPower;
@@ -37,6 +39,7 @@ namespace Gameplay.Player
         public float SummonDamage => summonDamage;
         public float CooldownReduction => cooldownReduction;
         public float ProjectileAmount => projectileAmount;
+        public float ProjectileSize => projectileSize;
 
 
         private static readonly TableEntryReference PlayerStatsStringReference = "Essentials_PlayerStats";
@@ -50,7 +53,7 @@ namespace Gameplay.Player
         public PlayerStats(float movementSpeed = 0, float rotationSpeed = 0, float maxHealth = 0,
             float attackPower = 0, float attackDamage = 0, float armor = 0, float immunityDuration = 0,
             float abilityDamage = 0, float passiveProcRate = 0, float mutagenicity = 0, int bonusSummonAmount = 0,
-            float summonDamage = 0, float cooldownReduction = 0, float projectileAmount = 0)
+            float summonDamage = 0, float cooldownReduction = 0, float projectileAmount = 0, float projectileSize = 0)
         {
             this.movementSpeed = movementSpeed;
             this.rotationSpeed = rotationSpeed;
@@ -66,6 +69,7 @@ namespace Gameplay.Player
             this.summonDamage = summonDamage;
             this.cooldownReduction = cooldownReduction;
             this.projectileAmount = projectileAmount;
+            this.projectileSize = projectileSize;
         }
 
         public void AddStats(PlayerStats stats)
@@ -87,6 +91,7 @@ namespace Gameplay.Player
             summonDamage = Mathf.Clamp(summonDamage + stats.summonDamage, baseStats.summonDamage, float.MaxValue);
             cooldownReduction = Mathf.Clamp(cooldownReduction + stats.cooldownReduction, -1f, 1f);
             projectileAmount = Mathf.Clamp(projectileAmount + stats.projectileAmount, baseStats.projectileAmount, 100);
+            projectileSize = Mathf.Clamp(projectileSize + stats.projectileSize, baseStats.projectileSize, 5);
         }
 
         public static PlayerStats LerpLevel(PlayerStats lvl1, PlayerStats lvl10, int level)
@@ -106,7 +111,8 @@ namespace Gameplay.Player
                 bonusSummonAmount: Mathf.RoundToInt(Mathf.Lerp(lvl1.bonusSummonAmount, lvl10.bonusSummonAmount, t)),
                 summonDamage: Mathf.Lerp(lvl1.summonDamage, lvl10.summonDamage, t),
                 cooldownReduction: Mathf.Lerp(lvl1.cooldownReduction, lvl10.cooldownReduction, t),
-                projectileAmount: Mathf.Lerp(lvl1.projectileAmount, lvl10.projectileAmount, t)
+                projectileAmount: Mathf.Lerp(lvl1.projectileAmount, lvl10.projectileAmount, t),
+                projectileSize: Mathf.Lerp(lvl1.projectileSize, lvl10.projectileSize, t)
             );
         }
 
@@ -126,7 +132,8 @@ namespace Gameplay.Player
                 bonusSummonAmount: -bonusSummonAmount,
                 summonDamage: -summonDamage,
                 cooldownReduction: -cooldownReduction,
-                projectileAmount: -projectileAmount
+                projectileAmount: -projectileAmount,
+                projectileSize: -projectileSize
             );
         }
 
@@ -146,7 +153,8 @@ namespace Gameplay.Player
             bonusSummonAmount: 0,
             summonDamage: 0f,
             cooldownReduction: 0f,
-            projectileAmount: 0f
+            projectileAmount: 0f,
+            projectileSize: 0f
         );
 
         public object[] GetStringArguments()
@@ -159,14 +167,14 @@ namespace Gameplay.Player
                 AttackPower,
                 AttackDamage,
                 Armor,
-                (int)(abilityDamage * 100),
-                (int)(mutagenicity * 100),
+                AsReadablePercent(abilityDamage),
+                AsReadablePercent(mutagenicity),
                 bonusSummonAmount,
-                (int)(summonDamage * 100),
-                (int)(cooldownReduction * 100),
-                (int)(projectileAmount * 100),
+                AsReadablePercent(summonDamage),
+                AsReadablePercent(cooldownReduction),
+                AsReadablePercent(projectileAmount),
+                AsReadablePercent(projectileSize),
             };
-            ;
         }
 
         public string Print(object[] args = null)
@@ -181,11 +189,12 @@ namespace Gameplay.Player
 
         public string PrintCompared(PlayerStats with)
         {
-            int abilityDmg = (int)(abilityDamage * 100);
-            int summonDmg = (int)(summonDamage * 100);
-            int muta = (int)(mutagenicity * 100);
-            int cooldownRed = (int)(cooldownReduction * 100);
-            int projAmount = (int)(projectileAmount * 100);
+            int abilityDmg = AsReadablePercent(abilityDamage);
+            int summonDmg = AsReadablePercent(summonDamage);
+            int muta = AsReadablePercent(mutagenicity);
+            int cooldownRed = AsReadablePercent(cooldownReduction);
+            int projAmount = AsReadablePercent(projectileAmount);
+            int projSize = AsReadablePercent(projectileSize);
             return LocalizationSettings.StringDatabase
                 .GetLocalizedString(EssentialsTableReference, PlayerStatsComparedStringReference,
                     arguments: new object[]
@@ -210,25 +219,29 @@ namespace Gameplay.Player
                         armor - with.armor,
                         // 12
                         abilityDmg,
-                        abilityDmg - (int)(with.abilityDamage * 100),
+                        abilityDmg - AsReadablePercent(with.abilityDamage),
                         // 14
                         muta,
-                        muta - (int)(with.mutagenicity * 100),
+                        muta - AsReadablePercent(with.mutagenicity),
                         // 16
                         bonusSummonAmount,
                         bonusSummonAmount - with.bonusSummonAmount,
                         // 18
                         summonDmg,
-                        summonDmg - (int)(with.summonDamage * 100),
+                        summonDmg - AsReadablePercent(with.summonDamage),
                         // 20
                         cooldownRed,
-                        cooldownRed - (int)(with.cooldownReduction * 100),
+                        cooldownRed - AsReadablePercent(with.cooldownReduction),
                         // 22
                         projAmount,
-                        projAmount - (int)(with.projectileAmount * 100)
+                        projAmount - AsReadablePercent(with.projectileAmount),
+                        // 24
+                        projSize,
+                        projSize - AsReadablePercent(with.projectileSize)
                     });
         }
 
+        public static int AsReadablePercent(float value) => (int)(value * 100);
         public static bool operator ==(PlayerStats a, PlayerStats b) => a.Equals(b);
         public static bool operator !=(PlayerStats a, PlayerStats b) => !a.Equals(b);
 
@@ -246,7 +259,8 @@ namespace Gameplay.Player
             a.bonusSummonAmount + b.bonusSummonAmount,
             a.summonDamage + b.summonDamage,
             a.cooldownReduction + b.cooldownReduction,
-            a.projectileAmount + b.projectileAmount
+            a.projectileAmount + b.projectileAmount,
+            a.projectileSize + b.projectileSize
         );
 
         public static PlayerStats operator -(PlayerStats a, PlayerStats b) => new(
@@ -263,7 +277,9 @@ namespace Gameplay.Player
             a.bonusSummonAmount - b.bonusSummonAmount,
             a.summonDamage - b.summonDamage,
             a.cooldownReduction - b.cooldownReduction,
-            a.projectileAmount - b.projectileAmount
+            a.projectileAmount - b.projectileAmount,
+            a.projectileSize - b.projectileSize
+            
         );
 
 
@@ -282,7 +298,8 @@ namespace Gameplay.Player
                    bonusSummonAmount == other.bonusSummonAmount &&
                    Mathf.Approximately(summonDamage, other.summonDamage) &&
                    Mathf.Approximately(cooldownReduction, other.cooldownReduction) &&
-                   Mathf.Approximately(projectileAmount, other.projectileAmount);
+                   Mathf.Approximately(projectileAmount, other.projectileAmount) &&
+                   Mathf.Approximately(projectileSize, other.projectileSize);
         }
 
         // -----------------------------------------------------------------
@@ -313,6 +330,7 @@ namespace Gameplay.Player
                 hash = hash * 23 + RoundForHash(summonDamage).GetHashCode();
                 hash = hash * 23 + RoundForHash(cooldownReduction).GetHashCode();
                 hash = hash * 23 + RoundForHash(projectileAmount).GetHashCode();
+                hash = hash * 23 + RoundForHash(projectileSize).GetHashCode();
                 return hash;
             }
         }
@@ -320,3 +338,21 @@ namespace Gameplay.Player
         private float RoundForHash(float value) => Mathf.Round(value * HASH_PRECISION) / HASH_PRECISION;
     }
 }
+
+/*
+
+Movespeed: {0:0.##}
+Rotation speed: {1:0.##}
+Max health: {2:0.##}
+Attack power: {3:0.##}
+Attack damage: {4:0.##}
+Armor: {5:0.##}
+Mutagenicity: {7}%
+Cooldown reduction: {10:0.##}%
+Bonus ability dmg: {6}%
+Bonus units: {8}
+Bonus unit dmg: {9:0.##}%
+Bonus bullets: {11:0.##}%
+Bonus bullet size: {12:0.##}%
+
+*/

@@ -2,7 +2,7 @@
 using Hitboxes;
 using UnityEngine;
 
-namespace Util
+namespace Util.Particles
 {
     [RequireComponent(typeof(ParticleSystem))]
     public class ParticleCollisionProvider : MonoBehaviour

@@ -5,14 +5,15 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using Util;
 using Util.Interfaces;
+using Util.Particles;
 
 namespace Gameplay.Mutations.Active
 {
     public class AcidSpray : ActiveAbility, IDamageSource
     {
         [FormerlySerializedAs("particleSystem")] 
-        [SerializeField] private ParticleSystem basicParticleSystem;
-        [SerializeField] private ParticleSystem comboParticleSystem;
+        [SerializeField] private BulletParticleSystem basicParticleSystem;
+        [SerializeField] private BulletParticleSystem comboParticleSystem;
         [Header("Particles amount")] 
         [SerializeField] private int amountLvl1;
         [SerializeField] private int amountLvl10;
@@ -30,33 +31,32 @@ namespace Gameplay.Mutations.Active
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
-            if(basicParticleSystem.isPlaying) basicParticleSystem.Stop();
-            if(comboParticleSystem.isPlaying) comboParticleSystem.Stop();
-            damage = LerpLevel(damageLvl1, damageLvl10, lvl);
-            var emission = basicParticleSystem.emission;
-            var shape = basicParticleSystem.shape;
-            shape.angle = LerpLevel(angleLvl1, angleLvl10, lvl);
-            float amount = LerpLevel(amountLvl1, amountLvl10, lvl);
-            emission.SetBurst(0, new ParticleSystem.Burst(0, amount));
-            emission = comboParticleSystem.emission;
-            emission.SetBurst(0, new ParticleSystem.Burst(0, amount * 2));
+            if(basicParticleSystem.Particles.isPlaying) basicParticleSystem.Particles.Stop();
+            if(comboParticleSystem.Particles.isPlaying) comboParticleSystem.Particles.Stop();
+            
+            damage = LerpLevel(damageLvl1, damageLvl10, lvl); 
 
+            basicParticleSystem.SetShapeAngle(LerpLevel(angleLvl1, angleLvl10, lvl));
+
+            float amount = LerpLevel(amountLvl1, amountLvl10, lvl);
+            basicParticleSystem.SetBaseAmount(amount);
+            comboParticleSystem.SetBaseAmount(amount * 2);
         }
 
         public override void Activate(bool auto = false)
         {
             base.Activate(auto);
             if (AttackController.IsInComboDash)
-                comboParticleSystem.Play();
+                comboParticleSystem.Particles.Play();
             else
-                basicParticleSystem.Play();
+                basicParticleSystem.Particles.Play();
         }
 
         protected override void OnBulletCollision(IDamageable damageable, int collisionID)
         {
             if(damageable is IDamageableEnemy enemy)
                 enemy.Damage(new DamageInstance(new DamageSource(this, collisionID),
-                    GetAbilityDamage(damage),
+                    CalculateAbilityDamage(damage),
                     PlayerPhysicsBody.Position,
                     damageColor: GlobalDefinitions.PoisonColor,
                     piercing: true));

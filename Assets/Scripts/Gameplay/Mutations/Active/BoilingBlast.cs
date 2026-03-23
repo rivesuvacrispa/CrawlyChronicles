@@ -2,13 +2,14 @@
 using Hitboxes;
 using UnityEngine;
 using Util.Interfaces;
+using Util.Particles;
 
 namespace Gameplay.Mutations.Active
 {
     public class BoilingBlast : ActiveAbility, IDamageSource
     {
-        [SerializeField] private ParticleSystem basicParticles;
-        [SerializeField] private ParticleSystem comboParticles;
+        [SerializeField] private BulletParticleSystem basicParticles;
+        [SerializeField] private BulletParticleSystem comboParticles;
         [Header("Particles amount")] 
         [SerializeField] private int amountLvl1;
         [SerializeField] private int amountLvl10;
@@ -31,36 +32,34 @@ namespace Gameplay.Mutations.Active
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
-            if(basicParticles.isPlaying) basicParticles.Stop();
+            if(basicParticles.Particles.isPlaying) basicParticles.Particles.Stop();
             damage = LerpLevel(damageLvl1, damageLvl10, lvl);
             stun = LerpLevel(stunLvl1, stunLvl10, lvl);
             knockback = LerpLevel(knockbackLvl1, knockbackLvl10, lvl);
             
-            var emission = basicParticles.emission;
             float amount = LerpLevel(amountLvl1, amountLvl10, lvl);
-            emission.SetBurst(0, new ParticleSystem.Burst(0, amount));
-            emission = comboParticles.emission;
-            emission.SetBurst(0, new ParticleSystem.Burst(0, amount * 2));
+            basicParticles.SetBaseAmount(amount);
+            comboParticles.SetBaseAmount(amount * 2);
         }
 
         protected override void OnBulletCollision(IDamageable damageable, int collisionID)
         {
             damageable.Damage(
                 new DamageInstance(new DamageSource(this),
-                    GetAbilityDamage(damage),
+                    CalculateAbilityDamage(damage),
                     PlayerPhysicsBody.Position,
                     knockback,
                     stun,
-                    Color.white));
+                    Color.orange));
         }
 
         public override void Activate(bool auto = false)
         {
             base.Activate(auto);
             if (AttackController.IsInComboDash)
-                comboParticles.Play();
+                comboParticles.Particles.Play();
             else
-                basicParticles.Play();
+                basicParticles.Particles.Play();
         }
 
         protected override object[] GetDescriptionArguments(int lvl, bool withUpgrade)

@@ -51,7 +51,7 @@ namespace Gameplay.Mutations.Passive
         {
             damageable.Damage(new DamageInstance(
                     new DamageSource(this, collisionID),
-                GetAbilityDamage(damage),
+                CalculateAbilityDamage(damage),
                     PlayerPhysicsBody.Position,
                     knockbackPower,
                     stunDuration,

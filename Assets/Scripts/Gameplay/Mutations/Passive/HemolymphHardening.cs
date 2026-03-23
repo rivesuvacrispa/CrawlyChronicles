@@ -3,14 +3,14 @@ using Hitboxes;
 using UnityEngine;
 using Util;
 using Util.Interfaces;
+using Util.Particles;
 
 namespace Gameplay.Mutations.Passive
 {
     public class HemolymphHardening : BasicAbility, IDamageSource
     {
         [Header("References")]
-        [SerializeField] private ParticleSystem burst;
-
+        [SerializeField] private BulletParticleSystem burst;
         [SerializeField] private ParticleSystem orbits;
 
         [Header("Health per blob")]
@@ -42,11 +42,13 @@ namespace Gameplay.Mutations.Passive
             base.OnLevelChanged(lvl);
             maxBlobs = LerpLevel(maxBlobsLvl1, maxBlobsLvl10, lvl);
             damage = LerpLevel(damageLvl1, damageLvl10, lvl);
-            ParticleSystem.EmissionModule e = burst.emission;
-            var b = e.GetBurst(0);
-            float blobAmount = LerpLevel(explosionBlobAmountLvl1, explosionBlobAmountLvl10, lvl);
-            b.count = new ParticleSystem.MinMaxCurve(blobAmount * 0.5f, blobAmount);
-            e.SetBurst(0, b);
+            
+            burst.SetBaseAmount(LerpLevel(explosionBlobAmountLvl1, explosionBlobAmountLvl10, lvl));
+            // ParticleSystem.EmissionModule e = burst.emission;
+            // var b = e.GetBurst(0);
+            // float blobAmount =;
+            // b.count = new ParticleSystem.MinMaxCurve(blobAmount * 0.5f, blobAmount);
+            // e.SetBurst(0, b);
         }
 
         protected override void OnEnable()
@@ -71,7 +73,7 @@ namespace Gameplay.Mutations.Passive
             if (currentBlobsAmount <= 0) return;
 
             blockState.Vote(GetHashCode());
-            burst.Play();
+            burst.Particles.Play();
             currentBlobsAmount--;
             UpdateBlobs();
         }
@@ -82,8 +84,12 @@ namespace Gameplay.Mutations.Passive
 
             accumulatedHealth += amount;
             int blobsFormed = Mathf.FloorToInt(accumulatedHealth / healthPerBlob);
-            accumulatedHealth %= maxBlobs;
+            
+            if (blobsFormed == 0) return;
+            accumulatedHealth %= blobsFormed;
             currentBlobsAmount += blobsFormed;
+            
+            print($"Added HP: {amount}, blobs formed: {blobsFormed}, accumulated: {accumulatedHealth}, current blobs: {currentBlobsAmount}");
 
             if (currentBlobsAmount >= maxBlobs)
                 accumulatedHealth = 0;
@@ -96,7 +102,8 @@ namespace Gameplay.Mutations.Passive
             if (damageable is IDamageableEnemy enemy)
                 enemy.Damage(
                     new DamageSource(this, collisionID),
-                    damage, transform.position, piercing: true
+                    CalculateAbilityDamage(damage),
+                    transform.position, piercing: true
                 );
         }
 
