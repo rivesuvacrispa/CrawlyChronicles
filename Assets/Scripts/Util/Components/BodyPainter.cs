@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-namespace Util
+namespace Util.Components
 {
     [RequireComponent(typeof(SpriteRenderer))]
     public class BodyPainter : MonoBehaviour

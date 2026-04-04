@@ -1,25 +1,24 @@
 ﻿using Timeline;
+using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
-namespace Gameplay.Food.Foodbeds
+namespace Util.Components
 {
-    public abstract class Fungi : Foodbed
+    public class NightLight : MonoBehaviour
     {
         private new Light2D light;
         
-        protected override void Start()
+        private void Start()
         {
             light = GetComponent<Light2D>();
             TimeManager.OnDayStart += OnDayStart;
             TimeManager.OnNightStart += OnNightStart;
             if(TimeManager.IsDay) OnDayStart(0);
             else OnNightStart(0);
-            base.Start();
         }
 
-        protected override void OnDestroy()
+        private void OnDestroy()
         {
-            base.OnDestroy();
             TimeManager.OnDayStart -= OnDayStart;
             TimeManager.OnNightStart -= OnNightStart;
         }

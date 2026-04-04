@@ -33,6 +33,7 @@ namespace UI.Menus
         [SerializeField] private GeneDisplay geneDisplay;
         [SerializeField] private List<BasicMutation> allMutations = new();
         [SerializeField] private MutationsRerollButton rerollButton;
+        [SerializeField] private MutationSlotGroup slotGroup;
         [Header("Settings")]
         [SerializeField] private int maxMutationsAmount = 20;
         [SerializeField] private Vector2Int randomAmountBounds = new(6, 12);
@@ -43,7 +44,7 @@ namespace UI.Menus
         private MutationTarget mutationTarget;
         private TrioGene genesLeft;
         private readonly Dictionary<BasicMutation, BasicAbilityButton> basicAbilityButtons = new();
-        private Dictionary<BasicMutation, int> current = new();
+        private MutationData current = new();
         private TrioGene rerollCost;
         private readonly List<MutationButton> currentButtons = new();
         private float currentMutationRerollCost;
@@ -70,7 +71,7 @@ namespace UI.Menus
             hatchingEgg = egg;
             genesLeft = egg.Genes;
             geneDisplay.UpdateTrioText(genesLeft);
-            current = egg.MutationData.GetAll();
+            current = egg.MutationData;
             ShowCurrentMutations();
             UpdateRerollButton();
             CreateMutations();
@@ -80,19 +81,21 @@ namespace UI.Menus
 
         private void CreateMutations()
         {
+            // TODO: remove ones that are out of slots
             // Dictionary of mutation + lvl of final given variants
             Dictionary<BasicMutation, int> variants = new();
             HashSet<BasicMutation> maxed = new();
             HashSet<BasicMutation> incompatible = new();
             
             // Build collection of incompatible mutations
-            foreach (var (m, _) in current)
+            var all = current.GetAll();
+            foreach (var (m, _) in all)
             {
                 if (m.HasIncompatible) incompatible.AddRange(m.IncompatibleMutations);
             }
 
             // Build collection of mutations that player maxxed
-            foreach (var (basicMutation, lvl) in current)
+            foreach (var (basicMutation, lvl) in all)
             {
                 if (lvl == 9) maxed.Add(basicMutation);
             }
@@ -133,8 +136,8 @@ namespace UI.Menus
 
                 // If player has chosen mutation, give it +1 lvl 
                 int lvl = 0;
-                if (current.ContainsKey(chosenOne)) 
-                    lvl = current[chosenOne] + 1;
+                if (all.ContainsKey(chosenOne)) 
+                    lvl = all[chosenOne] + 1;
                 
                 // Add chosen mutation to a final variants list
                 variants.Add(chosenOne, lvl);
@@ -155,7 +158,7 @@ namespace UI.Menus
 
         private void ShowCurrentMutations()
         {
-            foreach (var (mutation, level) in current) 
+            foreach (var (mutation, level) in current.GetAll()) 
                 CreateBasicAbilityButton(mutation, level);
         }
 
@@ -176,17 +179,12 @@ namespace UI.Menus
             }
             
             int cost = GlobalDefinitions.GetMutationCost(level);
-            
-            if (current.ContainsKey(mutation))
-            {
-                current[mutation] = level;
+            current.Set(mutation, level);
+
+            if (basicAbilityButtons.ContainsKey(mutation))
                 basicAbilityButtons[mutation].UpdateLevelText(level);
-            }
             else
-            {
                 CreateBasicAbilityButton(mutation, level);
-                current.Add(mutation, level);
-            }
 
             genesLeft.SetGene(mutation.GeneType, genesLeft.GetGene(mutation.GeneType) - cost);
             geneDisplay.UpdateTrioText(genesLeft);
@@ -220,10 +218,7 @@ namespace UI.Menus
 
         public void Hatch()
         {
-            Egg mutated = new Egg(genesLeft, new MutationData(
-                current.ToDictionary(
-                    pair => pair.Key, 
-                    pair => pair.Value)));
+            Egg mutated = new Egg(genesLeft, current.Copy());
             gameObject.SetActive(false);
             ClearAll();
             if(mutationTarget is MutationTarget.Egg) 
@@ -261,7 +256,7 @@ namespace UI.Menus
         {
             var candidates = new List<BasicMutation>();
             
-            foreach (var (mutation, lvl) in current)
+            foreach (var (mutation, lvl) in current.GetAll())
             {
                 if (lvl == 9) continue;
                 candidates.Add(mutation);
@@ -269,22 +264,37 @@ namespace UI.Menus
 
             var candidate = candidates.OrderBy(_ => Random.value).FirstOrDefault();
             if (candidate is null || 
-                !basicAbilityButtons.TryGetValue(candidate, out BasicAbilityButton b)) return;
+                !basicAbilityButtons.TryGetValue(candidate, out BasicAbilityButton b) || 
+                !current.TryGet(candidate, out int currentLvl)) 
+                return;
             
-            
-            int downgradedLvl = current[candidate] - 1;
-            current[candidate] = downgradedLvl;
+            int downgradedLvl = currentLvl - 1;
             
             Debug.Log($"Mutation {candidate.Name} is broken to lvl {downgradedLvl}");
 
             if (downgradedLvl == -1)
             {
-                current.Remove(candidate);
-                basicAbilityButtons.Remove(candidate);
-                b.PlayBreak();
+                if (current.Remove(candidate))
+                {
+                    basicAbilityButtons.Remove(candidate);
+                    b.PlayBreak();
+                }
             }
             else
+            {
+                current.Set(candidate, downgradedLvl);
                 b.PlayDowngrade(downgradedLvl);
+            }
+        }
+
+        private void UpdateSlotsGroup(TrioGene currentSlots)
+        {
+            slotGroup.UpdateCanFit(currentSlots, PlayerManager.Instance.MaxMutationsByType);
+        }
+
+        private void UpdateAvailability(TrioGene currentSlots)
+        {
+            
         }
 
 
@@ -296,7 +306,6 @@ namespace UI.Menus
             foreach (Transform t in mutationTypeToTransform[2]) Destroy(t.gameObject);
             foreach (Transform t in newMutationsTransform) Destroy(t.gameObject);
             basicAbilityButtons.Clear();
-            current.Clear();
             currentButtons.Clear();
         }
         

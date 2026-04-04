@@ -16,7 +16,7 @@
             existing = false;
         }
         
-        public override bool CanSpawn(float random) => existing == false;
+        public override bool CanSpawn(float random) => base.CanSpawn(random) && !existing;
         
         protected override bool CreateNotification => false;
     }

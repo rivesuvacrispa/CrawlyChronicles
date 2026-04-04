@@ -2,6 +2,7 @@
 using Hitboxes;
 using UnityEngine;
 using Util;
+using Util.Components;
 using Util.Interfaces;
 
 namespace Gameplay.Enemies.Spawners

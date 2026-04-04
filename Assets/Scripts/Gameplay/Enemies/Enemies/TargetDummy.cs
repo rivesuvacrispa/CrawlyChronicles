@@ -5,6 +5,7 @@ using Hitboxes;
 using SoundEffects;
 using UnityEngine;
 using Util;
+using Util.Components;
 using Util.Interfaces;
 
 namespace Gameplay.Enemies.Enemies

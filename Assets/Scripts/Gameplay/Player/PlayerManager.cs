@@ -2,8 +2,10 @@
 using GameCycle;
 using Gameplay.Breeding;
 using Gameplay.Effects.Healthbars;
+using Gameplay.Genes;
 using Gameplay.Interaction;
 using Gameplay.Map;
+using Gameplay.Mutations;
 using Gameplay.Mutations.EntityEffects;
 using Hitboxes;
 using SoundEffects;
@@ -39,10 +41,13 @@ namespace Gameplay.Player
         [SerializeField] private AttackController attackController;
         [SerializeField] private Collider2D col;
         [SerializeField] private EffectController effectController;
+
         [Header("Stats")]
+        [SerializeField] private TrioGene maxMutationsByType;
         [SerializeField] private PlayerStats baseStats;
         [SerializeField] private PlayerStats currentStats;
 
+        public TrioGene MaxMutationsByType => maxMutationsByType;
         public Collider2D Collider => col;
         public bool IsHoldingEgg { get; private set; }
         public Egg HoldingEgg { get; private set; }

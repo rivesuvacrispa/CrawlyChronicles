@@ -64,8 +64,6 @@ namespace Gameplay.Food.Foodbeds
         }
 
         public override bool CanInteract() => spikesLeft == 0;
-
-        public override bool CanSpawn(float random) => base.CanSpawn(random) && TimeManager.DayCounter > 1 && random < 1 / 3f;
         
         protected override bool CreateNotification => spikesLeft == 0;
     }

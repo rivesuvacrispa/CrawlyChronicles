@@ -1,5 +1,4 @@
-﻿ using Timeline;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Gameplay.Food.VenusFlyTrap
 {
@@ -18,8 +17,6 @@ namespace Gameplay.Food.VenusFlyTrap
         protected override void OnEatenByPlayer()
         {
         }
-
-        public override bool CanSpawn(float random) => base.CanSpawn(random) && TimeManager.DayCounter > 1 && random < 1 / 3f;
 
         public override bool CanInteract() => base.CanInteract() && caughtTimes >= 6;
         protected override bool CreateNotification => false;

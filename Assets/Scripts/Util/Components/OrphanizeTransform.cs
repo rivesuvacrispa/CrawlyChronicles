@@ -1,7 +1,6 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Util
+namespace Util.Components
 {
     public class OrphanizeTransform : MonoBehaviour
     {

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Util
+namespace Util.Components
 {
     public class AnimationHelper : MonoBehaviour
     {

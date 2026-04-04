@@ -16,6 +16,7 @@ using UI.Menus;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Util;
+using Util.Components;
 using Util.Interfaces;
 
 namespace Gameplay.Enemies

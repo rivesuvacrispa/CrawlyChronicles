@@ -3,6 +3,7 @@ using System.Collections;
 using Gameplay.Player;
 using UnityEngine;
 using Util;
+using Util.Components;
 using Util.Interfaces;
 
 namespace Hitboxes

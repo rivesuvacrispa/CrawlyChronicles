@@ -6,6 +6,7 @@ using Gameplay.AI.Locators;
 using Gameplay.Breeding;
 using Gameplay.Genes;
 using Gameplay.Interaction;
+using Timeline;
 using UI.Menus;
 using UnityEngine;
 using Util.Interfaces;
@@ -97,6 +98,15 @@ namespace Gameplay.Food
 
             return true;
         }
+
+        public void Grow()
+        {
+            if (Amount == scriptable.GetMaxAmount()) return;
+
+            Amount++;
+            OnDataUpdate?.Invoke();
+            UpdateSprite();
+        }
         
         private void UpdateSprite() => spriteRenderer.sprite = scriptable.GetGrowthSprite(Amount);
         private void OnResetRequested()
@@ -106,9 +116,13 @@ namespace Gameplay.Food
         }
 
         protected abstract void OnEatenByPlayer();
-        public abstract bool CanSpawn(float random);
+        public virtual bool CanSpawn(float random)
+        {
+            return random <= scriptable.SpawnChance && 
+                   TimeManager.DayCounter > scriptable.CanSpawnFromDay &&
+                   TimeManager.Is(scriptable.TimeOfDay);
+        }
 
-        
 
         // IContinuouslyInteractable
         public void Interact()

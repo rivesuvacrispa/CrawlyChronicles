@@ -75,7 +75,7 @@ namespace Gameplay.Enemies.Enemies
 
         public override void OnFoodLocated(Foodbed foodBed)
         {
-            if (!hungry || foodBed is Ghostcap) return;
+            if (!hungry || foodBed is MutagenicFoodbed) return;
             StateController.SetState(AIState.Follow, 
                 followTarget: foodBed,
                 () => {

@@ -76,7 +76,7 @@ namespace Gameplay.Player
         {
             MutationData data = new MutationData();
             foreach (var basicAbility in instance.allAbilities.Where(basicAbility => basicAbility.isActiveAndEnabled))
-                data.Add(basicAbility.Scriptable, basicAbility.Level);
+                data.Set(basicAbility.Scriptable, basicAbility.Level);
             return data;
         }
 

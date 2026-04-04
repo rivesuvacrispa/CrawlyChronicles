@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using Gameplay.Food.Foodbeds;
 using Gameplay.Player;
 using TMPro;
 using UI.Menus;
@@ -35,8 +37,21 @@ namespace Timeline
 
         public static bool IsDay => Instance.time < Instance.dayDurationInSeconds;
         public static int DayDuration => Instance.dayDurationInSeconds;
+
+
         
         private TimeManager() => Instance = this;
+
+        public static bool Is(TimeOfDay timeOfDay)
+        {
+            return timeOfDay switch
+            {
+                TimeOfDay.ANY => true,
+                TimeOfDay.DAY => IsDay,
+                TimeOfDay.NIGHT => !IsDay,
+                _ => false
+            };
+        }
 
         private void Awake()
         {

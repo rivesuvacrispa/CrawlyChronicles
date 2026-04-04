@@ -183,7 +183,7 @@ namespace Gameplay.Breeding
             {
                 Egg egg = new Egg(
                     genes.Randomize(GlobalDefinitions.EggGeneEntropy), 
-                    mutationData.Randomize());
+                    mutationData.Copy());
                 eggs.Add(egg);
                 amount--;
             }
