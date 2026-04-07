@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Gameplay.Food.Foodbeds
+namespace Gameplay.Food.Cacti
 {
     public class CactiCollider : MonoBehaviour
     {

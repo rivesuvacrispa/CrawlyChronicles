@@ -1,0 +1,126 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using Definitions;
+using Gameplay.Player;
+using UnityEngine;
+using Util.Interfaces;
+
+namespace Hitboxes
+{
+    public class DamageableHitbox : MonoBehaviour, IDamageableHitbox 
+    {
+        [SerializeField] private Component damagableComponent;
+
+        public IDamageable Enemy { get; private set; }
+        private readonly HashSet<DamageSource> blockedSources = new();
+
+        public delegate void EnemyHitboxEvent(IDamageable enemy, BasePlayerAttack attack, float damage);
+        public static event EnemyHitboxEvent OnCollideWithPlayerAttack;
+        
+        public bool Dead { get; private set; }
+        
+        
+        
+        public bool ImmuneToSource(DamageSource source) => !isActiveAndEnabled || Dead || blockedSources.Contains(source);
+
+        private void Awake()
+        {
+            if (damagableComponent is IDamageable e)
+            {
+                Enemy = e;
+                Enemy.OnDeath += OnTargetDeath;
+            }
+            else
+            {
+                Debug.LogError($"Component {damagableComponent.name} is not IDamageable");
+                gameObject.SetActive(false);
+            }
+        }
+
+        private void OnDestroy()
+        {
+            Enemy.OnDeath -= OnTargetDeath;
+        }
+
+        // Handle other death cases that are not included in IDamageable
+        protected virtual void OnTargetDeath(IDamageable target) => Die();
+        
+        /***
+         * EnemyHitbox x PlayerAttack
+         * Player attack collides with enemy 
+         * Enemy takes damage
+         */
+        private void OnCollisionEnter2D(Collision2D col)
+        {
+            if (col.collider.TryGetComponent(out BasePlayerAttack playerAttack))
+            {
+                float damage = Enemy.Damage(playerAttack.CreateDamageInstance());
+                OnCollideWithPlayerAttack?.Invoke(Enemy, playerAttack, damage);
+            }
+        }
+        
+        /***
+         * EnemyHitbox x PlayerAttack (trigger)
+         * Player attack triggers with enemy
+         * Enemy takes damage
+         */
+        private void OnTriggerEnter2D(Collider2D col)
+        {
+            if (col.TryGetComponent(out BasePlayerAttack playerAttack))
+            {
+                float damage = Enemy.Damage(playerAttack.CreateDamageInstance());
+                OnCollideWithPlayerAttack?.Invoke(Enemy, playerAttack, damage);
+            }
+        }
+        
+        public void Enable()
+        {
+            if (Dead) return;
+            
+            gameObject.SetActive(true);
+        }
+
+        public void Disable()
+        {
+            gameObject.SetActive(false);
+        }
+
+        public void Reset()
+        {
+            blockedSources.Clear();
+            Dead = false;
+            Enable();
+        }
+
+        public void Die()
+        {
+            if (Dead) return;
+            
+            Dead = true;
+            Disable();
+        }
+
+        public void Hit(DamageInstance instance)
+        {
+            if (Dead || !blockedSources.Add(instance.source)) return;
+            
+            ImmunityTask(instance, gameObject.GetCancellationTokenOnDestroy()).Forget();
+        }
+
+        private async UniTask ImmunityTask(DamageInstance instance, CancellationToken cancellationToken)
+        {
+            await UniTask.Delay(TimeSpan.FromSeconds(GlobalDefinitions.EnemyImmunityDuration), cancellationToken: cancellationToken);
+            blockedSources.Remove(instance.source);
+        }
+
+
+        
+        private void OnValidate()
+        {
+            if (gameObject.TryGetComponent(out IDamageable _))
+                Debug.LogWarning("DamageableEnemyHitbox shouldn't be used on the same object as its wearer. Move it to child gameobject instead");
+        }
+    }
+}

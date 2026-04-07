@@ -1,6 +1,4 @@
-﻿using Gameplay.Breeding;
-using Gameplay.Player;
-using UI.Menus;
+﻿using UI.Menus;
 
 namespace Gameplay.Food.Foodbeds
 {
@@ -8,8 +6,7 @@ namespace Gameplay.Food.Foodbeds
     {
         protected override void OnEatenByPlayer()
         {
-            MutationMenu.Show(MutationTarget.Player, 
-                new Egg(BreedingManager.Instance.TrioGene, AbilityController.GetMutationData()));
+            MutationMenu.ShowForCurrentEgg();
         }
     }
 }

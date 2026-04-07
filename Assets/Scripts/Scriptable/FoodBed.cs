@@ -1,5 +1,6 @@
 ﻿using Gameplay.Food.Foodbeds;
 using UnityEngine;
+using Util;
 
 namespace Scriptable
 {
@@ -16,13 +17,14 @@ namespace Scriptable
         public TimeOfDay TimeOfDay => timeOfDay;
         public float SpawnChance => spawnChance;
         public int CanSpawnFromDay => canSpawnFromDay;
+        public int MaxAmount => amountRandom.y;
+
 
         public Sprite GetGrowthSprite(int amount)
         {
-            return growthSprites[Mathf.Clamp(amount - 1, 0, 5)];
+            return growthSprites[Mathf.Clamp(amount, 0, growthSprites.Length - 1)];
         }
 
         public int GetRandomAmount() => Random.Range(amountRandom.x, amountRandom.y + 1);
-        public int GetMaxAmount() => amountRandom.y;
     }
 }

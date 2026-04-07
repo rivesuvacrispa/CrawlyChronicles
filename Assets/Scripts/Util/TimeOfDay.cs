@@ -1,4 +1,4 @@
-﻿namespace Gameplay.Food.Foodbeds
+﻿namespace Util
 {
     public enum TimeOfDay
     {

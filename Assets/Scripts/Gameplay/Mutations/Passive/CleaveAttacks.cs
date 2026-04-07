@@ -48,7 +48,7 @@ namespace Gameplay.Mutations.Passive
             DamageableEnemyHitbox.OnCollideWithPlayerAttack -= OnCollideWithPlayerAttack;
         }
 
-        private void OnCollideWithPlayerAttack(IDamageableEnemy enemy, BasePlayerAttack attack, float damageDealt)
+        private void OnCollideWithPlayerAttack(IDamageable enemy, BasePlayerAttack attack, float damageDealt)
         {
             if (damageDealt == 0) return;
 

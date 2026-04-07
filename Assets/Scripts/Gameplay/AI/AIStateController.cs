@@ -5,6 +5,7 @@ using Gameplay.AI.Locators;
 using Gameplay.Breeding;
 using Gameplay.Enemies;
 using Gameplay.Food;
+using Gameplay.Food.Foodbeds;
 using Gameplay.Food.VenusFlyTrap;
 using Gameplay.Map;
 using Gameplay.Player;

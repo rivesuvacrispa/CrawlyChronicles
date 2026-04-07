@@ -61,6 +61,10 @@ namespace UI.Menus
 
         private void OnDestroy() => SettingsMenu.OnDifficultyChanged -= OnDifficultyChanged;
 
+        public static void ShowForCurrentEgg()
+        {
+            Show(MutationTarget.Player, new Egg(BreedingManager.Instance.TrioGene, AbilityController.GetMutationData()));
+        }
         public static void Show(MutationTarget target, Egg egg) => instance.ShowNonStatic(target, egg);
 
         private void ShowNonStatic(MutationTarget target, Egg egg)

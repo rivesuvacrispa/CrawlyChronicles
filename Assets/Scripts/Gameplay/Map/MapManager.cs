@@ -2,6 +2,7 @@
 using System.Linq;
 using Gameplay.Enemies;
 using Gameplay.Food;
+using Gameplay.Food.Foodbeds;
 using UnityEngine;
 
 namespace Gameplay.Map

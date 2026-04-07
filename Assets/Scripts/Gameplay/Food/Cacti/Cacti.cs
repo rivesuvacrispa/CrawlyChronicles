@@ -1,12 +1,10 @@
-﻿
-using Gameplay.Enemies;
+﻿using Gameplay.Enemies;
 using Gameplay.Player;
 using Hitboxes;
-using Timeline;
 using UnityEngine;
 using Util.Interfaces;
 
-namespace Gameplay.Food.Foodbeds
+namespace Gameplay.Food.Cacti
 {
     public class Cacti : UniqueFoodbed, IDamageSource
     {

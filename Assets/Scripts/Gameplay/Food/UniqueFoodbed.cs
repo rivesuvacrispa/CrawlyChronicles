@@ -1,4 +1,6 @@
-﻿namespace Gameplay.Food
+﻿using Gameplay.Food.Foodbeds;
+
+namespace Gameplay.Food
 {
     public abstract class UniqueFoodbed : Foodbed
     {

@@ -1,6 +1,7 @@
 ﻿using Gameplay.AI;
 using Gameplay.Breeding;
 using Gameplay.Food;
+using Gameplay.Food.Foodbeds;
 
 namespace Gameplay.Enemies.Enemies
 {

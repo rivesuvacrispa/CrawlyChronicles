@@ -53,7 +53,6 @@ namespace Hitboxes
 
             float damage = instance.CalculateDamage(Armor);
             CurrentHealth -= damage;
-            // Debug.Log($"{((Component)this).gameObject.name} damaged for {damage}, piercing: {instance.piercing}");
             OnDamageTakenGlobal?.Invoke(this, instance);
             OnBeforeHit(instance);
 
@@ -78,6 +77,9 @@ namespace Hitboxes
             return damage;
         }
 
+        /**
+         * This is where OnDamageTaken should be called
+         */
         public void OnBeforeHit(DamageInstance damageInstance);
         
         public void Struck() { }

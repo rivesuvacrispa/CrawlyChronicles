@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Gameplay.Food.Foodbeds;
+using UnityEngine;
 
 namespace Gameplay.Food
 {

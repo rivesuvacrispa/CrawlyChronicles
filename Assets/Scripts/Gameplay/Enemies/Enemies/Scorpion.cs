@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using Gameplay.AI;
 using Gameplay.Breeding;
 using Gameplay.Food;
+using Gameplay.Food.Foodbeds;
 using UnityEngine;
 
 namespace Gameplay.Enemies.Enemies

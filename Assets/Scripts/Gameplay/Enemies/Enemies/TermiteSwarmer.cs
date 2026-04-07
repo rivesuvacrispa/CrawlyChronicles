@@ -5,6 +5,7 @@ using Gameplay.AI;
 using Gameplay.AI.Locators;
 using Gameplay.Breeding;
 using Gameplay.Food;
+using Gameplay.Food.Foodbeds;
 using UnityEngine;
 using Util;
 using Util.Interfaces;

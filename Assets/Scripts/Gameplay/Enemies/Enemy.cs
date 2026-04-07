@@ -6,6 +6,7 @@ using Definitions;
 using Gameplay.AI;
 using Gameplay.Breeding;
 using Gameplay.Food;
+using Gameplay.Food.Foodbeds;
 using Gameplay.Map;
 using Gameplay.Mutations.EntityEffects;
 using Gameplay.Player;

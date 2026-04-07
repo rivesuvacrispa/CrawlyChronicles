@@ -1,6 +1,7 @@
 ﻿using DG.Tweening;
 using Gameplay.Breeding;
 using Gameplay.Enemies;
+using Gameplay.Food.Clam;
 using Gameplay.Genes;
 using Gameplay.Map;
 using Gameplay.Mutations;
@@ -40,6 +41,7 @@ namespace Definitions
         [SerializeField] private EggDrop eggDropPrefab;
         [SerializeField] private PopupNotification popupNotificationPrefab;
         [SerializeField] private GeneDrop geneDropPrefab;
+        [SerializeField] private ClamMeat clamMeatPrefab;
         [Header("Colors")]
         [SerializeField] private Color deadColor;
         [SerializeField] private Color eggPuddleColor;
@@ -77,6 +79,7 @@ namespace Definitions
         public static int BreedingPartnersGeneEntropy => instance.breedingPartnersGeneEntropy;
         public static int EggGeneEntropy => instance.eggGeneEntropy;
         public static EggBed EggBedPrefab => instance.eggBedPrefab;
+        public static ClamMeat ClamMeatPrefab => instance.clamMeatPrefab;
         public static float MaxAppliableForce => instance.maxAppliedForce;
         public static float UnitMass => instance.unitMass;
         public static float EnemyImmunityDuration => instance.enemyImmunityDuration;
