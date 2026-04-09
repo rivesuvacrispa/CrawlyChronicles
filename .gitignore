@@ -1,5 +1,9 @@
-﻿*
-!Assets/Scripts/**
-!Assets/Editor/**
-!*.cs
-!.gitignore
+﻿*.meta
+.git/
+.idea/
+*.csproj
+*.csproj.*
+*.sln
+*.asset
+*.renderTexture
+*.user
