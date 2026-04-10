@@ -1,4 +1,6 @@
-﻿using Definitions;
+﻿using System;
+using Controls;
+using Definitions;
 using Gameplay.Mutations;
 using Gameplay.Player;
 using Scriptable;
@@ -15,6 +17,13 @@ namespace UI.Elements
         [SerializeField] private Image cooldownImage;
         [SerializeField] private ParticleSystem autocastParticles;
 
+        public delegate void KeyCodeEvent(KeyCode keyCode);
+        public static event KeyCodeEvent OnKeyReserved;
+        public static event KeyCodeEvent OnKeyUnreserved;
+        
+        private KeyCode? reservedKey;
+        
+        
 
         public override void SetAbility(ActiveAbility newAbility)
         {
@@ -24,13 +33,14 @@ namespace UI.Elements
                 .GetGeneColor(Ability.Scriptable.GeneType)
                 .WithAlpha(0.35f);
             cooldownImage.fillAmount = 0;
-            hotkeyText.text = Ability.Scriptable.KeyCode.ToString();
+            
+            SetTextToHotkey();
             Ability.OnCooldownChanged += UpdateCooldown;
         }
 
         private void Update()
         {
-            if (Input.GetKeyDown(Scriptable.KeyCode))
+            if (reservedKey is not null && Input.GetKeyDown(reservedKey.Value))
                 Activate();
         }
 
@@ -65,15 +75,19 @@ namespace UI.Elements
             }
             else
             {
-                hotkeyText.text = Scriptable.KeyCode.ToString();
+                SetTextToHotkey();
                 cooldownImage.fillAmount = 0;
             }
         }
 
         private void OnEnable()
         {
+            transform.SetAsLastSibling();
             if (Ability is null) return;
 
+            ReserveKey();
+            SetTextToHotkey();
+            
             if (Ability.Autocast)
                 autocastParticles.Play();
             else
@@ -84,8 +98,36 @@ namespace UI.Elements
         {
             if (Scriptable is null) return;
 
-            hotkeyText.text = Scriptable.KeyCode.ToString();
+            UnreserveKey();
+            SetTextToHotkey();
             cooldownImage.fillAmount = 0;
+        }
+
+        private void SetTextToHotkey()
+        {
+            string keyText = reservedKey?.ToString() ?? string.Empty;
+            keyText = keyText.Replace("Alpha", "");
+            hotkeyText.text = keyText;
+        }
+        
+        private void ReserveKey()
+        {
+            UnreserveKey();
+            
+            if (ControlsManager.TryGetFreeKeyCode(out KeyCode keyCode))
+            {
+                reservedKey = keyCode;
+                OnKeyReserved?.Invoke(keyCode);
+            }
+        }
+
+        private void UnreserveKey()
+        {
+            if (reservedKey is not null)
+            {
+                OnKeyUnreserved?.Invoke(reservedKey.Value);
+                reservedKey = null;
+            }
         }
     }
 }
