@@ -33,5 +33,10 @@ namespace Util
             this.stateOn = stateOn;
             this.stateOff = stateOff;
         }
+
+        public void Clear()
+        {
+            voteSources.Clear();
+        }
     }
 }
