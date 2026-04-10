@@ -43,11 +43,9 @@ namespace Gameplay.Player
         [SerializeField] private EffectController effectController;
 
         [Header("Stats")]
-        [SerializeField] private TrioGene maxMutationsByType;
         [SerializeField] private PlayerStats baseStats;
         [SerializeField] private PlayerStats currentStats;
 
-        public TrioGene MaxMutationsByType => maxMutationsByType;
         public Collider2D Collider => col;
         public bool IsHoldingEgg { get; private set; }
         public Egg HoldingEgg { get; private set; }

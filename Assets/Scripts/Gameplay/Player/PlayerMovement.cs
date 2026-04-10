@@ -2,6 +2,8 @@ using System;
 using System.Threading;
 using Camera;
 using Cysharp.Threading.Tasks;
+using Gameplay.Player.Movement;
+using Scriptable;
 using SoundEffects;
 using UnityEngine;
 using Util;
@@ -16,6 +18,7 @@ namespace Gameplay.Player
         [SerializeField] private Rigidbody2D rb;
         [SerializeField] private float knockbackResistance = 0.5f;
         [SerializeField] private float comboDashSpeedAmplifier;
+        [SerializeField, Header("Default Movement")] private PlayerMovementProvider movementProvider;
 
 
         
@@ -34,7 +37,23 @@ namespace Gameplay.Player
 
 
         private PlayerMovement() => instance = this;
-   
+
+        private void OnEnable()
+        {
+            CharacterManager.OnCharacterSelected += OnCharacterSelected;
+        }
+
+        private void OnDisable()
+        {
+            CharacterManager.OnCharacterSelected -= OnCharacterSelected;
+        }
+
+        private void OnCharacterSelected(Character selected)
+        {
+            movementProvider = selected.MovementProvider;
+            print($"Selected movement type: {movementProvider.name}");
+        }
+
 
         private void FixedUpdate()
         {
@@ -42,10 +61,10 @@ namespace Gameplay.Player
             float currentRotation = rb.rotation;
             rb.RotateTowardsPosition(mousePos, PlayerManager.PlayerStats.RotationSpeed);
 
-            if (CanMove && Input.GetMouseButton(1))
+            if (CanMove && movementProvider.ProvideMovement(transform, out Vector2 direction, out ForceMode2D forceMode))
             {
                 PlayCrawl();
-                rb.AddForce(transform.up * (PlayerManager.PlayerStats.MovementSpeed * MoveSpeedAmplifier));
+                rb.AddForce(direction * (PlayerManager.PlayerStats.MovementSpeed * MoveSpeedAmplifier), forceMode);
             }
             else if (Mathf.Abs(previousRotation - currentRotation) > 1f)
                 PlayCrawl();
