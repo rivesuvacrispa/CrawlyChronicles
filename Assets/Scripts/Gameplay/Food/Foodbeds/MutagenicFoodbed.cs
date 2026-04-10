@@ -1,4 +1,4 @@
-﻿using UI.Menus;
+﻿using Gameplay.Player;
 
 namespace Gameplay.Food.Foodbeds
 {
@@ -6,7 +6,7 @@ namespace Gameplay.Food.Foodbeds
     {
         protected override void OnEatenByPlayer()
         {
-            MutationMenu.ShowForCurrentEgg();
+            MutationManager.Instance.MutateFromPlayer();
         }
     }
 }

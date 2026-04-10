@@ -98,7 +98,7 @@ namespace GameCycle
             StopAllCoroutines();
             OnEggbedSelected?.Invoke(null);
             respawnMenuGO.SetActive(false);
-            MutationMenu.Show(MutationTarget.Egg, egg);
+            MutationManager.Instance.MutateFromEgg(egg);
         }
 
         public void Respawn(Egg origin, Egg mutated)

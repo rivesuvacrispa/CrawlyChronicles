@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 using Util;
 
@@ -7,7 +8,7 @@ namespace UI.Util
     public class VsyncToggleButton : ToggleButton
     {
         [SerializeField] private Slider fpsSlider;
-        [SerializeField] private Text fpsText;
+        [SerializeField] private TMP_Text fpsText;
         [SerializeField] private Image fpsFillArea;
 
 

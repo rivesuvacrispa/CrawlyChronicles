@@ -25,7 +25,7 @@ namespace UI.Elements
 
         private static DifficultyButton selectedButton;
 
-        public static Difficulty SelectedDifficulty => selectedButton.difficulty;
+        public static Difficulty SelectedDifficulty => selectedButton is null ? null : selectedButton.difficulty;
 
         private void OnEnable()
         {

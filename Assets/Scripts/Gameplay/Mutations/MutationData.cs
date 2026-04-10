@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Gameplay.Genes;
+using Gameplay.Player;
 using Scriptable;
 
 namespace Gameplay.Mutations
@@ -54,5 +55,9 @@ namespace Gameplay.Mutations
         }
         public Dictionary<BasicMutation, int> GetAll() => mutations;
         public MutationData Copy() => new(mutations.ToDictionary(pair => pair.Key, pair => pair.Value));
+
+        public bool CanFitMutation(BasicMutation mutation)
+            => mutations.Keys.Count(m => m.GeneType == mutation.GeneType) <
+               CharacterManager.CurrentCharacter.MutationSlots.GetGene(mutation.GeneType);
     }
 }

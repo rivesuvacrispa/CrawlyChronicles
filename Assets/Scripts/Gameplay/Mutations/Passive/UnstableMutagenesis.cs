@@ -1,6 +1,7 @@
 ﻿using Gameplay.Mutations.Stats;
-using UI.Menus;
+using Gameplay.Player;
 using UnityEngine;
+using Util;
 
 namespace Gameplay.Mutations.Passive
 {
@@ -11,21 +12,18 @@ namespace Gameplay.Mutations.Passive
         protected override void OnEnable()
         {
             base.OnEnable();
-            MutationMenu.OnMutationClick += OnMutationClick;
+            MutationManager.OnCollectBreakChance += CollectBreakChance;
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            MutationMenu.OnMutationClick -= OnMutationClick;
+            MutationManager.OnCollectBreakChance -= CollectBreakChance;
         }
 
-        private void OnMutationClick()
+        private void CollectBreakChance(FloatWrapper floatWrapper)
         {
-            if (Random.value <= downgradeChance)
-            {
-                MutationMenu.BreakRandomMutation();
-            }
+            floatWrapper.Add(downgradeChance);
         }
     }
 }

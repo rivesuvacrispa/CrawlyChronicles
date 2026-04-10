@@ -22,7 +22,6 @@ namespace Gameplay.AI
     public class AIStateController : MonoBehaviour
     {
         [SerializeField] private Locator locator;
-        [SerializeField] private DamageableEnemyHitbox hitbox;
         [SerializeField] private Collider2D physicsCollider;
 
         [field: SerializeField] public AIState StartingState { get; set; } = AIState.Enter;
@@ -32,7 +31,7 @@ namespace Gameplay.AI
         private AIDestinationSetter destinationSetter;
         private float defaultReachDistance;
         private ITransformProvider currentFollowTarget;
-        
+        private DamageableEnemyHitbox hitbox;
         public bool Etherial { get; private set; }
         private float movementSpeedMultiplier = 1f;
         private float rotationSpeedMultiplier = 1f;
@@ -72,7 +71,8 @@ namespace Gameplay.AI
             enemy = GetComponent<Enemy>();
             aiPath = GetComponent<CallbackableAIPath>();
             destinationSetter = GetComponent<AIDestinationSetter>();
-
+            hitbox = GetComponentInChildren<DamageableEnemyHitbox>();
+            
             locator.OnTargetLocated += OnLocatorTriggered;
             PlayerLocatorBody.OnDisabled += OnPlayerBecomeInvisible;
             aiPath.enabled = false;

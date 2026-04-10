@@ -12,142 +12,60 @@ using UI.Elements;
 using UI.Tooltips;
 using Unity.VisualScripting;
 using UnityEngine;
+using Util.Enums;
 using Random = UnityEngine.Random;
 
 namespace UI.Menus
 {
     public class MutationMenu : MonoBehaviour
     {
-        private static MutationMenu instance;
-
-
-        [Header("Mutations transforms")] 
+        [Header("Mutations transforms")]
         [SerializeField] private List<Transform> mutationTypeToTransform;
 
         [Header("Other refs")]
         [SerializeField] private RespawnManager respawnManager;
+
         [SerializeField] private Transform newMutationsTransform;
         [SerializeField] private MutationAbilityTooltip tooltip;
         [SerializeField] private BasicAbilityButton basicAbilityButtonPrefab;
         [SerializeField] private MutationButton mutationButtonPrefab;
         [SerializeField] private GeneDisplay geneDisplay;
-        [SerializeField] private List<BasicMutation> allMutations = new();
         [SerializeField] private MutationsRerollButton rerollButton;
         [SerializeField] private MutationSlotGroup slotGroup;
-        [Header("Settings")]
-        [SerializeField] private int maxMutationsAmount = 20;
-        [SerializeField] private Vector2Int randomAmountBounds = new(6, 12);
-        [SerializeField] private float mutationRerollCost;
 
-        
+
         private Egg hatchingEgg = new(TrioGene.Zero, new MutationData());
-        private MutationTarget mutationTarget;
+        private RespawnTarget respawnTarget;
         private TrioGene genesLeft;
         private readonly Dictionary<BasicMutation, BasicAbilityButton> basicAbilityButtons = new();
         private MutationData current = new();
         private TrioGene rerollCost;
         private readonly List<MutationButton> currentButtons = new();
-        private float currentMutationRerollCost;
 
 
         public delegate void MutationMenuEvent();
+
         public static event MutationMenuEvent OnMutationClick;
-        
 
 
-        private MutationMenu() => instance = this;
-
-        private void Awake() => SettingsMenu.OnDifficultyChanged += OnDifficultyChanged;
-
-        private void OnDestroy() => SettingsMenu.OnDifficultyChanged -= OnDifficultyChanged;
-
-        public static void ShowForCurrentEgg()
-        {
-            Show(MutationTarget.Player, new Egg(BreedingManager.Instance.TrioGene, AbilityController.GetMutationData()));
-        }
-        public static void Show(MutationTarget target, Egg egg) => instance.ShowNonStatic(target, egg);
-
-        private void ShowNonStatic(MutationTarget target, Egg egg)
+        public void Show(RespawnTarget target, Egg egg)
         {
             Time.timeScale = 0;
-            mutationTarget = target;
+            respawnTarget = target;
             tooltip.Clear();
             hatchingEgg = egg;
             genesLeft = egg.Genes;
             geneDisplay.UpdateTrioText(genesLeft);
             current = egg.MutationData;
-            ShowCurrentMutations();
+            CreateCurrentButtons();
+            CreateFieldButtons(MutationManager.Instance.GetRandomVariants());
             UpdateRerollButton();
-            CreateMutations();
-            
+
             gameObject.SetActive(true);
         }
 
-        private void CreateMutations()
+        private void CreateFieldButtons(Dictionary<BasicMutation, int> variants)
         {
-            // TODO: remove ones that are out of slots
-            // Dictionary of mutation + lvl of final given variants
-            Dictionary<BasicMutation, int> variants = new();
-            HashSet<BasicMutation> maxed = new();
-            HashSet<BasicMutation> incompatible = new();
-            
-            // Build collection of incompatible mutations
-            var all = current.GetAll();
-            foreach (var (m, _) in all)
-            {
-                if (m.HasIncompatible) incompatible.AddRange(m.IncompatibleMutations);
-            }
-
-            // Build collection of mutations that player maxxed
-            foreach (var (basicMutation, lvl) in all)
-            {
-                if (lvl == 9) maxed.Add(basicMutation);
-            }
-            
-            // Build collection of all existing available mutations
-            var availableSet = LinqUtility.ToHashSet(allMutations);
-            // Remove maxed mutations from available collection
-            availableSet.ExceptWith(maxed);
-            // Remove incompatible mutations
-            availableSet.ExceptWith(incompatible);
-            var available = availableSet.ToList();
-
-            float bonusChance = PlayerManager.PlayerStats.Mutagenicity;
-            int mutationsAmount = Random.Range(randomAmountBounds.x, randomAmountBounds.y + 1);
-            
-            // For each rest possible mutation slot, add it according to mutagenicity value
-            for (int i = 0; i < maxMutationsAmount - randomAmountBounds.y; i++)
-                if (Random.value <= bonusChance)
-                    mutationsAmount++;
-            
-            int len = available.Count;
-            int amount = Mathf.Clamp(mutationsAmount, 1, Mathf.Min(maxMutationsAmount, len));
-            
-            // For a chosen amount of mutations
-            while (amount > 0)
-            {
-                // Choose one random
-                BasicMutation chosenOne = available[Random.Range(0, len)];
-                
-                // If mutation already in the list of given mutations
-                if (variants.ContainsKey(chosenOne))
-                {
-                    // If list of given mutations equal to a list of possible mutations, there's no more available
-                    if(variants.Count == len) break;
-                    
-                    continue;
-                }
-
-                // If player has chosen mutation, give it +1 lvl 
-                int lvl = 0;
-                if (all.ContainsKey(chosenOne)) 
-                    lvl = all[chosenOne] + 1;
-                
-                // Add chosen mutation to a final variants list
-                variants.Add(chosenOne, lvl);
-                amount--;
-            }
-            
             // Create buttons for variants
             foreach (var (mutation, lvl) in variants)
             {
@@ -160,9 +78,9 @@ namespace UI.Menus
             }
         }
 
-        private void ShowCurrentMutations()
+        private void CreateCurrentButtons()
         {
-            foreach (var (mutation, level) in current.GetAll()) 
+            foreach (var (mutation, level) in current.GetAll())
                 CreateBasicAbilityButton(mutation, level);
         }
 
@@ -172,7 +90,7 @@ namespace UI.Menus
             if (mutation.HasIncompatible)
             {
                 Debug.Log($"Click on {mutation.Name}");
-                foreach (var button in 
+                foreach (var button in
                          currentButtons.Where(
                              button => button.Scriptable.HasIncompatible &&
                                        mutation.IncompatibleMutations.Contains(button.Scriptable)))
@@ -181,7 +99,7 @@ namespace UI.Menus
                     button.SetUnavailable();
                 }
             }
-            
+
             int cost = GlobalDefinitions.GetMutationCost(level);
             current.Set(mutation, level);
 
@@ -192,15 +110,17 @@ namespace UI.Menus
 
             genesLeft.SetGene(mutation.GeneType, genesLeft.GetGene(mutation.GeneType) - cost);
             geneDisplay.UpdateTrioText(genesLeft);
-            RefreshAffordable();
+            TryBreakRandomMutation();
+            UpdateAffordable();
             UpdateRerollButton();
+            UpdateSlotsGroup();
             OnMutationClick?.Invoke();
         }
 
         private void CreateBasicAbilityButton(BasicMutation mutation, int level)
         {
             Transform t = mutationTypeToTransform[(int)mutation.GeneType];
-            
+
             var btn = Instantiate(basicAbilityButtonPrefab, t);
             btn.SetVisuals(mutation);
             btn.UpdateLevelText(level);
@@ -209,9 +129,10 @@ namespace UI.Menus
         }
 
         private bool CanAfford(BasicMutation mutation, int level) =>
-            genesLeft.GetGene(mutation.GeneType) >= GlobalDefinitions.GetMutationCost(level);
+            genesLeft.GetGene(mutation.GeneType) >= GlobalDefinitions.GetMutationCost(level) &&
+            MutationManager.CurrentMutationData.CanFitMutation(mutation);
 
-        private void RefreshAffordable()
+        private void UpdateAffordable()
         {
             foreach (Transform t in newMutationsTransform)
             {
@@ -225,80 +146,56 @@ namespace UI.Menus
             Egg mutated = new Egg(genesLeft, current.Copy());
             gameObject.SetActive(false);
             ClearAll();
-            if(mutationTarget is MutationTarget.Egg) 
+            if (respawnTarget is RespawnTarget.Egg)
                 respawnManager.Respawn(hatchingEgg, mutated);
-            else if (mutationTarget is MutationTarget.Player)
+            else if (respawnTarget is RespawnTarget.Player)
             {
                 BreedingManager.Instance.SetTrioGene(mutated.Genes);
                 AbilityController.UpdateAbilities(mutated);
                 Time.timeScale = 1;
             }
         }
-        
+
         public void Reroll()
         {
             genesLeft.SetGene(0, genesLeft.GetGene(0) - rerollCost.GetGene(0));
             genesLeft.SetGene(1, genesLeft.GetGene(1) - rerollCost.GetGene(1));
             genesLeft.SetGene(2, genesLeft.GetGene(2) - rerollCost.GetGene(2));
             geneDisplay.UpdateTrioText(genesLeft);
-            foreach (Transform t in newMutationsTransform) 
+            foreach (Transform t in newMutationsTransform)
                 Destroy(t.gameObject);
             UpdateRerollButton();
             currentButtons.Clear();
-            CreateMutations();
+            CreateFieldButtons(MutationManager.Instance.GetRandomVariants());
         }
-        
+
         private void UpdateRerollButton()
         {
-            rerollCost = genesLeft.AsRerollCost(currentMutationRerollCost);
+            rerollCost = genesLeft.AsRerollCost(MutationManager.RerollCost);
             rerollButton.SetCost(rerollCost, genesLeft);
         }
-
-        public static void BreakRandomMutation() => instance.BreakRandomMutationNonStatic();
         
-        private void BreakRandomMutationNonStatic()
+        private void TryBreakRandomMutation()
         {
-            var candidates = new List<BasicMutation>();
-            
-            foreach (var (mutation, lvl) in current.GetAll())
-            {
-                if (lvl == 9) continue;
-                candidates.Add(mutation);
-            }
-
-            var candidate = candidates.OrderBy(_ => Random.value).FirstOrDefault();
-            if (candidate is null || 
-                !basicAbilityButtons.TryGetValue(candidate, out BasicAbilityButton b) || 
-                !current.TryGet(candidate, out int currentLvl)) 
+            if (!MutationManager.Instance.TryBreakRandomMutation(out BasicMutation broken, out int downgradedLvl) ||
+                !basicAbilityButtons.TryGetValue(broken, out BasicAbilityButton b))
                 return;
-            
-            int downgradedLvl = currentLvl - 1;
-            
-            Debug.Log($"Mutation {candidate.Name} is broken to lvl {downgradedLvl}");
 
             if (downgradedLvl == -1)
             {
-                if (current.Remove(candidate))
-                {
-                    basicAbilityButtons.Remove(candidate);
-                    b.PlayBreak();
-                }
+                basicAbilityButtons.Remove(broken);
+                b.PlayBreak();
             }
             else
             {
-                current.Set(candidate, downgradedLvl);
                 b.PlayDowngrade(downgradedLvl);
             }
         }
 
-        private void UpdateSlotsGroup(TrioGene currentSlots)
+        private void UpdateSlotsGroup()
         {
-            slotGroup.UpdateCanFit(currentSlots, PlayerManager.Instance.MaxMutationsByType);
-        }
-
-        private void UpdateAvailability(TrioGene currentSlots)
-        {
-            
+            TrioGene currentSlots = current.CountByType();
+            slotGroup.UpdateCanFit(currentSlots, CharacterManager.CurrentCharacter.MutationSlots);
         }
 
 
@@ -312,16 +209,5 @@ namespace UI.Menus
             basicAbilityButtons.Clear();
             currentButtons.Clear();
         }
-        
-        private void OnDifficultyChanged(Difficulty difficulty)
-        {
-            currentMutationRerollCost = mutationRerollCost * difficulty.GeneRerollCost;
-        }
-    }
-
-    public enum MutationTarget
-    {
-        Egg,
-        Player
     }
 }

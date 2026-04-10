@@ -34,7 +34,7 @@ namespace Gameplay.Enemies
         [SerializeField] private GameObject attackGO;
         [SerializeField] protected SpriteRenderer minimapIcon;
         [SerializeField] protected SpriteRenderer spriteRenderer;
-        [SerializeField] protected DamageableEnemyHitbox hitbox;
+        
         [SerializeField] protected Scriptable.Enemy scriptable;
 
         protected Animator animator;
@@ -43,6 +43,7 @@ namespace Gameplay.Enemies
         private EffectController effectController;
         private AudioController audioController;
 
+        protected DamageableEnemyHitbox hitbox;
         protected bool spawnedBySpawner;
         private bool stunned;
         private float attackDelay;
@@ -77,6 +78,7 @@ namespace Gameplay.Enemies
 
         protected void Awake()
         {
+            hitbox = GetComponentInChildren<DamageableEnemyHitbox>();
             animator = GetComponent<Animator>();
             rb = GetComponent<Rigidbody2D>();
             StateController = GetComponent<AIStateController>();

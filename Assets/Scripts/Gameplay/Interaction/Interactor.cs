@@ -53,7 +53,7 @@ namespace Gameplay.Interaction
             if (canInteract) UpdatePopup();
             else popup.Disable();
 
-            if (Input.GetKeyDown(KeyCode.E) && canInteract)
+            if (Input.GetKey(KeyCode.E) && canInteract && !Interacting)
             {
                 if (interactable is IContinuouslyInteractable continuouslyInteractable
                     && continuouslyInteractable.InteractionTime != 0)

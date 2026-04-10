@@ -46,8 +46,9 @@ namespace UI.Menus
             motionBlurSlider.onValueChanged.AddListener(UpdateMotionBlur);
 
 
+            ApplyGameDifficulty();
             ApplySettings(SettingsLoader.CurrentSettings);
-            
+
 #if UNITY_EDITOR
             if (debug_OverrideDifficulty) SelectedDifficulty = GetDifficulty(debug_Difficulty);
 #endif
@@ -58,10 +59,12 @@ namespace UI.Menus
         public void ApplyGameDifficulty()
         {
             var diff = DifficultyButton.SelectedDifficulty;
-            if(diff is null) diff = GetDifficulty(OverallDifficulty.Affordable);
-            OnDifficultyChanged?.Invoke(diff);
+            if (diff is null) diff = GetDifficulty(OverallDifficulty.Affordable);
 
             SelectedDifficulty = diff;
+            print($"Selected difficulty {diff}");
+            
+            OnDifficultyChanged?.Invoke(diff);
             SettingsLoader.CurrentSettings.Difficulty = diff.OverallDifficulty;
             SettingsLoader.SaveSettings(SettingsLoader.CurrentSettings);
         }

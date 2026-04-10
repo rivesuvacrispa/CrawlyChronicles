@@ -30,8 +30,7 @@ public class PlayerManagerEditor : Editor, IDamageSource
 
         if (GUILayout.Button("Mutate"))
         {
-            MutationMenu.Show(MutationTarget.Player, 
-                new Egg(BreedingManager.Instance.TrioGene, AbilityController.GetMutationData()));
+            MutationManager.Instance.MutateFromPlayer();
         }
 
         if (GUILayout.Button("Add Genes"))

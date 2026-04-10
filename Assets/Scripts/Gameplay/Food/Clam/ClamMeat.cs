@@ -14,7 +14,7 @@ namespace Gameplay.Food.Clam
 
         protected override void OnEatenByPlayer()
         {
-            MutationMenu.ShowForCurrentEgg();
+            MutationManager.Instance.MutateFromPlayer();
         }
 
         public override float PopupDistance => 0.75f;
