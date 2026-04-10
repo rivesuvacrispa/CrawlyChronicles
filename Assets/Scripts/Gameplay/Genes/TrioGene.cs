@@ -90,5 +90,10 @@ namespace Gameplay.Genes
         public static TrioGene Zero => new(0, 0, 0);
 
         public static TrioGene One => new(1, 1, 1);
+
+        public override string ToString()
+        {
+            return $"[{Aggressive}, {Defensive}, {Universal}]";
+        }
     }
 }

@@ -61,10 +61,10 @@ namespace Gameplay.Player
             float currentRotation = rb.rotation;
             rb.RotateTowardsPosition(mousePos, PlayerManager.PlayerStats.RotationSpeed);
 
-            if (CanMove && movementProvider.ProvideMovement(transform, out Vector2 direction, out ForceMode2D forceMode))
+            if (CanMove && movementProvider.ProvideMovement(transform, out Vector2 direction))
             {
                 PlayCrawl();
-                rb.AddForce(direction * (PlayerManager.PlayerStats.MovementSpeed * MoveSpeedAmplifier), forceMode);
+                Move(direction);
             }
             else if (Mathf.Abs(previousRotation - currentRotation) > 1f)
                 PlayCrawl();
@@ -72,6 +72,12 @@ namespace Gameplay.Player
                 PlayIdle();
             
             previousRotation = currentRotation;
+        }
+
+        private void Move(Vector2 direction)
+        {
+            rb.AddForce(direction * (PlayerManager.PlayerStats.MovementSpeed * MoveSpeedAmplifier), movementProvider.ForceMode);
+
         }
 
         private void PlayCrawl()
@@ -131,21 +137,24 @@ namespace Gameplay.Player
             PlayerAnimator.PlayIdle();
             rb.AddClampedForceTowards(position, PlayerManager.PlayerStats.AttackPower * MoveSpeedAmplifier, ForceMode2D.Impulse);
 
+            bool cancelled = false;
             float t = 0f;
             while (t < duration && Mathf.Abs(rb.rotation - direction) > 10f)
             {
                 rb.RotateTowardsPosition(position, 10 / PlayerSizeManager.CurrentSize);
                 t += Time.fixedDeltaTime;
-                bool cancelled = await UniTask.DelayFrame(1, PlayerLoopTiming.FixedUpdate, cancellationToken: cancellationToken)
+                cancelled = await UniTask.DelayFrame(1, PlayerLoopTiming.FixedUpdate, cancellationToken: cancellationToken)
                     .SuppressCancellationThrow();
                 
                 if (cancelled) break;
             }
 
-            await UniTask.DelayFrame(1, cancellationToken: cancellationToken)
+            cancelled = cancelled || await UniTask.DelayFrame(1, cancellationToken: cancellationToken)
                 .SuppressCancellationThrow();
             
             enabled = true;
+            // Propagate cancellation upwards
+            if (cancelled) throw new OperationCanceledException(cancellationToken);
         }
 
         private async UniTask StraightDashTask(Vector2 position, float duration, float force, CancellationToken cancellationToken)
@@ -154,13 +163,15 @@ namespace Gameplay.Player
             PlayerAnimator.PlayIdle();
             rb.AddClampedForceTowards(position, force, ForceMode2D.Impulse);
 
-            await UniTask.Delay(TimeSpan.FromSeconds(duration), cancellationToken: cancellationToken)
+            bool cancelled = await UniTask.Delay(TimeSpan.FromSeconds(duration), cancellationToken: cancellationToken)
                 .SuppressCancellationThrow();
             
-            await UniTask.DelayFrame(1, cancellationToken: cancellationToken)
+            cancelled = cancelled || await UniTask.DelayFrame(1, cancellationToken: cancellationToken)
                 .SuppressCancellationThrow();
             
             enabled = true;
+            // Propagate cancellation upwards
+            if (cancelled) throw new OperationCanceledException(cancellationToken);
         }
 
         private async UniTask ComboDashTask(float duration, CancellationToken cancellationToken)
@@ -168,7 +179,8 @@ namespace Gameplay.Player
             enabled = false;
             rb.angularVelocity = 60;
             float t = 0;
-
+            bool cancelled = false;
+            
             while (t < duration)
             {
                 rb.rotation += 60f / PlayerSizeManager.CurrentSize;
@@ -179,7 +191,7 @@ namespace Gameplay.Player
                     maxAmplifier: comboDashSpeedAmplifier);
 
                 t += Time.fixedDeltaTime;
-                bool cancelled = await UniTask.DelayFrame(1, PlayerLoopTiming.FixedUpdate, cancellationToken: cancellationToken)
+                cancelled = await UniTask.DelayFrame(1, PlayerLoopTiming.FixedUpdate, cancellationToken: cancellationToken)
                     .SuppressCancellationThrow();
                 
                 if (cancelled) break;
@@ -188,6 +200,8 @@ namespace Gameplay.Player
             enabled = true;
             rb.angularVelocity = 0;
             rb.RotateTowardsPosition(MainCamera.WorldMousePos, 360);
+            // Propagate cancellation upwards
+            if (cancelled) throw new OperationCanceledException(cancellationToken);
         }
 
         private async UniTask KnockbackTask(CancellationToken cancellationToken)

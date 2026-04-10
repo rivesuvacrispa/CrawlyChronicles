@@ -66,7 +66,7 @@ namespace Gameplay.Mutations.Active
         {
             await UniTask.DelayFrame(1, cancellationToken: cancellationToken);
             
-            AttackController.CancelAttack();
+            AttackController.Instance.CancelAttack();
             PlayerMovement.CancelKnockback();
             
             attack.Enable();

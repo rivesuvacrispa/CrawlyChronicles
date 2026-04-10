@@ -37,6 +37,7 @@ namespace Gameplay.Mutations.Active
         
         private async UniTask ActivateTask(CancellationToken cancellationToken)
         {
+            AttackController.Instance.CancelAttack();
             await AttackController.Instance.WhirlwindAttack(duration, cancellationToken)
                 .SuppressCancellationThrow();
             SetOnCooldown();

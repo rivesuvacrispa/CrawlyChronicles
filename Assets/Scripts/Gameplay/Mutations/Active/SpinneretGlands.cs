@@ -114,7 +114,7 @@ namespace Gameplay.Mutations.Active
         public override void Activate(bool auto = false)
         {
             base.Activate(auto);
-            AttackController.CancelAttack();
+            AttackController.Instance.CancelAttack();
             PlayerMovement.CancelKnockback();
                 
             ActivateTask(CreateCommonCancellationToken()).Forget();

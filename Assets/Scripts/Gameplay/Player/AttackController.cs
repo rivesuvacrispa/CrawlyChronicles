@@ -37,11 +37,13 @@ namespace Gameplay.Player
             cancellationTokenSource = new CancellationTokenSource();
         }
 
-        public static void CancelAttack()
+        public void CancelAttack()
         {
             cancellationTokenSource?.Cancel();
             cancellationTokenSource?.Dispose();
             cancellationTokenSource = new CancellationTokenSource();
+            attack.Disable();
+            hitbox.Enable();
         }
 
         private void Update()
@@ -50,7 +52,8 @@ namespace Gameplay.Player
                 !Input.GetMouseButtonDown(0) ||
                 Time.timeScale == 0 ||
                 !PlayerMovement.Enabled ||
-                !PlayerMovement.CanMove)
+                !PlayerMovement.CanMove ||
+                IsInComboDash)
                 return;
             
             Attack(PlayerManager.PlayerStats.AttackPower * PlayerMovement.MoveSpeedAmplifier,
@@ -63,11 +66,15 @@ namespace Gameplay.Player
             attack.Enable();
             hitbox.Disable();
 
-            await PlayerMovement.Dash(
-                    dashDuration, 
-                    force,
-                    cancellationToken: cancellationToken)
-                .SuppressCancellationThrow();
+            bool cancelled = await PlayerMovement.Dash(
+                dashDuration,
+                force,
+                cancellationToken: cancellationToken).SuppressCancellationThrow();
+
+            if (cancelled)
+            {
+                return;
+            }
             
             attack.Disable();
             hitbox.Enable();
@@ -81,6 +88,7 @@ namespace Gameplay.Player
             attack.transform.localPosition = comboAttackPosition;
             attack.Enable();
             hitbox.Disable();
+
 
             await PlayerMovement.ComboDash(duration, cancellationToken: cancellationToken)
                 .SuppressCancellationThrow();

@@ -59,7 +59,7 @@ namespace Gameplay.Mutations.Active
         {
             active = true;
             PlayerMovement.CancelKnockback();
-            AttackController.CancelAttack();
+            AttackController.Instance.CancelAttack();
             PlayerHitbox.Immune.Vote(VoteSource);
             spriteTransform.gameObject.SetActive(true);
             PlayerMovement.CanMove = false;

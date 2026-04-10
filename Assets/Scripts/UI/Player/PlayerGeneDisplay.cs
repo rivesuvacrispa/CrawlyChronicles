@@ -5,12 +5,12 @@ namespace UI.Player
 {
     public class PlayerGeneDisplay : GeneDisplay
     {
-        private void OnEnable()
+        private void Awake()
         {
             BreedingManager.OnTrioGeneChange += UpdateTrioText;
         }
 
-        private void OnDisable()
+        private void OnDestroy()
         {
             BreedingManager.OnTrioGeneChange -= UpdateTrioText;
         }

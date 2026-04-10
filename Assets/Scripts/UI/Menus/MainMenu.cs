@@ -1,9 +1,7 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using GameCycle;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace UI.Menus
 {
@@ -19,7 +17,7 @@ namespace UI.Menus
         [SerializeField] private GameObject difficultyGO;
         [SerializeField] private TutorialMenu tutorialMenu;
         [SerializeField] private PauseMenu pauseMenu;
-        [SerializeField] private Text gameOverStatsText;
+        [SerializeField] private TMP_Text gameOverStatsText;
         [SerializeField] private TMP_Text subtitleText;
         
         private bool settingsOpenedFromMainMenu;
