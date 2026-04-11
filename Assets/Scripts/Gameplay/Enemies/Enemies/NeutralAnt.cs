@@ -20,6 +20,7 @@ namespace Gameplay.Enemies.Enemies
 
         private delegate void NeutralAntEvent(Vector2 position);
         private static event NeutralAntEvent OnNeutralDamaged;
+        public override bool CanAggroUnit => false;
 
         public delegate void NeutralAntInteractionEvent();
 

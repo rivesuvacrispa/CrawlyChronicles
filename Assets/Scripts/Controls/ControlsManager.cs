@@ -2,6 +2,7 @@
 using System.Linq;
 using UI.Elements;
 using UI.Menus;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Controls
@@ -30,17 +31,17 @@ namespace Controls
 
         private void Awake()
         {
-            ResetKeyChain();
+            // ResetKeyChain();
             ActiveAbilityButton.OnKeyReserved += OnKeyReserved;
             ActiveAbilityButton.OnKeyUnreserved += OnKeyUnreserved;
-            MainMenu.OnAfterReset += AfterReset;
+            MainMenu.OnResetRequested += AfterReset;
         }
         
         private void OnDestroy()
         {
             ActiveAbilityButton.OnKeyReserved -= OnKeyReserved;
             ActiveAbilityButton.OnKeyUnreserved -= OnKeyUnreserved;
-            MainMenu.OnAfterReset -= AfterReset;
+            MainMenu.OnResetRequested -= AfterReset;
         }
 
         private void OnKeyUnreserved(KeyCode keycode)
@@ -63,6 +64,7 @@ namespace Controls
 
         private void ResetKeyChain()
         {
+            print("KeyChain is reset");
             KeyChain.Clear();
             foreach (KeyCode key in keyCodes.Reverse())
             {
@@ -72,7 +74,9 @@ namespace Controls
 
         public static bool TryGetFreeKeyCode(out KeyCode keyCode)
         {
-            return KeyChain.TryPop(out keyCode);
+            bool success= KeyChain.TryPop(out keyCode);
+            print($"Popped key {keyCode}");
+            return success;
         }
     }
 }

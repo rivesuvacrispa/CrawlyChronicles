@@ -60,6 +60,15 @@ namespace Gameplay.Genes
                 Random.Range(Universal - entropy, Universal + entropy + 1));
         }
 
+        public TrioGene Combine(TrioGene trioGene)
+        {
+            return new TrioGene(
+                Aggressive + trioGene.Aggressive,
+                Defensive + trioGene.Defensive,
+                Universal + trioGene.Universal
+            );
+        }
+
         public TrioGene AsRerollCost(float cost)
         {
             int minValue = int.MaxValue;

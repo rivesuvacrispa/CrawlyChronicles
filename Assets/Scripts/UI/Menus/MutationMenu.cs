@@ -194,8 +194,7 @@ namespace UI.Menus
 
         private void UpdateSlotsGroup()
         {
-            TrioGene currentSlots = current.CountByType();
-            slotGroup.UpdateCanFit(currentSlots, CharacterManager.CurrentCharacter.MutationSlots);
+            slotGroup.UpdateCanFit(current.CountTakenSlots(), CharacterManager.CurrentCharacter.MutationSlots);
         }
 
 

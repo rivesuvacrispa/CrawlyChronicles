@@ -393,7 +393,7 @@ namespace Gameplay.Enemies
         
         
         // IUnitTarget
-        public bool CanAggroUnit => !Hitbox.Dead;
+        public virtual bool CanAggroUnit => !Hitbox.Dead;
         public event IUnitTarget.UnitTargetEvent OnUnitDetach;
     }
 }

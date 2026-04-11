@@ -13,6 +13,8 @@ namespace Util.Components
         private Coroutine colorRoutine;
 
         private Color initialColor;
+
+        public Color InitialColor => initialColor;
         
         private void Awake()
         {

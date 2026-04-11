@@ -13,7 +13,7 @@ using Util.Particles;
 
 namespace Gameplay.Bosses.Terrorwing
 {
-    public class TerrorwingClone : MonoBehaviour, IDamageableEnemy, IDamageSource, IContactDamageProvider
+    public class TerrorwingClone : MonoBehaviour, IDamageableEnemy, IContactDamageProvider
     {
         [SerializeField] private bool original;
 
@@ -119,6 +119,7 @@ namespace Gameplay.Bosses.Terrorwing
             SetTrailsActive(false);
             ResetColor(fromPlayer ? default : new Color(0, 0, 0, 0.01f));
             OnDeath?.Invoke(this);
+            OnUnitDetach?.Invoke();
 
             if(fromPlayer)
             {
@@ -218,7 +219,7 @@ namespace Gameplay.Bosses.Terrorwing
         
         
         // IUnitTarget
-        public bool CanAggroUnit => false;
+        public bool CanAggroUnit => !Hitbox.Dead;
         public event IUnitTarget.UnitTargetEvent OnUnitDetach;
     }
 }

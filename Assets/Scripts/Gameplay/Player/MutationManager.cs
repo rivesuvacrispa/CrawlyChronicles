@@ -117,6 +117,8 @@ namespace Gameplay.Player
             // Remove incompatible mutations
             availableSet.ExceptWith(incompatible);
             var available = availableSet.ToList();
+            // leave only mutations that can fit
+            available = available.Where(m => CurrentMutationData.CanFitMutation(m)).ToList();
 
             // Decide amount of mutations
             int amount = GetRandomMutationAmount();

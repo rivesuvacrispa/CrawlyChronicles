@@ -82,10 +82,11 @@ namespace UI.Elements
 
         private void OnEnable()
         {
-            transform.SetAsLastSibling();
+            if (reservedKey is null)
+                ReserveKey();
+
             if (Ability is null) return;
 
-            ReserveKey();
             SetTextToHotkey();
             
             if (Ability.Autocast)
@@ -98,7 +99,8 @@ namespace UI.Elements
         {
             if (Scriptable is null) return;
 
-            UnreserveKey();
+            // Only unreserve key if the button itself was deactivated, not parent
+            if (!gameObject.activeSelf) UnreserveKey();
             SetTextToHotkey();
             cooldownImage.fillAmount = 0;
         }

@@ -65,8 +65,9 @@ namespace Gameplay.Player
         
         private void OnCollisionEnter2D(Collision2D col)
         {
-            if (col.collider.gameObject.layer.Equals(GlobalDefinitions.EnemyAttackLayer) && 
-                col.gameObject.TryGetComponent(out Enemy enemy))
+            bool collideWithAttack = col.gameObject.TryGetComponent(out Enemy enemy);
+            
+            if (col.collider.gameObject.layer.Equals(GlobalDefinitions.EnemyAttackLayer) && collideWithAttack)
             {
                 PlayerAudioController.Instance.PlayReckoning();
                 Vector2 point = col.contacts[0].point;
@@ -77,7 +78,7 @@ namespace Gameplay.Player
                 
                 if (col.contacts.Length != 0)
                 {
-                    PlayerParryParticles.Play(col.contacts.First().point);
+                    PlayerParryParticles.Play(col.contacts[0].point);
                 }
             }
         }

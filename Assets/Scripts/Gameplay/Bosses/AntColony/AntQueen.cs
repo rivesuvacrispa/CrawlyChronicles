@@ -240,7 +240,7 @@ namespace Gameplay.Bosses.AntColony
         public void OnHit(DamageInstance instance)
         {
             Bossbar.Instance.Damage(instance.Damage);
-            var gradient = new Gradient().FastGradient(instance.damageColor, painters[0].CurrentColor);
+            var gradient = new Gradient().FastGradient(instance.damageColor, painters[0].InitialColor);
             foreach (BodyPainter painter in painters) 
                 painter.Paint(gradient, GlobalDefinitions.EnemyImmunityDuration);
         }

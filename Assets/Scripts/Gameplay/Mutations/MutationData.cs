@@ -25,7 +25,7 @@ namespace Gameplay.Mutations
             if (mutations.ContainsKey(mutation)) return;
             mutations.Add(mutation, lvl);
         }
-        
+
         public void Set(BasicMutation mutation, int lvl)
         {
             mutations[mutation] = lvl;
@@ -44,20 +44,27 @@ namespace Gameplay.Mutations
             return true;
         }
 
-        public TrioGene CountByType()
+        public TrioGene CountTakenSlots()
         {
             var keys = mutations.Keys.ToList();
             return new TrioGene(
-                keys.Count(m => m.GeneType == GeneType.Aggressive),
-                keys.Count(m => m.GeneType == GeneType.Defensive),
-                keys.Count(m => m.GeneType == GeneType.Neutral)
+                keys.Count(m => m.TakesSlot && m.GeneType == GeneType.Aggressive),
+                keys.Count(m => m.TakesSlot && m.GeneType == GeneType.Defensive),
+                keys.Count(m => m.TakesSlot && m.GeneType == GeneType.Neutral)
             );
         }
+
         public Dictionary<BasicMutation, int> GetAll() => mutations;
         public MutationData Copy() => new(mutations.ToDictionary(pair => pair.Key, pair => pair.Value));
 
         public bool CanFitMutation(BasicMutation mutation)
-            => mutations.Keys.Count(m => m.GeneType == mutation.GeneType) <
-               CharacterManager.CurrentCharacter.MutationSlots.GetGene(mutation.GeneType);
+        {
+            var keys = mutations.Keys;
+            bool alreadyExists = keys.Contains(mutation);
+            return alreadyExists ||
+                   !mutation.TakesSlot ||
+                   keys.Count(m => m.TakesSlot && m.GeneType == mutation.GeneType) <
+                   CharacterManager.CurrentCharacter.MutationSlots.GetGene(mutation.GeneType);
+        }
     }
 }

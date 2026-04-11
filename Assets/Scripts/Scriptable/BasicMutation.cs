@@ -10,6 +10,7 @@ namespace Scriptable
     public class BasicMutation : ScriptableObject
     {
         [SerializeField] private GeneType geneType;
+        [SerializeField] private bool takesSlot = true;
         [SerializeField] private Color spriteColor;
         [SerializeField] private Sprite sprite;
         [SerializeField] private bool hasIncompatible;
@@ -27,6 +28,7 @@ namespace Scriptable
         public string Description => LocalizationSettings.StringDatabase.GetLocalizedString(tableReference, DescriptionReference);
         public bool HasIncompatible => hasIncompatible;
         public List<BasicMutation> IncompatibleMutations => incompatibleMutations;
+        public bool TakesSlot => takesSlot;
 
 
         public string GetStatDescription(object[] arguments) 
