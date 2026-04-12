@@ -7,6 +7,7 @@ using Gameplay.Interaction;
 using UI.Menus;
 using UnityEngine;
 using Util.Components;
+using Util.Enums;
 
 namespace Gameplay.Food
 {
@@ -17,6 +18,7 @@ namespace Gameplay.Food
         public int Amount { get; protected set; }
         private bool destructionInvoked;
         public abstract int StartAmount { get; }
+        public abstract FoodType FoodType { get; }
 
 
 

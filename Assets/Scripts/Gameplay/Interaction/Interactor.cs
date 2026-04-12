@@ -12,6 +12,10 @@ namespace Gameplay.Interaction
         [SerializeField] private InteractionPopup popup;
 
         private static IInteractable interactable;
+        public delegate void InteractionEvent(IInteractable interactable);
+        public static event InteractionEvent OnInteract;
+        
+        
 
         public static bool CanInteract () => interactable is not null &&
                                              interactable.CanInteract() &&
@@ -60,6 +64,7 @@ namespace Gameplay.Interaction
                     StartCoroutine(InteractionRoutine(continuouslyInteractable));
                 else
                 {
+                    OnInteract?.Invoke(interactable);
                     interactable.Interact();
                     popup.Disable();
                 }
@@ -98,6 +103,7 @@ namespace Gameplay.Interaction
 
             if (!interrupted)
             {
+                OnInteract?.Invoke(interactable);
                 interactable.Interact();
                 popup.Disable();
                 StartCoroutine(InteractionRoutine(continuouslyInteractable));

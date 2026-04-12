@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using GameCycle;
 using Gameplay.Player;
 using Hitboxes;
 using UnityEngine;
@@ -15,13 +16,14 @@ namespace Gameplay.Mutations.Passive
         [SerializeField, Range(0, 10)] private float baseDamage;
         [SerializeField, Range(0, 1)] private float damagePerFood;
 
-        private static readonly TimeSpan activationDelay = TimeSpan.FromSeconds(0.2f);
-        private int foodEaten = 0;
+        private static readonly TimeSpan ActivationDelay = TimeSpan.FromSeconds(0.2f);
+        
+        
         
         protected override void OnBulletCollision(IDamageable damageable, int collisionID)
         {
             damageable.Damage(new DamageSource(this, collisionID),
-                baseDamage + damagePerFood * foodEaten);
+                baseDamage + damagePerFood * StatRecorder.PlantsEaten);
         }
 
         protected override void OnEnable()
@@ -43,7 +45,7 @@ namespace Gameplay.Mutations.Passive
 
         private async UniTask ActivateTask(CancellationToken cancellationToken)
         {
-            await UniTask.Delay(activationDelay, cancellationToken: cancellationToken);
+            await UniTask.Delay(ActivationDelay, cancellationToken: cancellationToken);
             particleSystem.Play();
         }
     }

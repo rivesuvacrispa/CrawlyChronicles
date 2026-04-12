@@ -1,12 +1,14 @@
 ﻿using Gameplay.Food.Foodbeds;
 using UnityEngine;
 using Util;
+using Util.Enums;
 
 namespace Scriptable
 {
     [CreateAssetMenu(menuName = "Scriptable/Food bed")]
     public class FoodBed : ScriptableObject
     {
+        [SerializeField] private FoodType foodType;
         [SerializeField] private Vector2Int amountRandom;
         [SerializeField] private Sprite[] growthSprites = new Sprite[6];
         [SerializeField] private TimeOfDay timeOfDay = TimeOfDay.ANY;
@@ -18,6 +20,7 @@ namespace Scriptable
         public float SpawnChance => spawnChance;
         public int CanSpawnFromDay => canSpawnFromDay;
         public int MaxAmount => amountRandom.y;
+        public FoodType FoodType => foodType;
 
 
         public Sprite GetGrowthSprite(int amount)

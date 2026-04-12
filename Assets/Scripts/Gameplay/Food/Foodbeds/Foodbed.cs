@@ -1,6 +1,7 @@
 ﻿using Definitions;
 using Timeline;
 using UnityEngine;
+using Util.Enums;
 using Util.Interfaces;
 
 namespace Gameplay.Food.Foodbeds
@@ -15,8 +16,8 @@ namespace Gameplay.Food.Foodbeds
         public FoodSpawnPoint FoodSpawnPoint { get; set; }
         public virtual bool CanGrow => Amount < scriptable.MaxAmount;
         public override int StartAmount => scriptable.GetRandomAmount();
+        public override FoodType FoodType => scriptable.FoodType;
 
-        
 
         protected override void Awake()
         {
