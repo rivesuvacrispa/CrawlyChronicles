@@ -11,8 +11,8 @@ namespace Gameplay.Effects.LilHorror
     {
         private void OnTriggerEnter2D(Collider2D col)
         {
-            if (col.TryGetComponent(out DamageableEnemyHitbox hitbox) && hitbox.Enemy is not NeutralAnt)
-                hitbox.Enemy.Damage(
+            if (col.TryGetComponent(out DamageableEnemyHitbox hitbox) && hitbox.Damageable is not NeutralAnt)
+                hitbox.Damageable.Damage(
                     new DamageSource(this),
                     BasicAbility.CalculateSummonDamage(LegTremor.ContactDamage),
                     transform.position

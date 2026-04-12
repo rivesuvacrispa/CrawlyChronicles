@@ -25,6 +25,7 @@ namespace Gameplay.Mutations
         public IAbilityButton Button { get; set; }
         public int Level => level;
         private ParticleCollisionProvider[] collisionProviders;
+        private ParticleTriggerProvider[] triggerProviders;
 
 
         protected virtual void Awake()
@@ -32,12 +33,19 @@ namespace Gameplay.Mutations
             collisionProviders = GetComponentsInChildren<ParticleCollisionProvider>();
             foreach (var provider in collisionProviders) 
                 provider.OnCollision += OnBulletCollision;
+            
+            triggerProviders = GetComponentsInChildren<ParticleTriggerProvider>();
+            foreach (var provider in triggerProviders) 
+                provider.OnTrigger += OnBulletCollision;
         }
 
         protected virtual void OnDestroy()
         {
             foreach (var provider in collisionProviders) 
                 provider.OnCollision -= OnBulletCollision;
+            
+            foreach (var provider in triggerProviders) 
+                provider.OnTrigger -= OnBulletCollision;
         }
 
         protected virtual void Start() => SetLevel(level, true);

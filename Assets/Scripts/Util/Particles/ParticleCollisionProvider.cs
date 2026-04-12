@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Hitboxes;
 using UnityEngine;
 
@@ -7,7 +8,7 @@ namespace Util.Particles
     [RequireComponent(typeof(ParticleSystem))]
     public class ParticleCollisionProvider : MonoBehaviour
     {
-        private readonly List<ParticleCollisionEvent> collisionEvents = new();
+        private List<ParticleCollisionEvent> collisionEvents;
         private new ParticleSystem particleSystem;
         
         public delegate void CollisionEvent(IDamageable col, int collisionID);
@@ -16,6 +17,8 @@ namespace Util.Particles
         private void Awake()
         {
             particleSystem = GetComponent<ParticleSystem>();
+            if (particleSystem.collision.enabled)
+                collisionEvents = new List<ParticleCollisionEvent>();
         }
 
         private void OnParticleCollision(GameObject other)
