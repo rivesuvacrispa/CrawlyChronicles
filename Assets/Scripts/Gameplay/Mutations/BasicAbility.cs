@@ -100,14 +100,7 @@ namespace Gameplay.Mutations
         protected static int LerpLevel(int from, int to, int lvl) => Mathf.RoundToInt(Mathf.Lerp(from, to, lvl / 9f));
 
         public virtual string GetLevelDescription(int lvl, bool withUpgrade) => string.Empty;
-
-        public static float CalculateParticleSize(float baseSize) =>
-            baseSize * (1 * PlayerManager.PlayerStats.ProjectileSize);
         
-        public static float CalculateParticleAmount(float baseAmount) =>
-            baseAmount * (1 * PlayerManager.PlayerStats.ProjectileAmount);
-        
-        // TODO: apply to every ability that should benify from it
         public static float CalculateAbilityDamage(float baseDamage) =>
             baseDamage * (1 + PlayerManager.PlayerStats.AbilityDamage);
 

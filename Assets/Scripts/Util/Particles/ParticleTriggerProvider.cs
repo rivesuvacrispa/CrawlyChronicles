@@ -33,12 +33,13 @@ namespace Util.Particles
             {
                 ParticleTrigger p = (ParticleTrigger) pool.GetEffectObject(colliderSize);
                 triggerPool[i] = p;
+                p.SetActive(false);
                 p.OnTrigger += OnParticleTriggered;
                 p.OnTakenFromPool(colliderSize);
             }
         }
 
-        private void OnDisable()
+        private void OnDestroy()
         {
             for (int i = 0; i < maxParticles; i++) 
                 triggerPool[i].OnTrigger -= OnParticleTriggered;

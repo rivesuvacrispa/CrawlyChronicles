@@ -23,6 +23,7 @@ namespace Gameplay.Player
 
         public delegate void AttackControllerEvent();
         public static event AttackControllerEvent OnAttackStart;
+        public static event AttackControllerEvent OnAttackEnd;
         private static CancellationTokenSource cancellationTokenSource;
 
         public bool IsAttacking => attack.IsActive;
@@ -76,6 +77,7 @@ namespace Gameplay.Player
                 return;
             }
             
+            OnAttackEnd?.Invoke();
             attack.Disable();
             hitbox.Enable();
         }
