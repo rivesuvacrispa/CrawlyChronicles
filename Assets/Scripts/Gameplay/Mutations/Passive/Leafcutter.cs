@@ -16,7 +16,7 @@ namespace Gameplay.Mutations.Passive
         [SerializeField, Range(0, 10)] private float baseDamage;
         [SerializeField, Range(0, 1)] private float damagePerFood;
 
-        private static readonly TimeSpan ActivationDelay = TimeSpan.FromSeconds(0.2f);
+        private static readonly TimeSpan ActivationDelay = TimeSpan.FromSeconds(0.15f);
         
         
         

@@ -11,6 +11,7 @@ namespace Scriptable
     {
         [SerializeField] private GeneType geneType;
         [SerializeField] private bool takesSlot = true;
+        [SerializeField] private bool notUpgradeable = false;
         [SerializeField] private Color spriteColor;
         [SerializeField] private Sprite sprite;
         [SerializeField] private bool hasIncompatible;
@@ -29,7 +30,9 @@ namespace Scriptable
         public bool HasIncompatible => hasIncompatible;
         public List<BasicMutation> IncompatibleMutations => incompatibleMutations;
         public bool TakesSlot => takesSlot;
+        public bool NotUpgradeable => notUpgradeable;
 
+        
 
         public string GetStatDescription(object[] arguments) 
             => LocalizationSettings.StringDatabase

@@ -28,7 +28,7 @@ namespace UI.Elements
             bgImage.color = GlobalDefinitions.GetGeneColor(mutation.GeneType).WithAlpha(0.5f);
             icon.sprite = mutation.Sprite;
             icon.color = mutation.SpriteColor;
-            lvlText.text = GlobalDefinitions.GetRomanDigit(Lvl);
+            lvlText.text = mutation.NotUpgradeable ? string.Empty : GlobalDefinitions.GetRomanDigit(Lvl);
         }
 
         public void SetUnavailable()

@@ -39,7 +39,7 @@ namespace UI.Elements
         public void UpdateLevelText(int lvl)
         {
             level = lvl;
-            levelText.text = GlobalDefinitions.GetRomanDigit(lvl);
+            levelText.text = Scriptable.NotUpgradeable ? string.Empty : GlobalDefinitions.GetRomanDigit(lvl);
         }
 
         public void SetActive(bool isActive)

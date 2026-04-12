@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using Cysharp.Threading.Tasks;
+﻿using System.Threading;
 using Gameplay.Player;
 using Hitboxes;
 using Scriptable;
 using UI.Elements;
-using UI.Menus;
 using UnityEngine;
 using Util;
-using Util.Interfaces;
 using Util.Particles;
 using Random = UnityEngine.Random;
 
@@ -23,7 +17,7 @@ namespace Gameplay.Mutations
 
         public BasicMutation Scriptable => scriptable;
         public IAbilityButton Button { get; set; }
-        public int Level => level;
+        public int Level => scriptable.NotUpgradeable ? 9 : level;
         private ParticleCollisionProvider[] collisionProviders;
         private ParticleTriggerProvider[] triggerProviders;
 
@@ -48,7 +42,7 @@ namespace Gameplay.Mutations
                 provider.OnTrigger -= OnBulletCollision;
         }
 
-        protected virtual void Start() => SetLevel(level, true);
+        protected virtual void Start() => SetLevel(Level, true);
 
         protected virtual void OnEnable()
         {
@@ -79,10 +73,10 @@ namespace Gameplay.Mutations
         
         public void SetLevel(int newLevel, bool forceUpdate = false)
         {
-            if(newLevel == level && !forceUpdate) return;
+            if(newLevel == Level && !forceUpdate) return;
             level = Mathf.Clamp(newLevel, 0, 9);
-            Button.UpdateLevelText(level);
-            OnLevelChanged(level);
+            Button.UpdateLevelText(Level);
+            OnLevelChanged(Level);
         }
 
         public virtual void OnLevelChanged(int lvl)
