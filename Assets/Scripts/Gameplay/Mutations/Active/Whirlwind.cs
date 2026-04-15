@@ -3,23 +3,24 @@ using Cysharp.Threading.Tasks;
 using Gameplay.Player;
 using UI.Menus;
 using UnityEngine;
+using Util.Abilities;
+using Util.Attributes;
 
 namespace Gameplay.Mutations.Active
 {
     public class Whirlwind : ActiveAbility
     {
-        [SerializeField, Range(1, 10)] private float durationLvl1; 
-        [SerializeField, Range(1, 10)] private float durationLvl10;
+        [SerializeField, MinMaxRange(1f, 10f)] private LevelFloat duration = new LevelFloat(1.5f, 3.6f);
         
         private CancellationTokenSource cancellationTokenSource;
-        private float duration;
+        private float currentDuration;
 
         
         
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
-            duration = LerpLevel(durationLvl1, durationLvl10, lvl);
+            currentDuration = duration.AtLvl(lvl);
         }
 
 
@@ -38,14 +39,18 @@ namespace Gameplay.Mutations.Active
         private async UniTask ActivateTask(CancellationToken cancellationToken)
         {
             AttackController.Instance.CancelAttack();
-            await AttackController.Instance.WhirlwindAttack(duration, cancellationToken)
+            await AttackController.Instance.WhirlwindAttack(currentDuration, cancellationToken)
                 .SuppressCancellationThrow();
             SetOnCooldown();
         }
 
-        protected override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
+        protected override ILevelField[] CreateLevelFields(int lvl)
         {
-            return null;
+            return new[]
+            {
+                Scriptable.Cooldown,
+                duration.UseKey(LevelFieldKeys.DURATION).UseFormatter(StatFormatter.SECONDS)
+            };
         }
     }
 }

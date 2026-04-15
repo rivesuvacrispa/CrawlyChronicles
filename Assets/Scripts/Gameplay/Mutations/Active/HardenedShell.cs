@@ -1,43 +1,38 @@
 ﻿using System;
-using System.Collections;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Gameplay.Player;
-using UI.Menus;
 using UnityEngine;
+using Util.Abilities;
+using Util.Attributes;
 
 namespace Gameplay.Mutations.Active
 {
     public class HardenedShell : ActiveAbility
     {
         [SerializeField] private new ParticleSystem particleSystem;
-        [Header("Duration")] 
-        [SerializeField] private float durationLvl1;
-        [SerializeField] private float durationLvl10;
-        [Header("Bonus armor")] 
-        [SerializeField, Range(0, 1)] private float armorLvl1;
-        [SerializeField, Range(0, 1)] private float armorLvl10;
-        [Header("Bonus proc chance")] 
-        [SerializeField, Range(0, 1)] private float procChanceLvl1;
-        [SerializeField, Range(0, 1)] private float procChanceLvl10;
+        [SerializeField, MinMaxRange(0, 10)] private LevelFloat duration = new LevelFloat(new Vector2(3f, 5f));
+        [SerializeField, MinMaxRange(0f, 1)] private LevelFloat bonusArmor = new LevelFloat(new Vector2(0.1f, 1f));
+        [SerializeField, MinMaxRange(0f, 1)] private LevelFloat bonusProcChance = new LevelFloat(new Vector2(0.15f, 1f));
+
         
-        private float duration;
-        private float armor;
-        private float procChance;
+        private float currentDuration;
+        private float currentBonusArmor;
+        private float currentBonusProcChance;
 
         private PlayerStats activeStats = PlayerStats.Zero;
 
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
-            duration = LerpLevel(durationLvl1, durationLvl10, lvl);
-            armor = LerpLevel(armorLvl1, armorLvl10, lvl);
-            procChance = LerpLevel(procChanceLvl1, procChanceLvl10, lvl);
+            currentDuration = duration.AtLvl(lvl);
+            currentBonusArmor = bonusArmor.AtLvl(lvl);
+            currentBonusProcChance = bonusProcChance.AtLvl(lvl);
         }
 
         public override void Activate(bool auto = false)
         {
-            base.Activate();
+            base.Activate(auto);
             PlayerManager.Instance.AddStats(activeStats.Negated());
             ActivateTask(CreateCommonCancellationToken()).Forget();
         }
@@ -46,11 +41,11 @@ namespace Gameplay.Mutations.Active
         {
             particleSystem.Play();
             activeStats = new PlayerStats
-                (armor: PlayerManager.PlayerStats.Armor * armor,
-                passiveProcRate: procChance);
+                (armor: PlayerManager.PlayerStats.Armor * currentBonusArmor,
+                passiveProcRate: currentBonusProcChance);
             PlayerManager.Instance.AddStats(activeStats);
 
-            await UniTask.Delay(TimeSpan.FromSeconds(duration), cancellationToken: cancellationToken).SuppressCancellationThrow();
+            await UniTask.Delay(TimeSpan.FromSeconds(currentDuration), cancellationToken: cancellationToken).SuppressCancellationThrow();
 
             PlayerManager.Instance.AddStats(activeStats.Negated());
             activeStats = PlayerStats.Zero;
@@ -63,30 +58,14 @@ namespace Gameplay.Mutations.Active
             PlayerManager.Instance.AddStats(activeStats.Negated());
         }
 
-        protected override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
+        protected override ILevelField[] CreateLevelFields(int lvl)
         {
-            float cd = Scriptable.GetCooldown(lvl);
-            float prevCd = cd;
-            float dur = LerpLevel(durationLvl1, durationLvl10, lvl);
-            float prevDur = dur;
-            int arm = (int) (LerpLevel(armorLvl1, armorLvl10, lvl) * 100);
-            int prevArm = arm;
-            int proc = (int) (LerpLevel(procChanceLvl1, procChanceLvl10, lvl) * 100);
-            int prevProc = proc;
-
-            if (lvl > 0 && withUpgrade)
+            return new ILevelField[]
             {
-                int prevLvl = lvl - 1;
-                prevCd = Scriptable.GetCooldown(prevLvl);
-                prevDur = LerpLevel(durationLvl1, durationLvl10, prevLvl);
-                prevArm = (int) (LerpLevel(armorLvl1, armorLvl10, prevLvl) * 100);
-                prevProc = (int) (LerpLevel(procChanceLvl1, procChanceLvl10, prevLvl) * 100);
-            }
-            
-            return new object[]
-            {
-                cd,          dur,           arm,           proc,
-                cd - prevCd, dur - prevDur, arm - prevArm, proc - prevProc
+                Scriptable.Cooldown,
+                duration.UseKey(LevelFieldKeys.EFFECT_DURATION).UseFormatter(StatFormatter.SECONDS),
+                bonusArmor.UseKey(LevelFieldKeys.BONUS_ARMOR).UseFormatter(StatFormatter.PERCENT),
+                bonusProcChance.UseKey(LevelFieldKeys.BONUS_PROC_CHANCE).UseFormatter(StatFormatter.PERCENT)
             };
         }
     }

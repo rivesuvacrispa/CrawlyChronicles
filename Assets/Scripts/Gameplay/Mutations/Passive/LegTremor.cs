@@ -1,41 +1,52 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using Cysharp.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
 using Gameplay.Effects.LilHorror;
 using Gameplay.Player;
 using Pooling;
 using UnityEngine;
+using Util.Abilities;
+using Util.Attributes;
 
 namespace Gameplay.Mutations.Passive
 {
     public class LegTremor : BasicAbility
     {
-        [Header("Contact Damage")] 
-        [SerializeField, Range(0.1f, 10f)] private float contactDamageLvl1;
-        [SerializeField, Range(0.1f, 10f)] private float contactDamageLvl10;
-        [Header("Movespeed")] 
-        [SerializeField, Range(0.001f, 10f)] private float speedLvl1;
-        [SerializeField, Range(0.001f, 10f)] private float speedLvl10;
-        [Header("Rotation speed")] 
-        [SerializeField, Range(0.1f, 360f)] private float rotationSpeedLvl1;
-        [SerializeField, Range(0.1f, 360f)] private float rotationSpeedLvl10;
+        [SerializeField, MinMaxRange(0.1f, 10f)] private LevelFloat contactDamage = new LevelFloat(1, 2.5f);
+        [SerializeField, MinMaxRange(0.01f, 10f)] private LevelFloat speed = new LevelFloat(2, 4);
+        [SerializeField, MinMaxRange(0.1f, 360f)] private LevelFloat rotationSpeed = new LevelFloat(160, 260);
 
-        public static float ContactDamage { get; private set; }
-        public static float MoveSpeed { get; private set; }
-        public static float RotationSpeed { get; private set; }
+
+        public static float CurrentContactDamage { get; private set; }
+        public static float CurrentMoveSpeed { get; private set; }
+        public static float CurrentRotationSpeed { get; private set; }
         private int bodyLength;
         
         private LilHorrorPart headPart;
         private readonly List<LilHorrorPart> parts = new();
+
+
         
+        protected override ILevelField[] CreateLevelFields(int lvl)
+        {
+            if (lvl == 0) return Array.Empty<ILevelField>();
+            
+            return new[]
+            {
+                contactDamage.UseKey(LevelFieldKeys.CONTACT_DAMAGE),
+                speed.UseKey(LevelFieldKeys.MOVEMENT_SPEED),
+                rotationSpeed.UseKey(LevelFieldKeys.ROTATION_SPEED)
+            };
+        }
         
+        protected override bool CacheLevelFields => false;
+
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
 
-            ContactDamage = LerpLevel(contactDamageLvl1, contactDamageLvl10, lvl);
-            MoveSpeed = LerpLevel(speedLvl1, speedLvl10, lvl);
-            RotationSpeed = LerpLevel(rotationSpeedLvl1, rotationSpeedLvl10, lvl);
+            CurrentContactDamage = contactDamage.AtLvl(lvl);
+            CurrentMoveSpeed = speed.AtLvl(lvl);
+            CurrentRotationSpeed = rotationSpeed.AtLvl(lvl);
             bodyLength = lvl + 2;
 
 #if UNITY_EDITOR
@@ -56,7 +67,6 @@ namespace Gameplay.Mutations.Passive
             int currentAmount = parts.Count;
             int maxAmount = CalculateSummonsAmount(bodyLength);
             int changeAmount = maxAmount - currentAmount;
-            Debug.Log($"Leg tremor change, current: {currentAmount}, max: {maxAmount}, change: {changeAmount}");
             if (changeAmount == 0) return;
             
             if (headPart is null) 
@@ -85,8 +95,6 @@ namespace Gameplay.Mutations.Passive
                     }
                 }
             }
-            
-            Debug.Log($"Leg tremor final count: {parts.Count}");
         }
 
         private void ClearParts()

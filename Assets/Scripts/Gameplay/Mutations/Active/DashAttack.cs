@@ -5,6 +5,8 @@ using Gameplay.Player;
 using Hitboxes;
 using UnityEngine;
 using Util;
+using Util.Abilities;
+using Util.Attributes;
 
 namespace Gameplay.Mutations.Active
 {
@@ -13,19 +15,17 @@ namespace Gameplay.Mutations.Active
         [Header("References")] 
 
         [SerializeField] private DashPlayerAttack attack;
-        [Header("Force")]
-        [SerializeField, Range(0, 10f)] private float forceLvl1;
-        [SerializeField, Range(0, 10f)] private float forceLvl10;
-        [Header("Size")]
-        [SerializeField, Range(0.1f, 10f)] private float sizeLvl1;
-        [SerializeField, Range(0.1f, 10f)] private float sizeLvl10;
+        [SerializeField, MinMaxRange(0, 10f)] private LevelFloat force = new LevelFloat(new Vector2(3, 10));
+        [SerializeField, MinMaxRange(0.1f, 10f)] private LevelFloat size = new LevelFloat(new Vector2(0.8f, 3f));
+
         
-        private float force;
+        private float currentForce;
+        private float currentSize;
         private int VoteSource => GetHashCode();
-        private float size;
-
 
         
+
+        // TODO: WALLS COLLIDER
         protected override void OnEnable()
         {
             base.OnEnable();
@@ -40,16 +40,16 @@ namespace Gameplay.Mutations.Active
 
         private void OnPlayerSizeChanged(float f)
         {
-            size = LerpLevel(sizeLvl1, sizeLvl10, level) * PlayerSizeManager.CurrentSize;
-            attack.UpdateSize(size);
+            currentSize = size.AtLvl(level) * PlayerSizeManager.CurrentSize;
+            attack.UpdateSize(currentSize);
         }
 
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
-            force = LerpLevel(forceLvl1, forceLvl10, lvl);
-            size = LerpLevel(sizeLvl1, sizeLvl10, lvl) * PlayerSizeManager.CurrentSize;
-            attack.UpdateSize(size);
+            currentForce = force.AtLvl(lvl);
+            currentSize = size.AtLvl(lvl) * PlayerSizeManager.CurrentSize;
+            attack.UpdateSize(currentSize);
         }
 
         public override void Activate(bool auto = false)
@@ -76,7 +76,7 @@ namespace Gameplay.Mutations.Active
             PlayerPhysicsBody.Rigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
             PlayerPhysicsBody.PhysicsCollider.enabled = false;
             
-            await PlayerMovement.Dash(0.4f, force, cancellationToken: cancellationToken)
+            await PlayerMovement.Dash(0.4f, currentForce, cancellationToken: cancellationToken)
                 .SuppressCancellationThrow();
             
             PlayerHitbox.Immune.Unvote(VoteSource);
@@ -87,9 +87,14 @@ namespace Gameplay.Mutations.Active
             attack.Disable();
         }
 
-        protected override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
+        protected override ILevelField[] CreateLevelFields(int lvl)
         {
-            return null;
+            return new[]
+            {
+                Scriptable.Cooldown,
+                force.UseKey(LevelFieldKeys.ATTACK_FORCE),
+                size.UseKey(LevelFieldKeys.ATTACK_SIZE)
+            };
         }
     }
 }

@@ -12,6 +12,8 @@ using Pooling;
 using UI.Menus;
 using UnityEngine;
 using Util;
+using Util.Abilities;
+using Util.Attributes;
 
 namespace Gameplay.Mutations.Active
 {
@@ -20,31 +22,21 @@ namespace Gameplay.Mutations.Active
         [SerializeField] private ParticleSystem particles;
         [SerializeField] private ParticleSystem debuffParticles;
 
-        [Header("Maximum Simultaneous Web")] 
-        [SerializeField, Range(1, 20)] private int maxAmountLvl1;
-        [SerializeField, Range(1, 20)] private int maxAmountLvl10;
-        [Header("Movement Slow")] 
-        [SerializeField, Range(0f, 1f)] private float movementSlowLvl1;
-        [SerializeField, Range(0f, 1f)] private float movementSlowLvl10;
-        [Header("Rotation Slow")] 
-        [SerializeField, Range(0f, 1f)] private float rotationSlowLvl1;
-        [SerializeField, Range(0f, 1f)] private float rotationSlowLvl10;
-        [Header("Movement Speed")] 
-        [SerializeField, Range(0f, 10f)] private float movementSpeedLvl1;
-        [SerializeField, Range(0f, 10f)] private float movementSpeedLvl10;
-        [Header("Rotation Speed")] 
-        [SerializeField, Range(0f, 10f)] private float rotationSpeedLvl1;
-        [SerializeField, Range(0f, 10f)] private float rotationSpeedLvl10;
+        [SerializeField, MinMaxRange(1, 20)] private LevelInt websAmount = new LevelInt(4, 16);
+        [SerializeField, MinMaxRange(0f, 1f)] private LevelFloat movementSlow = new LevelFloat(0.25f, 0.75f);
+        [SerializeField, MinMaxRange(0f, 1f)] private LevelFloat rotationSlow = new LevelFloat(0.2f, 0.8f);
+        [SerializeField, MinMaxRange(0f, 10f)] private LevelFloat movementSpeed = new LevelFloat(0.1f, 1f);
+        [SerializeField, MinMaxRange(0f, 10f)] private LevelFloat rotationSpeed = new LevelFloat(0.5f, 5f);
 
         private ParticleSystem.MainModule mainModule;
         private ParticleSystem.ShapeModule shapeModule;
         private readonly Queue<PlayerWeb> webQueue = new();
 
-        private int maxAmount;
-        private float movementSlow;
-        private float rotationSlow;
-        private float movementSpeed;
-        private float rotationSpeed;
+        private int currentMaxAmount;
+        private float currentMovementSlow;
+        private float currentRotationSlow;
+        private float currentMovementSpeed;
+        private float currentRotationSpeed;
         public static SlowEffectData DebuffEffectData { get; private set; }
         public static StatEffectData BuffEffectData { get; private set; }
         public static ParticleSystem DebuffParticles { get; private set; }
@@ -78,21 +70,21 @@ namespace Gameplay.Mutations.Active
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
-            maxAmount = LerpLevel(maxAmountLvl1, maxAmountLvl10, lvl);
-            movementSlow = LerpLevel(movementSlowLvl1, movementSlowLvl10, lvl);
-            rotationSlow = LerpLevel(rotationSlowLvl1, rotationSlowLvl10, lvl);
-            movementSpeed = LerpLevel(movementSpeedLvl1, movementSpeedLvl10, lvl);
-            rotationSpeed = LerpLevel(rotationSlowLvl1, rotationSpeedLvl10, lvl);
+            currentMaxAmount = websAmount.AtLvl(lvl);
+            currentMovementSlow = movementSlow.AtLvl(lvl);
+            currentRotationSlow = rotationSlow.AtLvl(lvl);
+            currentMovementSpeed = movementSpeed.AtLvl(lvl);
+            currentRotationSpeed = rotationSpeed.AtLvl(lvl);
 
-            DebuffEffectData = new SlowEffectData(1, movementSlow, rotationSlow);
+            DebuffEffectData = new SlowEffectData(1, currentMovementSlow, currentRotationSlow);
             BuffEffectData = new StatEffectData(1, new PlayerStats(
-                movementSpeed: movementSpeed, 
-                rotationSpeed: rotationSpeed)
+                movementSpeed: currentMovementSpeed, 
+                rotationSpeed: currentRotationSpeed)
             );
             
             if (Application.IsPlaying(this) && isActiveAndEnabled)
             {
-                RemoveExcessWeb(maxAmount);
+                RemoveExcessWeb(currentMaxAmount);
             }
         }
 
@@ -137,7 +129,7 @@ namespace Gameplay.Mutations.Active
                     .SuppressCancellationThrow();
 
                 webQueue.Enqueue(PoolManager.GetEffect<PlayerWeb>(position: mousePos));
-                RemoveExcessWeb(maxAmount);
+                RemoveExcessWeb(currentMaxAmount);
             }
             
             PlayerMovement.Enabled = true;
@@ -185,9 +177,17 @@ namespace Gameplay.Mutations.Active
             await UniTask.Delay(TimeSpan.FromSeconds(0.1f), cancellationToken: cancellationToken);
         }
 
-        protected override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
+        protected override ILevelField[] CreateLevelFields(int lvl)
         {
-            return null;
+            return new ILevelField[]
+            {
+                Scriptable.Cooldown,
+                websAmount.UseKey(LevelFieldKeys.MAX_WEBS),
+                movementSlow.UseKey(LevelFieldKeys.MOVEMENT_SLOW).UseFormatter(StatFormatter.PERCENT),
+                rotationSlow.UseKey(LevelFieldKeys.ROTATION_SLOW).UseFormatter(StatFormatter.PERCENT),
+                movementSpeed.UseKey(LevelFieldKeys.MOVEMENT_SPEED),
+                movementSpeed.UseKey(LevelFieldKeys.ROTATION_SPEED),
+            };
         }
     }
 }

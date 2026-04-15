@@ -17,27 +17,31 @@ namespace Scriptable
         [SerializeField] private bool hasIncompatible;
         [SerializeField] private List<BasicMutation> incompatibleMutations;
 
-        private TableReference tableReference;
-        private static readonly TableEntryReference NameReference = "AbilityName";
-        private static readonly TableEntryReference DescriptionReference = "AbilityDescription"; 
-        private static readonly TableEntryReference StatsReference = "AbilityStats";
+        private static readonly TableReference TableReference = "Abilities_All";
+        private TableEntryReference nameReference;
+        private TableEntryReference descriptionReference;
         
         public GeneType GeneType => geneType;
         public Color SpriteColor => spriteColor;
         public Sprite Sprite => sprite;
-        public string Name => LocalizationSettings.StringDatabase.GetLocalizedString(tableReference, NameReference);
-        public string Description => LocalizationSettings.StringDatabase.GetLocalizedString(tableReference, DescriptionReference);
+        public string Name => LocalizationSettings.StringDatabase.GetLocalizedString(TableReference, nameReference);
+        public string Description => LocalizationSettings.StringDatabase.GetLocalizedString(TableReference, descriptionReference);
         public bool HasIncompatible => hasIncompatible;
         public List<BasicMutation> IncompatibleMutations => incompatibleMutations;
         public bool TakesSlot => takesSlot;
         public bool NotUpgradeable => notUpgradeable;
 
-        
 
-        public string GetStatDescription(object[] arguments) 
-            => LocalizationSettings.StringDatabase
-                .GetLocalizedString(tableReference, StatsReference, arguments);
-        private void Init() => tableReference = $"Abilities_{name}";
+
+        public string GetStatDescription(object[] arguments)
+            => string.Empty; /*LocalizationSettings.StringDatabase
+                .GetLocalizedString(TableReference, StatsReference, arguments);*/
+        private void Init()
+        {
+            nameReference = $"{name}_Name";
+            descriptionReference = $"{name}_Description";
+        }
+
         private void Awake() => Init();
         private void OnValidate() => Init();
     }

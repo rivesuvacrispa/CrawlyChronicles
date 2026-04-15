@@ -175,7 +175,7 @@ namespace Gameplay.Breeding
         public void LayEggs(Vector2 position, TrioGene genes, MutationData mutationData)
         {
             var bed = Instantiate(GlobalDefinitions.EggBedPrefab, MapManager.GameObjectsTransform);
-            int amount = Mathf.RoundToInt(Random.Range(Mathf.Clamp(2f + QueensFertility.EggsAmount, 2f, 6f), 6f));
+            int amount = Mathf.RoundToInt(Random.Range(Mathf.Clamp(2f + QueensFertility.CurrentEggsAmount, 2f, 6f), 6f));
             var eggs = new List<Egg>();
             OnEggsLaid?.Invoke(amount);
 

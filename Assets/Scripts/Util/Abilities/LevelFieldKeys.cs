@@ -1,0 +1,80 @@
+﻿namespace Util.Abilities
+{
+    public static class LevelFieldKeys
+    {
+        public const string TABLE_REFERENCE = "LevelFields";
+        
+        public static readonly LevelFieldKey BONUS_SPEED = new LevelFieldKey("bonus_speed");
+        public static readonly LevelFieldKey BONUS_DAMAGE = new LevelFieldKey("bonus_damage");
+        public static readonly LevelFieldKey COOLDOWN = new LevelFieldKey("cooldown");
+        public static readonly LevelFieldKey SPRAY_ANGLE = new LevelFieldKey("spray_angle");
+        public static readonly LevelFieldKey PARTICLES_AMOUNT = new LevelFieldKey("particles_amount");
+        public static readonly LevelFieldKey BONUS_PARTICLES_AMOUNT = new LevelFieldKey("bonus_particles_amount");
+        public static readonly LevelFieldKey DAMAGE = new LevelFieldKey("damage");
+        public static readonly LevelFieldKey KNOCKBACK = new LevelFieldKey("knockback");
+        public static readonly LevelFieldKey STUN_DURATION = new LevelFieldKey("stun_duration");
+        public static readonly LevelFieldKey EFFECT_DURATION = new LevelFieldKey("effect_duration");
+        public static readonly LevelFieldKey TOTAL_HEALTH = new LevelFieldKey("total_health");
+        public static readonly LevelFieldKey TOTAL_LIFESPAN = new LevelFieldKey("total_lifespan");
+        public static readonly LevelFieldKey SEEDS_AMOUNT = new LevelFieldKey("seeds_amount");
+        public static readonly LevelFieldKey SEEDS_DAMAGE = new LevelFieldKey("seeds_damage");
+        public static readonly LevelFieldKey THROW_POWER = new LevelFieldKey("throw_power");
+        public static readonly LevelFieldKey EXPLOSION_DAMAGE = new LevelFieldKey("explosion_damage");
+        public static readonly LevelFieldKey EXPLOSION_RANGE = new LevelFieldKey("explosion_range");
+        public static readonly LevelFieldKey EXPLOSION_CHANCE = new LevelFieldKey("explosion_chance");
+        public static readonly LevelFieldKey ATTACK_FORCE = new LevelFieldKey("attack_force");
+        public static readonly LevelFieldKey ATTACK_SIZE = new LevelFieldKey("attack_size");
+        public static readonly LevelFieldKey IMMUNITY_DURATION = new LevelFieldKey("immunity_duration");
+        public static readonly LevelFieldKey BONUS_ARMOR = new LevelFieldKey("bonus_armor");
+        public static readonly LevelFieldKey BONUS_PROC_CHANCE = new LevelFieldKey("bonus_proc_chance");
+        public static readonly LevelFieldKey ARMOR = new LevelFieldKey("armor");
+        public static readonly LevelFieldKey PROC_CHANCE = new LevelFieldKey("proc_chance");
+        public static readonly LevelFieldKey EGGS_AMOUNT = new LevelFieldKey("eggs_amount");
+        public static readonly LevelFieldKey REFLECTION = new LevelFieldKey("reflection");
+        public static readonly LevelFieldKey BONUS_REFLECTION = new LevelFieldKey("bonus_reflection");
+        public static readonly LevelFieldKey ATTACKS_INTERVAL = new LevelFieldKey("attacks_interval");
+        public static readonly LevelFieldKey ATTACKS_AMOUNT = new LevelFieldKey("attacks_amount");
+        public static readonly LevelFieldKey WAVES_AMOUNT = new LevelFieldKey("waves_amount");
+        public static readonly LevelFieldKey WAVES_LENGTH = new LevelFieldKey("waves_length");
+        public static readonly LevelFieldKey DURATION = new LevelFieldKey("duration");
+        public static readonly LevelFieldKey MAX_WEBS = new LevelFieldKey("max_webs");
+        public static readonly LevelFieldKey MOVEMENT_SLOW = new LevelFieldKey("movement_slow");
+        public static readonly LevelFieldKey ROTATION_SLOW = new LevelFieldKey("rotation_slow");
+        public static readonly LevelFieldKey MOVEMENT_SPEED = new LevelFieldKey("movement_speed");
+        public static readonly LevelFieldKey ROTATION_SPEED = new LevelFieldKey("rotation_speed");
+        public static readonly LevelFieldKey MAX_HEALTH = new LevelFieldKey("max_health");
+        public static readonly LevelFieldKey ATTACK_POWER = new LevelFieldKey("attack_power");
+        public static readonly LevelFieldKey ATTACK_DAMAGE = new LevelFieldKey("attack_damage");
+        public static readonly LevelFieldKey ABILITY_DAMAGE = new LevelFieldKey("ability_damage");
+        public static readonly LevelFieldKey MUTAGENICITY = new LevelFieldKey("mutagenicity");
+        public static readonly LevelFieldKey BONUS_SUMMON_AMOUNT = new LevelFieldKey("bonus_summon_amount");
+        public static readonly LevelFieldKey SUMMON_DAMAGE = new LevelFieldKey("summon_damage");
+        public static readonly LevelFieldKey COOLDOWN_REDUCTION = new LevelFieldKey("cooldown_reduction");
+        public static readonly LevelFieldKey BONUS_PARTICLES_SIZE = new LevelFieldKey("bonus_particles_size");
+        public static readonly LevelFieldKey EFFECT_RANGE = new LevelFieldKey("effect_range");
+        public static readonly LevelFieldKey MAX_SPIDERS = new LevelFieldKey("max_spiders");
+        public static readonly LevelFieldKey UNIT_INFECTION_CHANCE = new LevelFieldKey("unit_infection_chance");
+        public static readonly LevelFieldKey SPIDER_LIFETIME = new LevelFieldKey("spider_lifetime");
+        public static readonly LevelFieldKey SPIDER_SPEED = new LevelFieldKey("spider_speed");
+        public static readonly LevelFieldKey SPIDER_DAMAGE = new LevelFieldKey("spider_damage");
+        public static readonly LevelFieldKey SPIDER_SPAWN_CHANCE = new LevelFieldKey("spider_spawn_chance");
+        public static readonly LevelFieldKey SPIDER_SPAWN_AMOUNT = new LevelFieldKey("spider_spawn_amount");
+        public static readonly LevelFieldKey FLIES_DAMAGE = new LevelFieldKey("flies_damage");
+        public static readonly LevelFieldKey FLIES_ATTACK_INTERVAL = new LevelFieldKey("flies_attack_interval");
+        public static readonly LevelFieldKey FLIES_SPEED = new LevelFieldKey("flies_speed");
+        public static readonly LevelFieldKey FLIES_ROTATION_SPEED = new LevelFieldKey("flies_rotation_speed");
+        public static readonly LevelFieldKey FLIES_AMOUNT = new LevelFieldKey("flies_amount");
+        public static readonly LevelFieldKey BONUS_GENES = new LevelFieldKey("bonus_genes");
+        public static readonly LevelFieldKey HEALTH_PER_BLOB = new LevelFieldKey("health_per_blob");
+        public static readonly LevelFieldKey MAX_BLOBS = new LevelFieldKey("max_blobs");
+        public static readonly LevelFieldKey EXPLOSION_PARTICLES_AMOUNT = new LevelFieldKey("explosion_particles_amount");
+        public static readonly LevelFieldKey BASE_DAMAGE = new LevelFieldKey("base_damage");
+        public static readonly LevelFieldKey DAMAGE_PER_PLANTS = new LevelFieldKey("damage_per_plants");
+        public static readonly LevelFieldKey CONTACT_DAMAGE = new LevelFieldKey("contact_damage");
+        public static readonly LevelFieldKey LIFESTEAL = new LevelFieldKey("lifesteal");
+        public static readonly LevelFieldKey EFFECT_INTERVAL = new LevelFieldKey("effect_interval");
+        public static readonly LevelFieldKey HEALTH_AMOUNT = new LevelFieldKey("health_amount");
+        public static readonly LevelFieldKey JUMPS_AMOUNT = new LevelFieldKey("number_of_jumps");
+        public static readonly LevelFieldKey JUMP_DAMAGE_REDUCTION = new LevelFieldKey("damage_reduction_per_jump");
+    }
+}

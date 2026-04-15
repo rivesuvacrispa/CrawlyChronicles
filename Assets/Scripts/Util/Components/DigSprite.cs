@@ -2,14 +2,15 @@
 using UI.Menus;
 using UnityEngine;
 
-namespace Gameplay.Mutations.Active
+namespace Util.Components
 {
     public class DigSprite : MonoBehaviour
     {
         private void Awake()
         {
-            transform.SetParent(null);
-            transform.rotation = Quaternion.identity;
+            Transform t = transform;
+            t.SetParent(null);
+            t.rotation = Quaternion.identity;
             MainMenu.OnResetRequested += OnResetRequested;
         }
 

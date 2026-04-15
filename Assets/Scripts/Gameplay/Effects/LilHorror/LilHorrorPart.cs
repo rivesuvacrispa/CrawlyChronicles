@@ -59,9 +59,9 @@ namespace Gameplay.Effects.LilHorror
          */
         public float Move(Vector2 target, float speedModifier)
         {
-            rb.RotateTowardsPosition(target, LegTremor.RotationSpeed * Time.fixedDeltaTime);
+            rb.RotateTowardsPosition(target, LegTremor.CurrentRotationSpeed * Time.fixedDeltaTime);
             rb.linearVelocity = transform.up.normalized * 
-                                (LegTremor.MoveSpeed * Mathf.Clamp01(speedModifier));
+                                (LegTremor.CurrentMoveSpeed * Mathf.Clamp01(speedModifier));
             return (target - (Vector2) transform.position).sqrMagnitude;
         }
         

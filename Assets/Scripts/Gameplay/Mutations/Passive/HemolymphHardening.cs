@@ -2,6 +2,8 @@
 using Hitboxes;
 using UnityEngine;
 using Util;
+using Util.Abilities;
+using Util.Attributes;
 using Util.Interfaces;
 using Util.Particles;
 
@@ -12,43 +14,35 @@ namespace Gameplay.Mutations.Passive
         [Header("References")]
         [SerializeField] private BulletParticleSystem burst;
         [SerializeField] private ParticleSystem orbits;
+        [Header("Stats")]
+        [SerializeField] private LevelConst healthPerBlob = new LevelConst(3);
+        [SerializeField, MinMaxRange(0, 20)] private LevelInt maxBlobs = new LevelInt(2, 10);
+        [SerializeField, MinMaxRange(0f, 10f)] private LevelFloat damage = new LevelFloat(0.5f, 2f);
+        [SerializeField, MinMaxRange(0f, 50f)] private LevelFloat explosionBlobAmount = new LevelFloat(5f, 15f);
 
-        [Header("Health per blob")]
-        [SerializeField] private float healthPerBlob;
-
-        [Header("Max Blobs")]
-        [SerializeField, Range(0, 20)] private int maxBlobsLvl1;
-
-        [SerializeField, Range(0, 20)] private int maxBlobsLvl10;
-
-        [Header("Max Blobs")]
-        [SerializeField, Range(0f, 10f)] private float damageLvl1;
-
-        [SerializeField, Range(0f, 10f)] private float damageLvl10;
-
-        [Header("Explosion blob amount")]
-        [SerializeField, Range(0f, 50f)] private float explosionBlobAmountLvl1;
-
-        [SerializeField, Range(0f, 50f)] private float explosionBlobAmountLvl10;
-
-        private float damage;
-        private int maxBlobs;
+        private float currentDamage;
+        private int currentMaxBlobs;
         private int currentBlobsAmount = 0;
         private float accumulatedHealth = 0;
 
 
+        protected override ILevelField[] CreateLevelFields(int lvl)
+        {
+            return new[]
+            {
+                healthPerBlob.UseKey(LevelFieldKeys.HEALTH_PER_BLOB),
+                maxBlobs.UseKey(LevelFieldKeys.MAX_BLOBS),
+                damage.UseKey(LevelFieldKeys.DAMAGE),
+                explosionBlobAmount.UseKey(LevelFieldKeys.EXPLOSION_PARTICLES_AMOUNT)
+            };
+        }
+
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
-            maxBlobs = LerpLevel(maxBlobsLvl1, maxBlobsLvl10, lvl);
-            damage = LerpLevel(damageLvl1, damageLvl10, lvl);
-            
-            burst.SetBaseAmount(LerpLevel(explosionBlobAmountLvl1, explosionBlobAmountLvl10, lvl));
-            // ParticleSystem.EmissionModule e = burst.emission;
-            // var b = e.GetBurst(0);
-            // float blobAmount =;
-            // b.count = new ParticleSystem.MinMaxCurve(blobAmount * 0.5f, blobAmount);
-            // e.SetBurst(0, b);
+            currentMaxBlobs = maxBlobs.AtLvl(lvl);
+            currentDamage = damage.AtLvl(lvl);
+            burst.SetBaseAmount(explosionBlobAmount.AtLvl(lvl));
         }
 
         protected override void OnEnable()
@@ -80,10 +74,10 @@ namespace Gameplay.Mutations.Passive
 
         private void OnHealthAdded(float amount)
         {
-            if (currentBlobsAmount >= maxBlobs) return;
+            if (currentBlobsAmount >= currentMaxBlobs) return;
 
             accumulatedHealth += amount;
-            int blobsFormed = Mathf.FloorToInt(accumulatedHealth / healthPerBlob);
+            int blobsFormed = Mathf.FloorToInt(accumulatedHealth / healthPerBlob.Value);
             
             if (blobsFormed == 0) return;
             accumulatedHealth %= blobsFormed;
@@ -91,7 +85,7 @@ namespace Gameplay.Mutations.Passive
             
             print($"Added HP: {amount}, blobs formed: {blobsFormed}, accumulated: {accumulatedHealth}, current blobs: {currentBlobsAmount}");
 
-            if (currentBlobsAmount >= maxBlobs)
+            if (currentBlobsAmount >= currentMaxBlobs)
                 accumulatedHealth = 0;
 
             UpdateBlobs();
@@ -102,7 +96,7 @@ namespace Gameplay.Mutations.Passive
             if (damageable is IDamageableEnemy enemy)
                 enemy.Damage(
                     new DamageSource(this, collisionID),
-                    CalculateAbilityDamage(damage),
+                    CalculateAbilityDamage(currentDamage),
                     transform.position, piercing: true
                 );
         }

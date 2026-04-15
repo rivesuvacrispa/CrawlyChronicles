@@ -1,6 +1,8 @@
 ﻿using Gameplay.Player;
 using Hitboxes;
 using UnityEngine;
+using Util.Abilities;
+using Util.Attributes;
 using Util.Interfaces;
 using Util.Particles;
 
@@ -9,39 +11,32 @@ namespace Gameplay.Mutations.Active
     public class SpikeFan : ActiveAbility, IDamageSource
     {
         [SerializeField] private new BulletParticleSystem particleSystem;
-        [Header("Particles amount")] 
-        [SerializeField] private int amountLvl1;
-        [SerializeField] private int amountLvl10;
-        [Header("Fan duration")] 
-        [SerializeField] private float durationLvl1;
-        [SerializeField] private float durationLvl10;
-        [Header("Stun and knockback")] 
-        [SerializeField, Range(0, 1)] private float stunDuration = 0.5f;
-        [SerializeField, Range(0, 10)]  private float knockbackPower = 0.5f;
-        [Header("Damage")]
-        [SerializeField] private float damageLvl1;
-        [SerializeField] private float damageLvl10;
+        [SerializeField, MinMaxRange(0, 50)] private LevelInt amount = new LevelInt(20, 40);
+        [SerializeField, MinMaxRange(0, 5)] private LevelFloat duration = new LevelFloat(1, 3);
+        [SerializeField] private LevelConst stunDuration = new LevelConst(0.5f);
+        [SerializeField]  private LevelConst knockbackPower = new LevelConst(0.5f);
+        [SerializeField, MinMaxRange(0f, 5f)] private LevelFloat damage = new LevelFloat(1f, 3f);
 
         
-        private float damage;
+        private float currentDamage;
         
         
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
             if(particleSystem.Particles.isPlaying) particleSystem.Particles.Stop();
-            damage = LerpLevel(damageLvl1, damageLvl10, lvl);
-            particleSystem.SetBaseAmount(LerpLevel(amountLvl1, amountLvl10, lvl));
-            particleSystem.SetDuration(LerpLevel(durationLvl1, durationLvl10, lvl));
+            currentDamage = damage.AtLvl(lvl);
+            particleSystem.SetBaseAmount(amount.AtLvl(lvl));
+            particleSystem.SetDuration(duration.AtLvl(lvl));
         }
 
         protected override void OnBulletCollision(IDamageable damageable, int collisionID)
         {
             damageable.Damage(new DamageInstance(new DamageSource(this, collisionID), 
-                CalculateAbilityDamage(damage),
+                CalculateAbilityDamage(currentDamage),
                 PlayerPhysicsBody.Position,
-                knockbackPower,
-                stunDuration,
+                knockbackPower.Value,
+                stunDuration.Value,
                 Color.white));
         }
 
@@ -52,31 +47,14 @@ namespace Gameplay.Mutations.Active
             else particleSystem.Particles.Play();
         }
 
-        protected override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
+        protected override ILevelField[] CreateLevelFields(int lvl)
         {
-            float cd = Scriptable.GetCooldown(lvl);
-            float prevCd = cd;
-            float dur = LerpLevel(durationLvl1, durationLvl10, lvl);
-            float prevDur = dur;
-            float amount = LerpLevel(amountLvl1, amountLvl10, lvl);
-            float prevAmount = amount;
-            float dmg = LerpLevel(damageLvl1, damageLvl10, lvl);
-            float prevDmg = dmg;
-
-            if (lvl > 0 && withUpgrade)
+            return new[]
             {
-                var prevLvl = lvl - 1;
-                prevCd = Scriptable.GetCooldown(prevLvl);
-                prevDur = LerpLevel(durationLvl1, durationLvl10, prevLvl);
-                prevAmount = LerpLevel(amountLvl1, amountLvl10, prevLvl);
-                prevDmg = LerpLevel(damageLvl1, damageLvl10, prevLvl);
-            }
-            
-            return new object[]
-            {
-                cd,          dur,           amount,              dmg, 
-                cd - prevCd, dur - prevDur, amount - prevAmount, dmg - prevDmg,
-                stunDuration, knockbackPower
+                Scriptable.Cooldown,
+                duration.UseKey(LevelFieldKeys.DURATION).UseFormatter(StatFormatter.SECONDS),
+                amount.UseKey(LevelFieldKeys.PARTICLES_AMOUNT),
+                damage.UseKey(LevelFieldKeys.DAMAGE)
             };
         }
     }

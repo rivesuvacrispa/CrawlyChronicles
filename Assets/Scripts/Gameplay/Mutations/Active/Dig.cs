@@ -1,22 +1,21 @@
 ﻿using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using Gameplay.Interaction;
 using Gameplay.Player;
 using Hitboxes;
-using UI.Menus;
 using UnityEngine;
+using Util.Abilities;
+using Util.Attributes;
 
 namespace Gameplay.Mutations.Active
 {
     public class Dig : ActiveAbility
     {
         [SerializeField] private Transform spriteTransform;
-        
-        [SerializeField, Range(1, 10)] private float durationLvl1; 
-        [SerializeField, Range(1, 10)] private float durationLvl10;
+        [SerializeField] private LevelConst immunityDuration = new LevelConst(0.5f);
+        [SerializeField, MinMaxRange(1f, 10f)] private LevelFloat duration = new LevelFloat(new Vector2(3f, 10f));
 
-        private float duration;
+        private float currentDuration;
         private int VoteSource => GetHashCode();
         private bool active;
         private CancellationTokenSource cancellationTokenSource;
@@ -27,7 +26,7 @@ namespace Gameplay.Mutations.Active
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
-            duration = LerpLevel(durationLvl1, durationLvl10, lvl);
+            currentDuration = duration.AtLvl(lvl);
         }
 
 
@@ -68,11 +67,11 @@ namespace Gameplay.Mutations.Active
             PlayerPhysicsBody.PhysicsCollider.enabled = false;
             PlayerLocatorBody.Enabled = false;
 
-            await UniTask.Delay(TimeSpan.FromSeconds(0.5f), cancellationToken: cancellationToken)
+            await UniTask.Delay(TimeSpan.FromSeconds(immunityDuration.Value), cancellationToken: cancellationToken)
                 .SuppressCancellationThrow();
             PlayerHitbox.Immune.Unvote(VoteSource);
 
-            await UniTask.Delay(TimeSpan.FromSeconds(duration - 0.5f), cancellationToken: cancellationToken)
+            await UniTask.Delay(TimeSpan.FromSeconds(currentDuration - immunityDuration.Value), cancellationToken: cancellationToken)
                 .SuppressCancellationThrow();
 
             active = false;
@@ -85,9 +84,14 @@ namespace Gameplay.Mutations.Active
             SetOnCooldown();
         }
 
-        protected override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
+        protected override ILevelField[] CreateLevelFields(int lvl)
         {
-            return null;
+            return new[]
+            {
+                Scriptable.Cooldown,
+                immunityDuration.UseKey(LevelFieldKeys.IMMUNITY_DURATION).UseFormatter(StatFormatter.SECONDS),
+                duration.UseKey(LevelFieldKeys.EFFECT_DURATION).UseFormatter(StatFormatter.SECONDS)
+            };
         }
     }
 }

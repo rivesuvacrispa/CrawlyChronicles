@@ -1,34 +1,31 @@
 ﻿using System.Collections;
 using Gameplay.Player;
 using UnityEngine;
+using Util.Abilities;
+using Util.Attributes;
 
 namespace Gameplay.Mutations.Active
 {
     public class PheromoneBurst : ActiveAbility
     {
         [SerializeField] private TrailRenderer trailRenderer;
-        [Header("Duration")] 
-        [SerializeField] private float durationLvl1;
-        [SerializeField] private float durationLvl10;
-        [Header("Speed amplifier")]
-        [SerializeField] private float speedLvl1;
-        [SerializeField] private float speedLvl10;
-        [Header("Bonus damage")] 
-        [SerializeField, Range(0, 1)] private float damageBoostLvl1;
-        [SerializeField, Range(0, 1)] private float damageBoostLvl10;
+        [SerializeField, MinMaxRange(1f, 10f)] private LevelFloat duration = new LevelFloat(new Vector2(2f, 6f));
+        [SerializeField, MinMaxRange(1f, 10f)] private LevelFloat bonusSpeed = new LevelFloat(new Vector2(0.2f, 2f));
+        [SerializeField, MinMaxRange(0f, 1f)] private LevelFloat bonusDamage = new LevelFloat(new Vector2(0.15f, 1f));
+
         
-        private float duration;
-        private float speed;
-        private float damageBoost;
+        private float currentDuration;
+        private float currentBonusSpeed;
+        private float currentBonusDamage;
 
         private PlayerStats activeStats = PlayerStats.Zero;
 
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
-            duration = LerpLevel(durationLvl1, durationLvl10, lvl);
-            speed = LerpLevel(speedLvl1, speedLvl10, lvl);
-            damageBoost = LerpLevel(damageBoostLvl1, damageBoostLvl10, lvl);
+            currentDuration = duration.AtLvl(lvl);
+            currentBonusSpeed = bonusSpeed.AtLvl(lvl);
+            currentBonusDamage = bonusDamage.AtLvl(lvl);
         }
 
         public override void Activate(bool auto = false)
@@ -43,13 +40,13 @@ namespace Gameplay.Mutations.Active
         private IEnumerator AbilityRoutine()
         {
             trailRenderer.emitting = true;
-            PlayerMovement.MoveSpeedAmplifier = speed;
+            PlayerMovement.MoveSpeedAmplifier = currentBonusSpeed;
             activeStats = new PlayerStats
-                (attackDamage: PlayerManager.PlayerStats.AttackDamage * damageBoost,
-                abilityDamage: damageBoost);
+                (attackDamage: PlayerManager.PlayerStats.AttackDamage * currentBonusDamage,
+                abilityDamage: currentBonusDamage);
             PlayerManager.Instance.AddStats(activeStats);
             
-            yield return new WaitForSeconds(duration);
+            yield return new WaitForSeconds(currentDuration);
 
             PlayerMovement.MoveSpeedAmplifier = 1;
             trailRenderer.emitting = false;
@@ -64,29 +61,14 @@ namespace Gameplay.Mutations.Active
             PlayerManager.Instance.AddStats(activeStats.Negated());
         }
 
-        protected override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
+        protected override ILevelField[] CreateLevelFields(int lvl)
         {
-            float cd = Scriptable.GetCooldown(lvl);
-            float prevCd = cd;
-            float dur = LerpLevel(durationLvl1, durationLvl10, lvl);
-            float prevDur = dur;
-            int spd = (int) (LerpLevel(speedLvl1, speedLvl10, lvl) * 100) - 100;
-            int prevSpd = spd;
-            int dmg = (int) (LerpLevel(damageBoostLvl1, damageBoostLvl10, lvl) * 100);
-            int prevDmg = dmg;
-
-            if (lvl > 0 && withUpgrade)
+            return new[]
             {
-                int prevLvl = lvl - 1;
-                prevCd = Scriptable.GetCooldown(prevLvl);
-                prevDur = LerpLevel(durationLvl1, durationLvl10, prevLvl);
-                prevSpd = (int) (LerpLevel(speedLvl1, speedLvl10, prevLvl) * 100) - 100;
-                prevDmg = (int) (LerpLevel(damageBoostLvl1, damageBoostLvl10, prevLvl) * 100);
-            }
-            return new object[]
-            {
-                cd,          dur,           spd,           dmg,
-                cd - prevCd, dur - prevDur, spd - prevSpd, dmg - prevDmg
+                Scriptable.Cooldown,
+                duration.UseKey(LevelFieldKeys.EFFECT_DURATION).UseFormatter(StatFormatter.SECONDS),
+                bonusSpeed.UseKey(LevelFieldKeys.BONUS_SPEED),
+                bonusDamage.UseKey(LevelFieldKeys.BONUS_DAMAGE).UseFormatter(StatFormatter.PERCENT),
             };
         }
     }

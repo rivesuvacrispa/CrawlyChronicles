@@ -1,8 +1,12 @@
-﻿using Gameplay.Player;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Gameplay.Player;
 using Hitboxes;
 using Timeline;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using Util.Abilities;
+using Util.Attributes;
 using Util.Interfaces;
 using Util.Particles;
 
@@ -12,38 +16,32 @@ namespace Gameplay.Mutations.Passive
     {
         [SerializeField] private new BulletParticleSystem particleSystem;
         [SerializeField] private new Light2D light;
-        [Header("Particles amount")] 
-        [SerializeField] private int amountLvl1;
-        [SerializeField] private int amountLvl10;
-        [Header("Damage")] 
-        [SerializeField] private float damageLvl1;
-        [SerializeField] private float damageLvl10;
-        [Header("Particles lifetime")] 
-        [SerializeField] private float lifetimeLvl1;
-        [SerializeField] private float lifetimeLvl10;
+        [SerializeField, MinMaxRange(0, 100)] private LevelInt amount = new LevelInt(25, 60);
+        [SerializeField, MinMaxRange(0, 5)] private LevelFloat damage = new LevelFloat(1, 3);
+        [SerializeField, MinMaxRange(0, 1)] private LevelFloat lifetime = new LevelFloat(0.35f, 0.6f);
         
         
-        private float damage;
-
+        private float currentDamage;
+        private ParticleSystem.MainModule main;
 
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
-            damage = LerpLevel(damageLvl1, damageLvl10, lvl);
-            float lifetime = LerpLevel(lifetimeLvl1, lifetimeLvl10, lvl);
-            light.pointLightOuterRadius = lifetime * 3;
+            currentDamage = damage.AtLvl(lvl);
+            float currentLifetime = lifetime.AtLvl(lvl);
+            light.pointLightOuterRadius = currentLifetime * 3;
             
-            var main = particleSystem.Particles.main;
-            main.startLifetime = lifetime;
+            main = particleSystem.Particles.main;
+            main.startLifetime = currentLifetime;
             
-            particleSystem.SetBaseAmount(LerpLevel(amountLvl1, amountLvl10, lvl));
+            particleSystem.SetBaseAmount(amount.AtLvl(lvl));
         }
 
         protected override void OnBulletCollision(IDamageable damageable, int collisionID)
         {
             damageable.Damage(new DamageInstance(
                 new DamageSource(this, collisionID),
-                CalculateAbilityDamage(damage),
+                CalculateAbilityDamage(currentDamage),
                 PlayerPhysicsBody.Position,
                 piercing: true));
         }
@@ -76,30 +74,15 @@ namespace Gameplay.Mutations.Passive
             light.enabled = true;
         }
         
-        public override string GetLevelDescription(int lvl, bool withUpgrade)
-        {
-            float life = LerpLevel(lifetimeLvl1, lifetimeLvl10, lvl) * 3;
-            float prevLife = life;
-            float amount = LerpLevel(amountLvl1, amountLvl10, lvl);
-            float prevAmount = amount;
-            float dmg = LerpLevel(damageLvl1, damageLvl10, lvl);
-            float prevDmg = dmg;
 
-            if (lvl > 0 && withUpgrade)
+        protected override ILevelField[] CreateLevelFields(int lvl)
+        {
+            return new ILevelField[]
             {
-                var prevLvl = lvl - 1;
-                prevLife = LerpLevel(lifetimeLvl1, lifetimeLvl10, prevLvl) * 3;
-                prevAmount = LerpLevel(amountLvl1, amountLvl10, prevLvl);
-                prevDmg = LerpLevel(damageLvl1, damageLvl10, prevLvl);
-            }
-            
-            var args = new object[]
-            {
-                 amount,              dmg,           life,           
-                 amount - prevAmount, dmg - prevDmg, life - prevLife,
+                amount.UseKey(LevelFieldKeys.PARTICLES_AMOUNT),
+                damage.UseKey(LevelFieldKeys.DAMAGE),
+                lifetime.UseKey(LevelFieldKeys.EFFECT_RANGE).UseFormatter(new StatFormatter(multiplier: main.startSpeed.Evaluate(0)))
             };
-            
-            return scriptable.GetStatDescription(args);
         }
     }
 }

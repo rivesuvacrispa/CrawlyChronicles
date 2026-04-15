@@ -20,7 +20,7 @@ namespace Gameplay.Enemies.Enemies
 
         private delegate void NeutralAntEvent(Vector2 position);
         private static event NeutralAntEvent OnNeutralDamaged;
-        public override bool CanAggroUnit => false;
+        public override bool CanAggroUnit => Aggressive;
 
         public delegate void NeutralAntInteractionEvent();
 
@@ -32,7 +32,7 @@ namespace Gameplay.Enemies.Enemies
 
         private Coroutine interestRoutine;
         private bool hungry = true;
-        private bool aggressive;
+        public bool Aggressive { get; private set; }
         public bool CanBreed { get; set; } = true;
 
         [field:SerializeField] public TrioGene TrioGene { get; private set; } = TrioGene.Zero;
@@ -56,7 +56,7 @@ namespace Gameplay.Enemies.Enemies
 
         public override void OnPlayerLocated()
         {
-            if (aggressive)
+            if (Aggressive)
                 AttackPlayer();
             else
             {
@@ -142,7 +142,7 @@ namespace Gameplay.Enemies.Enemies
         {
             if(Vector2.Distance(rb.position, pos) > 7.5f || StateController.CurrentState == AIState.Enter) return;
             StopInterest();
-            aggressive = true;
+            Aggressive = true;
             minimapIcon.color = Color.red;
             CanBreed = false;
             AttackPlayer();

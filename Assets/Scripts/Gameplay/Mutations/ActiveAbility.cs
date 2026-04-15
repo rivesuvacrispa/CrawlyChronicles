@@ -26,9 +26,6 @@ namespace Gameplay.Mutations
 
         private float currentCooldown;
 
-        
-
-        protected abstract object[] GetDescriptionArguments(int lvl, bool withUpgrade);
 
         private void Update()
         {
@@ -66,9 +63,6 @@ namespace Gameplay.Mutations
         }
 
         public virtual bool CanActivate() => CurrentCooldown <= 0;
-
-        public override string GetLevelDescription(int lvl, bool withUpgrade) 
-            => Scriptable.GetStatDescription(GetDescriptionArguments(lvl, withUpgrade));
 
         protected override void OnDisable()
         {

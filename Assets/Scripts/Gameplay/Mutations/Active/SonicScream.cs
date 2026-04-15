@@ -1,6 +1,8 @@
 ﻿using Gameplay.Player;
 using Hitboxes;
 using UnityEngine;
+using Util.Abilities;
+using Util.Attributes;
 using Util.Interfaces;
 
 namespace Gameplay.Mutations.Active
@@ -8,34 +10,27 @@ namespace Gameplay.Mutations.Active
     public class SonicScream : ActiveAbility, IDamageSource
     {
         [SerializeField] private new ParticleSystem particleSystem;
-        [Header("Waves amount")] 
-        [SerializeField] private int wavesLvl1;
-        [SerializeField] private int wavesLvl10;
-        [Header("Waves lifetime")] 
-        [SerializeField] private float lifetimeLvl1;
-        [SerializeField] private float lifetimeLvl10;
-        [Header("Stun duration")] 
-        [SerializeField] private float stunLvl1;
-        [SerializeField] private float stunLvl10;
-        [Header("Knockback")] 
-        [SerializeField] private float knockbackLvl1;
-        [SerializeField] private float knockbackLvl10;
-
-        private float stun;
-        private float knockback;
+        [SerializeField, MinMaxRange(1, 5)] private LevelInt wavesAmount = new LevelInt(1, 3);
+        [SerializeField, MinMaxRange(0f, 1f)] private LevelFloat lifetime = new LevelFloat(0.35f, 0.6f);
+        [SerializeField, MinMaxRange(0f, 5f)] private LevelFloat stunDuration = new LevelFloat(1, 3);
+        [SerializeField, MinMaxRange(0f, 10f)] private LevelFloat knockback = new LevelFloat(3f, 6f);
+        
+        private float currentStunDuration;
+        private float currentKnockback;
+        private ParticleSystem.MainModule main;
         
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
             if(particleSystem.isPlaying) particleSystem.Stop();
-            stun = LerpLevel(stunLvl1, stunLvl10, lvl);
-            knockback = LerpLevel(knockbackLvl1, knockbackLvl10, lvl);
+            currentStunDuration = stunDuration.AtLvl(lvl);
+            currentKnockback = knockback.AtLvl(lvl);
             var emission = particleSystem.emission;
-            var main = particleSystem.main;
-            int waves = Mathf.FloorToInt(LerpLevel(wavesLvl1, wavesLvl10, lvl));
+            main = particleSystem.main;
+            int waves = wavesAmount.AtLvlFloor(lvl);
             emission.SetBurst(0, new ParticleSystem.Burst(0, 15, 15, waves, 0.2f));
-            float lifetime = LerpLevel(lifetimeLvl1, lifetimeLvl10, lvl);
-            main.startLifetime = new ParticleSystem.MinMaxCurve(lifetime, lifetime + 0.25f);
+            float currentLifetime = lifetime.AtLvl(lvl);
+            main.startLifetime = new ParticleSystem.MinMaxCurve(currentLifetime, currentLifetime + 0.25f);
         }
 
         protected override void OnBulletCollision(IDamageable damageable, int collisionID)
@@ -43,8 +38,8 @@ namespace Gameplay.Mutations.Active
             damageable.Damage(new DamageInstance(new DamageSource(this), 
                 0,
                 PlayerPhysicsBody.Position,
-                knockback,
-                stun,
+                currentKnockback,
+                currentStunDuration,
                 Color.pink));
         }
         
@@ -54,32 +49,15 @@ namespace Gameplay.Mutations.Active
             particleSystem.Play();
         }
 
-        protected override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
+        protected override ILevelField[] CreateLevelFields(int lvl)
         {
-            float cd = Scriptable.GetCooldown(lvl);
-            float prevCd = cd;
-            float waves = Mathf.FloorToInt(LerpLevel(wavesLvl1, wavesLvl10, lvl));
-            float prevWaves = waves;
-            float life = LerpLevel(lifetimeLvl1, lifetimeLvl10, lvl) * 6;
-            float prevLife = life;
-            float stunDur = LerpLevel(stunLvl1, stunLvl10, lvl);
-            float prevStunDur = stunDur;
-            float kb = LerpLevel(knockbackLvl1, knockbackLvl10, lvl);
-            float prevKb = kb;
-
-            if (lvl > 0 && withUpgrade)
+            return new[]
             {
-                var prevLvl = lvl - 1;
-                prevCd = Scriptable.GetCooldown(prevLvl);
-                prevWaves = Mathf.FloorToInt(LerpLevel(wavesLvl1, wavesLvl10, prevLvl));
-                prevLife = LerpLevel(lifetimeLvl1, lifetimeLvl10, prevLvl) * 6;
-                prevStunDur = LerpLevel(stunLvl1, stunLvl10, prevLvl);
-                prevKb = LerpLevel(knockbackLvl1, knockbackLvl10, prevLvl);
-            }
-            return new object[]
-            {
-                cd,          waves,             life,            stunDur,               kb,
-                cd - prevCd, waves - prevWaves, life - prevLife, stunDur - prevStunDur, kb - prevKb,
+                Scriptable.Cooldown,
+                wavesAmount.UseKey(LevelFieldKeys.WAVES_AMOUNT),
+                lifetime.UseKey(LevelFieldKeys.WAVES_LENGTH).UseFormatter(new StatFormatter(multiplier: main.startLifetime.constant)),
+                stunDuration.UseKey(LevelFieldKeys.STUN_DURATION).UseFormatter(StatFormatter.SECONDS),
+                knockback.UseKey(LevelFieldKeys.KNOCKBACK)
             };
         }
     }

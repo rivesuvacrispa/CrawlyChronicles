@@ -1,26 +1,39 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using Gameplay.Mutations.Stats;
 using Gameplay.Player;
 using UnityEngine;
+using Util.Abilities;
+using Util.Attributes;
 
 namespace Gameplay.Mutations.Passive
 {
     public class PredatorsHeart : StatsAbility
     {
         [SerializeField] private PlayerManager playerManager;
-
-        [Header("Regen")]
-        [SerializeField] private float regenDelay;
-        [SerializeField] private float regenLvl1;
-        [SerializeField] private float regenLvl10;
+        [SerializeField] private LevelConst regenInterval = new LevelConst(10);
+        [SerializeField, MinMaxRange(0f, 1f)] private LevelFloat regen = new LevelFloat(0.05f, 0.2f);
 
         private PlayerStats currentStats = PlayerStats.Zero;
         private float currentRegen;
 
+        
+
+        protected override ILevelField[] CreateLevelFields(int lvl)
+        {
+            List<ILevelField> fields = new List<ILevelField>()
+            {
+                regenInterval.UseKey(LevelFieldKeys.EFFECT_INTERVAL).UseFormatter(StatFormatter.SECONDS),
+                regen.UseKey(LevelFieldKeys.HEALTH_AMOUNT).UseFormatter(StatFormatter.PERCENT)
+            };
+            fields.AddRange(base.CreateLevelFields(lvl));
+            return fields.ToArray();
+        }
+
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
-            currentRegen = LerpLevel(regenLvl1, regenLvl10, lvl);
+            currentRegen = regen.AtLvl(lvl);
         }
 
         protected override void OnEnable()
@@ -40,30 +53,9 @@ namespace Gameplay.Mutations.Passive
         {
             while (isActiveAndEnabled)
             {
-                yield return new WaitForSeconds(regenDelay);
+                yield return new WaitForSeconds(regenInterval.Value);
                 PlayerManager.Instance.AddHealthPercent(currentRegen);
             }
-        }
-        
-        public override string GetLevelDescription(int lvl, bool withUpgrade)
-        {
-            int regen = (int) (LerpLevel(regenLvl1, regenLvl10, lvl) * 100);
-            int prevRegen = regen;
-
-            if (lvl > 0 && withUpgrade)
-            {
-                var prevLvl = lvl - 1;
-                prevRegen = (int) (LerpLevel(regenLvl1, regenLvl10, prevLvl) * 100);
-            }
-            
-            var args = new object[]
-            {
-                regen,
-                regen - prevRegen,
-                regenDelay
-            };
-            
-            return  scriptable.GetStatDescription(args) + "\n" + base.GetLevelDescription(lvl, withUpgrade);
         }
     }
 }

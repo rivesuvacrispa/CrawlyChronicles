@@ -6,8 +6,9 @@ using Gameplay.Mutations.AttackEffects;
 using Gameplay.Player;
 using SoundEffects;
 using UnityEngine;
+using Util.Abilities;
+using Util.Attributes;
 using Util.Interfaces;
-using Random = UnityEngine.Random;
 
 namespace Gameplay.Mutations.Passive
 {
@@ -18,34 +19,38 @@ namespace Gameplay.Mutations.Passive
         [SerializeField] private ParticleSystem bloodParticles;
         [SerializeField] private SimpleAudioSource attackSource;
         [SerializeField] private SimpleAudioSource hitSource;
-        [Header("Proc Chance")] 
-        [SerializeField, Range(0.01f, 1)] private float procChanceLvl1;
-        [SerializeField, Range(0.01f, 1)] private float procChanceLvl10;
-        [Header("Damage Multiplier")] 
-        [SerializeField, Range(1f, 100f)] private float damageMultiplierLvl1;
-        [SerializeField, Range(1f, 100f)] private float damageMultiplierLvl10;
+        [SerializeField, MinMaxRange(0.01f, 1f)] private LevelFloat procChance = new LevelFloat(0.05f, 0.125f);
+        [SerializeField, MinMaxRange(1f, 100f)] private LevelFloat damageMultiplier = new LevelFloat(5f, 15f);
 
-        private float procChance;
-        private float damageMultiplier;
+        private float currentProcChance;
+        private float currentDamageMultiplier;
         private CancellationTokenSource cancellationTokenSource;
-        
-        
+
+
+        protected override ILevelField[] CreateLevelFields(int lvl)
+        {
+            return new[]
+            {
+                procChance.UseKey(LevelFieldKeys.PROC_CHANCE).UseFormatter(StatFormatter.PERCENT),
+                damageMultiplier.UseKey(LevelFieldKeys.BONUS_DAMAGE).UseFormatter(StatFormatter.PERCENT)
+            };
+        }
 
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
 
-            procChance = LerpLevel(procChanceLvl1, procChanceLvl10, lvl);
-            damageMultiplier = LerpLevel(damageMultiplierLvl1, damageMultiplierLvl10, lvl);
+            currentProcChance = procChance.AtLvl(lvl);
+            currentDamageMultiplier = damageMultiplier.AtLvl(lvl);
         }
         
         private void OnAttackEffectCollectionRequested(List<AttackEffect> effects)
         {
-            if (TryProc(procChance))
+            if (TryProc(currentProcChance))
             {
                 attackSource.Play();
                 effects.Add(new DeadlyStrikeAttackEffect(effectGradient, OnImpact,
-                    PlayerManager.PlayerStats.AttackDamage * (damageMultiplier - 1)));
+                    PlayerManager.PlayerStats.AttackDamage * (currentDamageMultiplier - 1)));
             }
         }
 

@@ -8,25 +8,22 @@ using Gameplay.Player;
 using Hitboxes;
 using Pooling;
 using UnityEngine;
+using Util.Abilities;
+using Util.Attributes;
 using Random = UnityEngine.Random;
 
 namespace Gameplay.Mutations.Active
 {
     public class SlicingStrikes : ActiveAbility
     {
-        [Header("Cleave Radius")] 
-        [SerializeField, Range(0, 5f)] private float radiusLvl1;
-        [SerializeField, Range(0, 5f)] private float radiusLvl10;
-        [Header("Damage")] 
-        [SerializeField, Range(0, 5f)] private float bonusDamageLvl1;
-        [SerializeField, Range(0, 5f)] private float bonusDamageLvl10;
-        [Header("Damage")] 
-        [SerializeField, Range(0, 10f)] private int attacksAmountLvl1;
-        [SerializeField, Range(0, 10f)] private int attacksAmountLvl10;
-        
-        private float radius;
-        private int attacksAmount;
-        private float bonusDamage;
+        [SerializeField] private LevelConst attackInterval = new LevelConst(0.25f);
+        [SerializeField, MinMaxRange(0f, 5f)] private LevelFloat radius = new LevelFloat(1.25f, 3f);
+        [SerializeField, MinMaxRange(0f, 5f)] private LevelFloat bonusDamage = new LevelFloat(0.25f, 4f);
+        [SerializeField, MinMaxRange(0f, 10f)] private LevelInt attacksAmount = new LevelInt(3, 10);
+
+        private float currentRadius;
+        private int currentAttacksAmount;
+        private float currentBonusDamage;
         private static readonly List<Collider2D> OverlapResults = new(32);
 
 
@@ -34,9 +31,9 @@ namespace Gameplay.Mutations.Active
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
-            radius = LerpLevel(radiusLvl1, radiusLvl10, lvl);
-            bonusDamage = LerpLevel(bonusDamageLvl1, bonusDamageLvl10, lvl);
-            attacksAmount = LerpLevel(attacksAmountLvl1, attacksAmountLvl10, lvl);
+            currentRadius = radius.AtLvl(lvl);
+            currentBonusDamage = bonusDamage.AtLvl(lvl);
+            currentAttacksAmount = attacksAmount.AtLvl(lvl);
         }
 
         public override void Activate(bool auto = false)
@@ -57,13 +54,15 @@ namespace Gameplay.Mutations.Active
             OverlapResults.Clear();
             int contacts = Physics2D.OverlapCircle(
                 transform.position,
-                radius, GlobalDefinitions.EnemyPhysicsContactFilter, OverlapResults);
+                currentRadius, GlobalDefinitions.EnemyPhysicsContactFilter, OverlapResults);
             return contacts;
         }
 
         private async UniTask ActivateTask(CancellationToken cancellationToken)
         {
-            for (int i = 0; i < attacksAmount; i++)
+            var interval = TimeSpan.FromSeconds(attackInterval.Value);
+            
+            for (int i = 0; i < currentAttacksAmount; i++)
             {
                 int contacts = CollectTargets();
 
@@ -75,19 +74,25 @@ namespace Gameplay.Mutations.Active
                     Vector3 targetPos = e.Transform.position;
                     Vector3 spawnPos = targetPos + (Vector3)Random.insideUnitCircle.normalized * 1.25f;
                     PoolManager.GetEffect<PhantomPlayerAttack>(
-                        new PhantomPlayerAttackArguments(targetPos, bonusDamage),
+                        new PhantomPlayerAttackArguments(targetPos, currentBonusDamage),
                         spawnPos
                     );
                 }
 
-                if (attacksAmount > 1) 
-                    await UniTask.Delay(TimeSpan.FromSeconds(1f / attacksAmount), cancellationToken: cancellationToken);
+                if (currentAttacksAmount > 1) 
+                    await UniTask.Delay(interval, cancellationToken: cancellationToken);
             }
         }
 
-        protected override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
+        protected override ILevelField[] CreateLevelFields(int lvl)
         {
-            return null;
+            return new[]
+            {
+                Scriptable.Cooldown,
+                attackInterval.UseKey(LevelFieldKeys.ATTACKS_INTERVAL).UseFormatter(StatFormatter.SECONDS),
+                bonusDamage.UseKey(LevelFieldKeys.BONUS_DAMAGE),
+                attacksAmount.UseKey(LevelFieldKeys.ATTACKS_AMOUNT)
+            };
         }
     }
 }

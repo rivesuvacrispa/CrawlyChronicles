@@ -4,44 +4,36 @@ using Gameplay.Effects.Fly;
 using Gameplay.Player;
 using Pooling;
 using UnityEngine;
+using Util.Abilities;
+using Util.Attributes;
 
 namespace Gameplay.Mutations.Passive
 {
     public class CorpseScent : BasicAbility
     {
-        // TODO: Ability description & icon
-        [Header("Damage")] 
-        [SerializeField, Range(0.1f, 5f)] private float damageLvl1;
-        [SerializeField, Range(0.1f, 5f)] private float damageLvl10;
-        [Header("Damage")] 
-        [SerializeField, Range(0.25f, 1f)] private float attackCooldownLvl1;
-        [SerializeField, Range(0.25f, 1f)] private float attackCooldownLvl10;
-        [Header("Fly Speed")] 
-        [SerializeField, Range(5, 20)] private float flySpeedLvl1;
-        [SerializeField, Range(5, 20)] private float flySpeedLvl10;
-        [Header("Rotation Speed")] 
-        [SerializeField, Range(20, 100)] private float rotationSpedLvl1;
-        [SerializeField, Range(20, 100)] private float rotationSpeedLvl10;
-        [Header("Damage")] 
-        [SerializeField, Range(1, 20)] private int fliesAmountLvl1;
-        [SerializeField, Range(1, 20)] private int fliesAmountLvl10;
+        [SerializeField, MinMaxRange(0.1f, 5f)] private LevelFloat damage = new LevelFloat(0.5f, 1.5f);
+        [SerializeField, MinMaxRange(0.25f, 1f)] private LevelFloat attackCooldown = new LevelFloat(1, 0.5f);
+        [SerializeField, MinMaxRange(5, 20)] private LevelFloat flySpeed = new LevelFloat(8, 16);
+        [SerializeField, MinMaxRange(20, 100)] private LevelFloat rotationSpeed = new LevelFloat(20, 80);
+        [SerializeField, MinMaxRange(1, 20)] private LevelInt fliesAmount = new LevelInt(1, 10);
 
-        private float damage;
-        private float attackCooldown;
-        private float flySpeed;
-        private float rotationSpeed;
-        private int fliesAmount;
+        private float currentDamage;
+        private float currentAttackCooldown;
+        private float currentFlySpeed;
+        private float currentRotationSpeed;
+        private int currentFliesAmount;
         private readonly List<Fly> flies = new();
-
+        
+        
 
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
-            damage = LerpLevel(damageLvl1, damageLvl10, lvl);
-            attackCooldown = LerpLevel(attackCooldownLvl1, attackCooldownLvl10, lvl);
-            flySpeed = LerpLevel(flySpeedLvl1, flySpeedLvl10, lvl);
-            rotationSpeed = LerpLevel(rotationSpedLvl1, rotationSpeedLvl10, lvl);
-            fliesAmount = LerpLevel(fliesAmountLvl1, fliesAmountLvl10, lvl);
+            currentDamage = damage.AtLvl(lvl);
+            currentAttackCooldown = attackCooldown.AtLvl(lvl);
+            currentFlySpeed = flySpeed.AtLvl(lvl);
+            currentRotationSpeed = rotationSpeed.AtLvl(lvl);
+            currentFliesAmount = fliesAmount.AtLvl(lvl);
 
 #if UNITY_EDITOR
             if (Application.isPlaying)
@@ -59,7 +51,7 @@ namespace Gameplay.Mutations.Passive
         private void SpawnOrDespawnFlies()
         {
             int currentAmount = flies.Count;
-            int maxAmount = CalculateSummonsAmount(fliesAmount);
+            int maxAmount = CalculateSummonsAmount(currentFliesAmount);
             int changeAmount = maxAmount - currentAmount;
             if (changeAmount == 0) return;
             
@@ -67,7 +59,7 @@ namespace Gameplay.Mutations.Passive
                 for (int i = 0; i < changeAmount; i++)
                 {
                     Fly fly = PoolManager.GetEffect<Fly>(
-                        new FlyArguments(damage, attackCooldown, flySpeed, rotationSpeed),
+                        new FlyArguments(currentDamage, currentAttackCooldown, currentFlySpeed, currentRotationSpeed),
                         position: transform.position + (Vector3)Random.insideUnitCircle * 0.2f);
                     flies.Add(fly);
                 }
@@ -109,6 +101,18 @@ namespace Gameplay.Mutations.Passive
         {
             if (changes.BonusSummonAmount != 0)
                 SpawnOrDespawnFlies();
+        }
+        
+        protected override ILevelField[] CreateLevelFields(int lvl)
+        {
+            return new[]
+            {
+                damage.UseKey(LevelFieldKeys.FLIES_DAMAGE),
+                attackCooldown.UseKey(LevelFieldKeys.FLIES_ATTACK_INTERVAL),
+                flySpeed.UseKey(LevelFieldKeys.FLIES_SPEED),
+                rotationSpeed.UseKey(LevelFieldKeys.FLIES_ROTATION_SPEED),
+                fliesAmount.UseKey(LevelFieldKeys.FLIES_AMOUNT),
+            };
         }
     }
 }

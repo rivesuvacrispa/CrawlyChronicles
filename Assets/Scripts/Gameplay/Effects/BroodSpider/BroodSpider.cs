@@ -30,7 +30,7 @@ namespace Gameplay.Effects.BroodSpider
         protected override float TargetSearchRadius => 3f;
 
         private static int currentSpidersAmount = 0;
-        public static bool CanSpawnSpider => currentSpidersAmount < BasicAbility.CalculateSummonsAmount(Brood.MAX_SPIDERS_AMOUNT);
+        public static bool CanSpawnSpider => currentSpidersAmount < BasicAbility.CalculateSummonsAmount(Brood.MaxSpiders);
 
 
         

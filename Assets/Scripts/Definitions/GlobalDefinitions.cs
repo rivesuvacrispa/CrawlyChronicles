@@ -100,8 +100,8 @@ namespace Definitions
             return lvl switch
             {
                 <= 3 => lvl * 10,
-                <= 7 => 50 * (lvl - 3),
-                <= 10 => 100 * (lvl - 5),
+                <= 8 => 50 + 25 * (lvl - 4),
+                <= 10 => 150 + 50 * (lvl - 8),
                 _ => 0
             };
         }

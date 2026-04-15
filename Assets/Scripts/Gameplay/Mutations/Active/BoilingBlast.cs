@@ -1,6 +1,8 @@
 ﻿using Gameplay.Player;
 using Hitboxes;
 using UnityEngine;
+using Util.Abilities;
+using Util.Attributes;
 using Util.Interfaces;
 using Util.Particles;
 
@@ -10,46 +12,39 @@ namespace Gameplay.Mutations.Active
     {
         [SerializeField] private BulletParticleSystem basicParticles;
         [SerializeField] private BulletParticleSystem comboParticles;
-        [Header("Particles amount")] 
-        [SerializeField] private int amountLvl1;
-        [SerializeField] private int amountLvl10;
-        [Header("Stun duration")] 
-        [SerializeField] private float stunLvl1;
-        [SerializeField] private float stunLvl10;
-        [Header("Knockback")] 
-        [SerializeField] private float knockbackLvl1;
-        [SerializeField] private float knockbackLvl10;
-        [Header("Damage")]
-        [SerializeField] private float damageLvl1;
-        [SerializeField] private float damageLvl10;
+        [SerializeField, MinMaxRange(0, 100)] private LevelInt amount = new LevelInt(new Vector2Int(25, 75));
+        [SerializeField, MinMaxRange(0, 5)] private LevelFloat stunDuration = new LevelFloat(new Vector2(1, 3));
+        [SerializeField, MinMaxRange(0, 10)] private LevelFloat knockback = new LevelFloat(new Vector2(4, 10));
+        [SerializeField, MinMaxRange(0, 10)] private LevelFloat damage = new LevelFloat(new Vector2(3, 10));
 
 
-        private float damage;
-        private float knockback;
-        private float stun;
+
+        private float currentDamage;
+        private float currentKnockback;
+        private float currentStunDurtation;
         
         
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
             if(basicParticles.Particles.isPlaying) basicParticles.Particles.Stop();
-            damage = LerpLevel(damageLvl1, damageLvl10, lvl);
-            stun = LerpLevel(stunLvl1, stunLvl10, lvl);
-            knockback = LerpLevel(knockbackLvl1, knockbackLvl10, lvl);
+            currentDamage = damage.AtLvl(lvl);
+            currentStunDurtation = stunDuration.AtLvl(lvl);
+            currentKnockback = knockback.AtLvl(lvl);
             
-            float amount = LerpLevel(amountLvl1, amountLvl10, lvl);
-            basicParticles.SetBaseAmount(amount);
-            comboParticles.SetBaseAmount(amount * 2);
+            float currentAmount = amount.AtLvl(lvl);
+            basicParticles.SetBaseAmount(currentAmount);
+            comboParticles.SetBaseAmount(currentAmount * 2);
         }
 
         protected override void OnBulletCollision(IDamageable damageable, int collisionID)
         {
             damageable.Damage(
                 new DamageInstance(new DamageSource(this),
-                    CalculateAbilityDamage(damage),
+                    CalculateAbilityDamage(currentDamage),
                     PlayerPhysicsBody.Position,
-                    knockback,
-                    stun,
+                    currentKnockback,
+                    currentStunDurtation,
                     Color.orange));
         }
 
@@ -61,32 +56,17 @@ namespace Gameplay.Mutations.Active
             else
                 basicParticles.Particles.Play();
         }
-
-        protected override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
+        
+        protected override ILevelField[] CreateLevelFields(int lvl)
         {
-            float cd = Scriptable.GetCooldown(lvl);
-            float prevCd = cd;
-            float amount = LerpLevel(amountLvl1, amountLvl10, lvl);
-            float prevAmount = amount;
-            float dmg = LerpLevel(damageLvl1, damageLvl10, lvl);
-            float prevDmg = dmg;            
-            float kb = LerpLevel(knockbackLvl1, knockbackLvl10, lvl);
-            float prevKb = kb;   
-            float stunDur = LerpLevel(stunLvl1, stunLvl10, lvl);
-            float prevStunDur = stunDur;
-
-            if (lvl > 0 && withUpgrade)
+            return new[]
             {
-                var prevLvl = lvl - 1;
-                prevCd = Scriptable.GetCooldown(prevLvl);
-                prevStunDur = LerpLevel(stunLvl1, stunLvl10, prevLvl);
-                prevKb = LerpLevel(knockbackLvl1, knockbackLvl10, prevLvl);
-                prevAmount = LerpLevel(amountLvl1, amountLvl10, prevLvl);
-                prevDmg = LerpLevel(damageLvl1, damageLvl10, prevLvl);
-            }
-            return new object[] { 
-                cd,          amount,              stunDur,               dmg,           kb, 
-                cd - prevCd, amount - prevAmount, stunDur - prevStunDur, dmg - prevDmg, kb - prevKb };
+                Scriptable.Cooldown,
+                amount.UseKey(LevelFieldKeys.PARTICLES_AMOUNT),
+                damage.UseKey(LevelFieldKeys.DAMAGE),
+                knockback.UseKey(LevelFieldKeys.KNOCKBACK),
+                stunDuration.UseKey(LevelFieldKeys.STUN_DURATION).UseFormatter(StatFormatter.SECONDS)
+            };
         }
     }
 }

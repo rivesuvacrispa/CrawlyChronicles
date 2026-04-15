@@ -2,6 +2,8 @@
 using Gameplay.Mutations.AttackEffects;
 using Gameplay.Player;
 using UnityEngine;
+using Util.Abilities;
+using Util.Attributes;
 using Util.Interfaces;
 
 namespace Gameplay.Mutations.Passive
@@ -9,14 +11,21 @@ namespace Gameplay.Mutations.Passive
     public class LifestealingСhelicerae : BasicAbility
     {
         [SerializeField] private Gradient effectGradient;
-        [Header("Lifesteal")] 
-        [SerializeField, Range(0f, 1f)] private float lifestealLvl1;
-        [SerializeField, Range(0f, 1f)] private float lifestealLvl10;
+        [SerializeField, MinMaxRange(0, 1f)] private LevelFloat lifesteal = new LevelFloat(0.5f, 1f);
         
         private AttackEffect attackEffect;
-        private float lifesteal;
+        private float currentLifesteal;
+
         
-        
+
+        protected override ILevelField[] CreateLevelFields(int lvl)
+        {
+            return new[]
+            {
+                lifesteal.UseKey(LevelFieldKeys.LIFESTEAL).UseFormatter(StatFormatter.PERCENT)
+            };
+        }
+
         protected override void Start()
         {
             attackEffect = new AttackEffect(effectGradient, OnImpact);
@@ -26,16 +35,14 @@ namespace Gameplay.Mutations.Passive
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
-            lifesteal = LerpLevel(lifestealLvl1, lifestealLvl10, lvl);
+            currentLifesteal = lifesteal.AtLvl(lvl);
         }
 
         private void OnImpact(IImpactable enemy, float damage)
         {
-            PlayerManager.Instance.AddHealth(damage * lifesteal);
+            PlayerManager.Instance.AddHealth(damage * currentLifesteal);
         }
 
-
-        
         private void OnAttackEffectCollectionRequested(List<AttackEffect> effects) 
             => effects.Add(attackEffect);
         
@@ -50,29 +57,6 @@ namespace Gameplay.Mutations.Passive
             base.OnDisable();
             StopAllCoroutines();
             BasePlayerAttack.OnAttackEffectCollectionRequested -= OnAttackEffectCollectionRequested;
-        }
-        
-        public override string GetLevelDescription(int lvl, bool withUpgrade)
-        {
-            float cd = 0;
-            float prevCd = cd;
-            int ls = (int) (LerpLevel(lifestealLvl1, lifestealLvl10, lvl) * 100);
-            int prevLs = ls;
-
-            if (lvl > 0 && withUpgrade)
-            {
-                var prevLvl = lvl - 1;
-                prevCd = 0;
-                prevLs = (int) (LerpLevel(lifestealLvl1, lifestealLvl10, prevLvl) * 100);
-            }
-
-            var args = new object[]
-            {
-                cd,          ls,
-                cd - prevCd, ls - prevLs
-            };
-            
-            return scriptable.GetStatDescription(args);
         }
     }
 }

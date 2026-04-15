@@ -3,6 +3,8 @@ using Gameplay.Mutations.AttackEffects;
 using Gameplay.Mutations.EntityEffects.Poison;
 using Gameplay.Player;
 using UnityEngine;
+using Util.Abilities;
+using Util.Attributes;
 using Util.Interfaces;
 
 namespace Gameplay.Mutations.Passive
@@ -10,21 +12,25 @@ namespace Gameplay.Mutations.Passive
     public class PoisoningBite : BasicAbility
     {
         [SerializeField] private Gradient effectGradient;
-        [Header("Poison damage")]
-        [SerializeField] private float totalDamageLvl1;
-        [SerializeField] private float totalDamageLvl10;        
-        [Header("Slow effect")]
-        [SerializeField, Range(0, 1)] private float slowLvl1;
-        [SerializeField, Range(0, 1)] private float slowLvl10;
-        [Header("Duration")] 
-        [SerializeField] private int durationLvl1;
-        [SerializeField] private int durationLvl10;
+        [SerializeField, MinMaxRange(0, 10)] private LevelFloat totalDamage = new LevelFloat(1.5f, 10f);
+        [SerializeField, MinMaxRange(0, 1)] private LevelFloat slow = new LevelFloat(0.25f, 0.85f);
+        [SerializeField, MinMaxRange(0, 10)] private LevelInt duration = new LevelInt(4, 8);
 
         private AttackEffect attackEffect;
         private PoisonEffectData effectData;
 
-
         
+
+        protected override ILevelField[] CreateLevelFields(int lvl)
+        {
+            return new[]
+            {
+                totalDamage.UseKey(LevelFieldKeys.DAMAGE),
+                slow.UseKey(LevelFieldKeys.MOVEMENT_SLOW).UseFormatter(StatFormatter.PERCENT),
+                duration.UseKey(LevelFieldKeys.EFFECT_DURATION).UseFormatter(StatFormatter.SECONDS)
+            };
+        }
+
         protected override void Start()
         {
             attackEffect = new AttackEffect(effectGradient, OnImpact);
@@ -34,11 +40,9 @@ namespace Gameplay.Mutations.Passive
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
-            int duration = LerpLevel(durationLvl1, durationLvl10, lvl);
+            int currentDuration = duration.AtLvl(lvl);
             effectData = new PoisonEffectData
-                (duration,
-                LerpLevel(slowLvl1, slowLvl10, lvl),
-                LerpLevel(totalDamageLvl1, totalDamageLvl10, lvl) / duration);
+                (currentDuration, slow.AtLvl(lvl), totalDamage.AtLvl(lvl) / currentDuration);
         }
 
         private void OnImpact(IImpactable impactable, float _)
@@ -60,32 +64,6 @@ namespace Gameplay.Mutations.Passive
         {
             base.OnDisable();
             BasePlayerAttack.OnAttackEffectCollectionRequested -= OnAttackEffectCollectionRequested;
-        }
-        
-        public override string GetLevelDescription(int lvl, bool withUpgrade)
-        {
-            float dmg = LerpLevel(totalDamageLvl1, totalDamageLvl10, lvl);
-            float prevDmg = dmg;
-            int slw = (int) (LerpLevel(slowLvl1, slowLvl10, lvl) * 100);
-            int prevSlw = slw;
-            float dur = LerpLevel(durationLvl1, durationLvl10, lvl);
-            float prevDur = dur;
-
-            if (lvl > 0 && withUpgrade)
-            {
-                var prevLvl = lvl - 1;
-                prevDmg = LerpLevel(totalDamageLvl1, totalDamageLvl10, prevLvl);
-                prevSlw = (int) (LerpLevel(slowLvl1, slowLvl10, prevLvl) * 100);
-                prevDur = LerpLevel(durationLvl1, durationLvl10, prevLvl);
-            }
-            
-            var args = new object[]
-            {
-                dur,           dmg,           slw,         
-                dur - prevDur, dmg - prevDmg, slw - prevSlw
-            };
-            
-            return scriptable.GetStatDescription(args);
         }
     }
 }

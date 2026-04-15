@@ -3,8 +3,9 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Gameplay.Player;
 using Hitboxes;
-using UI.Menus;
 using UnityEngine;
+using Util.Abilities;
+using Util.Attributes;
 using Util.Interfaces;
 
 namespace Gameplay.Mutations.Active
@@ -12,20 +13,14 @@ namespace Gameplay.Mutations.Active
     public class ReflectiveChitin : ActiveAbility, IDamageSource
     {
         [SerializeField] private new ParticleSystem particleSystem;
-        
-        [Header("Passive Reflection")]
-        [SerializeField, Range(0f, 2f)] private float reflectionLvl1;
-        [SerializeField, Range(0f, 2f)] private float reflectionLvl10;
-        [Header("Active Reflection Multiplier")] 
-        [SerializeField, Range(0f, 2f)] private float bonusReflectionLvl1;
-        [SerializeField, Range(0f, 2f)] private float bonusReflectionLvl10;
-        [Header("Active Effect Duration")] 
-        [SerializeField, Range(1f, 10f)] private float activeEffectDurationLvl1;
-        [SerializeField, Range(1f, 10f)] private float activeEffectDurationLvl10;
+        [SerializeField, MinMaxRange(0f, 2f)] private LevelFloat reflection = new LevelFloat(0.25f, 1f);
+        [SerializeField, MinMaxRange(0f, 2f)] private LevelFloat bonusReflection = new LevelFloat(0.1f, 1f);
+        [SerializeField, MinMaxRange(0f, 10f)] private LevelFloat duration = new LevelFloat(2.5f, 5f);
 
-        private float reflection;
-        private float bonusReflection = 1f;
-        private float activeEffectDuration;
+        
+        private float currentReflection;
+        private float currentBonusReflection = 1f;
+        private float currentDuration;
         private ParticleSystem.MainModule main;
         private ParticleSystem.MinMaxCurve initialParticleSize;
         
@@ -71,7 +66,7 @@ namespace Gameplay.Mutations.Active
                 particleSystem.Play();
                 enemy.Damage(new DamageInstance(
                     new DamageSource(this, Time.frameCount), 
-                    instance.Damage * ((1 + bonusReflection) * reflection), piercing: true)
+                    instance.Damage * ((1 + currentBonusReflection) * currentReflection), piercing: true)
                 );
             }
         }
@@ -79,8 +74,8 @@ namespace Gameplay.Mutations.Active
         public override void OnLevelChanged(int lvl)
         {
             base.OnLevelChanged(lvl);
-            reflection = LerpLevel(reflectionLvl1, reflectionLvl10, lvl);
-            activeEffectDuration = LerpLevel(activeEffectDurationLvl1, activeEffectDurationLvl10, lvl);
+            currentReflection = reflection.AtLvl(lvl);
+            currentDuration = duration.AtLvl(lvl);
         }
 
         public override void Activate(bool auto = false)
@@ -93,19 +88,25 @@ namespace Gameplay.Mutations.Active
         {
             main.loop = true;
             particleSystem.Play();
-            bonusReflection = LerpLevel(bonusReflectionLvl1, bonusReflectionLvl10, Level);
+            currentBonusReflection = bonusReflection.AtLvl(level);
             
-            await UniTask.Delay(TimeSpan.FromSeconds(activeEffectDuration), cancellationToken: cancellationToken)
+            await UniTask.Delay(TimeSpan.FromSeconds(currentDuration), cancellationToken: cancellationToken)
                 .SuppressCancellationThrow();
             
-            bonusReflection = 0f;
+            currentBonusReflection = 0f;
             particleSystem.Stop();
             main.loop = false;
         }
 
-        protected override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
+        protected override ILevelField[] CreateLevelFields(int lvl)
         {
-            return null;
+            return new[]
+            {
+                Scriptable.Cooldown,
+                reflection.UseKey(LevelFieldKeys.REFLECTION).UseFormatter(StatFormatter.PERCENT),
+                bonusReflection.UseKey(LevelFieldKeys.BONUS_REFLECTION).UseFormatter(StatFormatter.PERCENT),
+                duration.UseKey(LevelFieldKeys.EFFECT_DURATION).UseFormatter(StatFormatter.SECONDS)
+            };
         }
     }
 }

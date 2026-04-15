@@ -2,42 +2,28 @@
 using Gameplay.Player;
 using Pooling;
 using UnityEngine;
+using Util.Abilities;
+using Util.Attributes;
 
 namespace Gameplay.Mutations.Active
 {
     public class Cucumberbardier : ActiveAbility
     {
-        // TODO: ability description & icon
-        [Header("Spontaneous Explosion Chance")] 
-        [SerializeField, Range(0, 1)] protected float explosionChanceLv1;
-        [SerializeField, Range(0, 1)] protected float explosionChanceLv10;
-        [Header("Explosion Damage")] 
-        [SerializeField, Range(1f, 10f)] private float explosionDamageLvl1;
-        [SerializeField, Range(1f, 10f)] private float explosionDamageLvl10;
-        [Header("Explosion Range")] 
-        [SerializeField, Range(1f, 5f)] private float explosionRangeLvl1;
-        [SerializeField, Range(1f, 5f)] private float explosionRangeLvl10;
-        [Header("Explosion Power")] 
-        [SerializeField, Range(0.01f, 10f)] private float knockbackLvl1;
-        [SerializeField, Range(0.01f, 10f)] private float knockbackLvl10;
-        [Header("Seeds Amount")] 
-        [SerializeField, Range(1, 20)] private int seedsAmountLvl1;
-        [SerializeField, Range(1, 20)] private int seedsAmountLvl10;
-        [Header("Seeds Damage")] 
-        [SerializeField, Range(0.01f, 5)] private float seedsDamageLvl1;
-        [SerializeField, Range(0.01f, 5)] private float seedsDamageLvl10;
-        [Header("Projectile Power")] 
-        [SerializeField, Range(1f, 20f)] private float projectilePowerLv1;
-        [SerializeField, Range(1f, 20f)] private float projectilePowerLv10;
-        
-        
-        private float explosionChance;
-        private int seedsAmount;
-        private float seedsDamage;
-        private float knockback;
-        private float projectilePower;
-        private float explosionDamage;
-        private float explosionRange;
+        [SerializeField, MinMaxRange(0, 1)] private LevelFloat explosionChance = new LevelFloat(new Vector2(0.05f, 0.2f));
+        [SerializeField, MinMaxRange(1f, 10f)] private LevelFloat explosionDamage = new LevelFloat(new Vector2(2f, 10f));
+        [SerializeField, MinMaxRange(1f, 5f)] private LevelFloat explosionRange = new LevelFloat(new Vector2(1f, 2.25f));
+        [SerializeField, MinMaxRange(0.0f, 10f)] private LevelFloat knockback = new LevelFloat(new Vector2(2f, 10f));
+        [SerializeField, MinMaxRange(1, 20)] private LevelInt seedsAmount = new LevelInt(new Vector2Int(5, 15));
+        [SerializeField, MinMaxRange(0.01f, 5f)] private LevelFloat seedsDamage = new LevelFloat(new Vector2(1f, 5f));
+        [SerializeField, MinMaxRange(1f, 20f)] private LevelFloat projectilePower = new LevelFloat(new Vector2(5f, 10f));
+
+        private float currentExplosionChance;
+        private int currentSeedsAmount;
+        private float currentSeedsDamage;
+        private float currentKnockback;
+        private float currentProjectilePower;
+        private float currentExplosionDamage;
+        private float currentExplosionRange;
 
         
         
@@ -45,33 +31,43 @@ namespace Gameplay.Mutations.Active
         {
             base.OnLevelChanged(lvl);
 
-            explosionChance = LerpLevel(explosionChanceLv1, explosionChanceLv10, lvl);
-            seedsAmount = LerpLevel(seedsAmountLvl1, seedsAmountLvl10, lvl);
-            seedsDamage = LerpLevel(seedsDamageLvl1, seedsDamageLvl10, lvl);
-            knockback = LerpLevel(knockbackLvl1, knockbackLvl10, lvl);
-            projectilePower = LerpLevel(projectilePowerLv1, projectilePowerLv10, lvl);
-            explosionDamage = LerpLevel(explosionDamageLvl1, explosionDamageLvl10, lvl);
-            explosionRange = LerpLevel(explosionRangeLvl1, explosionRangeLvl10, lvl);
+            currentExplosionChance = explosionChance.AtLvl(lvl);
+            currentSeedsAmount = seedsAmount.AtLvl(lvl);
+            currentSeedsDamage = seedsDamage.AtLvl(lvl);
+            currentKnockback = knockback.AtLvl(lvl);
+            currentProjectilePower = projectilePower.AtLvl(lvl);
+            currentExplosionDamage = explosionDamage.AtLvl(lvl);
+            currentExplosionRange = explosionRange.AtLvl(lvl);
         }
 
         public override void Activate(bool auto = false)
         {
             base.Activate(auto);
             var cucumber = PoolManager.GetEffect<WildCucumberProjectile>(new WildCucumberArguments(
-                explosionChance, seedsAmount, 
-                seedsDamage, knockback, 
+                currentExplosionChance, currentSeedsAmount, 
+                currentSeedsDamage, currentKnockback, 
                 PlayerManager.Instance.Transform.up, 
-                projectilePower,
-                explosionDamage, explosionRange, instant: AttackController.IsInComboDash
+                currentProjectilePower,
+                currentExplosionDamage, currentExplosionRange, instant: AttackController.IsInComboDash
             ), position: transform.position);
             
             if (AttackController.IsInComboDash)
                 cucumber.Explode();
         }
 
-        protected override object[] GetDescriptionArguments(int lvl, bool withUpgrade)
+        protected override ILevelField[] CreateLevelFields(int lvl)
         {
-            return default;
+            return new[]
+            {
+                Scriptable.Cooldown,
+                explosionChance.UseKey(LevelFieldKeys.EXPLOSION_CHANCE).UseFormatter(StatFormatter.PERCENT),
+                seedsAmount.UseKey(LevelFieldKeys.SEEDS_AMOUNT),
+                seedsDamage.UseKey(LevelFieldKeys.SEEDS_DAMAGE),
+                knockback.UseKey(LevelFieldKeys.KNOCKBACK),
+                projectilePower.UseKey(LevelFieldKeys.THROW_POWER),
+                explosionDamage.UseKey(LevelFieldKeys.EXPLOSION_DAMAGE),
+                explosionRange.UseKey(LevelFieldKeys.EXPLOSION_RANGE),
+            };
         }
     }
 }

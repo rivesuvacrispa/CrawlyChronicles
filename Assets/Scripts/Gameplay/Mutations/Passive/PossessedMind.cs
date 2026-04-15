@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using Util.Abilities;
 
 namespace Gameplay.Mutations.Passive
 {
@@ -21,6 +23,11 @@ namespace Gameplay.Mutations.Passive
             ConsumingDamage = LerpLevel(damageLvl1, damageLvl10, lvl);
         }
 
+        protected override ILevelField[] CreateLevelFields(int lvl)
+        {
+            return Array.Empty<ILevelField>();
+        }
+
         protected override void OnEnable()
         {
             base.OnEnable();
@@ -31,22 +38,6 @@ namespace Gameplay.Mutations.Passive
         {
             base.OnDisable();
             Enabled = false;
-        }
-        
-        public override string GetLevelDescription(int lvl, bool withUpgrade)
-        {
-            float dmg = LerpLevel(damageLvl1, damageLvl10, lvl);
-            float prevDmg = dmg;
-
-            if (lvl > 0 && withUpgrade) 
-                prevDmg = LerpLevel(damageLvl1, damageLvl10, lvl - 1);
-            
-            var args = new object[]
-            {
-                dmg, 
-                dmg - prevDmg
-            };
-            return scriptable.GetStatDescription(args);
         }
     }
 }

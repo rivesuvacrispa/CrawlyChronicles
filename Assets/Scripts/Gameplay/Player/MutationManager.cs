@@ -71,6 +71,8 @@ namespace Gameplay.Player
 
         private int GetRandomMutationAmount()
         {
+            return 20;
+            
             float bonusChance = PlayerManager.PlayerStats.Mutagenicity;
             int amount = Random.Range(randomAmountBounds.x, randomAmountBounds.y + 1);
 
@@ -91,7 +93,6 @@ namespace Gameplay.Player
 
         public Dictionary<BasicMutation, int> GetRandomVariants()
         {
-            // TODO: remove ones that are out of slots
             // Dictionary of mutation + lvl of final given variants
             Dictionary<BasicMutation, int> variants = new();
             HashSet<BasicMutation> maxed = new();

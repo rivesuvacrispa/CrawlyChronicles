@@ -14,7 +14,7 @@ namespace Gameplay.Effects.LilHorror
             if (col.TryGetComponent(out DamageableEnemyHitbox hitbox) && hitbox.Damageable is not NeutralAnt)
                 hitbox.Damageable.Damage(
                     new DamageSource(this),
-                    BasicAbility.CalculateSummonDamage(LegTremor.ContactDamage),
+                    BasicAbility.CalculateSummonDamage(LegTremor.CurrentContactDamage),
                     transform.position
                 );
         }
