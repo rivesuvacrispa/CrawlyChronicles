@@ -74,6 +74,9 @@ namespace Hitboxes
                 foreach (AttackEffect effect in instance.effects.ToArray())
                     effect.Impact(impactable, damage);
 
+            if (this is Component c)
+                Debug.Log($"{c.gameObject.name} damaged for {damage}");
+            
             return damage;
         }
 

@@ -6,11 +6,8 @@ namespace Gameplay.Player
 {
     public class BreedingAnimator : MonoBehaviour
     {
-        [SerializeField] private Animator animator;
         [SerializeField] private ParticleSystem breedingParticles;
         
-        private readonly int breedAnimHash = Animator.StringToHash("PlayerBodyBreeding");
-        private readonly int idleAnimHash = Animator.StringToHash("PlayerBodyIdle");
 
 
         private void OnEnable()
@@ -42,13 +39,13 @@ namespace Gameplay.Player
 
         private void PlayBreedingAnimation()
         {
-            animator.Play(breedAnimHash);
+            PlayerBodyAnimator.PlayBreed();
             PlayParticles();
         }
 
         private void PlayIdleAnimation()
         {
-            animator.Play(idleAnimHash);
+            PlayerBodyAnimator.PlayIdle();
             StopParticles();
         }
     }

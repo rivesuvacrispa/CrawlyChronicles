@@ -76,5 +76,7 @@
         public static readonly LevelFieldKey HEALTH_AMOUNT = new LevelFieldKey("health_amount");
         public static readonly LevelFieldKey JUMPS_AMOUNT = new LevelFieldKey("number_of_jumps");
         public static readonly LevelFieldKey JUMP_DAMAGE_REDUCTION = new LevelFieldKey("damage_reduction_per_jump");
+        public static readonly LevelFieldKey MAX_HONEY = new LevelFieldKey("max_honey");
+        public static readonly LevelFieldKey HEALTH_PER_POLLINATION = new LevelFieldKey("health_per_pollination");
     }
 }

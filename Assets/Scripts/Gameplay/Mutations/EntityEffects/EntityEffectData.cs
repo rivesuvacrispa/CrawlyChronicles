@@ -4,9 +4,9 @@
     {
         public int DurationInSeconds { get; }
 
-        public EntityEffectData(int durationInSecondsInSeconds)
+        public EntityEffectData(int durationInSeconds)
         {
-            DurationInSeconds = durationInSecondsInSeconds;
+            DurationInSeconds = durationInSeconds;
         }
     }
 }

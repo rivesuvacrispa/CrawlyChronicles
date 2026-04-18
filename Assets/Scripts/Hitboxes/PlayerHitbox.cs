@@ -48,9 +48,9 @@ namespace Hitboxes
         public bool Dead { get; private set; }
         public bool ImmuneToSource(DamageSource source)
         {
-            Component owner = (Component)source.owner;
             bool state = Dead || Immune.State;
-            Debug.Log($"Player hitbox immune to source {owner?.gameObject.name ?? "NO OWNER"}: {state}");
+            if (source.owner is Component c)
+                Debug.Log($"Player hitbox immune to source {c.gameObject.name}: {state}");
             return state;
         }
 

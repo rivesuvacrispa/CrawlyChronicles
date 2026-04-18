@@ -13,11 +13,13 @@ namespace Gameplay.Mutations.EntityEffects
         private float DurationInSeconds { get; set; }
         protected IEffectAffectable Target { get; set; }
 
-        private TimeSpan tickrate = TimeSpan.FromSeconds(0.25f);
+        protected const float TICKRATE = 0.25f;
+        protected const float TICKS_PER_SECOND = 1f / TICKRATE;
 
         protected abstract void OnApplied();
         protected abstract void Tick();
         protected abstract void OnRemoved();
+        protected virtual void OnRefreshed(EntityEffectData data){ }
         protected int TickCounter { get; private set; }
         protected int refreshedOnTick;
         
@@ -33,6 +35,7 @@ namespace Gameplay.Mutations.EntityEffects
             DurationInSeconds = data.DurationInSeconds;
             enabled = true;
             refreshedOnTick = TickCounter;
+            OnRefreshed(data);
         }
 
         public void Cancel()
@@ -45,18 +48,20 @@ namespace Gameplay.Mutations.EntityEffects
             await UniTask.DelayFrame(1, cancellationToken: cancellationToken);
             OnApplied();
 
+            TimeSpan delay = TimeSpan.FromSeconds(TICKRATE);
             while (enabled)
             {
-                await UniTask.Delay(tickrate, cancellationToken: cancellationToken);
+                await UniTask.Delay(delay, cancellationToken: cancellationToken);
                 
                 if (DurationInSeconds <= 0 && refreshedOnTick != TickCounter)
                 {
-                    enabled = false;
+                    Cancel();
+                    break;
                 }
 
                 Tick();
                 TickCounter++;
-                DurationInSeconds -= tickrate.Milliseconds / 1000f;
+                DurationInSeconds -= TICKRATE;
             }
         }
 

@@ -365,7 +365,10 @@ namespace Gameplay.Enemies
         {
             OnDamageTaken?.Invoke(this, instance);
             attackDelay = 1f;
-            StopAttack();
+            
+            if (instance.stunDuration > 0 || instance.knockback > 0)
+                StopAttack();
+            
             DamageTaken();
         }
 

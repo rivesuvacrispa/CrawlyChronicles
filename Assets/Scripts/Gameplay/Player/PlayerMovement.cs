@@ -77,7 +77,6 @@ namespace Gameplay.Player
         private void Move(Vector2 direction)
         {
             rb.AddForce(direction * (PlayerManager.PlayerStats.MovementSpeed * MoveSpeedAmplifier), movementProvider.ForceMode);
-
         }
 
         private void PlayCrawl()
@@ -90,6 +89,7 @@ namespace Gameplay.Player
         {
             PlayerAudioController.Instance.StopState();
             PlayerAnimator.PlayIdle();
+            PlayerBodyAnimator.PlayIdle();
         }
         
         public void Knockback(Vector2 attacker, float force)
